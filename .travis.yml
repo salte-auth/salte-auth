@@ -15,7 +15,7 @@ before_script:
 script:
   - npm run test
   - npm run build
-# after_success:
+after_success:
 # TODO: Add coverage support
 #   - npm run report-coverage
-  # - npm run semantic-release
+  - npm run semantic-release
