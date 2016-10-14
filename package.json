@@ -1,6 +1,6 @@
 {
   "name": "salte-auth",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/salte-auth.js",
   "description": "Test",
   "homepage": "https://github.com/salte-io/salte-auth",
@@ -45,6 +45,7 @@
     "jasmine-core": "2.4.1",
     "karma": "1.2.0",
     "karma-coverage": "1.1.1",
+    "karma-firefox-launcher": "^1.0.0",
     "karma-jasmine": "1.0.2",
     "karma-mocha-reporter": "2.1.0",
     "karma-phantomjs-launcher": "1.0.1",

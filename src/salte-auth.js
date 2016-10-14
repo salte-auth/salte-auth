@@ -1,37 +1,15 @@
-// ----------------------------------------------------------------------
-// AdalJS v1.0.12
-// @preserve Copyright (c) Microsoft Open Technologies, Inc.
-// All Rights Reserved
-// Apache License 2.0
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// ----------------------------------------------------------------------
-/* global window: false, document: false, localStorage: false, sessionStorage: false, Logging: false */
+/* global Logging: false */
 
 var AuthenticationContext = (function() {
   'use strict';
 
     /**
-     * Config information.  The base instance URL is derived as instance/tenant/rootContext.
-     *                      For example, https://login.microsoftonline.com/common/oauth2.
      * @public
      * @class Config
-     * @property {tenant}          Your target tenant.  This defaults to 'common' if undefined or null.  This is incorporated into the instance URL if non-blank.
      * @property {clientId}        Identifier assigned to your app by Azure Active Directory
      * @property {redirectUri}     Endpoint at which you expect to receive tokens
-     * @property {instance}        Azure Active Directory Instance(default:https://login.microsoftonline.com/)
+     * @property {instance}        This is the URL path to the identity provider that authorize and logout will be called against.
      * @property {endpoints}       Collection of {Endpoint-ResourceId} used for autmatically attaching tokens in webApi calls
-     * @property {rootContext}     This defaults to 'oauth2' if undefined or null.  This is incorporated into the instance URL if non-blank.
      * @property {scope}           This may be used to define the specific authorization(s) being requested from the resource owner.
      */
 
@@ -70,20 +48,20 @@ var AuthenticationContext = (function() {
       ERROR_DESCRIPTION: 'error_description',
       SESSION_STATE: 'session_state',
       STORAGE: {
-        TOKEN_KEYS: 'adal.token.keys',
-        ACCESS_TOKEN_KEY: 'adal.access.token.key',
-        EXPIRATION_KEY: 'adal.expiration.key',
-        STATE_LOGIN: 'adal.state.login',
-        STATE_RENEW: 'adal.state.renew',
-        NONCE_IDTOKEN: 'adal.nonce.idtoken',
-        SESSION_STATE: 'adal.session.state',
-        USERNAME: 'adal.username',
-        IDTOKEN: 'adal.idtoken',
-        ERROR: 'adal.error',
-        ERROR_DESCRIPTION: 'adal.error.description',
-        LOGIN_REQUEST: 'adal.login.request',
-        LOGIN_ERROR: 'adal.login.error',
-        RENEW_STATUS: 'adal.token.renew.status'
+        TOKEN_KEYS: 'auth.token.keys',
+        ACCESS_TOKEN_KEY: 'auth.access.token.key',
+        EXPIRATION_KEY: 'auth.expiration.key',
+        STATE_LOGIN: 'auth.state.login',
+        STATE_RENEW: 'auth.state.renew',
+        NONCE_IDTOKEN: 'auth.nonce.idtoken',
+        SESSION_STATE: 'auth.session.state',
+        USERNAME: 'auth.username',
+        IDTOKEN: 'auth.idtoken',
+        ERROR: 'auth.error',
+        ERROR_DESCRIPTION: 'auth.error.description',
+        LOGIN_REQUEST: 'auth.login.request',
+        LOGIN_ERROR: 'auth.login.error',
+        RENEW_STATUS: 'auth.token.renew.status'
       },
       RESOURCE_DELIMETER: '|',
       LOADFRAME_TIMEOUT: '6000',
@@ -106,13 +84,12 @@ var AuthenticationContext = (function() {
       POPUP_HEIGHT: 600
     };
 
-    if (AuthenticationContext.prototype._singletonInstance) {
-      return AuthenticationContext.prototype._singletonInstance;
+    if (window.AuthenticationContext) {
+      return window.AuthenticationContext;
     }
-    AuthenticationContext.prototype._singletonInstance = this;
+    window.AuthenticationContext = this;
 
-        // public
-    this.instance = 'https://login.microsoftonline.com/';
+    // public
     this.config = {};
     this.callback = null;
     this.popUp = false;
@@ -146,8 +123,8 @@ var AuthenticationContext = (function() {
       this.callback = this.config.callback;
     }
 
-    if (this.config.instance) {
-      this.instance = this.config.instance;
+    if (!this.config.instance || !this.config.instance.match(/^https:\/\/.*\/$/)) {
+      throw new Error('instance must be a valid https endpoint that ends in a forward slash.');
     }
 
         // App can request idtoken for itself using clientid as resource
@@ -167,11 +144,13 @@ var AuthenticationContext = (function() {
       this.isAngular = this.config.isAngular;
     }
 
-    this._initResponseType();
+    this.setResponseType(this.config.responseType);
   };
 
-  AuthenticationContext.prototype._initResponseType = function() {
-    if (!this.config.responseType) {
+  AuthenticationContext.prototype.setResponseType = function(responseType) {
+    if (responseType) {
+      this.config.responseType = responseType;
+    } else {
       this.config.responseType = this.CONSTANTS.ID_TOKEN;
     }
   };
@@ -368,7 +347,7 @@ var AuthenticationContext = (function() {
         // use iframe to try refresh token
         // use given resource to create new authz url
     this.info('renewToken is called for resource:' + resource);
-    var frameHandle = this._addAdalFrame('adalRenewFrame' + resource);
+    var frameHandle = this._addAuthFrame('authRenewFrame' + resource);
     var expectedState = this._guid() + '|' + resource;
     this.config.state = expectedState;
         // renew happens in iframe, so it keeps javascript context
@@ -382,13 +361,13 @@ var AuthenticationContext = (function() {
     this.verbose('Navigate to:' + urlNavigate);
     this._saveItem(this.CONSTANTS.STORAGE.LOGIN_REQUEST, '');
     frameHandle.src = 'about:blank';
-    this._loadFrameTimeout(urlNavigate, 'adalRenewFrame' + resource, resource);
+    this._loadFrameTimeout(urlNavigate, 'authRenewFrame' + resource, resource);
   };
 
   AuthenticationContext.prototype._renewIdToken = function(callback) {
         // use iframe to try refresh token
     this.info('renewIdToken is called');
-    var frameHandle = this._addAdalFrame('adalIdTokenFrame');
+    var frameHandle = this._addAuthFrame('authIdTokenFrame');
     var expectedState = this._guid() + '|' + this.config.clientId;
     this._idTokenNonce = this._guid();
     this._saveItem(this.CONSTANTS.STORAGE.NONCE_IDTOKEN, this._idTokenNonce);
@@ -406,7 +385,7 @@ var AuthenticationContext = (function() {
     this.verbose('Navigate to:' + urlNavigate);
     this._saveItem(this.CONSTANTS.STORAGE.LOGIN_REQUEST, '');
     frameHandle.src = 'about:blank';
-    this._loadFrameTimeout(urlNavigate, 'adalIdTokenFrame', this.config.clientId);
+    this._loadFrameTimeout(urlNavigate, 'authIdTokenFrame', this.config.clientId);
   };
 
   AuthenticationContext.prototype._urlContainsQueryStringParameter = function(name, url) {
@@ -444,7 +423,7 @@ var AuthenticationContext = (function() {
     self.info('LoadFrame: ' + frameName);
     var frameCheck = frameName;
     setTimeout(function() {
-      var frameHandle = self._addAdalFrame(frameCheck);
+      var frameHandle = self._addAuthFrame(frameCheck);
       if (frameHandle.src === '' || frameHandle.src === 'about:blank') {
         frameHandle.src = urlNavigate;
         self._loadFrame(urlNavigate, frameCheck);
@@ -557,7 +536,7 @@ var AuthenticationContext = (function() {
       logout = 'post_logout_redirect_uri=' + encodeURIComponent(this.config.postLogoutRedirectUri);
     }
 
-    var urlNavigate = this._getBaseUrl() + 'logout?' + logout;
+    var urlNavigate = this.config.instance + 'logout?' + logout;
     this.info('Logout navigate to: ' + urlNavigate);
     this.promptUser(urlNavigate);
   };
@@ -763,7 +742,7 @@ var AuthenticationContext = (function() {
 
         // external api requests may have many renewtoken requests for different resource
         if (!requestInfo.stateMatch && window.parent && window.parent.AuthenticationContext) {
-          var statesInParentContext = window.parent.AuthenticationContext()._renewStates;
+          var statesInParentContext = window.parent.AuthenticationContext._renewStates;
           for (var i = 0; i < statesInParentContext.length; i++) {
             if (statesInParentContext[i] === requestInfo.stateResponse) {
               requestInfo.requestType = this.REQUEST_TYPE.RENEW_TOKEN;
@@ -954,37 +933,12 @@ var AuthenticationContext = (function() {
   };
 
   AuthenticationContext.prototype._getNavigateUrl = function(responseType, resource) {
-    var urlNavigate = this._getBaseUrl() + 'authorize' + this._serialize(responseType, this.config, resource) + this._addLibMetadata();
+    var urlNavigate = this.config.instance + 'authorize' + this._serialize(responseType, this.config, resource) + this._addLibMetadata();
     if (this.config.scope) {
       urlNavigate += '&scope=' + encodeURIComponent(this.config.scope);
     }
     this.info('Navigate url:' + urlNavigate);
     return urlNavigate;
-  };
-
-  AuthenticationContext.prototype._getBaseUrl = function() {
-    var tenant = 'common';
-    var rootContext = 'oauth2';
-
-    var baseUrl = this.instance;
-
-    if ([undefined, null].indexOf(this.config.tenant) === -1) {
-      tenant = this.config.tenant;
-    }
-
-    if ([undefined, null].indexOf(this.config.rootContext) === -1) {
-      rootContext = this.config.rootContext;
-    }
-
-    if (tenant) {
-      baseUrl += tenant + '/';
-    }
-
-    if (rootContext) {
-      baseUrl += rootContext + '/';
-    }
-
-    return baseUrl;
   };
 
   AuthenticationContext.prototype._extractIdToken = function(encodedIdToken) {
@@ -1067,7 +1021,7 @@ var AuthenticationContext = (function() {
     return decoded;
   };
 
-    // Adal.node js crack function
+    // Auth.node js crack function
   AuthenticationContext.prototype._decodeJwt = function(jwtToken) {
     if (this._isEmpty(jwtToken)) {
       return null;
@@ -1212,15 +1166,15 @@ var AuthenticationContext = (function() {
     return Math.round(new Date().getTime() / 1000.0);
   };
 
-  AuthenticationContext.prototype._addAdalFrame = function(iframeId) {
+  AuthenticationContext.prototype._addAuthFrame = function(iframeId) {
     if (typeof iframeId === 'undefined') {
       return;
     }
 
-    this.info('Add adal frame to document:' + iframeId);
-    var adalFrame = document.getElementById(iframeId);
+    this.info('Add auth frame to document:' + iframeId);
+    var authFrame = document.getElementById(iframeId);
 
-    if (!adalFrame) {
+    if (!authFrame) {
       if (document.createElement && document.documentElement &&
                 (window.opera || window.navigator.userAgent.indexOf('MSIE 5.0') === -1)) {
         var ifr = document.createElement('iframe');
@@ -1229,16 +1183,16 @@ var AuthenticationContext = (function() {
         ifr.style.position = 'absolute';
         ifr.style.width = ifr.style.height = ifr.borderWidth = '0px';
 
-        adalFrame = document.getElementsByTagName('body')[0].appendChild(ifr);
+        authFrame = document.getElementsByTagName('body')[0].appendChild(ifr);
       } else if (document.body && document.body.insertAdjacentHTML) {
         document.body.insertAdjacentHTML('beforeEnd', '<iframe name="' + iframeId + '" id="' + iframeId + '" style="display:none"></iframe>');
       }
       if (window.frames && window.frames[iframeId]) {
-        adalFrame = window.frames[iframeId];
+        authFrame = window.frames[iframeId];
       }
     }
 
-    return adalFrame;
+    return authFrame;
   };
 
   AuthenticationContext.prototype._saveItem = function(key, obj) {
