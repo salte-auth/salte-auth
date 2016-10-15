@@ -1,6 +1,6 @@
 {
   "name": "salte-auth",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "dist/salte-auth.js",
   "description": "Test",
   "homepage": "https://github.com/salte-io/salte-auth",
@@ -19,17 +19,20 @@
     "url": "https://github.com/salte-io/salte-auth.git"
   },
   "scripts": {
-    "test": "jasmine tests/salte-auth/salte-auth.spec.js",
-    "build": "webpack --progress --colors -p",
+    "lint": "eslint src/salte-auth.js tests/salte-auth/salte-auth.spec.js",
+    "test": "babel-node tests/index.js",
+    "build": "webpack --progress --colors -d",
+    "build:prod": "webpack --progress --colors -p",
     "tdd": "karma start",
     "check-coverage": "istanbul check-coverage --statements 93 --branches 89 --functions 92 --lines 92",
     "report-coverage": "coveralls < coverage/lcov.info",
     "publish-latest": "publish-latest --user-email nick+salte-bot@salte.io --user-name salte-bot",
-    "semantic-release": "semantic-release pre && npm run build && npm publish && npm run publish-latest && semantic-release post"
+    "semantic-release": "semantic-release pre && npm run build:prod && npm publish && npm run publish-latest && semantic-release post"
   },
   "license": "MIT",
   "devDependencies": {
     "atob": "1.1.2",
+    "babel-cli": "6.16.0",
     "babel-core": "6.13.2",
     "babel-loader": "6.2.5",
     "babel-preset-es2015": "6.13.2",

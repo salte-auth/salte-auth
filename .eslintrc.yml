@@ -5,13 +5,18 @@ env:
   worker: true
 globals:
   angular: true
+  Logging: true
 rules:
   max-nested-callbacks: 0
   no-warning-comments: 0
   require-jsdoc: 0
-  camelcase: 0
   max-len: 0
   object-curly-spacing: 0
   one-var: 0
   arrow-parens: 0
   new-cap: 0
+  camelcase: 0
+  no-var: 2
+  prefer-const: 2
+  no-confusing-arrow: 2
+  prefer-arrow-callback: 2

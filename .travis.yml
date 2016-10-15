@@ -1,21 +1,18 @@
 sudo: false
 language: node_js
-node_js:
-- 6.3
+node_js: node
 cache:
   directories:
-  - node_modules
+    - node_modules
 branches:
   only:
     - master
-notifications:
-  email: false
 before_script:
   - npm prune
 script:
+  - npm run lint
   - npm run test
-  - npm run build
 after_success:
-# TODO: Add coverage support
-#   - npm run report-coverage
   - npm run semantic-release
+notifications:
+  email: change
