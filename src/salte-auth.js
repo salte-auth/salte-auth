@@ -1,46 +1,41 @@
-/* global Logging: false */
+/**
+ * @public
+ * @class Config
+ * @property {clientId}        Identifier assigned to your app by Azure Active Directory
+ * @property {redirectUri}     Endpoint at which you expect to receive tokens
+ * @property {instance}        This is the URL path to the identity provider that authorize and logout will be called against.
+ * @property {endpoints}       Collection of {Endpoint-ResourceId} used for autmatically attaching tokens in webApi calls
+ * @property {scope}           This may be used to define the specific authorization(s) being requested from the resource owner.
+ */
 
-var AuthenticationContext = (function() {
-  'use strict';
+/**
+ * User information from idtoken.
+ *  @class User
+ *  @property {string} userName - username assigned from upn, email, or sub (i.e. subject).
+ *  @property {object} profile - properties parsed from idtoken.
+ */
 
+/**
+ * Creates a new AuthenticationContext object.
+ * @constructor
+ * @param {object}  config               Configuration options for AuthenticationContext
+ */
+export default class AuthenticationContext {
+  constructor(config) {
     /**
-     * @public
-     * @class Config
-     * @property {clientId}        Identifier assigned to your app by Azure Active Directory
-     * @property {redirectUri}     Endpoint at which you expect to receive tokens
-     * @property {instance}        This is the URL path to the identity provider that authorize and logout will be called against.
-     * @property {endpoints}       Collection of {Endpoint-ResourceId} used for autmatically attaching tokens in webApi calls
-     * @property {scope}           This may be used to define the specific authorization(s) being requested from the resource owner.
-     */
-
-    /**
-     * User information from idtoken.
-     *  @class User
-     *  @property {string} userName - username assigned from upn, email, or sub (i.e. subject).
-     *  @property {object} profile - properties parsed from idtoken.
-     */
-
-    /**
-     * Creates a new AuthenticationContext object.
-     * @constructor
-     * @param {object}  config               Configuration options for AuthenticationContext
-     *
-     **/
-  AuthenticationContext = function(config) {
-        /**
-         * Enum for request type
-         * @enum {string}
-         */
+    * Enum for request type
+    * @enum {string}
+    */
     this.REQUEST_TYPE = {
       LOGIN: 'LOGIN',
       RENEW_TOKEN: 'RENEW_TOKEN',
       UNKNOWN: 'UNKNOWN'
     };
 
-        /**
-         * Enum for storage constants
-         * @enum {string}
-         */
+    /**
+    * Enum for storage constants
+    * @enum {string}
+    */
     this.CONSTANTS = {
       ACCESS_TOKEN: 'access_token',
       EXPIRES_IN: 'expires_in',
@@ -95,7 +90,7 @@ var AuthenticationContext = (function() {
     this.popUp = false;
     this.isAngular = false;
 
-        // private
+    // private
     this._user = null;
     this._activeRenewals = {};
     this._loginInProgress = false;
@@ -104,7 +99,7 @@ var AuthenticationContext = (function() {
     window.callBackMappedToRenewStates = {};
     window.callBacksMappedToRenewStates = {};
 
-        // validate before constructor assignments
+    // validate before constructor assignments
     if (config.displayCall && typeof config.displayCall !== 'function') {
       throw new Error('displayCall is not a function');
     }
@@ -127,7 +122,7 @@ var AuthenticationContext = (function() {
       throw new Error('instance must be a valid https endpoint that ends in a forward slash.');
     }
 
-        // App can request idtoken for itself using clientid as resource
+    // App can request idtoken for itself using clientid as resource
     if (!this.config.loginResource) {
       this.config.loginResource = this.config.clientId;
     }
@@ -145,33 +140,24 @@ var AuthenticationContext = (function() {
     }
 
     this.setResponseType(this.config.responseType);
-  };
+  }
 
-  AuthenticationContext.prototype.setResponseType = function(responseType) {
-    if (responseType) {
-      this.config.responseType = responseType;
-    } else {
-      this.config.responseType = this.CONSTANTS.ID_TOKEN;
-    }
-  };
-
-  window.Logging = {
-    level: 0,
-    log: function(message) { }  // jshint ignore:line
-  };
+  setResponseType(responseType) {
+    this.config.responseType = responseType || this.CONSTANTS.ID_TOKEN;
+  }
 
   /**
    * Gets initial Idtoken for the app backend
    * Saves the resulting Idtoken in localStorage.
    * @param {string} startPage the start page
    */
-  AuthenticationContext.prototype.login = function(startPage) {
+  login(startPage) {
     // Token is not present and user needs to login
     if (this._loginInProgress) {
       this.info('Login in progress');
       return;
     }
-    var expectedState = this._guid();
+    const expectedState = this._guid();
     this.config.state = expectedState;
     this._idTokenNonce = this._guid();
     if (!startPage) {
@@ -184,7 +170,7 @@ var AuthenticationContext = (function() {
     this._saveItem(this.CONSTANTS.STORAGE.NONCE_IDTOKEN, this._idTokenNonce);
     this._saveItem(this.CONSTANTS.STORAGE.ERROR, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION, '');
-    var urlNavigate = this._getNavigateUrl(this.config.responseType, null) + '&nonce=' + encodeURIComponent(this._idTokenNonce);
+    const urlNavigate = this._getNavigateUrl(this.config.responseType, null) + '&nonce=' + encodeURIComponent(this._idTokenNonce);
     this._loginInProgress = true;
     if (this.popUp) {
       this._loginPopup(urlNavigate);
@@ -196,26 +182,26 @@ var AuthenticationContext = (function() {
     } else {
       this.promptUser(urlNavigate);
     }
-  };
+  }
 
-  AuthenticationContext.prototype._openPopup = function(urlNavigate, title, popUpWidth, popUpHeight) {
+  _openPopup(urlNavigate, title, popUpWidth, popUpHeight) {
     try {
-            /**
-            * adding winLeft and winTop to account for dual monitor
-            * using screenLeft and screenTop for IE8 and earlier
-            */
-      var winLeft = window.screenLeft ? window.screenLeft : window.screenX;
-      var winTop = window.screenTop ? window.screenTop : window.screenY;
-            /**
-            * window.innerWidth displays browser window's height and width excluding toolbars
-            * using document.documentElement.clientWidth for IE8 and earlier
-            */
-      var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-      var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-      var left = ((width / 2) - (popUpWidth / 2)) + winLeft;
-      var top = ((height / 2) - (popUpHeight / 2)) + winTop;
+      /**
+      * adding winLeft and winTop to account for dual monitor
+      * using screenLeft and screenTop for IE8 and earlier
+      */
+      const winLeft = window.screenLeft ? window.screenLeft : window.screenX;
+      const winTop = window.screenTop ? window.screenTop : window.screenY;
+      /**
+      * window.innerWidth displays browser window's height and width excluding toolbars
+      * using document.documentElement.clientWidth for IE8 and earlier
+      */
+      const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      const height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+      const left = ((width / 2) - (popUpWidth / 2)) + winLeft;
+      const top = ((height / 2) - (popUpHeight / 2)) + winTop;
 
-      var popupWindow = window.open(urlNavigate, title, 'width=' + popUpWidth + ', height=' + popUpHeight + ', top=' + top + ', left=' + left);
+      const popupWindow = window.open(urlNavigate, title, 'width=' + popUpWidth + ', height=' + popUpHeight + ', top=' + top + ', left=' + left);
       if (popupWindow.focus) {
         popupWindow.focus();
       }
@@ -225,10 +211,10 @@ var AuthenticationContext = (function() {
       this._loginInProgress = false;
       return null;
     }
-  };
+  }
 
-  AuthenticationContext.prototype._loginPopup = function(urlNavigate) {
-    var popupWindow = this._openPopup(urlNavigate, 'login', this.CONSTANTS.POPUP_WIDTH, this.CONSTANTS.POPUP_HEIGHT);
+  _loginPopup(urlNavigate) {
+    const popupWindow = this._openPopup(urlNavigate, 'login', this.CONSTANTS.POPUP_WIDTH, this.CONSTANTS.POPUP_HEIGHT);
     if (popupWindow === null) {
       this.warn('Popup Window is null. This can happen if you are using IE');
       this._saveItem(this.CONSTANTS.STORAGE.ERROR, 'Error opening popup');
@@ -239,14 +225,14 @@ var AuthenticationContext = (function() {
       }
       return;
     }
-    var registeredRedirectUri;
+    let registeredRedirectUri;
     if (this.config.redirectUri.indexOf('#') === -1) {
       registeredRedirectUri = this.config.redirectUri;
     } else {
       registeredRedirectUri = this.config.redirectUri.split('#')[0];
     }
-    var that = this;
-    var pollTimer = window.setInterval(function() {
+    const that = this;
+    const pollTimer = window.setInterval(() => {
       if (!popupWindow || popupWindow.closed || popupWindow.closed === undefined) {
         that._loginInProgress = false;
         window.clearInterval(pollTimer);
@@ -266,32 +252,32 @@ var AuthenticationContext = (function() {
       } catch (e) {
       }
     }, 20);
-  };
+  }
 
-  AuthenticationContext.prototype.loginInProgress = function() {
+  loginInProgress() {
     return this._loginInProgress;
-  };
+  }
 
-  AuthenticationContext.prototype._hasResource = function(key) {
-    var keys = this._getItem(this.CONSTANTS.STORAGE.TOKEN_KEYS);
+  _hasResource(key) {
+    const keys = this._getItem(this.CONSTANTS.STORAGE.TOKEN_KEYS);
     return keys && !this._isEmpty(keys) && (keys.indexOf(key + this.CONSTANTS.RESOURCE_DELIMETER) > -1);
-  };
+  }
 
-    /**
-     * Gets token for the specified resource from local storage cache
-     * @param {string}   resource A URI that identifies the resource for which the token is valid.
-     * @return {string} token if exists and not expired or null
-     */
-  AuthenticationContext.prototype.getCachedToken = function(resource) {
+  /**
+   * Gets token for the specified resource from local storage cache
+   * @param {string}   resource A URI that identifies the resource for which the token is valid.
+   * @return {string} token if exists and not expired or null
+   */
+  getCachedToken(resource) {
     if (!this._hasResource(resource)) {
       return null;
     }
 
-    var token = this._getItem(this.CONSTANTS.STORAGE.ACCESS_TOKEN_KEY + resource);
-    var expired = this._getItem(this.CONSTANTS.STORAGE.EXPIRATION_KEY + resource);
+    const token = this._getItem(this.CONSTANTS.STORAGE.ACCESS_TOKEN_KEY + resource);
+    const expired = this._getItem(this.CONSTANTS.STORAGE.EXPIRATION_KEY + resource);
 
-        // If expiration is within offset, it will force renew
-    var offset = this.config.expireOffsetSeconds || 120;
+    // If expiration is within offset, it will force renew
+    const offset = this.config.expireOffsetSeconds || 120;
 
     if (expired && (expired > this._now() + offset)) {
       return token;
@@ -299,32 +285,32 @@ var AuthenticationContext = (function() {
     this._saveItem(this.CONSTANTS.STORAGE.ACCESS_TOKEN_KEY + resource, '');
     this._saveItem(this.CONSTANTS.STORAGE.EXPIRATION_KEY + resource, 0);
     return null;
-  };
+  }
 
   /**
    * Retrieves and parse idToken from localstorage
    * @return {User} user object
    */
-  AuthenticationContext.prototype.getCachedUser = function() {
+  getCachedUser() {
     if (this._user) {
       return this._user;
     }
 
-    var idtoken = this._getItem(this.CONSTANTS.STORAGE.IDTOKEN);
+    const idtoken = this._getItem(this.CONSTANTS.STORAGE.IDTOKEN);
     this._user = this._createUser(idtoken);
     return this._user;
-  };
+  }
 
-  AuthenticationContext.prototype.registerCallback = function(expectedState, resource, callback) {
+  registerCallback(expectedState, resource, callback) {
     this._activeRenewals[resource] = expectedState;
     if (!window.callBacksMappedToRenewStates[expectedState]) {
       window.callBacksMappedToRenewStates[expectedState] = [];
     }
-    var self = this;
+    const self = this;
     window.callBacksMappedToRenewStates[expectedState].push(callback);
     if (!window.callBackMappedToRenewStates[expectedState]) {
-      window.callBackMappedToRenewStates[expectedState] = function(message, token) {
-        for (var i = 0; i < window.callBacksMappedToRenewStates[expectedState].length; ++i) {
+      window.callBackMappedToRenewStates[expectedState] = (message, token) => {
+        for (let i = 0; i < window.callBacksMappedToRenewStates[expectedState].length; ++i) {
           try {
             window.callBacksMappedToRenewStates[expectedState][i](message, token);
           } catch (error) {
@@ -336,25 +322,25 @@ var AuthenticationContext = (function() {
         window.callBackMappedToRenewStates[expectedState] = null;
       };
     }
-  };
+  }
 
   /**
    * Acquires access token with hidden iframe
    * @param {string} resource  ResourceUri identifying the target resource
    * @param {string} callback  ResourceUri identifying the target resource
    */
-  AuthenticationContext.prototype._renewToken = function(resource, callback) {
-        // use iframe to try refresh token
-        // use given resource to create new authz url
+  _renewToken(resource, callback) {
+    // use iframe to try refresh token
+    // use given resource to create new authz url
     this.info('renewToken is called for resource:' + resource);
-    var frameHandle = this._addAuthFrame('authRenewFrame' + resource);
-    var expectedState = this._guid() + '|' + resource;
+    const frameHandle = this._addAuthFrame('authRenewFrame' + resource);
+    const expectedState = this._guid() + '|' + resource;
     this.config.state = expectedState;
-        // renew happens in iframe, so it keeps javascript context
+    // renew happens in iframe, so it keeps javascript context
     this._renewStates.push(expectedState);
 
     this.verbose('Renew token Expected state: ' + expectedState);
-    var urlNavigate = this._getNavigateUrl('token', resource) + '&prompt=none';
+    let urlNavigate = this._getNavigateUrl('token', resource) + '&prompt=none';
     urlNavigate = this._addHintParameters(urlNavigate);
 
     this.registerCallback(expectedState, resource, callback);
@@ -362,21 +348,21 @@ var AuthenticationContext = (function() {
     this._saveItem(this.CONSTANTS.STORAGE.LOGIN_REQUEST, '');
     frameHandle.src = 'about:blank';
     this._loadFrameTimeout(urlNavigate, 'authRenewFrame' + resource, resource);
-  };
+  }
 
-  AuthenticationContext.prototype._renewIdToken = function(callback) {
-        // use iframe to try refresh token
+  _renewIdToken(callback) {
+    // use iframe to try refresh token
     this.info('renewIdToken is called');
-    var frameHandle = this._addAuthFrame('authIdTokenFrame');
-    var expectedState = this._guid() + '|' + this.config.clientId;
+    const frameHandle = this._addAuthFrame('authIdTokenFrame');
+    const expectedState = this._guid() + '|' + this.config.clientId;
     this._idTokenNonce = this._guid();
     this._saveItem(this.CONSTANTS.STORAGE.NONCE_IDTOKEN, this._idTokenNonce);
     this.config.state = expectedState;
-        // renew happens in iframe, so it keeps javascript context
+    // renew happens in iframe, so it keeps javascript context
     this._renewStates.push(expectedState);
 
     this.verbose('Renew Idtoken Expected state: ' + expectedState);
-    var urlNavigate = this._getNavigateUrl(this.config.responseType, null) + '&prompt=none';
+    let urlNavigate = this._getNavigateUrl(this.config.responseType, null) + '&prompt=none';
     urlNavigate = this._addHintParameters(urlNavigate);
 
     urlNavigate += '&nonce=' + encodeURIComponent(this._idTokenNonce);
@@ -386,27 +372,27 @@ var AuthenticationContext = (function() {
     this._saveItem(this.CONSTANTS.STORAGE.LOGIN_REQUEST, '');
     frameHandle.src = 'about:blank';
     this._loadFrameTimeout(urlNavigate, 'authIdTokenFrame', this.config.clientId);
-  };
+  }
 
-  AuthenticationContext.prototype._urlContainsQueryStringParameter = function(name, url) {
-        // regex to detect pattern of a ? or & followed by the name parameter and an equals character
-    var regex = new RegExp('[\\?&]' + name + '=');
+  _urlContainsQueryStringParameter(name, url) {
+    // regex to detect pattern of a ? or & followed by the name parameter and an equals character
+    const regex = new RegExp('[\\?&]' + name + '=');
     return regex.test(url);
-  };
+  }
 
-    // Calling _loadFrame but with a timeout to signal failure in loadframeStatus. Callbacks are left
-    // registered when network errors occur and subsequent token requests for same resource are registered to the pending request
-  AuthenticationContext.prototype._loadFrameTimeout = function(urlNavigation, frameName, resource) {
-        // set iframe session to pending
+  // Calling _loadFrame but with a timeout to signal failure in loadframeStatus. Callbacks are left
+  // registered when network errors occur and subsequent token requests for same resource are registered to the pending request
+  _loadFrameTimeout(urlNavigation, frameName, resource) {
+    // set iframe session to pending
     this.verbose('Set loading state to pending for: ' + resource);
     this._saveItem(this.CONSTANTS.STORAGE.RENEW_STATUS + resource, this.CONSTANTS.TOKEN_RENEW_STATUS_IN_PROGRESS);
     this._loadFrame(urlNavigation, frameName);
-    var self = this;
-    setTimeout(function() {
+    const self = this;
+    setTimeout(() => {
       if (self._getItem(self.CONSTANTS.STORAGE.RENEW_STATUS + resource) === self.CONSTANTS.TOKEN_RENEW_STATUS_IN_PROGRESS) {
-                // fail the iframe session if it's in pending state
+        // fail the iframe session if it's in pending state
         self.verbose('Loading frame has timed out after: ' + (self.CONSTANTS.LOADFRAME_TIMEOUT / 1000) + ' seconds for resource ' + resource);
-        var expectedState = self._activeRenewals[resource];
+        const expectedState = self._activeRenewals[resource];
         if (expectedState && window.callBackMappedToRenewStates[expectedState]) {
           window.callBackMappedToRenewStates[expectedState]('Token renewal operation failed due to timeout', null);
         }
@@ -414,36 +400,36 @@ var AuthenticationContext = (function() {
         self._saveItem(self.CONSTANTS.STORAGE.RENEW_STATUS + resource, self.CONSTANTS.TOKEN_RENEW_STATUS_CANCELED);
       }
     }, self.CONSTANTS.LOADFRAME_TIMEOUT);
-  };
+  }
 
-  AuthenticationContext.prototype._loadFrame = function(urlNavigate, frameName) {
-        // This trick overcomes iframe navigation in IE
-        // IE does not load the page consistently in iframe
-    var self = this;
+  _loadFrame(urlNavigate, frameName) {
+    // This trick overcomes iframe navigation in IE
+    // IE does not load the page consistently in iframe
+    const self = this;
     self.info('LoadFrame: ' + frameName);
-    var frameCheck = frameName;
-    setTimeout(function() {
-      var frameHandle = self._addAuthFrame(frameCheck);
+    const frameCheck = frameName;
+    setTimeout(() => {
+      const frameHandle = self._addAuthFrame(frameCheck);
       if (frameHandle.src === '' || frameHandle.src === 'about:blank') {
         frameHandle.src = urlNavigate;
         self._loadFrame(urlNavigate, frameCheck);
       }
     }, 500);
-  };
+  }
 
   /**
    * Acquire token from cache if not expired and available. Acquires token from iframe if expired.
    * @param {string} resource  ResourceUri identifying the target resource
    * @param {function} callback The callback function
    */
-  AuthenticationContext.prototype.acquireToken = function(resource, callback) {
+  acquireToken(resource, callback) {
     if (this._isEmpty(resource)) {
       this.warn('resource is required');
       callback('resource is required', null);
       return;
     }
 
-    var token = this.getCachedToken(resource);
+    const token = this.getCachedToken(resource);
     if (token) {
       this.info('Token is already in cache for resource:' + resource);
       callback(null, token);
@@ -469,25 +455,25 @@ var AuthenticationContext = (function() {
     } else {
       this._renewToken(resource, callback);
     }
-  };
+  }
 
   /**
    * Redirect the Browser to Azure AD Authorization endpoint
    * @param {string} urlNavigate The authorization request url
    */
-  AuthenticationContext.prototype.promptUser = function(urlNavigate) {
+  promptUser(urlNavigate) {
     if (urlNavigate) {
       this.info('Navigate to:' + urlNavigate);
       window.location.replace(urlNavigate);
     } else {
       this.info('Navigate url is empty');
     }
-  };
+  }
 
   /**
    * Clear cache items.
    */
-  AuthenticationContext.prototype.clearCache = function() {
+  clearCache() {
     this._saveItem(this.CONSTANTS.STORAGE.ACCESS_TOKEN_KEY, '');
     this._saveItem(this.CONSTANTS.STORAGE.EXPIRATION_KEY, 0);
     this._saveItem(this.CONSTANTS.STORAGE.SESSION_STATE, '');
@@ -497,23 +483,23 @@ var AuthenticationContext = (function() {
     this._saveItem(this.CONSTANTS.STORAGE.IDTOKEN, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION, '');
-    var keys = this._getItem(this.CONSTANTS.STORAGE.TOKEN_KEYS);
+    let keys = this._getItem(this.CONSTANTS.STORAGE.TOKEN_KEYS);
 
     if (!this._isEmpty(keys)) {
       keys = keys.split(this.CONSTANTS.RESOURCE_DELIMETER);
-      for (var i = 0; i < keys.length; i++) {
+      for (let i = 0; i < keys.length; i++) {
         this._saveItem(this.CONSTANTS.STORAGE.ACCESS_TOKEN_KEY + keys[i], '');
         this._saveItem(this.CONSTANTS.STORAGE.EXPIRATION_KEY + keys[i], 0);
       }
     }
     this._saveItem(this.CONSTANTS.STORAGE.TOKEN_KEYS, '');
-  };
+  }
 
   /**
    * Clear cache items for a resource.
    * @param {string} resource The resource
    */
-  AuthenticationContext.prototype.clearCacheForResource = function(resource) {
+  clearCacheForResource(resource) {
     this._saveItem(this.CONSTANTS.STORAGE.STATE_RENEW, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION, '');
@@ -521,35 +507,35 @@ var AuthenticationContext = (function() {
       this._saveItem(this.CONSTANTS.STORAGE.ACCESS_TOKEN_KEY + resource, '');
       this._saveItem(this.CONSTANTS.STORAGE.EXPIRATION_KEY + resource, 0);
     }
-  };
+  }
 
-    /**
-     * Logout user will redirect page to logout endpoint.
-     * After logout, it will redirect to post_logout page if provided.
-     */
-  AuthenticationContext.prototype.logOut = function() {
+  /**
+   * Logout user will redirect page to logout endpoint.
+   * After logout, it will redirect to post_logout page if provided.
+   */
+  logOut() {
     this.clearCache();
-    var logout = '';
+    let logout = '';
     this._user = null;
 
     if (this.config.postLogoutRedirectUri) {
       logout = 'post_logout_redirect_uri=' + encodeURIComponent(this.config.postLogoutRedirectUri);
     }
 
-    var urlNavigate = this.config.instance + 'logout?' + logout;
+    const urlNavigate = this.config.instance + 'logout?' + logout;
     this.info('Logout navigate to: ' + urlNavigate);
     this.promptUser(urlNavigate);
-  };
+  }
 
-  AuthenticationContext.prototype._isEmpty = function(str) {
+  _isEmpty(str) {
     return (typeof str === 'undefined' || !str || str.length === 0);
-  };
+  }
 
   /**
    * Gets a user profile
    * @param {requestCallback} callback The callback that handles the response.
    */
-  AuthenticationContext.prototype.getUser = function(callback) {
+  getUser(callback) {
     // IDToken is first call
     if (typeof callback !== 'function') {
       throw new Error('callback is not a function');
@@ -561,8 +547,8 @@ var AuthenticationContext = (function() {
       return;
     }
 
-        // frame is used to get idtoken
-    var idtoken = this._getItem(this.CONSTANTS.STORAGE.IDTOKEN);
+    // frame is used to get idtoken
+    const idtoken = this._getItem(this.CONSTANTS.STORAGE.IDTOKEN);
     if (this._isEmpty(idtoken)) {
       this.warn('User information is not available');
       callback('User information is not available');
@@ -571,35 +557,35 @@ var AuthenticationContext = (function() {
       this._user = this._createUser(idtoken);
       callback(null, this._user);
     }
-  };
+  }
 
-  AuthenticationContext.prototype._addHintParameters = function(urlNavigate) {
-        // include hint params only if upn is present
+  _addHintParameters(urlNavigate) {
+    // include hint params only if upn is present
     if (this._user && this._user.profile && this._user.profile.hasOwnProperty('upn')) {
-            // add login_hint
+      // add login_hint
       urlNavigate += '&login_hint=' + encodeURIComponent(this._user.profile.upn);
 
-            // don't add domain_hint twice if user provided it in the extraQueryParameter value
+      // don't add domain_hint twice if user provided it in the extraQueryParameter value
       if (!this._urlContainsQueryStringParameter('domain_hint', urlNavigate) && this._user.profile.upn.indexOf('@') > -1) {
-        var parts = this._user.profile.upn.split('@');
-                // local part can include @ in quotes. Sending last part handles that.
+        const parts = this._user.profile.upn.split('@');
+        // local part can include @ in quotes. Sending last part handles that.
         urlNavigate += '&domain_hint=' + encodeURIComponent(parts[parts.length - 1]);
       }
     }
 
     return urlNavigate;
-  };
+  }
 
-  AuthenticationContext.prototype._createUser = function(idToken) {
-    var user = null;
-    var parsedJson = this._extractIdToken(idToken);
+  _createUser(idToken) {
+    let user = null;
+    const parsedJson = this._extractIdToken(idToken);
     if (parsedJson && parsedJson.hasOwnProperty('aud')) {
-      var audienceMatch = false;
+      let audienceMatch = false;
 
       if (Array.isArray(parsedJson.aud)) {
-                // If the ID Token contains multiple audiences then an azp claim must be present and equal to the client id.
+        // If the ID Token contains multiple audiences then an azp claim must be present and equal to the client id.
         if (parsedJson.hasOwnProperty('azp') && parsedJson.azp.toLowerCase() === this.config.clientId.toLowerCase()) {
-          for (var i = 0; i < parsedJson.aud.length; i++) {
+          for (let i = 0; i < parsedJson.aud.length; i++) {
             if (parsedJson.aud[i].toLowerCase() === this.config.clientId.toLowerCase()) {
               audienceMatch = true;
               break;
@@ -629,9 +615,9 @@ var AuthenticationContext = (function() {
     }
 
     return user;
-  };
+  }
 
-  AuthenticationContext.prototype._getHash = function(hash) {
+  _getHash(hash) {
     if (hash.indexOf('#/') > -1) {
       hash = hash.substring(hash.indexOf('#/') + 2);
     } else if (hash.indexOf('#') > -1) {
@@ -639,18 +625,18 @@ var AuthenticationContext = (function() {
     }
 
     return hash;
-  };
+  }
 
-  AuthenticationContext.prototype._getSearch = function(search) {
+  _getSearch(search) {
     if (search.indexOf('?') > -1) {
       search = search.substring(1);
     }
 
     return search;
-  };
+  }
 
-  AuthenticationContext.prototype._getParameters = function(hash, search) {
-    var parameters = {};
+  _getParameters(hash, search) {
+    let parameters = {};
 
     if (hash) {
       hash = this._getHash(hash);
@@ -659,21 +645,21 @@ var AuthenticationContext = (function() {
 
     if (search) {
       search = this._getSearch(search);
-      var searchParameters = this._deserialize(search);
+      const searchParameters = this._deserialize(search);
       parameters = this._extend(parameters, searchParameters);
     }
 
     return parameters;
-  };
+  }
 
-  AuthenticationContext.prototype._extend = function(obj, src) {
-    for (var key in src) {
+  _extend(obj, src) {
+    for (const key in src) {
       if (src.hasOwnProperty(key)) {
         obj[key] = src[key];
       }
     }
     return obj;
-  };
+  }
 
   /**
    * Checks if hash contains access token or id token or error_description
@@ -681,21 +667,21 @@ var AuthenticationContext = (function() {
    * @param {string} search  -  Search passed from redirect page
    * @return {boolean} exists if all the parameters exist
    */
-  AuthenticationContext.prototype.isCallback = function(hash, search) {
-    var parameters = this._getParameters(hash, search);
+  isCallback(hash, search) {
+    const parameters = this._getParameters(hash, search);
 
     return parameters.hasOwnProperty(this.CONSTANTS.ERROR_DESCRIPTION) ||
       parameters.hasOwnProperty(this.CONSTANTS.ACCESS_TOKEN) ||
       parameters.hasOwnProperty(this.CONSTANTS.ID_TOKEN);
-  };
+  }
 
   /**
    * Gets login error
    * @return {string} error message related to login
    */
-  AuthenticationContext.prototype.getLoginError = function() {
+  getLoginError() {
     return this._getItem(this.CONSTANTS.STORAGE.LOGIN_ERROR);
-  };
+  }
 
   /**
    * Gets requestInfo from given hash.
@@ -703,9 +689,9 @@ var AuthenticationContext = (function() {
    * @param {string} search  -  Search passed from redirect page
    * @return {string} error message related to login
    */
-  AuthenticationContext.prototype.getRequestInfo = function(hash, search) {
-    var parameters = this._getParameters(hash, search);
-    var requestInfo = {
+  getRequestInfo(hash, search) {
+    const parameters = this._getParameters(hash, search);
+    const requestInfo = {
       valid: false,
       parameters: {},
       stateMatch: false,
@@ -721,7 +707,7 @@ var AuthenticationContext = (function() {
         requestInfo.valid = true;
 
         // which call
-        var stateResponse = '';
+        let stateResponse = '';
         if (parameters.hasOwnProperty('state')) {
           this.verbose('State: ' + parameters.state);
           stateResponse = parameters.state;
@@ -742,8 +728,8 @@ var AuthenticationContext = (function() {
 
         // external api requests may have many renewtoken requests for different resource
         if (!requestInfo.stateMatch && window.parent && window.parent.AuthenticationContext) {
-          var statesInParentContext = window.parent.AuthenticationContext._renewStates;
-          for (var i = 0; i < statesInParentContext.length; i++) {
+          const statesInParentContext = window.parent.AuthenticationContext._renewStates;
+          for (let i = 0; i < statesInParentContext.length; i++) {
             if (statesInParentContext[i] === requestInfo.stateResponse) {
               requestInfo.requestType = this.REQUEST_TYPE.RENEW_TOKEN;
               requestInfo.stateMatch = true;
@@ -755,31 +741,31 @@ var AuthenticationContext = (function() {
     }
 
     return requestInfo;
-  };
+  }
 
-  AuthenticationContext.prototype._getResourceFromState = function(state) {
+  _getResourceFromState(state) {
     if (state) {
-      var splitIndex = state.indexOf('|');
+      const splitIndex = state.indexOf('|');
       if (splitIndex > -1 && splitIndex + 1 < state.length) {
         return state.substring(splitIndex + 1);
       }
     }
 
     return '';
-  };
+  }
 
   /**
    * Saves token from hash that is received from redirect.
    * @param {string} requestInfo Hash passed from redirect page
    */
-  AuthenticationContext.prototype.saveTokenFromHash = function(requestInfo) {
+  saveTokenFromHash(requestInfo) {
     this.info('State status:' + requestInfo.stateMatch + '; Request type:' + requestInfo.requestType);
     this._saveItem(this.CONSTANTS.STORAGE.ERROR, '');
     this._saveItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION, '');
 
-    var resource = this._getResourceFromState(requestInfo.stateResponse);
+    let resource = this._getResourceFromState(requestInfo.stateResponse);
 
-        // Record error
+    // Record error
     if (requestInfo.parameters.hasOwnProperty(this.CONSTANTS.ERROR_DESCRIPTION)) {
       this.info('Error :' + requestInfo.parameters.error + '; Error description:' + requestInfo.parameters[this.CONSTANTS.ERROR_DESCRIPTION]);
       this._saveItem(this.CONSTANTS.STORAGE.ERROR, requestInfo.parameters.error);
@@ -787,7 +773,7 @@ var AuthenticationContext = (function() {
 
       if (requestInfo.requestType === this.REQUEST_TYPE.LOGIN) {
         this._loginInProgress = false;
-        this._saveItem(this.CONSTANTS.STORAGE.LOGIN_ERROR, requestInfo.parameters.error_description);  // jshint ignore:line
+        this._saveItem(this.CONSTANTS.STORAGE.LOGIN_ERROR, requestInfo.parameters.error_description);
       }
     } else if (requestInfo.stateMatch) {
       // record tokens to storage if exists
@@ -796,7 +782,7 @@ var AuthenticationContext = (function() {
         this._saveItem(this.CONSTANTS.STORAGE.SESSION_STATE, requestInfo.parameters[this.CONSTANTS.SESSION_STATE]);
       }
 
-      var keys;
+      let keys;
 
       if (requestInfo.parameters.hasOwnProperty(this.CONSTANTS.ACCESS_TOKEN)) {
         this.info('Fragment has access token');
@@ -805,7 +791,7 @@ var AuthenticationContext = (function() {
           keys = this._getItem(this.CONSTANTS.STORAGE.TOKEN_KEYS) || '';
           this._saveItem(this.CONSTANTS.STORAGE.TOKEN_KEYS, keys + resource + this.CONSTANTS.RESOURCE_DELIMETER);
         }
-                  // save token with related resource
+        // save token with related resource
         this._saveItem(this.CONSTANTS.STORAGE.ACCESS_TOKEN_KEY + resource, requestInfo.parameters[this.CONSTANTS.ACCESS_TOKEN]);
         this._saveItem(this.CONSTANTS.STORAGE.EXPIRATION_KEY + resource, this._expiresIn(requestInfo.parameters[this.CONSTANTS.EXPIRES_IN]));
       }
@@ -820,7 +806,7 @@ var AuthenticationContext = (function() {
           if (this._user.profile.nonce === this._getItem(this.CONSTANTS.STORAGE.NONCE_IDTOKEN)) {
             this._saveItem(this.CONSTANTS.STORAGE.IDTOKEN, requestInfo.parameters[this.CONSTANTS.ID_TOKEN]);
 
-                          // Save idtoken as access token for app itself
+            // Save idtoken as access token for app itself
             resource = this.config.loginResource ? this.config.loginResource : this.config.clientId;
 
             if (!this._hasResource(resource)) {
@@ -843,17 +829,17 @@ var AuthenticationContext = (function() {
       this._saveItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION, 'Invalid_state. state: ' + requestInfo.stateResponse);
     }
     this._saveItem(this.CONSTANTS.STORAGE.RENEW_STATUS + resource, this.CONSTANTS.TOKEN_RENEW_STATUS_COMPLETED);
-  };
+  }
 
   /**
    * Gets resource for given endpoint if mapping is provided with config.
    * @param {string} endpoint API endpoint
    * @return {string} resource for this API endpoint
    */
-  AuthenticationContext.prototype.getResourceForEndpoint = function(endpoint) {
+  getResourceForEndpoint(endpoint) {
     if (this.config && this.config.endpoints) {
-      for (var configEndpoint in this.config.endpoints) {
-                // configEndpoint is like /api/Todo requested endpoint can be /api/Todo/1
+      for (const configEndpoint in this.config.endpoints) {
+        // configEndpoint is like /api/Todo requested endpoint can be /api/Todo/1
         if (endpoint.indexOf(configEndpoint) > -1) {
           return this.config.endpoints[configEndpoint];
         }
@@ -872,32 +858,32 @@ var AuthenticationContext = (function() {
       // if it's relative call, we'll treat it as app backend call.
       // if user specified list of anonymous endpoints, no need to send token to these endpoints, return null.
       if (this.config && this.config.anonymousEndpoints) {
-        for (var i = 0; i < this.config.anonymousEndpoints.length; i++) {
+        for (let i = 0; i < this.config.anonymousEndpoints.length; i++) {
           if (endpoint.indexOf(this.config.anonymousEndpoints[i]) > -1) {
             return null;
           }
         }
       }
-            // all other app's backend calls are secured.
+      // all other app's backend calls are secured.
       return this.config.loginResource;
     }
 
-        // if not the app's own backend or not a domain listed in the endpoints structure
+    // if not the app's own backend or not a domain listed in the endpoints structure
     return null;
-  };
+  }
 
-  AuthenticationContext.prototype._getHostFromUri = function(uri) {
-        // remove http:// or https:// from uri
-    var extractedUri = String(uri).replace(/^(https?:)\/\//, '');
+  _getHostFromUri(uri) {
+    // remove http:// or https:// from uri
+    let extractedUri = String(uri).replace(/^(https?:)\/\//, '');
 
     extractedUri = extractedUri.split('/')[0];
     return extractedUri;
-  };
+  }
 
-    /* exported  oauth2Callback */
-  AuthenticationContext.prototype.handleWindowCallback = function(hash, search) {
-        // This is for regular javascript usage for redirect handling
-        // need to make sure this is for callback
+  /* exported  oauth2Callback */
+  handleWindowCallback(hash, search) {
+    // This is for regular javascript usage for redirect handling
+    // need to make sure this is for callback
     if (!hash) {
       hash = window.location.hash;
     }
@@ -907,12 +893,12 @@ var AuthenticationContext = (function() {
     }
 
     if (this.isCallback(hash, search)) {
-      var requestInfo = this.getRequestInfo(hash, search);
+      const requestInfo = this.getRequestInfo(hash, search);
       this.info('Returned from redirect url');
       this.saveTokenFromHash(requestInfo);
-      var callback = null;
+      let callback = null;
       if ((requestInfo.requestType === this.REQUEST_TYPE.RENEW_TOKEN) && window.parent && (window.parent !== window)) {
-                // iframe call but same single page
+        // iframe call but same single page
         this.verbose('Window is in iframe');
         callback = window.parent.callBackMappedToRenewStates[requestInfo.stateResponse];
         if (callback) {
@@ -925,76 +911,75 @@ var AuthenticationContext = (function() {
           callback(this._getItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION), requestInfo.parameters[this.CONSTANTS.ID_TOKEN]);
         }
       }
-            // No need to redirect user in case of popup
+      // No need to redirect user in case of popup
       if (!this.popUp) {
         window.location = this._getItem(this.CONSTANTS.STORAGE.LOGIN_REQUEST);
       }
     }
-  };
+  }
 
-  AuthenticationContext.prototype._getNavigateUrl = function(responseType, resource) {
-    var urlNavigate = this.config.instance + 'authorize' + this._serialize(responseType, this.config, resource) + this._addLibMetadata();
+  _getNavigateUrl(responseType, resource) {
+    let urlNavigate = this.config.instance + 'authorize' + this._serialize(responseType, this.config, resource) + this._addLibMetadata();
     if (this.config.scope) {
       urlNavigate += '&scope=' + encodeURIComponent(this.config.scope);
     }
     this.info('Navigate url:' + urlNavigate);
     return urlNavigate;
-  };
+  }
 
-  AuthenticationContext.prototype._extractIdToken = function(encodedIdToken) {
-        // id token will be decoded to get the username
-    var decodedToken = this._decodeJwt(encodedIdToken);
+  _extractIdToken(encodedIdToken) {
+    // id token will be decoded to get the username
+    const decodedToken = this._decodeJwt(encodedIdToken);
     if (!decodedToken) {
       return null;
     }
 
     try {
-      var base64IdToken = decodedToken.JWSPayload;
-      var base64Decoded = this._base64DecodeStringUrlSafe(base64IdToken);
+      const base64IdToken = decodedToken.JWSPayload;
+      const base64Decoded = this._base64DecodeStringUrlSafe(base64IdToken);
       if (!base64Decoded) {
         this.info('The returned id_token could not be base64 url safe decoded.');
         return null;
       }
 
-            // ECMA script has JSON built-in support
       return JSON.parse(base64Decoded);
     } catch (err) {
       this.error('The returned id_token could not be decoded', err);
     }
 
     return null;
-  };
+  }
 
-  AuthenticationContext.prototype._base64DecodeStringUrlSafe = function(base64IdToken) {
-        // html5 should support atob function for decoding
+  _base64DecodeStringUrlSafe(base64IdToken) {
+    // html5 should support atob function for decoding
     base64IdToken = base64IdToken.replace(/-/g, '+').replace(/_/g, '/');
     if (window.atob) {
       return decodeURIComponent(escape(window.atob(base64IdToken)));
     }
     return decodeURIComponent(escape(this._decode(base64IdToken)));
-  };
+  }
 
-    // Take https://cdnjs.cloudflare.com/ajax/libs/Base64/0.3.0/base64.js and https://en.wikipedia.org/wiki/Base64 as reference.
-  AuthenticationContext.prototype._decode = function(base64IdToken) {
-    var codes = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+  // Take https://cdnjs.cloudflare.com/ajax/libs/Base64/0.3.0/base64.js and https://en.wikipedia.org/wiki/Base64 as reference.
+  _decode(base64IdToken) {
+    const codes = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
     base64IdToken = String(base64IdToken).replace(/[=]+$/, '');
 
-    var length = base64IdToken.length;
+    const length = base64IdToken.length;
     if (length % 4 === 1) {
       throw new Error('The token to be decoded is not correctly encoded.');
     }
 
-    var h1, h2, h3, h4, bits, c1, c2, c3;
-    var decoded = '';
-    for (var i = 0; i < length; i += 4) {
-            // Every 4 base64 encoded character will be converted to 3 byte string, which is 24 bits
-            // then 6 bits per base64 encoded character
+    let h1, h2, h3, h4, bits, c1, c2, c3;
+    let decoded = '';
+    for (let i = 0; i < length; i += 4) {
+      // Every 4 base64 encoded character will be converted to 3 byte string, which is 24 bits
+      // then 6 bits per base64 encoded character
       h1 = codes.indexOf(base64IdToken.charAt(i));
       h2 = codes.indexOf(base64IdToken.charAt(i + 1));
       h3 = codes.indexOf(base64IdToken.charAt(i + 2));
       h4 = codes.indexOf(base64IdToken.charAt(i + 3));
 
-            // For padding, if last two are '='
+      // For padding, if last two are '='
       if (i + 2 === length - 1) {
         bits = h1 << 18 | h2 << 12 | h3 << 6;
         c1 = bits >> 16 & 255;
@@ -1010,7 +995,7 @@ var AuthenticationContext = (function() {
 
       bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
 
-            // then convert to 3 byte chars
+      // then convert to 3 byte chars
       c1 = bits >> 16 & 255;
       c2 = bits >> 8 & 255;
       c3 = bits & 255;
@@ -1019,37 +1004,37 @@ var AuthenticationContext = (function() {
     }
 
     return decoded;
-  };
+  }
 
     // Auth.node js crack function
-  AuthenticationContext.prototype._decodeJwt = function(jwtToken) {
+  _decodeJwt(jwtToken) {
     if (this._isEmpty(jwtToken)) {
       return null;
     }
 
-    var idTokenPartsRegex = /^([^\.\s]*)\.([^\.\s]+)\.([^\.\s]*)$/;
+    const idTokenPartsRegex = /^([^\.\s]*)\.([^\.\s]+)\.([^\.\s]*)$/;
 
-    var matches = idTokenPartsRegex.exec(jwtToken);
+    const matches = idTokenPartsRegex.exec(jwtToken);
     if (!matches || matches.length < 4) {
       this.warn('The returned id_token is not parseable.');
       return null;
     }
 
-    var crackedToken = {
+    const crackedToken = {
       header: matches[1],
       JWSPayload: matches[2],
       JWSSig: matches[3]
     };
 
     return crackedToken;
-  };
+  }
 
-  AuthenticationContext.prototype._convertUrlSafeToRegularBase64EncodedString = function(str) {
+  _convertUrlSafeToRegularBase64EncodedString(str) {
     return str.replace('-', '+').replace('_', '/');
-  };
+  }
 
-  AuthenticationContext.prototype._serialize = function(responseType, obj, resource) {
-    var str = [];
+  _serialize(responseType, obj, resource) {
+    const str = [];
     if (obj !== null) {
       str.push('?response_type=' + encodeURIComponent(responseType));
       str.push('client_id=' + encodeURIComponent(obj.clientId));
@@ -1068,40 +1053,38 @@ var AuthenticationContext = (function() {
         str.push(obj.extraQueryParameter);
       }
 
-      var correlationId = obj.correlationId ? obj.correlationId : this._guid();
+      const correlationId = obj.correlationId ? obj.correlationId : this._guid();
       str.push('client-request-id=' + encodeURIComponent(correlationId));
     }
 
     return str.join('&');
-  };
+  }
 
-  AuthenticationContext.prototype._deserialize = function(query) {
-    var match,
-      pl = /\+/g,  // Regex for replacing addition symbol with a space
-      search = /([^&=]+)=([^&]*)/g,
-      decode = function(s) {
-        return decodeURIComponent(s.replace(pl, ' '));
-      },
-      obj = {};
-    match = search.exec(query);
+  _deserialize(query) {
+    const pl = /\+/g; // Regex for replacing addition symbol with a space
+    const search = /([^&=]+)=([^&]*)/g;
+    const decode = (s) => {
+      return decodeURIComponent(s.replace(pl, ' '));
+    };
+    const obj = {};
+    let match = search.exec(query);
     while (match) {
       obj[decode(match[1])] = decode(match[2]);
       match = search.exec(query);
     }
 
     return obj;
-  };
+  }
 
-  AuthenticationContext.prototype._decimalToHex = function(number) {
-    var hex = number.toString(16);
+  _decimalToHex(number) {
+    let hex = number.toString(16);
     while (hex.length < 2) {
       hex = '0' + hex;
     }
     return hex;
-  };
+  }
 
-    /* jshint ignore:start */
-  AuthenticationContext.prototype._guid = function() {
+  _guid() {
     // RFC4122: The version 4 UUID is meant for generating UUIDs from truly-random or
     // pseudo-random numbers.
     // The algorithm is as follows:
@@ -1122,24 +1105,24 @@ var AuthenticationContext = (function() {
     // Format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
     // y could be 1000, 1001, 1010, 1011 since most significant two bits needs to be 10
     // y values are 8, 9, A, B
-    var cryptoObj = window.crypto || window.msCrypto; // for IE 11
+    const cryptoObj = window.crypto || window.msCrypto; // for IE 11
     if (cryptoObj && cryptoObj.getRandomValues) {
-      var buffer = new Uint8Array(16);
+      const buffer = new Uint8Array(16);
       cryptoObj.getRandomValues(buffer);
-            // buffer[6] and buffer[7] represents the time_hi_and_version field. We will set the four most significant bits (4 through 7) of buffer[6] to represent decimal number 4 (UUID version number).
+      // buffer[6] and buffer[7] represents the time_hi_and_version field. We will set the four most significant bits (4 through 7) of buffer[6] to represent decimal number 4 (UUID version number).
       buffer[6] |= 0x40; // buffer[6] | 01000000 will set the 6 bit to 1.
       buffer[6] &= 0x4f; // buffer[6] & 01001111 will set the 4, 5, and 7 bit to 0 such that bits 4-7 == 0100 = "4".
-            // buffer[8] represents the clock_seq_hi_and_reserved field. We will set the two most significant bits (6 and 7) of the clock_seq_hi_and_reserved to zero and one, respectively.
+      // buffer[8] represents the clock_seq_hi_and_reserved field. We will set the two most significant bits (6 and 7) of the clock_seq_hi_and_reserved to zero and one, respectively.
       buffer[8] |= 0x80; // buffer[8] | 10000000 will set the 7 bit to 1.
       buffer[8] &= 0xbf; // buffer[8] & 10111111 will set the 6 bit to 0.
       return this._decimalToHex(buffer[0]) + this._decimalToHex(buffer[1]) + this._decimalToHex(buffer[2]) + this._decimalToHex(buffer[3]) + '-' + this._decimalToHex(buffer[4]) + this._decimalToHex(buffer[5]) + '-' + this._decimalToHex(buffer[6]) + this._decimalToHex(buffer[7]) + '-' +
              this._decimalToHex(buffer[8]) + this._decimalToHex(buffer[9]) + '-' + this._decimalToHex(buffer[10]) + this._decimalToHex(buffer[11]) + this._decimalToHex(buffer[12]) + this._decimalToHex(buffer[13]) + this._decimalToHex(buffer[14]) + this._decimalToHex(buffer[15]);
     }
-    var guidHolder = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
-    var hex = '0123456789abcdef';
-    var r = 0;
-    var guidResponse = "";
-    for (var i = 0; i < 36; i++) {
+    const guidHolder = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+    const hex = '0123456789abcdef';
+    let r = 0;
+    let guidResponse = "";
+    for (let i = 0; i < 36; i++) {
       if (guidHolder[i] !== '-' && guidHolder[i] !== '4') {
                   // each x and y needs to be random
         r = Math.random() * 16 | 0;
@@ -1156,28 +1139,28 @@ var AuthenticationContext = (function() {
       }
     }
     return guidResponse;
-  };
+  }
 
-  AuthenticationContext.prototype._expiresIn = function(expires) {
+  _expiresIn(expires) {
     return this._now() + parseInt(expires, 10);
-  };
+  }
 
-  AuthenticationContext.prototype._now = function() {
+  _now() {
     return Math.round(new Date().getTime() / 1000.0);
-  };
+  }
 
-  AuthenticationContext.prototype._addAuthFrame = function(iframeId) {
+  _addAuthFrame(iframeId) {
     if (typeof iframeId === 'undefined') {
       return;
     }
 
     this.info('Add auth frame to document:' + iframeId);
-    var authFrame = document.getElementById(iframeId);
+    let authFrame = document.getElementById(iframeId);
 
     if (!authFrame) {
       if (document.createElement && document.documentElement &&
                 (window.opera || window.navigator.userAgent.indexOf('MSIE 5.0') === -1)) {
-        var ifr = document.createElement('iframe');
+        const ifr = document.createElement('iframe');
         ifr.setAttribute('id', iframeId);
         ifr.style.visibility = 'hidden';
         ifr.style.position = 'absolute';
@@ -1193,9 +1176,9 @@ var AuthenticationContext = (function() {
     }
 
     return authFrame;
-  };
+  }
 
-  AuthenticationContext.prototype._saveItem = function(key, obj) {
+  _saveItem(key, obj) {
     if (this.config && this.config.cacheLocation && this.config.cacheLocation === 'localStorage') {
       if (!this._supportsLocalStorage()) {
         this.info('Local storage is not supported');
@@ -1207,7 +1190,7 @@ var AuthenticationContext = (function() {
       return true;
     }
 
-        // Default as session storage
+    // Default as session storage
     if (!this._supportsSessionStorage()) {
       this.info('Session storage is not supported');
       return false;
@@ -1215,9 +1198,9 @@ var AuthenticationContext = (function() {
 
     sessionStorage.setItem(key, obj);
     return true;
-  };
+  }
 
-  AuthenticationContext.prototype._getItem = function(key) {
+  _getItem(key) {
     if (this.config && this.config.cacheLocation && this.config.cacheLocation === 'localStorage') {
       if (!this._supportsLocalStorage()) {
         this.info('Local storage is not supported');
@@ -1227,55 +1210,55 @@ var AuthenticationContext = (function() {
       return localStorage.getItem(key);
     }
 
-        // Default as session storage
+    // Default as session storage
     if (!this._supportsSessionStorage()) {
       this.info('Session storage is not supported');
       return null;
     }
 
     return sessionStorage.getItem(key);
-  };
+  }
 
-  AuthenticationContext.prototype._supportsLocalStorage = function() {
+  _supportsLocalStorage() {
     try {
       return 'localStorage' in window && window.localStorage;
     } catch (e) {
       return false;
     }
-  };
+  }
 
-  AuthenticationContext.prototype._supportsSessionStorage = function() {
+  _supportsSessionStorage() {
     try {
       return 'sessionStorage' in window && window.sessionStorage;
     } catch (e) {
       return false;
     }
-  };
+  }
 
-  AuthenticationContext.prototype._cloneConfig = function(obj) {
+  _cloneConfig(obj) {
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }
 
-    var copy = {};
-    for (var attr in obj) {
+    const copy = {};
+    for (const attr in obj) {
       if (obj.hasOwnProperty(attr)) {
         copy[attr] = obj[attr];
       }
     }
     return copy;
-  };
+  }
 
-  AuthenticationContext.prototype._addLibMetadata = function() {
-        // x-client-SKU
-        // x-client-Ver
+  _addLibMetadata() {
+    // x-client-SKU
+    // x-client-Ver
     return '&x-client-SKU=Js&x-client-Ver=' + this._libVersion();
-  };
+  }
 
-  AuthenticationContext.prototype.log = function(level, message, error) {
+  log(level, message, error) {
     if (level <= Logging.level) {
-      var timestamp = new Date().toUTCString();
-      var formattedMessage = '';
+      const timestamp = new Date().toUTCString();
+      let formattedMessage = '';
 
       if (this.config.correlationId) {
         formattedMessage = timestamp + ':' + this.config.correlationId + '-' + this._libVersion() + '-' + this.CONSTANTS.LEVEL_STRING_MAP[level] + ' ' + message;
@@ -1289,34 +1272,30 @@ var AuthenticationContext = (function() {
 
       Logging.log(formattedMessage);
     }
-  };
-
-  AuthenticationContext.prototype.error = function(message, error) {
-    this.log(this.CONSTANTS.LOGGING_LEVEL.ERROR, message, error);
-  };
-
-  AuthenticationContext.prototype.warn = function(message) {
-    this.log(this.CONSTANTS.LOGGING_LEVEL.WARN, message, null);
-  };
-
-  AuthenticationContext.prototype.info = function(message) {
-    this.log(this.CONSTANTS.LOGGING_LEVEL.INFO, message, null);
-  };
-
-  AuthenticationContext.prototype.verbose = function(message) {
-    this.log(this.CONSTANTS.LOGGING_LEVEL.VERBOSE, message, null);
-  };
-
-  AuthenticationContext.prototype._libVersion = function() {
-    return '1.0.12';
-  };
-
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = AuthenticationContext;
-    module.exports.inject = function(conf) {
-      return new AuthenticationContext(conf);
-    };
   }
 
-  return AuthenticationContext;
-})();
+  error(message, error) {
+    this.log(this.CONSTANTS.LOGGING_LEVEL.ERROR, message, error);
+  }
+
+  warn(message) {
+    this.log(this.CONSTANTS.LOGGING_LEVEL.WARN, message, null);
+  }
+
+  info(message) {
+    this.log(this.CONSTANTS.LOGGING_LEVEL.INFO, message, null);
+  }
+
+  verbose(message) {
+    this.log(this.CONSTANTS.LOGGING_LEVEL.VERBOSE, message, null);
+  }
+
+  _libVersion() {
+    return '1.0.12';
+  }
+}
+
+global.Logging = {
+  level: 0,
+  log: (message) => {}
+};
