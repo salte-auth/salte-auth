@@ -7,10 +7,6 @@ module.exports = {
       test: /\.js$/,
       include: /tests/,
       loader: 'eslint'
-    }, {
-      test: /\.js$/,
-      exclude: /tests|node_modules/,
-      loader: 'isparta'
     }],
     loaders: [{
       test: /\.js$/,
