@@ -20,3 +20,6 @@ rules:
   prefer-const: 2
   no-confusing-arrow: 2
   prefer-arrow-callback: 2
+  consistent-this:
+    - error
+    - window.AuthenticationContext

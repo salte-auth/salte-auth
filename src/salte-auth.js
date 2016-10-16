@@ -89,6 +89,7 @@ export default class AuthenticationContext {
     this.callback = null;
     this.popUp = false;
     this.isAngular = false;
+    this.crypto = window.crypto || window.msCrypto;
 
     // private
     this._user = null;
@@ -177,7 +178,7 @@ export default class AuthenticationContext {
       return;
     }
     if (this.config.displayCall) {
-            // User defined way of handling the navigation
+      // User defined way of handling the navigation
       this.config.displayCall(urlNavigate);
     } else {
       this.promptUser(urlNavigate);
@@ -231,22 +232,21 @@ export default class AuthenticationContext {
     } else {
       registeredRedirectUri = this.config.redirectUri.split('#')[0];
     }
-    const that = this;
     const pollTimer = window.setInterval(() => {
       if (!popupWindow || popupWindow.closed || popupWindow.closed === undefined) {
-        that._loginInProgress = false;
+        this._loginInProgress = false;
         window.clearInterval(pollTimer);
       }
       try {
         if (popupWindow.location.href.indexOf(registeredRedirectUri) !== -1) {
-          if (that.isAngular) {
+          if (this.isAngular) {
             window.location.hash = popupWindow.location.hash;
           } else {
-            that.handleWindowCallback(popupWindow.location.hash, popupWindow.location.search);
+            this.handleWindowCallback(popupWindow.location.hash, popupWindow.location.search);
           }
           window.clearInterval(pollTimer);
-          that._loginInProgress = false;
-          that.info('Closing popup window');
+          this._loginInProgress = false;
+          this.info('Closing popup window');
           popupWindow.close();
         }
       } catch (e) {
@@ -306,7 +306,6 @@ export default class AuthenticationContext {
     if (!window.callBacksMappedToRenewStates[expectedState]) {
       window.callBacksMappedToRenewStates[expectedState] = [];
     }
-    const self = this;
     window.callBacksMappedToRenewStates[expectedState].push(callback);
     if (!window.callBackMappedToRenewStates[expectedState]) {
       window.callBackMappedToRenewStates[expectedState] = (message, token) => {
@@ -314,10 +313,10 @@ export default class AuthenticationContext {
           try {
             window.callBacksMappedToRenewStates[expectedState][i](message, token);
           } catch (error) {
-            self.warn(error);
+            this.warn(error);
           }
         }
-        self._activeRenewals[resource] = null;
+        this._activeRenewals[resource] = null;
         window.callBacksMappedToRenewStates[expectedState] = null;
         window.callBackMappedToRenewStates[expectedState] = null;
       };
@@ -387,32 +386,31 @@ export default class AuthenticationContext {
     this.verbose('Set loading state to pending for: ' + resource);
     this._saveItem(this.CONSTANTS.STORAGE.RENEW_STATUS + resource, this.CONSTANTS.TOKEN_RENEW_STATUS_IN_PROGRESS);
     this._loadFrame(urlNavigation, frameName);
-    const self = this;
     setTimeout(() => {
-      if (self._getItem(self.CONSTANTS.STORAGE.RENEW_STATUS + resource) === self.CONSTANTS.TOKEN_RENEW_STATUS_IN_PROGRESS) {
+      if (this._getItem(this.CONSTANTS.STORAGE.RENEW_STATUS + resource) === this.CONSTANTS.TOKEN_RENEW_STATUS_IN_PROGRESS) {
         // fail the iframe session if it's in pending state
-        self.verbose('Loading frame has timed out after: ' + (self.CONSTANTS.LOADFRAME_TIMEOUT / 1000) + ' seconds for resource ' + resource);
-        const expectedState = self._activeRenewals[resource];
+        this.verbose('Loading frame has timed out after: ' + (this.CONSTANTS.LOADFRAME_TIMEOUT / 1000) + ' seconds for resource ' + resource);
+        const expectedState = this._activeRenewals[resource];
+
+        this._saveItem(this.CONSTANTS.STORAGE.RENEW_STATUS + resource, this.CONSTANTS.TOKEN_RENEW_STATUS_CANCELED);
+
         if (expectedState && window.callBackMappedToRenewStates[expectedState]) {
           window.callBackMappedToRenewStates[expectedState]('Token renewal operation failed due to timeout', null);
         }
-
-        self._saveItem(self.CONSTANTS.STORAGE.RENEW_STATUS + resource, self.CONSTANTS.TOKEN_RENEW_STATUS_CANCELED);
       }
-    }, self.CONSTANTS.LOADFRAME_TIMEOUT);
+    }, this.CONSTANTS.LOADFRAME_TIMEOUT);
   }
 
   _loadFrame(urlNavigate, frameName) {
     // This trick overcomes iframe navigation in IE
     // IE does not load the page consistently in iframe
-    const self = this;
-    self.info('LoadFrame: ' + frameName);
+    this.info('LoadFrame: ' + frameName);
     const frameCheck = frameName;
     setTimeout(() => {
-      const frameHandle = self._addAuthFrame(frameCheck);
+      const frameHandle = this._addAuthFrame(frameCheck);
       if (frameHandle.src === '' || frameHandle.src === 'about:blank') {
         frameHandle.src = urlNavigate;
-        self._loadFrame(urlNavigate, frameCheck);
+        this._loadFrame(urlNavigate, frameCheck);
       }
     }, 500);
   }
@@ -464,7 +462,7 @@ export default class AuthenticationContext {
   promptUser(urlNavigate) {
     if (urlNavigate) {
       this.info('Navigate to:' + urlNavigate);
-      window.location.replace(urlNavigate);
+      this.navigate(urlNavigate);
     } else {
       this.info('Navigate url is empty');
     }
@@ -897,7 +895,7 @@ export default class AuthenticationContext {
       this.info('Returned from redirect url');
       this.saveTokenFromHash(requestInfo);
       let callback = null;
-      if ((requestInfo.requestType === this.REQUEST_TYPE.RENEW_TOKEN) && window.parent && (window.parent !== window)) {
+      if ((requestInfo.requestType === this.REQUEST_TYPE.RENEW_TOKEN) && this.isIframe()) {
         // iframe call but same single page
         this.verbose('Window is in iframe');
         callback = window.parent.callBackMappedToRenewStates[requestInfo.stateResponse];
@@ -913,7 +911,7 @@ export default class AuthenticationContext {
       }
       // No need to redirect user in case of popup
       if (!this.popUp) {
-        window.location = this._getItem(this.CONSTANTS.STORAGE.LOGIN_REQUEST);
+        this.navigate(this._getItem(this.CONSTANTS.STORAGE.LOGIN_REQUEST));
       }
     }
   }
@@ -1105,10 +1103,9 @@ export default class AuthenticationContext {
     // Format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
     // y could be 1000, 1001, 1010, 1011 since most significant two bits needs to be 10
     // y values are 8, 9, A, B
-    const cryptoObj = window.crypto || window.msCrypto; // for IE 11
-    if (cryptoObj && cryptoObj.getRandomValues) {
+    if (this.crypto && this.crypto.getRandomValues) {
       const buffer = new Uint8Array(16);
-      cryptoObj.getRandomValues(buffer);
+      this.crypto.getRandomValues(buffer);
       // buffer[6] and buffer[7] represents the time_hi_and_version field. We will set the four most significant bits (4 through 7) of buffer[6] to represent decimal number 4 (UUID version number).
       buffer[6] |= 0x40; // buffer[6] | 01000000 will set the 6 bit to 1.
       buffer[6] &= 0x4f; // buffer[6] & 01001111 will set the 4, 5, and 7 bit to 0 such that bits 4-7 == 0100 = "4".
@@ -1288,6 +1285,14 @@ export default class AuthenticationContext {
 
   verbose(message) {
     this.log(this.CONSTANTS.LOGGING_LEVEL.VERBOSE, message, null);
+  }
+
+  navigate(url) {
+    window.location.replace(url);
+  }
+
+  isIframe() {
+    return window.parent && window.parent !== window;
   }
 
   _libVersion() {

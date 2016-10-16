@@ -1,0 +1,17 @@
+name: salte-io/salte-auth
+ui: jasmine2
+scripts:
+  - /node_modules/sinon/pkg/sinon.js
+browsers:
+  - name: chrome
+    version: latest
+  - name: firefox
+    version: latest
+  - name: microsoftedge
+    version: latest
+  - name: internet explorer
+    version: 10..11
+  - name: safari
+    version: 7..9
+builder: zuul-builder-webpack
+webpack: ./webpack.test.config
