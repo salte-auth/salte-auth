@@ -1,3 +1,5 @@
+const ci = process.env.CI === 'true';
+
 module.exports = {
   output: {
     pathinfo: true
@@ -17,6 +19,10 @@ module.exports = {
       exclude: /node_modules/,
       loader: 'html'
     }]
+  },
+  eslint: {
+    emitError: ci,
+    failOnError: ci
   },
   devtool: 'inline-source-map'
 };

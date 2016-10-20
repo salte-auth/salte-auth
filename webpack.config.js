@@ -1,4 +1,7 @@
 const path = require('path');
+const webpack = require('webpack');
+const deindent = require('deindent');
+const packageJson = require('./package.json');
 
 module.exports = {
   context: path.join(__dirname, 'src'),
@@ -11,14 +14,6 @@ module.exports = {
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
-  externals: [{
-    angular: {
-      root: 'angular',
-      commonjs2: 'angular',
-      commonjs: 'angular',
-      amd: 'angular'
-    }
-  }],
   devtool: 'source-map',
   module: {
     preLoaders: [{
@@ -35,5 +30,16 @@ module.exports = {
       exclude: /node_modules/,
       loader: 'html'
     }]
-  }
+  },
+  plugins: [
+    new webpack.BannerPlugin(deindent(`
+      /**
+       * ${packageJson.name} JavaScript Library v${packageJson.version}
+       *
+       * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
+       *
+       * Made with ♥ by ${packageJson.contributors.join(', ')}
+       */
+    `).trim(), {raw: true})
+  ]
 };
