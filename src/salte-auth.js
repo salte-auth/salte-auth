@@ -97,8 +97,8 @@ export default class AuthenticationContext {
     this._loginInProgress = false;
     this._renewStates = [];
 
-    window.callBackMappedToRenewStates = {};
-    window.callBacksMappedToRenewStates = {};
+    this.callBackMappedToRenewStates = {};
+    this.callBacksMappedToRenewStates = {};
 
     // validate before constructor assignments
     if (config.displayCall && typeof config.displayCall !== 'function') {
@@ -202,7 +202,7 @@ export default class AuthenticationContext {
       const left = ((width / 2) - (popUpWidth / 2)) + winLeft;
       const top = ((height / 2) - (popUpHeight / 2)) + winTop;
 
-      const popupWindow = window.open(urlNavigate, title, 'width=' + popUpWidth + ', height=' + popUpHeight + ', top=' + top + ', left=' + left);
+      const popupWindow = this.open(urlNavigate, title, 'width=' + popUpWidth + ', height=' + popUpHeight + ', top=' + top + ', left=' + left);
       if (popupWindow.focus) {
         popupWindow.focus();
       }
@@ -303,22 +303,22 @@ export default class AuthenticationContext {
 
   registerCallback(expectedState, resource, callback) {
     this._activeRenewals[resource] = expectedState;
-    if (!window.callBacksMappedToRenewStates[expectedState]) {
-      window.callBacksMappedToRenewStates[expectedState] = [];
+    if (!this.callBacksMappedToRenewStates[expectedState]) {
+      this.callBacksMappedToRenewStates[expectedState] = [];
     }
-    window.callBacksMappedToRenewStates[expectedState].push(callback);
-    if (!window.callBackMappedToRenewStates[expectedState]) {
-      window.callBackMappedToRenewStates[expectedState] = (message, token) => {
-        for (let i = 0; i < window.callBacksMappedToRenewStates[expectedState].length; ++i) {
+    this.callBacksMappedToRenewStates[expectedState].push(callback);
+    if (!this.callBackMappedToRenewStates[expectedState]) {
+      this.callBackMappedToRenewStates[expectedState] = (message, token) => {
+        for (let i = 0; i < this.callBacksMappedToRenewStates[expectedState].length; ++i) {
           try {
-            window.callBacksMappedToRenewStates[expectedState][i](message, token);
+            this.callBacksMappedToRenewStates[expectedState][i](message, token);
           } catch (error) {
             this.warn(error);
           }
         }
         this._activeRenewals[resource] = null;
-        window.callBacksMappedToRenewStates[expectedState] = null;
-        window.callBackMappedToRenewStates[expectedState] = null;
+        this.callBacksMappedToRenewStates[expectedState] = null;
+        this.callBackMappedToRenewStates[expectedState] = null;
       };
     }
   }
@@ -394,8 +394,8 @@ export default class AuthenticationContext {
 
         this._saveItem(this.CONSTANTS.STORAGE.RENEW_STATUS + resource, this.CONSTANTS.TOKEN_RENEW_STATUS_CANCELED);
 
-        if (expectedState && window.callBackMappedToRenewStates[expectedState]) {
-          window.callBackMappedToRenewStates[expectedState]('Token renewal operation failed due to timeout', null);
+        if (expectedState && this.callBackMappedToRenewStates[expectedState]) {
+          this.callBackMappedToRenewStates[expectedState]('Token renewal operation failed due to timeout', null);
         }
       }
     }, this.CONSTANTS.LOADFRAME_TIMEOUT);
@@ -898,7 +898,7 @@ export default class AuthenticationContext {
       if ((requestInfo.requestType === this.REQUEST_TYPE.RENEW_TOKEN) && this.isIframe()) {
         // iframe call but same single page
         this.verbose('Window is in iframe');
-        callback = window.parent.callBackMappedToRenewStates[requestInfo.stateResponse];
+        callback = window.parent.AuthenticationContext.callBackMappedToRenewStates[requestInfo.stateResponse];
         if (callback) {
           callback(this._getItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION), requestInfo.parameters[this.CONSTANTS.ACCESS_TOKEN] || requestInfo.parameters[this.CONSTANTS.ID_TOKEN]);
         }
@@ -1293,6 +1293,10 @@ export default class AuthenticationContext {
 
   isIframe() {
     return window.parent && window.parent !== window;
+  }
+
+  open(url, name, features) {
+    return window.open(url, name, features);
   }
 
   _libVersion() {
