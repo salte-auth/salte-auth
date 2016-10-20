@@ -898,7 +898,7 @@ export default class AuthenticationContext {
       if ((requestInfo.requestType === this.REQUEST_TYPE.RENEW_TOKEN) && this.isIframe()) {
         // iframe call but same single page
         this.verbose('Window is in iframe');
-        callback = this.callBackMappedToRenewStates[requestInfo.stateResponse];
+        callback = window.parent.AuthenticationContext.callBackMappedToRenewStates[requestInfo.stateResponse];
         if (callback) {
           callback(this._getItem(this.CONSTANTS.STORAGE.ERROR_DESCRIPTION), requestInfo.parameters[this.CONSTANTS.ACCESS_TOKEN] || requestInfo.parameters[this.CONSTANTS.ID_TOKEN]);
         }
@@ -1296,7 +1296,7 @@ export default class AuthenticationContext {
   }
 
   open(url, name, features) {
-    window.open(url, name, features);
+    return window.open(url, name, features);
   }
 
   _libVersion() {
