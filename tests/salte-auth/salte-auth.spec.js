@@ -4,14 +4,7 @@ import { expect } from 'chai';
 // TODO: Refactor this out
 mocha.setup({
   globals: [
-    'AuthenticationContext',
-    'callBackMappedToRenewStates',
-    'callBacksMappedToRenewStates',
-    'open',
-    'authRenewFrametoken.resource1',
-    'authIdTokenFrame',
-    'frameName',
-    'lptoolband'
+    'AuthenticationContext'
   ]
 });
 
@@ -179,7 +172,7 @@ describe('salte-auth', () => {
       auth.config.clientId = 'client';
       auth.config.redirectUri = 'contoso_site';
       const callback = sandbox.spy();
-      sandbox.stub(global, 'open').returns(null);
+      sandbox.stub(auth, 'open').returns(null);
       auth.callback = callback;
       auth.login();
       expect(callback.callCount).to.equal(1);
@@ -195,7 +188,7 @@ describe('salte-auth', () => {
       auth.config.clientId = 'client';
       auth.config.redirectUri = 'contoso_site';
       let popupWindow;
-      window.open = () => {
+      sandbox.stub(auth, 'open', () => {
         popupWindow = {
           location: {
             hash: VALID_URLFRAGMENT,
@@ -208,7 +201,7 @@ describe('salte-auth', () => {
           }
         };
         return popupWindow;
-      };
+      });
       const callback = (error, token) => {
         sessionStorage.setItem(auth.CONSTANTS.STORAGE.LOGIN_REQUEST, 'home page');
         expect(auth.loginInProgress()).to.equal(false);
@@ -225,29 +218,24 @@ describe('salte-auth', () => {
 
   describe('function: acquireToken', function() {
     this.timeout(10000);
-    afterEach(() => {
-      window.callBackMappedToRenewStates = {};
-      window.callBacksMappedToRenewStates = {};
-    });
-
-    it('returns from cache for auto renewable if not expired', () => {
-      const callback = sandbox.spy();
+    it('returns from cache for auto renewable if not expired', (done) => {
       auth.config.expireOffsetSeconds = -100;
 
-      auth.acquireToken(RESOURCE1, callback);
-
-      expect(callback.callCount).to.equal(1);
-      expect(callback.calledWith(null, 'access_token_in_cache' + RESOURCE1)).to.equal(true);
+      auth.acquireToken(RESOURCE1, (error, token) => {
+        expect(error).to.equal(null);
+        expect(token).to.equal('access_token_in_cache' + RESOURCE1);
+        done();
+      });
     });
 
-    it('returns error for acquireToken without resource', () => {
-      const callback = sandbox.spy();
+    it('returns error for acquireToken without resource', (done) => {
       auth.config.expireOffsetSeconds = -100;
 
-      auth.acquireToken(null, callback);
-
-      expect(callback.callCount).to.equal(1);
-      expect(callback.calledWith('resource is required', null)).to.equal(true);
+      auth.acquireToken(null, (error, token) => {
+        expect(error).to.equal('resource is required');
+        expect(token).to.equal(null);
+        done();
+      });
     });
 
     it('attempts to renew if token expired and renew is allowed', (done) => {
@@ -261,13 +249,7 @@ describe('salte-auth', () => {
         },
         userName: 'test@domain.com'
       };
-      auth.acquireToken(RESOURCE1, null);
-      expect(sessionStorage.getItem(auth.CONSTANTS.STORAGE.LOGIN_REQUEST)).to.equal('');
-      expect(auth._renewStates.length).to.equal(1);
-
-      // TODO: These need to be swapped out because timeouts aren't reliable. :(
-      // Also they cause the tests to take quite a bit longer
-      setTimeout(() => {
+      auth.acquireToken(RESOURCE1, (error, token) => {
         expect(document.getElementById('authRenewFrame' + RESOURCE1).src).to.equal('https://login.microsoftonline.com/tenant/oauth2/authorize' +
           '?response_type=token' +
           '&client_id=client' +
@@ -279,7 +261,9 @@ describe('salte-auth', () => {
           '&login_hint=test%40testuser.com' +
           '&domain_hint=testuser.com');
         done();
-      }, 2000);
+      });
+      expect(sessionStorage.getItem(auth.CONSTANTS.STORAGE.LOGIN_REQUEST)).to.equal('');
+      expect(auth._renewStates.length).to.equal(1);
     });
 
     // Necessary for integration with Angular when multiple http calls are queued.
@@ -321,7 +305,7 @@ describe('salte-auth', () => {
         done();
       }, 2000);
       // We need to simulate the callback since we're mocking out location.replace
-      window.callBackMappedToRenewStates[auth.config.state](null, '33333333-3333-4333-b333-333333333333');
+      auth.callBackMappedToRenewStates[auth.config.state](null, '33333333-3333-4333-b333-333333333333');
     });
 
     it('tests that callbacks are called when renewal token request was canceled', (done) => {
@@ -337,7 +321,7 @@ describe('salte-auth', () => {
       auth.acquireToken(RESOURCE1, callback);
     });
 
-    it('attempts to renewidToken if token expired and renew is allowed', (done) => {
+    it('attempts to renew idToken if token expired and renew is allowed', (done) => {
       auth.config.redirectUri = 'contoso_site';
       auth.config.clientId = 'client';
       auth.config.expireOffsetSeconds = SECONDS_TO_EXPIRE + 100;
@@ -357,17 +341,15 @@ describe('salte-auth', () => {
       }, 2000);
     });
 
-    it('use the same correlationId for each request sent to AAD if set by user', () => {
+    it('use the same correlationId for each request sent to AAD if set by user', (done) => {
       auth.config.correlationId = '33333333-3333-4333-b333-333333333333';
       auth.config.redirectUri = 'contoso_site';
       auth.config.clientId = 'client';
       auth.config.expireOffsetSeconds = SECONDS_TO_EXPIRE + 100;
-      const callback = () => {
-      };
       auth._renewStates = [];
       auth._user = { profile: { upn: 'test@testuser.com' }, userName: 'test@domain.com' };
       sandbox.spy(auth, '_loadFrameTimeout');
-      auth.acquireToken(RESOURCE1, callback);
+      auth.acquireToken(RESOURCE1, sandbox.spy());
       expect(auth._loadFrameTimeout.calledWith('https://login.microsoftonline.com/tenant/oauth2/authorize' +
         '?response_type=token' +
         '&client_id=client' +
@@ -381,7 +363,7 @@ describe('salte-auth', () => {
         'token.resource1')).to.equal(true);
       auth._activeRenewals = {};
       auth._user = { profile: { sub: 'test@testuser.com' }, userName: 'test@domain.com' };
-      auth.acquireToken(RESOURCE1, callback);
+      auth.acquireToken(RESOURCE1, () => done());
       expect(auth._loadFrameTimeout.calledWith('https://login.microsoftonline.com/tenant/oauth2/authorize' +
         '?response_type=token' +
         '&client_id=client' +
@@ -394,17 +376,16 @@ describe('salte-auth', () => {
         'token.resource1')).to.equal(true);
     });
 
-    it('generates new correlationId for each request sent to AAD if not set by user', () => {
+    it('generates new correlationId for each request sent to AAD if not set by user', (done) => {
       auth.config.correlationId = null;
       auth.config.redirectUri = 'contoso_site';
       auth.config.clientId = 'client';
       auth.config.expireOffsetSeconds = SECONDS_TO_EXPIRE + 100;
-      const callback = sandbox.spy();
       auth._renewStates = [];
       auth._user = { profile: { upn: 'test@testuser.com' }, userName: 'test@domain.com' };
       Math.random = sandbox.stub().returns(0.1);
       sandbox.spy(auth, '_loadFrameTimeout');
-      auth.acquireToken(RESOURCE1, callback);
+      auth.acquireToken(RESOURCE1, sandbox.spy());
       expect(auth._loadFrameTimeout.calledWith('https://login.microsoftonline.com/tenant/oauth2/authorize' +
         '?response_type=token' +
         '&client_id=client' +
@@ -420,7 +401,7 @@ describe('salte-auth', () => {
       Math.random = sandbox.stub().returns(0.3);
       auth._activeRenewals = {};
       auth._user = { profile: { sub: 'test@testuser.com' }, userName: 'test@domain.com' };
-      auth.acquireToken(RESOURCE1, callback);
+      auth.acquireToken(RESOURCE1, sandbox.spy());
       expect(auth._loadFrameTimeout.calledWith('https://login.microsoftonline.com/tenant/oauth2/authorize' +
         '?response_type=token' +
         '&client_id=client' +
@@ -431,6 +412,10 @@ describe('salte-auth', () => {
         '&prompt=none',
         'authRenewFrametoken.resource1',
         'token.resource1')).to.equal(true);
+
+      setTimeout(() => {
+        done();
+      }, 2000);
     });
   });
 
@@ -800,7 +785,8 @@ describe('salte-auth', () => {
   describe('function: _loadFrameTimeout', function() {
     this.timeout(10000);
     it('tests the load frame timeout method', (done) => {
-      window.callBackMappedToRenewStates['33333333-3333-4333-b333-333333333333|token.resource1'] = function() {
+      auth._activeRenewals[RESOURCE1] = 'example';
+      auth.callBackMappedToRenewStates.example = function() {
         expect(sessionStorage.getItem(auth.CONSTANTS.STORAGE.RENEW_STATUS + RESOURCE1)).to.equal(auth.CONSTANTS.TOKEN_RENEW_STATUS_CANCELED);
 
         auth._loadFrameTimeout('urlnavigation', 'frameName', RESOURCE1);
@@ -841,7 +827,7 @@ describe('salte-auth', () => {
         };
       };
       sandbox.stub(auth, 'isIframe').returns(true);
-      window.parent.callBackMappedToRenewStates[auth.getRequestInfo().stateResponse] = callback;
+      auth.callBackMappedToRenewStates[auth.getRequestInfo().stateResponse] = callback;
       auth.handleWindowCallback();
     });
 
