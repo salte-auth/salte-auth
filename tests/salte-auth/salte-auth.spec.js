@@ -25,6 +25,7 @@ describe('salte-auth', () => {
   let sandbox;
   beforeEach(() => {
     window.AuthenticationContext = null;
+    window.parent.AuthenticationContext = null;
     sandbox = sinon.sandbox.create();
     Math.random = sandbox.stub().returns(0.2);
     sessionStorage.clear();
@@ -42,6 +43,7 @@ describe('salte-auth', () => {
     sandbox.stub(auth, 'navigate');
     auth.crypto = {};
     auth.CONSTANTS.LOADFRAME_TIMEOUT = 800;
+    window.parent.AuthenticationContext = auth;
   });
 
   afterEach(() => {

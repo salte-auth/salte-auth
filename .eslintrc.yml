@@ -4,7 +4,6 @@ env:
   serviceworker: true
   worker: true
 globals:
-  angular: true
   Logging: true
 rules:
   max-nested-callbacks: 0
