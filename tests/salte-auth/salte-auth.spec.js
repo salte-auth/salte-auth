@@ -274,7 +274,7 @@ describe('salte-auth', () => {
       auth.config.clientId = 'client';
       auth.config.expireOffsetSeconds = 100;
       const callback = sandbox.spy(() => {
-        throw new Error("Error occurred in callback function");
+        throw new Error('Error occurred in callback function');
       });
       const callback2 = sandbox.spy();
 
