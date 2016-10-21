@@ -32,19 +32,19 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "babel-core": "6.13.2",
+    "babel-core": "6.17.0",
     "babel-loader": "6.2.5",
     "babel-plugin-istanbul": "2.0.3",
-    "babel-preset-es2015": "6.13.2",
+    "babel-preset-es2015": "6.16.0",
     "chai": "3.5.0",
-    "coveralls": "2.11.12",
+    "coveralls": "2.11.14",
     "cz-conventional-changelog": "1.2.0",
     "deindent": "0.1.0",
-    "eslint": "3.3.1",
-    "eslint-config-google": "0.6.0",
-    "eslint-loader": "1.5.0",
+    "eslint": "3.8.1",
+    "eslint-config-google": "0.7.0",
+    "eslint-loader": "1.6.0",
     "eslint-plugin-mocha": "4.7.0",
-    "html-loader": "0.4.3",
+    "html-loader": "0.4.4",
     "isparta-loader": "2.0.0",
     "karma": "1.3.0",
     "karma-chrome-launcher": "2.0.0",
@@ -64,7 +64,7 @@
     "semantic-release": "4.3.5",
     "sinon": "1.17.6",
     "watch": "1.0.1",
-    "webpack": "1.13.1"
+    "webpack": "1.13.2"
   },
   "config": {
     "commitizen": {

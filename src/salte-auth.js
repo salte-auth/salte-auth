@@ -1118,7 +1118,7 @@ export default class AuthenticationContext {
     const guidHolder = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
     const hex = '0123456789abcdef';
     let r = 0;
-    let guidResponse = "";
+    let guidResponse = '';
     for (let i = 0; i < 36; i++) {
       if (guidHolder[i] !== '-' && guidHolder[i] !== '4') {
                   // each x and y needs to be random

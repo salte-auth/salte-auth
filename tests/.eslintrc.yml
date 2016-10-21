@@ -9,3 +9,4 @@ globals:
   sinon: true
 rules:
   no-unused-expressions: 0
+  no-invalid-this: 0
