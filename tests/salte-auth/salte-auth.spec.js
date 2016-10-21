@@ -745,28 +745,6 @@ describe('salte-auth', () => {
     });
   });
 
-  describe('function: _decode', () => {
-    it('test decode with no padding', () => {
-      expect(auth._decode('ZGVjb2RlIHRlc3Rz')).to.equal('decode tests');
-    });
-
-    it('test decode with one = padding', () => {
-      expect(auth._decode('ZWNvZGUgdGVzdHM=')).to.equal('ecode tests');
-    });
-
-    it('test decode with two == padding', () => {
-      expect(auth._decode('Y29kZSB0ZXN0cw==')).to.equal('code tests');
-    });
-
-    it('test decode throw error', () => {
-      try {
-        auth._decode('YW55I');
-      } catch (e) {
-        expect(e.message).to.equal('The token to be decoded is not correctly encoded.');
-      }
-    });
-  });
-
   describe('function: _getHostFromUri', () => {
     it('test host extraction', () => {
       expect(auth._getHostFromUri('https://a.com/b/c')).to.equal('a.com');
