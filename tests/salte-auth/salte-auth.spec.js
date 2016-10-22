@@ -1,5 +1,6 @@
 import SalteAuth from '../../src/salte-auth.js';
 import { expect } from 'chai';
+import uuid from 'uuid';
 
 // TODO: Refactor this out
 mocha.setup({
@@ -27,12 +28,11 @@ describe('salte-auth', () => {
     window.AuthenticationContext = null;
     window.parent.AuthenticationContext = null;
     sandbox = sinon.sandbox.create();
-    Math.random = sandbox.stub().returns(0.2);
+    uuid.v4 = sandbox.stub().returns('33333333-3333-4333-b333-333333333333');
     sessionStorage.clear();
     sessionStorage.setItem(STORAGE_ACCESS_TOKEN_KEY + RESOURCE1, 'access_token_in_cache' + RESOURCE1);
     sessionStorage.setItem(STORAGE_EXPIRATION_KEY + RESOURCE1, SECONDS_TO_EXPIRE); // seconds to expire
 
-    // add key
     sessionStorage.setItem(STORAGE_TOKEN_KEYS, RESOURCE1 + '|');
 
     auth = new SalteAuth({
@@ -41,7 +41,6 @@ describe('salte-auth', () => {
       clientId: 'e9a5a8b6-8af7-4719-9821-0deef255f68e'
     });
     sandbox.stub(auth, 'navigate');
-    auth.crypto = {};
     auth.CONSTANTS.LOADFRAME_TIMEOUT = 800;
     window.parent.AuthenticationContext = auth;
   });
@@ -212,7 +211,7 @@ describe('salte-auth', () => {
         done();
       };
       auth.callback = callback;
-      Math.random = sandbox.stub().returns(0.2);
+      uuid.v4 = sandbox.stub().returns('33333333-3333-4333-b333-333333333333');
 
       auth.login();
     });
@@ -385,7 +384,7 @@ describe('salte-auth', () => {
       auth.config.expireOffsetSeconds = SECONDS_TO_EXPIRE + 100;
       auth._renewStates = [];
       auth._user = { profile: { upn: 'test@testuser.com' }, userName: 'test@domain.com' };
-      Math.random = sandbox.stub().returns(0.1);
+      uuid.v4 = sandbox.stub().returns('11111111-1111-4111-9111-111111111111');
       sandbox.spy(auth, '_loadFrameTimeout');
       auth.acquireToken(RESOURCE1, sandbox.spy());
       expect(auth._loadFrameTimeout.calledWith('https://login.microsoftonline.com/tenant/oauth2/authorize' +
@@ -400,7 +399,7 @@ describe('salte-auth', () => {
         'authRenewFrametoken.resource1',
         'token.resource1')).to.equal(true);
 
-      Math.random = sandbox.stub().returns(0.3);
+      uuid.v4 = sandbox.stub().returns('44444444-4444-4444-8444-444444444444');
       auth._activeRenewals = {};
       auth._user = { profile: { sub: 'test@testuser.com' }, userName: 'test@domain.com' };
       auth.acquireToken(RESOURCE1, sandbox.spy());
@@ -418,44 +417,6 @@ describe('salte-auth', () => {
       setTimeout(() => {
         done();
       }, 2000);
-    });
-  });
-
-  describe('function: _guid', () => {
-    it('check guid masking', () => {
-      // masking is required for ver4 guid at begining hex  after version block
-      // 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
-      Math.random = sandbox.stub().returns(0.1);
-
-      // 1->0001 after masked with & 0011 | 1000  1001
-      expect(auth._guid()).to.equal('11111111-1111-4111-9111-111111111111');
-      Math.random = sandbox.stub().returns(0.3);
-
-      // 4->0100 after masked with & 0011 | 1000  1000
-      expect(auth._guid()).to.equal('44444444-4444-4444-8444-444444444444');
-      Math.random = sandbox.stub().returns(0.99);
-
-      // 15->1111 after masked with & 0011 | 1000  1011
-      expect(auth._guid()).to.equal('ffffffff-ffff-4fff-bfff-ffffffffffff');
-
-      Math.random = sandbox.stub().returns(0.9);
-
-      // 14->1110 after masked with & 0011 | 1000  1010
-      expect(auth._guid()).to.equal('eeeeeeee-eeee-4eee-aeee-eeeeeeeeeeee');
-      Math.random = sandbox.stub().returns(0.2);
-
-      // 3->0011 after masked with & 0011 | 1000  1011
-      expect(auth._guid()).to.equal('33333333-3333-4333-b333-333333333333');
-    });
-
-    it('tests _guid function if window.crypto is defined in the browser', () => {
-      const buffer = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-      auth.crypto.getRandomValues = function(_buffer) {
-        for (let i = 0; i < _buffer.length; i++) {
-          _buffer[i] = buffer[i];
-        }
-      };
-      expect(auth._guid()).to.equal('00010203-0405-4607-8809-0a0b0c0d0e0f');
     });
   });
 
