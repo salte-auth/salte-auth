@@ -1,6 +1,6 @@
 {
   "name": "salte-auth",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "dist/salte-auth.js",
   "description": "OAuth 2.0 for the masses!",
   "homepage": "https://github.com/salte-io/salte-auth",
@@ -34,6 +34,9 @@
     "semantic-release": "semantic-release pre && npm run build:prod && npm publish && npm run publish-latest && semantic-release post"
   },
   "license": "MIT",
+  "dependencies": {
+    "uuid": "2.0.3"
+  },
   "devDependencies": {
     "babel-core": "6.17.0",
     "babel-loader": "6.2.5",
