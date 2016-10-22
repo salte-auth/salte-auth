@@ -37,7 +37,7 @@ describe('salte-auth', () => {
 
     auth = new SalteAuth({
       loginResource: 'defaultResource',
-      instance: 'https://login.microsoftonline.com/tenant/oauth2/',
+      url: 'https://login.microsoftonline.com/tenant/oauth2/',
       clientId: 'e9a5a8b6-8af7-4719-9821-0deef255f68e'
     });
     sandbox.stub(auth, 'navigate');
@@ -52,7 +52,7 @@ describe('salte-auth', () => {
 
   describe('function: getResourceForEndpoint', () => {
     it('gets specific resource for defined endpoint mapping', () => {
-      auth.config.endpoints = {
+      auth.config.securedEndpoints = {
         a: 'resource for a'
       };
       expect(auth.getResourceForEndpoint('a')).to.equal('resource for a');
@@ -60,7 +60,7 @@ describe('salte-auth', () => {
     });
 
     it('gets default resource for empty endpoint mapping', () => {
-      auth.config.endpoints = null;
+      auth.config.securedEndpoints = null;
       expect(auth.getResourceForEndpoint('a')).to.equal('defaultResource');
       expect(auth.getResourceForEndpoint('b')).to.equal('defaultResource');
     });
@@ -902,7 +902,7 @@ describe('salte-auth', () => {
     });
 
     it('verifies _getNavigateUrl() returns the correct value when scope and responseType are not truthy', () => {
-      auth.config.instance = 'https://login.microsoftonline.com/contoso/oauth2/';
+      auth.config.url = 'https://login.microsoftonline.com/contoso/oauth2/';
       auth.config.scope = '';
       auth.setResponseType('');
       auth.config.clientId = 'the_client_id';
@@ -913,7 +913,7 @@ describe('salte-auth', () => {
     });
 
     it('verifies _getNavigateUrl() returns the correct value when scope is not truthy and responseType is truthy', () => {
-      auth.config.instance = 'https://login.microsoftonline.com/contoso/oauth2/';
+      auth.config.url = 'https://login.microsoftonline.com/contoso/oauth2/';
       auth.config.scope = '';
       auth.setResponseType('id_token token');
       auth.config.clientId = 'the_client_id';
@@ -924,7 +924,7 @@ describe('salte-auth', () => {
     });
 
     it('verifies _getNavigateUrl() returns the correct value when scope is truthy and responseType is not truthy', () => {
-      auth.config.instance = 'https://login.microsoftonline.com/contoso/oauth2/';
+      auth.config.url = 'https://login.microsoftonline.com/contoso/oauth2/';
       auth.config.scope = 'openid';
       auth.setResponseType('');
       auth.config.clientId = 'the_client_id';
@@ -935,7 +935,7 @@ describe('salte-auth', () => {
     });
 
     it('verifies _getNavigateUrl() returns the correct value when scope and responseType are truthy', () => {
-      auth.config.instance = 'https://login.microsoftonline.com/contoso/oauth2/';
+      auth.config.url = 'https://login.microsoftonline.com/contoso/oauth2/';
       auth.config.scope = 'openid';
       auth.setResponseType('id_token token');
       auth.config.clientId = 'the_client_id';
