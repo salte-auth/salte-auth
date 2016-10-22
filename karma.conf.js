@@ -1,21 +1,32 @@
-var webpackConfig = require('./webpack.test.config.js');
+const webpackConfig = require('./webpack.test.config.js');
+webpackConfig.module.loaders[0].query = {
+  presets: [
+    "es2015"
+  ],
+  plugins: [
+    ['istanbul', {
+      exclude: [
+        '**/*.spec.js'
+      ]
+    }]
+  ]
+};
 
 module.exports = function(config) {
   config.set({
     basePath: '',
 
     frameworks: [
-      'jasmine',
+      'mocha',
       'sinon'
     ],
 
     files: [
-      'tests/index.js'
+      'tests/**/*.spec.js'
     ],
 
     preprocessors: {
-      'tests/index.js': ['webpack', 'sourcemap'],
-      'src/**/*.js': ['coverage']
+      'tests/**/*.spec.js': ['webpack', 'sourcemap']
     },
 
     webpack: webpackConfig,
@@ -44,10 +55,7 @@ module.exports = function(config) {
 
     browsers: ['PhantomJS'],
 
-    captureTimeout: 60000,
-    browserDisconnectTimeout: 7000,
-    browserDisconnectTolerance: 1,
-    browserDisconnectNoActivityTimeout: 60000,
+    browserNoActivityTimeout: 120000,
 
     singleRun: false
   });

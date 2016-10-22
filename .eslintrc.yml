@@ -4,9 +4,17 @@ env:
   serviceworker: true
   worker: true
 globals:
-  angular: true
   Logging: true
+parserOptions:
+  sourceType: module
 rules:
+  comma-dangle:
+    - error
+    - arrays: never
+      objects: never
+      imports: never
+      exports: never
+      functions: never
   max-nested-callbacks: 0
   no-warning-comments: 0
   require-jsdoc: 0
@@ -20,3 +28,6 @@ rules:
   prefer-const: 2
   no-confusing-arrow: 2
   prefer-arrow-callback: 2
+  consistent-this:
+    - error
+    - window.AuthenticationContext
