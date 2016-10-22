@@ -1,0 +1,32 @@
+{
+  "name": "salte-auth",
+  "version": "0.0.0",
+  "description": "OAuth 2.0 for the masses!",
+  "main": [
+    "dist/salte-auth.js",
+    "dist/salte-auth.js.map"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salte-io/salte-auth.git"
+  },
+  "keywords": [
+    "salte-auth",
+    "oauth",
+    "2.0",
+    "authentication"
+  ],
+  "authors": [
+    "Ceci <admin@cecilias.me>",
+    "Dave Woodward <dave@salte.io>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/salte-io/salte-auth",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
