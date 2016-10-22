@@ -22,7 +22,14 @@
  *  @property {object} profile - properties parsed from idtoken.
  */
 
+import uuid from 'uuid';
+
 export default class AuthenticationContext {
+  /**
+   * Creates a new AuthenticationContext object.
+   * @constructor
+   * @param {object}  config               Configuration options for AuthenticationContext
+   */
   constructor(config) {
     /**
     * Enum for request type
@@ -91,7 +98,6 @@ export default class AuthenticationContext {
     this.callback = null;
     this.popUp = false;
     this.isAngular = false;
-    this.crypto = window.crypto || window.msCrypto;
 
     // private
     this._user = null;
@@ -160,9 +166,9 @@ export default class AuthenticationContext {
       this.info('Login in progress');
       return;
     }
-    const expectedState = this._guid();
+    const expectedState = uuid.v4();
     this.config.state = expectedState;
-    this._idTokenNonce = this._guid();
+    this._idTokenNonce = uuid.v4();
     if (!startPage) {
       startPage = window.location;
     }
@@ -335,7 +341,7 @@ export default class AuthenticationContext {
     // use given resource to create new authz url
     this.info('renewToken is called for resource:' + resource);
     const frameHandle = this._addAuthFrame('authRenewFrame' + resource);
-    const expectedState = this._guid() + '|' + resource;
+    const expectedState = uuid.v4() + '|' + resource;
     this.config.state = expectedState;
     // renew happens in iframe, so it keeps javascript context
     this._renewStates.push(expectedState);
@@ -355,8 +361,8 @@ export default class AuthenticationContext {
     // use iframe to try refresh token
     this.info('renewIdToken is called');
     const frameHandle = this._addAuthFrame('authIdTokenFrame');
-    const expectedState = this._guid() + '|' + this.config.clientId;
-    this._idTokenNonce = this._guid();
+    const expectedState = uuid.v4() + '|' + this.config.clientId;
+    this._idTokenNonce = uuid.v4();
     this._saveItem(this.CONSTANTS.STORAGE.NONCE_IDTOKEN, this._idTokenNonce);
     this.config.state = expectedState;
     // renew happens in iframe, so it keeps javascript context
@@ -951,59 +957,8 @@ export default class AuthenticationContext {
   }
 
   _base64DecodeStringUrlSafe(base64IdToken) {
-    // html5 should support atob function for decoding
     base64IdToken = base64IdToken.replace(/-/g, '+').replace(/_/g, '/');
-    if (window.atob) {
-      return decodeURIComponent(escape(window.atob(base64IdToken)));
-    }
-    return decodeURIComponent(escape(this._decode(base64IdToken)));
-  }
-
-  // Take https://cdnjs.cloudflare.com/ajax/libs/Base64/0.3.0/base64.js and https://en.wikipedia.org/wiki/Base64 as reference.
-  _decode(base64IdToken) {
-    const codes = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-    base64IdToken = String(base64IdToken).replace(/[=]+$/, '');
-
-    const length = base64IdToken.length;
-    if (length % 4 === 1) {
-      throw new Error('The token to be decoded is not correctly encoded.');
-    }
-
-    let h1, h2, h3, h4, bits, c1, c2, c3;
-    let decoded = '';
-    for (let i = 0; i < length; i += 4) {
-      // Every 4 base64 encoded character will be converted to 3 byte string, which is 24 bits
-      // then 6 bits per base64 encoded character
-      h1 = codes.indexOf(base64IdToken.charAt(i));
-      h2 = codes.indexOf(base64IdToken.charAt(i + 1));
-      h3 = codes.indexOf(base64IdToken.charAt(i + 2));
-      h4 = codes.indexOf(base64IdToken.charAt(i + 3));
-
-      // For padding, if last two are '='
-      if (i + 2 === length - 1) {
-        bits = h1 << 18 | h2 << 12 | h3 << 6;
-        c1 = bits >> 16 & 255;
-        c2 = bits >> 8 & 255;
-        decoded += String.fromCharCode(c1, c2);
-        break;
-      } else if (i + 1 === length - 1) { // if last one is '='
-        bits = h1 << 18 | h2 << 12;
-        c1 = bits >> 16 & 255;
-        decoded += String.fromCharCode(c1);
-        break;
-      }
-
-      bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
-
-      // then convert to 3 byte chars
-      c1 = bits >> 16 & 255;
-      c2 = bits >> 8 & 255;
-      c3 = bits & 255;
-
-      decoded += String.fromCharCode(c1, c2, c3);
-    }
-
-    return decoded;
+    return decodeURIComponent(escape(window.atob(base64IdToken)));
   }
 
     // Auth.node js crack function
@@ -1053,7 +1008,7 @@ export default class AuthenticationContext {
         str.push(obj.extraQueryParameter);
       }
 
-      const correlationId = obj.correlationId ? obj.correlationId : this._guid();
+      const correlationId = obj.correlationId ? obj.correlationId : uuid.v4();
       str.push('client-request-id=' + encodeURIComponent(correlationId));
     }
 
@@ -1082,62 +1037,6 @@ export default class AuthenticationContext {
       hex = '0' + hex;
     }
     return hex;
-  }
-
-  _guid() {
-    // RFC4122: The version 4 UUID is meant for generating UUIDs from truly-random or
-    // pseudo-random numbers.
-    // The algorithm is as follows:
-    //     Set the two most significant bits (bits 6 and 7) of the
-    //        clock_seq_hi_and_reserved to zero and one, respectively.
-    //     Set the four most significant bits (bits 12 through 15) of the
-    //        time_hi_and_version field to the 4-bit version number from
-    //        Section 4.1.3. Version4
-    //     Set all the other bits to randomly (or pseudo-randomly) chosen
-    //     values.
-    // UUID                   = time-low "-" time-mid "-"time-high-and-version "-"clock-seq-reserved and low(2hexOctet)"-" node
-    // time-low               = 4hexOctet
-    // time-mid               = 2hexOctet
-    // time-high-and-version  = 2hexOctet
-    // clock-seq-and-reserved = hexOctet:
-    // clock-seq-low          = hexOctet
-    // node                   = 6hexOctet
-    // Format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
-    // y could be 1000, 1001, 1010, 1011 since most significant two bits needs to be 10
-    // y values are 8, 9, A, B
-    if (this.crypto && this.crypto.getRandomValues) {
-      const buffer = new Uint8Array(16);
-      this.crypto.getRandomValues(buffer);
-      // buffer[6] and buffer[7] represents the time_hi_and_version field. We will set the four most significant bits (4 through 7) of buffer[6] to represent decimal number 4 (UUID version number).
-      buffer[6] |= 0x40; // buffer[6] | 01000000 will set the 6 bit to 1.
-      buffer[6] &= 0x4f; // buffer[6] & 01001111 will set the 4, 5, and 7 bit to 0 such that bits 4-7 == 0100 = "4".
-      // buffer[8] represents the clock_seq_hi_and_reserved field. We will set the two most significant bits (6 and 7) of the clock_seq_hi_and_reserved to zero and one, respectively.
-      buffer[8] |= 0x80; // buffer[8] | 10000000 will set the 7 bit to 1.
-      buffer[8] &= 0xbf; // buffer[8] & 10111111 will set the 6 bit to 0.
-      return this._decimalToHex(buffer[0]) + this._decimalToHex(buffer[1]) + this._decimalToHex(buffer[2]) + this._decimalToHex(buffer[3]) + '-' + this._decimalToHex(buffer[4]) + this._decimalToHex(buffer[5]) + '-' + this._decimalToHex(buffer[6]) + this._decimalToHex(buffer[7]) + '-' +
-             this._decimalToHex(buffer[8]) + this._decimalToHex(buffer[9]) + '-' + this._decimalToHex(buffer[10]) + this._decimalToHex(buffer[11]) + this._decimalToHex(buffer[12]) + this._decimalToHex(buffer[13]) + this._decimalToHex(buffer[14]) + this._decimalToHex(buffer[15]);
-    }
-    const guidHolder = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
-    const hex = '0123456789abcdef';
-    let r = 0;
-    let guidResponse = "";
-    for (let i = 0; i < 36; i++) {
-      if (guidHolder[i] !== '-' && guidHolder[i] !== '4') {
-                  // each x and y needs to be random
-        r = Math.random() * 16 | 0;
-      }
-      if (guidHolder[i] === 'x') {
-        guidResponse += hex[r];
-      } else if (guidHolder[i] === 'y') {
-                  // clock-seq-and-reserved first hex is filtered and remaining hex values are random
-        r &= 0x3; // bit and with 0011 to set pos 2 to zero ?0??
-        r |= 0x8; // set pos 3 to 1 as 1???
-        guidResponse += hex[r];
-      } else {
-        guidResponse += guidHolder[i];
-      }
-    }
-    return guidResponse;
   }
 
   _expiresIn(expires) {
