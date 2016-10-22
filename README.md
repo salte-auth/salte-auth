@@ -8,7 +8,10 @@
 [![Commitizen friendly][commitizen-image]][commitizen-url]
 [![semantic-release][semantic-release-image]][semantic-release-url]
 
-WIP: Move along this project is still in development!
+<!-- TODO: Remove this when we release! -->
+**WIP: Move along this project is still in development!**
+
+OAuth 2.0 for the masses!
 
 ## Install
 
