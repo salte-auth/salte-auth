@@ -2,7 +2,7 @@
   "name": "salte-auth",
   "version": "0.0.0-semantically-released.0",
   "main": "dist/salte-auth.js",
-  "description": "Test",
+  "description": "OAuth 2.0 for the masses!",
   "homepage": "https://github.com/salte-io/salte-auth",
   "bugs": "https://github.com/salte-io/salte-auth/issues",
   "contributors": [
@@ -10,7 +10,10 @@
     "Dave Woodward <dave@salte.io>"
   ],
   "keywords": [
-    "salte-auth"
+    "salte-auth",
+    "oauth",
+    "2.0",
+    "authentication"
   ],
   "engines": {
     "node": ">= 5.4.1 < 6"
