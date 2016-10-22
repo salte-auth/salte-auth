@@ -1,11 +1,18 @@
 /**
  * @public
  * @class Config
- * @property {clientId}        Identifier assigned to your app by Azure Active Directory
- * @property {redirectUri}     Endpoint at which you expect to receive tokens
- * @property {instance}        This is the URL path to the identity provider that authorize and logout will be called against.
- * @property {endpoints}       Collection of {Endpoint-ResourceId} used for autmatically attaching tokens in webApi calls
- * @property {scope}           This may be used to define the specific authorization(s) being requested from the resource owner.
+ * @property {string} url                 Required.  This is the base url for the identity provider's authorize endpoint; not including authorize.
+ * @property {string} responseType        Optional; defaults to id_token.  OAuth 2.0 Response Type value that determines the authorization processing flow to be used, including what parameters are returned from the endpoints used.
+ * @property {string} clientId            Required.  OAuth 2.0 Client Identifier valid at the Authorization Server.
+ * @property {string} scope               Optional.  This may be used to define the specific authorization(s) being requested from the resource owner.
+ * @property {string} redirectUri         Optional; defaults to current window location.  Redirection URI to which the response will be sent. This URI MUST exactly match one of the Redirection URI values for the Client pre-registered at the OpenID Provider.
+ * @property {string} loginResource       Optional; defaults to clientId.
+ * @property {object} securedEndpoints    Optional.  Object containing one or more named endpoints (e.g. { "Endpoint": "ResourceId" }).  This list is used to identify endpoints to which tokens should be attached.  If "Endpoint" exists anywhere within the endpoint being called then it is considered to be a match.  If the endpoint being called doesn't match then either no token will be passed or, if the endpoint's hostname matches the application hostname, then the id_token will be passed.
+ * @property {Array} anonymousEndpoints   Optional.  Array containing one or more endpoints to which a token need not be attached.  If the endpoint specified exists anywhere within the endpoint being called then it is considered to be a match.
+ * @property {boolean} isAngular          Optional.  Used to tell this library whether it should handle the callback from the authorization server itself or bubble the response up to the main window's URL and let the Angular http interceptor handle it.
+ * @property {function} displayCall       Optional.  If specified then this function will be called with the fully-formed authorization url when login is invoked.
+ * @property {boolean} popUp              Optional; defaults to true.
+ * @property {function} callback          Optional.  If specified then this function will be called upon receiving a successful response or error from the authorization server.
  */
 
 /**
@@ -15,15 +22,14 @@
  *  @property {object} profile - properties parsed from idtoken.
  */
 
-/**
- * Creates a new AuthenticationContext object.
- * @constructor
- * @param {object}  config               Configuration options for AuthenticationContext
- */
-
 import uuid from 'uuid';
 
 export default class AuthenticationContext {
+  /**
+   * Creates a new AuthenticationContext object.
+   * @constructor
+   * @param {object}  config               Configuration options for AuthenticationContext
+   */
   constructor(config) {
     /**
     * Enum for request type
@@ -121,8 +127,8 @@ export default class AuthenticationContext {
       this.callback = this.config.callback;
     }
 
-    if (!this.config.instance || !this.config.instance.match(/^https:\/\/.*\/$/)) {
-      throw new Error('instance must be a valid https endpoint that ends in a forward slash.');
+    if (!this.config.url || !this.config.url.match(/^https:\/\/.*\/$/)) {
+      throw new Error('url must be a valid https endpoint that ends in a forward slash.');
     }
 
     // App can request idtoken for itself using clientid as resource
@@ -522,7 +528,7 @@ export default class AuthenticationContext {
       logout = 'post_logout_redirect_uri=' + encodeURIComponent(this.config.postLogoutRedirectUri);
     }
 
-    const urlNavigate = this.config.instance + 'logout?' + logout;
+    const urlNavigate = this.config.url + 'logout?' + logout;
     this.info('Logout navigate to: ' + urlNavigate);
     this.promptUser(urlNavigate);
   }
@@ -837,11 +843,11 @@ export default class AuthenticationContext {
    * @return {string} resource for this API endpoint
    */
   getResourceForEndpoint(endpoint) {
-    if (this.config && this.config.endpoints) {
-      for (const configEndpoint in this.config.endpoints) {
+    if (this.config && this.config.securedEndpoints) {
+      for (const configEndpoint in this.config.securedEndpoints) {
         // configEndpoint is like /api/Todo requested endpoint can be /api/Todo/1
         if (endpoint.indexOf(configEndpoint) > -1) {
-          return this.config.endpoints[configEndpoint];
+          return this.config.securedEndpoints[configEndpoint];
         }
       }
     }
@@ -919,7 +925,7 @@ export default class AuthenticationContext {
   }
 
   _getNavigateUrl(responseType, resource) {
-    let urlNavigate = this.config.instance + 'authorize' + this._serialize(responseType, this.config, resource) + this._addLibMetadata();
+    let urlNavigate = this.config.url + 'authorize' + this._serialize(responseType, this.config, resource) + this._addLibMetadata();
     if (this.config.scope) {
       urlNavigate += '&scope=' + encodeURIComponent(this.config.scope);
     }
