@@ -14,14 +14,6 @@ module.exports = {
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
-  externals: [{
-    'uuid': {
-      root: 'uuid',
-      commonjs2: 'uuid',
-      commonjs: 'uuid',
-      amd: 'uuid'
-    }
-  }],
   devtool: 'source-map',
   module: {
     preLoaders: [{
