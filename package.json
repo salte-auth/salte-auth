@@ -34,9 +34,6 @@
     "semantic-release": "semantic-release pre && npm run build:prod && npm publish && npm run publish-latest && semantic-release post"
   },
   "license": "MIT",
-  "dependencies": {
-    "uuid": "2.0.3"
-  },
   "devDependencies": {
     "babel-core": "6.17.0",
     "babel-loader": "6.2.5",
@@ -69,6 +66,7 @@
     "publish-latest": "1.1.2",
     "semantic-release": "4.3.5",
     "sinon": "1.17.6",
+    "uuid": "2.0.3",
     "watch": "1.0.1",
     "webpack": "1.13.2"
   },
