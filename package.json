@@ -1,6 +1,6 @@
 {
   "name": "salte-auth",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "main": "dist/salte-auth.js",
   "description": "OAuth 2.0 for the masses!",
   "homepage": "https://github.com/salte-io/salte-auth",
@@ -34,9 +34,6 @@
     "semantic-release": "semantic-release pre && npm run build:prod && npm publish && npm run publish-latest && semantic-release post"
   },
   "license": "MIT",
-  "dependencies": {
-    "uuid": "2.0.3"
-  },
   "devDependencies": {
     "babel-core": "6.17.0",
     "babel-loader": "6.2.5",
@@ -59,7 +56,7 @@
     "karma-mocha": "1.2.0",
     "karma-mocha-reporter": "2.2.0",
     "karma-phantomjs-launcher": "1.0.2",
-    "karma-sauce-launcher": "1.0.0",
+    "karma-sauce-launcher": "1.1.0",
     "karma-sinon": "1.0.5",
     "karma-sourcemap-loader": "0.3.7",
     "karma-spec-reporter": "0.0.26",
@@ -69,6 +66,7 @@
     "publish-latest": "1.1.2",
     "semantic-release": "4.3.5",
     "sinon": "1.17.6",
+    "uuid": "2.0.3",
     "watch": "1.0.1",
     "webpack": "1.13.2"
   },
