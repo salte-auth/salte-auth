@@ -1,6 +1,6 @@
 {
   "name": "salte-auth",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "main": "dist/salte-auth.js",
   "description": "OAuth 2.0 for the masses!",
   "homepage": "https://github.com/salte-io/salte-auth",
@@ -66,7 +66,7 @@
     "publish-latest": "^1.1.2",
     "semantic-release": "^6.3.2",
     "sinon": "^1.17.6",
-    "uuid": "3.0.0",
+    "uuid": "3.0.1",
     "watch": "^1.0.1",
     "webpack": "^1.13.2"
   },
