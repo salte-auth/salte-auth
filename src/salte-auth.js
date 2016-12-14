@@ -13,6 +13,7 @@
  * @property {function} displayCall       Optional.  If specified then this function will be called with the fully-formed authorization url when login is invoked.
  * @property {boolean} popUp              Optional; defaults to true.
  * @property {function} callback          Optional.  If specified then this function will be called upon receiving a successful response or error from the authorization server.
+ * @property {string} hashPrefix          Optional; defaults to empty string.
  */
 
 /**
@@ -117,6 +118,10 @@ export default class AuthenticationContext {
       throw new Error('clientId is required');
     }
 
+    if (!config.url || !config.url.match(/^https:\/\/.*\/$/)) {
+      throw new Error('url must be a valid https endpoint that ends in a forward slash.');
+    }
+
     this.config = this._cloneConfig(config);
 
     if (this.config.popUp) {
@@ -125,10 +130,6 @@ export default class AuthenticationContext {
 
     if (this.config.callback && typeof this.config.callback === 'function') {
       this.callback = this.config.callback;
-    }
-
-    if (!this.config.url || !this.config.url.match(/^https:\/\/.*\/$/)) {
-      throw new Error('url must be a valid https endpoint that ends in a forward slash.');
     }
 
     // App can request idtoken for itself using clientid as resource
@@ -149,6 +150,10 @@ export default class AuthenticationContext {
     }
 
     this.setResponseType(this.config.responseType);
+
+    if (this._isEmpty(this.config.hashPrefix)) {
+      this.config.hashPrefix = '';
+    }
   }
 
   setResponseType(responseType) {
@@ -624,10 +629,15 @@ export default class AuthenticationContext {
   }
 
   _getHash(hash) {
-    if (hash.indexOf('#/') > -1) {
-      hash = hash.substring(hash.indexOf('#/') + 2);
-    } else if (hash.indexOf('#') > -1) {
-      hash = hash.substring(1);
+    let hashMatch = '#' + this.config.hashPrefix;
+    let index = hash.indexOf(hashMatch + '/');
+    let length = hashMatch.length + 1;
+    if (index === -1) {
+      index = hash.indexOf(hashMatch);
+      length = hashMatch.length;
+    }
+    if (index > -1) {
+      hash = hash.substring(index + length)
     }
 
     return hash;
