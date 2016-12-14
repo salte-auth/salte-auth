@@ -629,7 +629,7 @@ export default class AuthenticationContext {
   }
 
   _getHash(hash) {
-    let hashMatch = '#' + this.config.hashPrefix;
+    const hashMatch = '#' + this.config.hashPrefix;
     let index = hash.indexOf(hashMatch + '/');
     let length = hashMatch.length + 1;
     if (index === -1) {
@@ -637,7 +637,7 @@ export default class AuthenticationContext {
       length = hashMatch.length;
     }
     if (index > -1) {
-      hash = hash.substring(index + length)
+      hash = hash.substring(index + length);
     }
 
     return hash;
