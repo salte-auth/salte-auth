@@ -3,12 +3,14 @@ const webpack = require('webpack');
 const deindent = require('deindent');
 const packageJson = require('./package.json');
 
+const isProd = (process.env.NODE_ENV === 'production');
+
 module.exports = {
   context: path.join(__dirname, 'src'),
   entry: './salte-auth.js',
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'salte-auth.js',
+    filename: isProd ? 'salte-auth.min.js' : 'salte-auth.js',
     sourceMapFilename: '[file].map',
     library: 'salte-auth',
     libraryTarget: 'umd',
