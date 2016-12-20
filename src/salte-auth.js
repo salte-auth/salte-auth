@@ -14,6 +14,7 @@
  * @property {boolean} popUp              Optional; defaults to true.
  * @property {function} callback          Optional.  If specified then this function will be called upon receiving a successful response or error from the authorization server.
  * @property {string} hashPrefix          Optional; defaults to empty string.
+ * @property {string} tokenCallbackTimeout Optional; defaults to 6 seconds.  This is the amount of time salte-auth will wait for the identity provider's token endpoint to respond.
  */
 
 /**
@@ -153,6 +154,10 @@ export default class AuthenticationContext {
 
     if (this._isEmpty(this.config.hashPrefix)) {
       this.config.hashPrefix = '';
+    }
+
+    if (this._isEmpty(this.config.tokenCallbackTimeout)) {
+      this.config.tokenCallbackTimeout = this.CONSTANTS.LOADFRAME_TIMEOUT;
     }
   }
 
@@ -402,7 +407,7 @@ export default class AuthenticationContext {
     setTimeout(() => {
       if (this._getItem(this.CONSTANTS.STORAGE.RENEW_STATUS + resource) === this.CONSTANTS.TOKEN_RENEW_STATUS_IN_PROGRESS) {
         // fail the iframe session if it's in pending state
-        this.verbose('Loading frame has timed out after: ' + (this.CONSTANTS.LOADFRAME_TIMEOUT / 1000) + ' seconds for resource ' + resource);
+        this.verbose('Loading frame has timed out after: ' + (this.config.tokenCallbackTimeout / 1000) + ' seconds for resource ' + resource);
         const expectedState = this._activeRenewals[resource];
 
         this._saveItem(this.CONSTANTS.STORAGE.RENEW_STATUS + resource, this.CONSTANTS.TOKEN_RENEW_STATUS_CANCELED);
@@ -411,7 +416,7 @@ export default class AuthenticationContext {
           this.callBackMappedToRenewStates[expectedState]('Token renewal operation failed due to timeout', null);
         }
       }
-    }, this.CONSTANTS.LOADFRAME_TIMEOUT);
+    }, this.config.tokenCallbackTimeout);
   }
 
   _loadFrame(urlNavigate, frameName) {
