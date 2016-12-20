@@ -1,7 +1,7 @@
 {
   "name": "salte-auth",
   "version": "0.0.0-semantically-released.0",
-  "main": "dist/salte-auth.js",
+  "main": "dist/salte-auth.min.js",
   "description": "OAuth 2.0 for the masses!",
   "homepage": "https://github.com/salte-io/salte-auth",
   "bugs": "https://github.com/salte-io/salte-auth/issues",
@@ -27,8 +27,9 @@
     "test": "karma start --single-run",
     "test:sauce": "karma start karma.ci.conf.js",
     "tdd": "karma start",
-    "build": "webpack --progress --colors -d",
-    "build:prod": "webpack --progress --colors -p",
+    "build": "npm run build:dev && npm run build:prod",
+    "build:dev": "webpack --progress --colors -d",
+    "build:prod": "NODE_ENV=production webpack --progress --colors -p",
     "report-coverage": "coveralls < coverage/lcov.info",
     "publish-latest": "publish-latest --user-email nick+salte-bot@salte.io --user-name salte-bot",
     "semantic-release": "semantic-release pre && npm run build:prod && npm publish && npm run publish-latest && semantic-release post"
