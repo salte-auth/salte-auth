@@ -38,10 +38,10 @@ describe('salte-auth', () => {
     auth = new SalteAuth({
       loginResource: 'defaultResource',
       url: 'https://login.microsoftonline.com/tenant/oauth2/',
-      clientId: 'e9a5a8b6-8af7-4719-9821-0deef255f68e'
+      clientId: 'e9a5a8b6-8af7-4719-9821-0deef255f68e',
+      tokenCallbackTimeout: '800'
     });
     sandbox.stub(auth, 'navigate');
-    auth.CONSTANTS.LOADFRAME_TIMEOUT = 800;
     window.parent.AuthenticationContext = auth;
   });
 
@@ -546,6 +546,12 @@ describe('salte-auth', () => {
       expect(auth.isCallback(hash, undefined)).to.equal(true);
     });
 
+    it('verifies that isCallback returns true if a hashPrefix is present and the fragment portion of the URL contains an id_token and the search portion is blank', () => {
+      const hash = '#!/' + VALID_URLFRAGMENT;
+      auth.config.hashPrefix = '!';
+      expect(auth.isCallback(hash, undefined)).to.equal(true);
+    });
+
     it('verifies that isCallback returns true if the fragment portion of the URL is blank and the search portion contains an id_token', () => {
       const search = '?id_token=eyJ4NXQiOiJObUptT0dVeE16WmxZak0yWkRSaE5UWmxZVEExWXpkaFpUUmlPV0UwTldJMk0ySm1PVGMxWkEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImF1ZCI6WyJoUDdwa3JXYUJQa2NPTERaVmJsel9JZ2VtVmthIl0sImF6cCI6ImhQN3BrcldhQlBrY09MRFpWYmx6X0lnZW1Wa2EiLCJhdXRoX3RpbWUiOjE0NzU1MjI4MDksImlzcyI6Imh0dHBzOlwvXC9sb2NhbGhvc3Q6OTQ0M1wvb2F1dGgyXC90b2tlbiIsInNuIjoiV29vZHdhcmQiLCJnaXZlbl9uYW1lIjoiRGF2aWQiLCJleHAiOjE0NzU1MjMxMDksIm5vbmNlIjoiNWE3MWM5ZmYtYjI1YS00YzE1LWEzNjgtNzdmODgwZWRkOWI2IiwiaWF0IjoxNDc1NTIyODA5fQ.B5KAglX92PPppP66yMkyzD1LA7qdWhrQWqYEOzJ0uFB_ZN8_u7G7Pp0qBy0Uilbh6AS0go64pzX5sxU72psHr6z2xVMJYm8-zjTb1GDVP3thUlZ1nEK-esUjSBLDnN1qKmMINtX82S3KIpAlehB1nZ94kbOHCoZ9v_k1rnTiWRA&state=6777d1e8-6014-403d-ac0c-297dec5cc514';
       expect(auth.isCallback(undefined, search)).to.equal(true);
@@ -729,7 +735,6 @@ describe('salte-auth', () => {
       auth._activeRenewals[RESOURCE1] = 'example';
       auth.callBackMappedToRenewStates.example = function() {
         expect(sessionStorage.getItem(auth.CONSTANTS.STORAGE.RENEW_STATUS + RESOURCE1)).to.equal(auth.CONSTANTS.TOKEN_RENEW_STATUS_CANCELED);
-
         auth._loadFrameTimeout('urlnavigation', 'frameName', RESOURCE1);
         expect(sessionStorage.getItem(auth.CONSTANTS.STORAGE.RENEW_STATUS + RESOURCE1)).to.equal(auth.CONSTANTS.TOKEN_RENEW_STATUS_IN_PROGRESS);
         const requestInfo = {
