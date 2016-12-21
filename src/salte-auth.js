@@ -634,23 +634,17 @@ export default class AuthenticationContext {
   }
 
   _getHash(hash) {
-    const hashMatch = '#' + this.config.hashPrefix;
-    let index = hash.indexOf(hashMatch + '/');
-    let length = hashMatch.length + 1;
-    if (index === -1) {
-      index = hash.indexOf(hashMatch);
-      length = hashMatch.length;
-    }
-    if (index > -1) {
-      hash = hash.substring(index + length);
-    }
+    hash = ((hash.lastIndexOf('#!/') > -1) ? hash.substring(hash.lastIndexOf('#!/') + 3) : hash);
+    hash = ((hash.lastIndexOf('#/') > -1) ? hash.substring(hash.lastIndexOf('#/') + 2) : hash);
+    hash = ((hash.lastIndexOf('#') > -1) ? hash.substring(hash.lastIndexOf('#') + 1) : hash);
 
     return hash;
   }
 
   _getSearch(search) {
-    if (search.indexOf('?') > -1) {
-      search = search.substring(1);
+    const index = search.lastIndexOf('?');
+    if (index > -1) {
+      search = search.substring(index + 1);
     }
 
     return search;
