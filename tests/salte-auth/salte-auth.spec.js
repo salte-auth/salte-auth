@@ -38,10 +38,10 @@ describe('salte-auth', () => {
     auth = new SalteAuth({
       loginResource: 'defaultResource',
       url: 'https://login.microsoftonline.com/tenant/oauth2/',
-      clientId: 'e9a5a8b6-8af7-4719-9821-0deef255f68e'
+      clientId: 'e9a5a8b6-8af7-4719-9821-0deef255f68e',
+      tokenCallbackTimeout: '800'
     });
     sandbox.stub(auth, 'navigate');
-    auth.CONSTANTS.LOADFRAME_TIMEOUT = 800;
     window.parent.AuthenticationContext = auth;
   });
 
@@ -535,6 +535,9 @@ describe('salte-auth', () => {
       expect(auth.isCallback('#/error_description=someting_wrong')).to.equal(true);
       expect(auth.isCallback('#access_token=token123')).to.equal(true);
       expect(auth.isCallback('#id_token=idtoken234')).to.equal(true);
+      auth.config.hashPrefix = '!';
+      expect(auth.isCallback('#!/error_description=someting_wrong')).to.equal(true);
+      expect(auth.isCallback('#!#id_token=idtoken234')).to.equal(true);
     });
 
     it('verifies that isCallback returns false if both the fragment and search portions of the URL are blank', () => {
@@ -729,7 +732,6 @@ describe('salte-auth', () => {
       auth._activeRenewals[RESOURCE1] = 'example';
       auth.callBackMappedToRenewStates.example = function() {
         expect(sessionStorage.getItem(auth.CONSTANTS.STORAGE.RENEW_STATUS + RESOURCE1)).to.equal(auth.CONSTANTS.TOKEN_RENEW_STATUS_CANCELED);
-
         auth._loadFrameTimeout('urlnavigation', 'frameName', RESOURCE1);
         expect(sessionStorage.getItem(auth.CONSTANTS.STORAGE.RENEW_STATUS + RESOURCE1)).to.equal(auth.CONSTANTS.TOKEN_RENEW_STATUS_IN_PROGRESS);
         const requestInfo = {
