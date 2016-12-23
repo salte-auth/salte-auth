@@ -13,6 +13,8 @@
  * @property {function} displayCall       Optional.  If specified then this function will be called with the fully-formed authorization url when login is invoked.
  * @property {boolean} popUp              Optional; defaults to true.
  * @property {function} callback          Optional.  If specified then this function will be called upon receiving a successful response or error from the authorization server.
+ * @property {string} hashPrefix          Optional; defaults to empty string.
+ * @property {string} tokenCallbackTimeout Optional; defaults to 6 seconds.  This is the amount of time salte-auth will wait for the identity provider's token endpoint to respond.
  */
 
 /**
@@ -117,6 +119,10 @@ export default class AuthenticationContext {
       throw new Error('clientId is required');
     }
 
+    if (!config.url || !config.url.match(/^https:\/\/.*\/$/)) {
+      throw new Error('url must be a valid https endpoint that ends in a forward slash.');
+    }
+
     this.config = this._cloneConfig(config);
 
     if (this.config.popUp) {
@@ -125,10 +131,6 @@ export default class AuthenticationContext {
 
     if (this.config.callback && typeof this.config.callback === 'function') {
       this.callback = this.config.callback;
-    }
-
-    if (!this.config.url || !this.config.url.match(/^https:\/\/.*\/$/)) {
-      throw new Error('url must be a valid https endpoint that ends in a forward slash.');
     }
 
     // App can request idtoken for itself using clientid as resource
@@ -149,6 +151,14 @@ export default class AuthenticationContext {
     }
 
     this.setResponseType(this.config.responseType);
+
+    if (this._isEmpty(this.config.hashPrefix)) {
+      this.config.hashPrefix = '';
+    }
+
+    if (this._isEmpty(this.config.tokenCallbackTimeout)) {
+      this.config.tokenCallbackTimeout = this.CONSTANTS.LOADFRAME_TIMEOUT;
+    }
   }
 
   setResponseType(responseType) {
@@ -397,7 +407,7 @@ export default class AuthenticationContext {
     setTimeout(() => {
       if (this._getItem(this.CONSTANTS.STORAGE.RENEW_STATUS + resource) === this.CONSTANTS.TOKEN_RENEW_STATUS_IN_PROGRESS) {
         // fail the iframe session if it's in pending state
-        this.verbose('Loading frame has timed out after: ' + (this.CONSTANTS.LOADFRAME_TIMEOUT / 1000) + ' seconds for resource ' + resource);
+        this.verbose('Loading frame has timed out after: ' + (this.config.tokenCallbackTimeout / 1000) + ' seconds for resource ' + resource);
         const expectedState = this._activeRenewals[resource];
 
         this._saveItem(this.CONSTANTS.STORAGE.RENEW_STATUS + resource, this.CONSTANTS.TOKEN_RENEW_STATUS_CANCELED);
@@ -406,7 +416,7 @@ export default class AuthenticationContext {
           this.callBackMappedToRenewStates[expectedState]('Token renewal operation failed due to timeout', null);
         }
       }
-    }, this.CONSTANTS.LOADFRAME_TIMEOUT);
+    }, this.config.tokenCallbackTimeout);
   }
 
   _loadFrame(urlNavigate, frameName) {
@@ -624,18 +634,18 @@ export default class AuthenticationContext {
   }
 
   _getHash(hash) {
-    if (hash.indexOf('#/') > -1) {
-      hash = hash.substring(hash.indexOf('#/') + 2);
-    } else if (hash.indexOf('#') > -1) {
-      hash = hash.substring(1);
-    }
+    const marker = '#' + this.config.hashPrefix + '/';
+    hash = ((hash.lastIndexOf(marker) > -1) ? hash.substring(hash.lastIndexOf(marker) + this.config.hashPrefix.length + 2) : hash);
+    hash = ((hash.lastIndexOf('#/') > -1) ? hash.substring(hash.lastIndexOf('#/') + 2) : hash);
+    hash = ((hash.lastIndexOf('#') > -1) ? hash.substring(hash.lastIndexOf('#') + 1) : hash);
 
     return hash;
   }
 
   _getSearch(search) {
-    if (search.indexOf('?') > -1) {
-      search = search.substring(1);
+    const index = search.indexOf('?');
+    if (index > -1) {
+      search = search.substring(index + 1);
     }
 
     return search;
