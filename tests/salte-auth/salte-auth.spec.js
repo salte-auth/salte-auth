@@ -535,6 +535,9 @@ describe('salte-auth', () => {
       expect(auth.isCallback('#/error_description=someting_wrong')).to.equal(true);
       expect(auth.isCallback('#access_token=token123')).to.equal(true);
       expect(auth.isCallback('#id_token=idtoken234')).to.equal(true);
+      auth.config.hashPrefix = '!';
+      expect(auth.isCallback('#!/error_description=someting_wrong')).to.equal(true);
+      expect(auth.isCallback('#!#id_token=idtoken234')).to.equal(true);
     });
 
     it('verifies that isCallback returns false if both the fragment and search portions of the URL are blank', () => {
@@ -543,12 +546,6 @@ describe('salte-auth', () => {
 
     it('verifies that isCallback returns true if the fragment portion of the URL contains an id_token and the search portion is blank', () => {
       const hash = '#/' + VALID_URLFRAGMENT;
-      expect(auth.isCallback(hash, undefined)).to.equal(true);
-    });
-
-    it('verifies that isCallback returns true if a hashPrefix is present and the fragment portion of the URL contains an id_token and the search portion is blank', () => {
-      const hash = '#!/' + VALID_URLFRAGMENT;
-      auth.config.hashPrefix = '!';
       expect(auth.isCallback(hash, undefined)).to.equal(true);
     });
 
