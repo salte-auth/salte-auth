@@ -23,16 +23,16 @@
     "url": "https://github.com/salte-io/salte-auth.git"
   },
   "scripts": {
-    "lint": "eslint src/salte-auth.js tests/salte-auth/salte-auth.spec.js",
+    "lint": "eslint src/**/*.js tests/**/*.js",
     "test": "karma start --single-run",
     "test:sauce": "karma start karma.ci.conf.js",
     "tdd": "karma start",
     "build": "npm run build:dev && npm run build:prod",
     "build:dev": "webpack --progress --colors -d",
-    "build:prod": "NODE_ENV=production webpack --progress --colors -p",
+    "build:prod": "webpack --progress --colors -p",
     "report-coverage": "coveralls < coverage/lcov.info",
     "publish-latest": "publish-latest --user-email nick+salte-bot@salte.io --user-name salte-bot",
-    "semantic-release": "semantic-release pre && npm run build:prod && npm publish && npm run publish-latest && semantic-release post"
+    "semantic-release": "semantic-release pre && npm run build && npm publish && npm run publish-latest && semantic-release post"
   },
   "license": "MIT",
   "devDependencies": {
@@ -69,7 +69,8 @@
     "sinon": "^1.17.6",
     "uuid": "3.0.1",
     "watch": "^1.0.1",
-    "webpack": "^1.13.2"
+    "webpack": "^2.2.0-rc.3",
+    "yargs": "^6.6.0"
   },
   "config": {
     "commitizen": {
