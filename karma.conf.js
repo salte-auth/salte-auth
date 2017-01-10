@@ -1,7 +1,7 @@
 const webpackConfig = require('./webpack.test.config.js');
-webpackConfig.module.loaders[0].query = {
+webpackConfig.module.rules[1].options = {
   presets: [
-    "es2015"
+    'es2015'
   ],
   plugins: [
     ['istanbul', {
