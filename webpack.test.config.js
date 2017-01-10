@@ -5,24 +5,24 @@ module.exports = {
     pathinfo: true
   },
   module: {
-    preLoaders: [{
+    rules: [{
+      enforce: 'pre',
       test: /\.js$/,
       include: /tests/,
-      loader: 'eslint'
-    }],
-    loaders: [{
+      loader: 'eslint-loader',
+      options: {
+        emitError: ci,
+        failOnError: ci
+      }
+    }, {
       test: /\.js$/,
       exclude: /node_modules/,
-      loader: 'babel'
+      loader: 'babel-loader'
     }, {
       test: /\.html$/,
       exclude: /node_modules/,
-      loader: 'html'
+      loader: 'html-loader'
     }]
-  },
-  eslint: {
-    emitError: ci,
-    failOnError: ci
   },
   devtool: 'inline-source-map'
 };
