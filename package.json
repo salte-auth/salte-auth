@@ -1,6 +1,6 @@
 {
   "name": "salte-auth",
-  "version": "0.0.0-semantically-released.0",
+  "version": "1.0.15",
   "main": "dist/salte-auth.min.js",
   "description": "OAuth 2.0 for the masses!",
   "homepage": "https://github.com/salte-io/salte-auth",
