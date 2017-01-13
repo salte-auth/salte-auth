@@ -940,8 +940,6 @@ export default class AuthenticationContext {
     if (this.config.scope) {
       urlNavigate += '&scope=' + encodeURIComponent(this.config.scope);
     }
-    if (this.config.quer)
-
     this.info('Navigate url:' + urlNavigate);
     return urlNavigate;
   }
