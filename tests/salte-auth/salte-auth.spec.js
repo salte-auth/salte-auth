@@ -828,7 +828,7 @@ describe('salte-auth', () => {
     });
   });
 
-  describe('function: _initResponseType', () => {
+  describe('function: _getNavigateUrl', () => {
     it('verifies _getNavigateUrl() returns the correct value when tenant and rootContext are undefined, and scope and responseType are not truthy', () => {
       auth.config.tenant = undefined;
       auth.config.rootContext = undefined;
@@ -884,6 +884,18 @@ describe('salte-auth', () => {
       auth.config.state = 'the_state';
       auth.config.correlationId = 'the_correlation_id';
       expect(auth._getNavigateUrl(auth.config.responseType, '')).to.match(/https:\/\/login\.microsoftonline\.com\/contoso\/oauth2\/authorize\?response_type=id_token%20token&client_id=the_client_id&redirect_uri=the_redirect_uri&state=the_state&client-request-id=the_correlation_id.*&scope=openid/);
+    });
+
+    it('verifies _getNavigateUrl() returns the correct value when extraQueryParameter is provided', () => {
+      auth.config.url = 'https://login.microsoftonline.com/contoso/oauth2/';
+      auth.config.scope = 'openid';
+      auth.setResponseType('id_token token');
+      auth.config.clientId = 'the_client_id';
+      auth.config.redirectUri = 'the_redirect_uri';
+      auth.config.state = 'the_state';
+      auth.config.correlationId = 'the_correlation_id';
+      auth.config.extraQueryParameter = 'tenantDomain=wso2.com';
+      expect(auth._getNavigateUrl(auth.config.responseType, '')).to.match(/https:\/\/login\.microsoftonline\.com\/contoso\/oauth2\/authorize\?response_type=id_token%20token&client_id=the_client_id&redirect_uri=the_redirect_uri&state=the_state&tenantDomain=wso2.com&client-request-id=the_correlation_id.*&scope=openid/);
     });
   });
 
