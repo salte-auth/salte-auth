@@ -1,7 +1,8 @@
 /**
  * @public
  * @class Config
- * @property {string} url                 Required.  This is the base url for the identity provider's authorize endpoint; not including authorize.
+ * @property {string} url                 Required.  This is the base url for the identity provider's authorize and token endpoint; not including the word authorize or token.
+ * @property {string} extraQueryParameter Optional.  Value to be included as an additional query parameter when calling the identity provider's authorize and token endpoints.  Should be formatted as "name=value".
  * @property {string} responseType        Optional; defaults to id_token.  OAuth 2.0 Response Type value that determines the authorization processing flow to be used, including what parameters are returned from the endpoints used.
  * @property {string} clientId            Required.  OAuth 2.0 Client Identifier valid at the Authorization Server.
  * @property {string} scope               Optional.  This may be used to define the specific authorization(s) being requested from the resource owner.
@@ -939,6 +940,8 @@ export default class AuthenticationContext {
     if (this.config.scope) {
       urlNavigate += '&scope=' + encodeURIComponent(this.config.scope);
     }
+    if (this.config.quer)
+
     this.info('Navigate url:' + urlNavigate);
     return urlNavigate;
   }
