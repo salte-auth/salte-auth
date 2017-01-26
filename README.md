@@ -1,4 +1,6 @@
 # Salte Auth
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/salte-io/salte-auth.svg)](https://greenkeeper.io/)
 [![Slack Status][slack-image]][slack-url]
 [![NPM Version][npm-version-image]][npm-url]
 [![NPM Downloads][npm-downloads-image]][npm-url]
