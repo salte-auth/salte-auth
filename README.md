@@ -1,4 +1,5 @@
 # Salte Auth
+
 [![Slack Status][slack-image]][slack-url]
 [![NPM Version][npm-version-image]][npm-url]
 [![NPM Downloads][npm-downloads-image]][npm-url]
@@ -7,6 +8,7 @@
 
 [![Commitizen friendly][commitizen-image]][commitizen-url]
 [![semantic-release][semantic-release-image]][semantic-release-url]
+[![Greenkeeper badge][greenkeeper-image]][greenkeeper-url]
 
 OAuth 2.0 for the masses!
 
@@ -78,3 +80,6 @@ THE SOFTWARE.
 
 [semantic-release-url]: https://github.com/semantic-release/semantic-release
 [semantic-release-image]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
+
+[greenkeeper-image]: https://badges.greenkeeper.io/salte-io/salte-auth.svg
+[greenkeeper-url]: https://greenkeeper.io
