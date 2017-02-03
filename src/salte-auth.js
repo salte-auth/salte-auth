@@ -259,7 +259,6 @@ export default class AuthenticationContext {
       try {
         if (popupWindow.location.href.indexOf(registeredRedirectUri) !== -1) {
           if (this.isAngular) {
-            window.location.hash = popupWindow.location.hash;
             this.callback && this.callback();
           } else {
             this.handleWindowCallback(popupWindow.location.hash, popupWindow.location.search);
