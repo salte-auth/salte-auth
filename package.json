@@ -67,7 +67,7 @@
     "uuid": "3.0.1",
     "watch": "^1.0.1",
     "webpack": "^2.2.0-rc.3",
-    "yargs": "^7.0.1"
+    "yargs": "^8.0.1"
   },
   "config": {
     "commitizen": {
