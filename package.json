@@ -41,7 +41,7 @@
     "coveralls": "2.13.1",
     "cz-conventional-changelog": "^1.2.0",
     "deindent": "^0.1.0",
-    "eslint": "^3.8.1",
+    "eslint": "^4.1.0",
     "eslint-config-google": "^0.8.0",
     "eslint-loader": "^1.6.0",
     "eslint-plugin-mocha": "^4.7.0",
