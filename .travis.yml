@@ -10,12 +10,17 @@ branches:
     - /^greenkeeper/.*$/
 addons:
   sauce_connect: true
+before_install:
+  - npm install -g greenkeeper-lockfile@1
 before_script:
   - npm prune
+  - greenkeeper-lockfile-update
 script:
   - npm run lint
   - npm run test:sauce
   - npm run test
+after_script:
+  - greenkeeper-lockfile-upload
 after_success:
   - npm run report-coverage
   - npm run semantic-release
