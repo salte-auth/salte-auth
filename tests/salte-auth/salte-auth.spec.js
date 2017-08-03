@@ -182,15 +182,13 @@ describe('salte-auth', () => {
     });
 
     it('tests login functionality in case of popup window', (done) => {
-      sandbox.stub(window, 'setInterval', (method) => {
+      sandbox.stub(window, 'setInterval').callsFake((method) => {
         method();
       });
       auth.popUp = true;
       auth.config.clientId = 'client';
       auth.config.redirectUri = 'contoso_site';
-      let popupWindow;
-      sandbox.stub(auth, 'open', () => {
-        popupWindow = {
+      sandbox.stub(auth, 'open').returns({
           location: {
             hash: VALID_URLFRAGMENT,
             href: 'hrefcontoso_site',
@@ -200,8 +198,6 @@ describe('salte-auth', () => {
           close: () => {
             this.closed = true;
           }
-        };
-        return popupWindow;
       });
       const callback = (error, token) => {
         sessionStorage.setItem(auth.CONSTANTS.STORAGE.LOGIN_REQUEST, 'home page');
