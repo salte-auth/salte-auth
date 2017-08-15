@@ -28,7 +28,7 @@
     "build:dev": "webpack --progress --colors -d",
     "build:prod": "webpack --progress --colors -p",
     "report-coverage": "coveralls < coverage/lcov.info",
-    "publish-latest": "publish-latest --user-email nick+salte-bot@salte.io --user-name salte-bot",
+    "publish-latest": "publish-latest --user-email bot@salte.io --user-name salte-bot",
     "semantic-release": "semantic-release pre && npm run build && npm publish && npm run publish-latest && semantic-release post"
   },
   "license": "MIT",
