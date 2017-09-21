@@ -74,7 +74,7 @@ module.exports = function(config) {
     sauceLabs: {
       testName: 'salte-io/salte-auth',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-      startConnect: false
+      startConnect: true
     },
 
     customLaunchers: customLaunchers,
