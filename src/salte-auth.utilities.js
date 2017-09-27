@@ -1,0 +1,223 @@
+import { get, set } from 'lodash';
+
+class SalteAuthUtilities {
+  /**
+   * Parses the current url for the authentication values
+   */
+  constructor() {
+    if (window.salte.SalteAuthUtilities.$instance) {
+      return window.salte.SalteAuthUtilities.$instance;
+    }
+    window.salte.SalteAuthUtilities.$instance = this;
+
+    this.interceptors = {
+      fetch: [],
+      xhr: []
+    };
+
+    (function(open) {
+      XMLHttpRequest.prototype.open = function(method, url) {
+        this.$url = url;
+        return open.call(this, method, url);
+      };
+    })(XMLHttpRequest.prototype.open);
+
+    (function(send) {
+      XMLHttpRequest.prototype.send = function(data) {
+        const promises = [];
+        for (let i = 0; i < window.salte.SalteAuthUtilities.$instance.interceptors.xhr.length; i++) {
+          const interceptor = window.salte.SalteAuthUtilities.$instance.interceptors.xhr[i];
+          promises.push(interceptor(this, data));
+        }
+        Promise.all(promises).then(() => {
+          send.call(this, data);
+        }).catch((error) => {
+          const event = document.createEvent('Event');
+          event.initEvent('error', false, true);
+          event.detail = error;
+          this.dispatchEvent(event);
+        });
+      };
+    })(XMLHttpRequest.prototype.send);
+
+    if (window.fetch) {
+      (function(fetch) {
+        window.fetch = function(input, options = {}) {
+          const promises = [];
+          for (let i = 0; i < window.salte.SalteAuthUtilities.$instance.interceptors.fetch.length; i++) {
+            const interceptor = window.salte.SalteAuthUtilities.$instance.interceptors.fetch[i];
+            promises.push(interceptor(input, options));
+          }
+          return Promise.all(promises).then(() => {
+            return fetch.call(this, input, options);
+          });
+        };
+      })(fetch);
+    }
+  }
+
+  /**
+   * Creates a URL using a base url and a queryParams object
+   * @param {String} baseUrl the base url to attach the queryParams to
+   * @param {Object} queryParams the queryParams to attach to the baseUrl
+   * @return {String} the url with the request queryParams
+   */
+  createUrl(baseUrl, queryParams = {}) {
+    let url = baseUrl;
+
+    Object.keys(queryParams).forEach((key) => {
+      const value = queryParams[key];
+      if ([undefined, null, ''].indexOf(value) === -1) {
+        url += `${url.indexOf('?') === -1 ? '?' : '&'}${key}=${encodeURIComponent(value)}`;
+      }
+    });
+
+    return url;
+  }
+
+  resolveUrl(path) {
+    if (!this.$urlDocument) {
+      this.$urlDocument = document.implementation.createHTMLDocument('url');
+      this.$urlBase = this.$urlDocument.createElement('base');
+      this.$urlDocument.head.appendChild(this.$urlBase);
+      this.$urlAnchor = this.$urlDocument.createElement('a');
+    }
+    this.$urlBase.href = window.location.protocol + '//' + window.location.host;
+    this.$urlAnchor.href = path.replace(/ /g, '%20');
+    return this.$urlAnchor.href;
+  }
+
+  /**
+   * Checks if the given url matches any of the test urls
+   * @param {String} url The url to test
+   * @param {String|RegExp} tests The urls to match the test url against
+   * @return {Boolean} true if the url matches one of the tests
+   */
+  checkForMatchingUrl(url, tests = []) {
+    const resolvedUrl = this.resolveUrl(url);
+    for (let i = 0; i < tests.length; i++) {
+      const test = tests[i];
+      if (test instanceof RegExp) {
+        return !!resolvedUrl.match(test);
+      } else {
+        return resolvedUrl.indexOf(test) !== -1;
+      }
+    }
+
+    return false;
+  }
+
+  isRouteSecure(route, securedRoutes) {
+    if (securedRoutes === true) {
+      return true;
+    } else if (securedRoutes instanceof Array) {
+      return this.checkForMatchingUrl(route, securedRoutes);
+    }
+    return false;
+  }
+
+  /**
+   * Opens a popup window in the middle of the viewport
+   * @param {String} url the url to be loaded
+   * @param {String} name the name of the window
+   * @param {Number} height the height of the window
+   * @param {Number} width the width of the window
+   * @return {Promise} resolves when the popup is closed
+   */
+  openPopup(url, name = 'salte-auth', height = 600, width = 400) {
+    const top = ((window.innerHeight / 2) - (height / 2)) + window.screenTop;
+    const left = ((window.innerWidth / 2) - (width / 2)) + window.screenLeft;
+    const popupWindow = window.open(url, name, `height=${height}, width=${width}, status=yes, toolbar=no, menubar=no, location=no, top=${top}, left=${left}`);
+    if (!popupWindow) {
+      return Promise.reject(new ReferenceError('We were unable to open the popup window, its likely that the request was blocked.'));
+    }
+
+    popupWindow.focus();
+    // TODO: Find a better way of tracking when a Popup Window closes.
+    return new Promise((resolve) => {
+      const checker = setInterval(() => {
+        if (!popupWindow.closed) return;
+        clearInterval(checker);
+        setTimeout(resolve);
+      }, 100);
+    });
+  }
+
+  /**
+   * Opens an iframe in the background
+   * @param {String} url the url to be loaded
+   * @param {Boolean} show whether the iframe should be visible
+   * @return {Promise} resolves when the iframe is closed
+   */
+  createIframe(url, show) {
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('owner', 'salte-auth');
+    if (show) {
+      _.assign(iframe.style, {
+        position: 'fixed',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '100%',
+        width: '100%',
+        zIndex: 9999,
+        border: 'none',
+
+        opacity: 0,
+        transition: '0.5s opacity'
+      });
+
+      setTimeout(() => {
+        iframe.style.opacity = 1;
+      });
+    } else {
+      iframe.style.display = 'none';
+    }
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    return new Promise((resolve) => {
+      iframe.addEventListener('DOMNodeRemoved', () => {
+        setTimeout(resolve);
+      });
+    });
+  }
+
+  /**
+   * Adds a XMLHttpRequest interceptor
+   * @param {Function} interceptor the interceptor function
+   */
+  addXHRInterceptor(interceptor) {
+    this.interceptors.xhr.push(interceptor);
+  }
+
+  /**
+   * Adds a fetch interceptor
+   * @param {Function} interceptor the interceptor function
+   */
+  addFetchInterceptor(interceptor) {
+    this.interceptors.fetch.push(interceptor);
+  }
+
+  /**
+   * Checks if the current window is an iframe
+   * @return {HTMLIFrameElement} true if the current window is an iframe.
+   */
+  get iframe() {
+    if (window.self === window.top) {
+      return null;
+    }
+    return parent.document.querySelector('body > iframe[owner="salte-auth"]');
+  }
+
+  get popup() {
+    if (window.opener && window.name === 'salte-auth') {
+      return window;
+    }
+    return null;
+  }
+}
+
+set(window, 'salte.SalteAuthUtilities', get(window, 'salte.SalteAuthUtilities', SalteAuthUtilities));
+export { SalteAuthUtilities };
+export default get(window, 'salte.SalteAuthUtilities.$instance');

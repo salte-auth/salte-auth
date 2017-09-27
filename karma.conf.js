@@ -1,16 +1,13 @@
 const webpackConfig = require('./webpack.test.config.js');
-webpackConfig.module.rules[1].options = {
-  presets: [
-    'es2015'
-  ],
-  plugins: [
-    ['istanbul', {
-      exclude: [
-        '**/*.spec.js'
-      ]
-    }]
-  ]
-};
+webpackConfig.module.rules.push({
+  enforce: 'pre',
+  test: /\.js$/,
+  exclude: /tests|node_modules/,
+  use: {
+    loader: 'istanbul-instrumenter-loader',
+    options: { esModules: true }
+  }
+});
 
 module.exports = function(config) {
   config.set({
@@ -18,15 +15,21 @@ module.exports = function(config) {
 
     frameworks: [
       'mocha',
-      'sinon'
+      'sinon',
+      'polyfill'
+    ],
+
+    polyfills: [
+      'fetch',
+      'Promise'
     ],
 
     files: [
-      'tests/**/*.spec.js'
+      'tests/index.js'
     ],
 
     preprocessors: {
-      'tests/**/*.spec.js': ['webpack', 'sourcemap']
+      'tests/index.js': ['webpack', 'sourcemap']
     },
 
     webpack: webpackConfig,
@@ -45,6 +48,10 @@ module.exports = function(config) {
       ]
     },
 
+    mochaReporter: {
+      showDiff: true
+    },
+
     port: 9876,
 
     colors: true,
@@ -53,7 +60,7 @@ module.exports = function(config) {
 
     autoWatch: true,
 
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadless'],
 
     browserNoActivityTimeout: 120000,
 

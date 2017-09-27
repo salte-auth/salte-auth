@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Salte Auth Demo</title>
+        <script src="salte-auth.js"></script>
+        <style>
+            .vertical {
+                display: flex;
+                flex-direction: column;
+                padding: 5px;
+            }
+
+            .vertical > * {
+                margin: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <button id="login">Login</button>
+        <button id="logout">Logout</button>
+        <button id="navigate">Navigate</button>
+        <div class="vertical">
+            <label>
+                <input type="radio" name="type" value="redirect" checked> Redirect
+            </label>
+            <label>
+                <input type="radio" name="type" value="popup"> Popup
+            </label>
+            <label>
+                <input type="radio" name="type" value="iframe"> Iframe
+            </label>
+        </div>
+        <script>
+            let auth = new salte.SalteAuth({
+                gateway: 'https://nick-woodward.auth0.com',
+                responseType: 'id_token',
+                redirectUrl: location.protocol + '//' + location.host,
+                clientId: 'clPAMX8O88JBusd9u09DsmwQZrKor5ay',
+                scope: 'openid',
+
+                routes: [
+                    'http://localhost:8080/account'
+                ],
+
+                endpoints: [
+                    'https://jsonplaceholder.typicode.com/posts/1'
+                ],
+
+                provider: 'auth0'
+            });
+
+            auth.profile.storageType = 'local';
+
+            document.querySelector('#login').addEventListener('click', function() {
+                var type = document.querySelector('[name="type"]:checked').value
+                switch (type) {
+                    case 'redirect':
+                        return auth.signInWithRedirect();
+                    case 'popup':
+                        return auth.signInWithPopup();
+                    case 'iframe':
+                        return auth.signInWithIframe();
+                }
+            });
+
+            document.querySelector('#logout').addEventListener('click', function() {
+                var type = document.querySelector('[name="type"]:checked').value
+                switch (type) {
+                    case 'redirect':
+                        return auth.signOutWithRedirect();
+                    case 'popup':
+                        return auth.signOutWithPopup();
+                    case 'iframe':
+                        return auth.signOutWithIframe();
+                }
+            });
+
+            document.querySelector('#navigate').addEventListener('click', function() {
+                if (location.pathname === '/') {
+                    history.pushState({}, '', location.protocol + '//' + location.host + '/account');
+                } else {
+                    history.pushState({}, '', location.protocol + '//' + location.host);
+                }
+            });
+
+            fetch('https://jsonplaceholder.typicode.com/posts/1').then(function(response) {
+                return response.json();
+            }).then(function(data) {
+                console.log(data);
+            }).catch(function(error) {
+                console.error(error);
+            });
+
+            var request = new XMLHttpRequest();
+            request.addEventListener('error', function(event) {
+                console.error(event.detail);
+            });
+            request.addEventListener('load', function(event) {
+                console.log(JSON.parse(this.responseText));
+            });
+            request.open('GET', 'https://jsonplaceholder.typicode.com/posts/2');
+            request.send();
+        </script>
+    </body>
+</html>

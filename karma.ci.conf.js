@@ -2,6 +2,11 @@ const webpackConfig = require('./webpack.test.config.js');
 
 module.exports = function(config) {
   const customLaunchers = {
+    ChromeBeta: {
+      base: 'SauceLabs',
+      browserName: 'chrome',
+      version: 'beta'
+    },
     Chrome: {
       base: 'SauceLabs',
       browserName: 'chrome'
@@ -24,6 +29,11 @@ module.exports = function(config) {
       browserName: 'internet explorer',
       version: '10'
     },
+    Safari10: {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      version: '10'
+    },
     Safari9: {
       base: 'SauceLabs',
       browserName: 'safari',
@@ -38,23 +48,45 @@ module.exports = function(config) {
       base: 'SauceLabs',
       browserName: 'safari',
       version: '7'
+    },
+    iPhone7Safari: {
+      base: 'SauceLabs',
+      browserName: 'Safari',
+      platform: 'iOS',
+      platformVersion: '10.3',
+      deviceName: 'iPhone 7 Simulator',
+      deviceOrientation: 'portrait'
+    },
+    Android6Browser: {
+      base: 'SauceLabs',
+      browserName: 'Browser',
+      platform: 'Android',
+      version: '6.0',
+      deviceName: 'Android Emulator',
+      deviceOrientation: 'portrait'
     }
   };
 
-  config.set({
+  const karmaConfig = {
     basePath: '',
 
     frameworks: [
       'mocha',
-      'sinon'
+      'sinon',
+      'polyfill'
+    ],
+
+    polyfill: [
+      'Promise',
+      'fetch'
     ],
 
     files: [
-      'tests/**/*.spec.js'
+      'tests/index.js'
     ],
 
     preprocessors: {
-      'tests/**/*.spec.js': ['webpack', 'sourcemap']
+      'tests/index.js': ['webpack', 'sourcemap']
     },
 
     webpack: webpackConfig,
@@ -63,7 +95,11 @@ module.exports = function(config) {
       noInfo: true
     },
 
-    reporters: ['spec', 'saucelabs'],
+    reporters: ['mocha', 'saucelabs'],
+
+    mochaReporter: {
+      showDiff: true
+    },
 
     port: 9876,
 
@@ -79,10 +115,11 @@ module.exports = function(config) {
 
     customLaunchers: customLaunchers,
     browsers: Object.keys(customLaunchers),
-
     captureTimeout: 0,
     browserNoActivityTimeout: 120000,
 
     singleRun: true
-  });
+  };
+
+  config.set(karmaConfig);
 };
