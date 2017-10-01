@@ -19,6 +19,8 @@ describe('salte-auth', () => {
       fetch: [],
       xhr: []
     };
+    auth.profile.clear();
+    delete window.salte.SalteAuthProfile.$instance;
     delete window.salte.auth;
     sandbox.restore();
   });
@@ -30,10 +32,54 @@ describe('salte-auth', () => {
       expect(new SalteAuth().bogus).to.equal('test');
     });
 
+    it('should allow passing an empty config', () => {
+      delete window.salte.SalteAuthProfile.$instance;
+      delete window.salte.auth;
+
+      auth = new SalteAuth();
+
+      expect(auth.$config).to.deep.equal({
+        storageType: 'session'
+      });
+      expect(auth.$config).to.deep.equal(auth.profile.$$config);
+    });
+
+    it('should default storageType to "session"', () => {
+      delete window.salte.SalteAuthProfile.$instance;
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        test: 'test'
+      });
+
+      expect(auth.$config).to.deep.equal({
+        test: 'test',
+        storageType: 'session'
+      });
+      expect(auth.$config).to.deep.equal(auth.profile.$$config);
+    });
+
+    it('should support overriding the storageType', () => {
+      delete window.salte.SalteAuthProfile.$instance;
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        test: 'test',
+        storageType: 'local'
+      });
+
+      expect(auth.$config).to.deep.equal({
+        test: 'test',
+        storageType: 'local'
+      });
+      expect(auth.$config).to.deep.equal(auth.profile.$$config);
+    });
+
     it('should recreate the path to the instance', () => {
       auth.bogus = 'test';
       expect(auth.bogus).to.equal('test');
 
+      delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
 
       auth = new SalteAuth();
@@ -47,6 +93,7 @@ describe('salte-auth', () => {
       parent.document.body.appendChild(iframe);
       iframe.setAttribute('owner', 'salte-auth');
 
+      delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
 
       auth = new SalteAuth();
@@ -60,6 +107,26 @@ describe('salte-auth', () => {
       };
       sandbox.stub(auth.utilities, 'popup').get(() => popup);
 
+      delete window.salte.SalteAuthProfile.$instance;
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        storageType: 'local'
+      });
+
+      expect(popup.close.callCount).to.equal(0);
+      setTimeout(() => {
+        expect(popup.close.callCount).to.equal(1);
+      });
+    });
+
+    it('should transfer the storage if we are using "sessionStorage"', () => {
+      const popup = {
+        close: sandbox.stub()
+      };
+      sandbox.stub(auth.utilities, 'popup').get(() => popup);
+
+      delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
 
       auth = new SalteAuth();
@@ -510,6 +577,8 @@ describe('salte-auth', () => {
       sandbox.stub(auth.profile, 'accessTokenExpired').get(() => true);
       sandbox.stub(auth.profile, 'clearErrors');
       sandbox.stub(auth.utilities, 'createIframe').returns(Promise.resolve());
+
+      auth.profile.accessToken = '55555-55555';
 
       const promise = auth.retrieveAccessToken();
 

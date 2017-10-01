@@ -6,23 +6,32 @@ import { SalteAuthProfile } from './salte-auth.profile.js';
 import { SalteAuthUtilities } from './salte-auth.utilities.js';
 
 class SalteAuth {
+  /**
+   * Sets up Salte Auth
+   * @param {Object} config the authentication config
+   */
   constructor(config) {
     if (window.salte.auth) {
       return window.salte.auth;
     }
     window.salte.auth = this;
+
     this.$promises = {};
     this.$config = config || {};
     this.providers = providers;
-    this.profile = new SalteAuthProfile();
+    this.profile = new SalteAuthProfile(this.$config);
     this.utilities = new SalteAuthUtilities();
 
     if (this.utilities.iframe) {
       parent.document.body.removeChild(this.utilities.iframe);
     } else if (this.utilities.popup) {
+      // We need to utilize local storage to retain our parsed values
+      if (this.$config.storageType === 'session') {
+        this.profile.$$transfer('session', 'local');
+      }
       setTimeout(this.utilities.popup.close);
     } else if (this.profile.redirectUrl && location.href !== this.profile.redirectUrl) {
-      location.href = this.profile.redirectUrl;
+      history.pushState({}, null, this.profile.redirectUrl);
       this.profile.redirectUrl = undefined;
     } else {
       this.utilities.addXHRInterceptor((request, data) => {
@@ -137,6 +146,10 @@ class SalteAuth {
     this.profile.clear();
     this.$promises.login = this.utilities.openPopup(this.authorizeUrl).then(() => {
       this.$promises.login = null;
+      // We need to utilize local storage to retain our parsed values
+      if (this.$config.storageType === 'session') {
+        this.profile.$$transfer('local', 'session');
+      }
       const error = this.profile.validate();
 
       if (error) {

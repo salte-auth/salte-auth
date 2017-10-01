@@ -1,16 +1,19 @@
-import { get, set } from 'lodash';
+import { defaults, get, set } from 'lodash';
 import moment from 'moment';
 
 class SalteAuthProfile {
   /**
    * Parses the current url for the authentication values
+   * @param {Object} config the authentication config
    */
-  constructor() {
+  constructor(config) {
     if (window.salte.SalteAuthProfile.$instance) {
       return window.salte.SalteAuthProfile.$instance;
     }
     window.salte.SalteAuthProfile.$instance = this;
-
+    this.$$config = defaults(config, {
+      storageType: 'session'
+    });
     if (location.hash) {
       const params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
       for (let i = 0; i < params.length; i++) {
@@ -67,7 +70,7 @@ class SalteAuthProfile {
   }
 
   get tokenType() {
-    return this.$getStorage().getItem('salte.auth.token-type');
+    return this.$storage.getItem('salte.auth.token-type');
   }
 
   set tokenType(tokenType) {
@@ -79,7 +82,7 @@ class SalteAuthProfile {
    * @return {Moment} the expiration time as a moment object
    */
   get expiration() {
-    return this.$getStorage().getItem('salte.auth.expiration');
+    return this.$storage.getItem('salte.auth.expiration');
   }
 
   set expiration(expiration) {
@@ -87,7 +90,7 @@ class SalteAuthProfile {
   }
 
   get accessToken() {
-    return this.$getStorage().getItem('salte.auth.access-token');
+    return this.$storage.getItem('salte.auth.access-token');
   }
 
   set accessToken(accessToken) {
@@ -95,7 +98,7 @@ class SalteAuthProfile {
   }
 
   get idToken() {
-    return this.$getStorage().getItem('salte.auth.id-token');
+    return this.$storage.getItem('salte.auth.id-token');
   }
 
   set idToken(idToken) {
@@ -103,7 +106,7 @@ class SalteAuthProfile {
   }
 
   get state() {
-    return this.$getStorage().getItem('salte.auth.state');
+    return this.$storage.getItem('salte.auth.state');
   }
 
   set state(state) {
@@ -111,7 +114,7 @@ class SalteAuthProfile {
   }
 
   get localState() {
-    return this.$getStorage().getItem('salte.auth.local-state');
+    return this.$storage.getItem('salte.auth.local-state');
   }
 
   set localState(localState) {
@@ -119,7 +122,7 @@ class SalteAuthProfile {
   }
 
   get error() {
-    return this.$getStorage().getItem('salte.auth.error');
+    return this.$storage.getItem('salte.auth.error');
   }
 
   set error(error) {
@@ -127,7 +130,7 @@ class SalteAuthProfile {
   }
 
   get errorDescription() {
-    return this.$getStorage().getItem('salte.auth.error-description');
+    return this.$storage.getItem('salte.auth.error-description');
   }
 
   set errorDescription(errorDescription) {
@@ -135,7 +138,7 @@ class SalteAuthProfile {
   }
 
   get redirectUrl() {
-    return this.$getStorage().getItem('salte.auth.redirect-url');
+    return this.$storage.getItem('salte.auth.redirect-url');
   }
 
   set redirectUrl(redirectUrl) {
@@ -143,7 +146,7 @@ class SalteAuthProfile {
   }
 
   get nonce() {
-    return this.$getStorage().getItem('salte.auth.nonce');
+    return this.$storage.getItem('salte.auth.nonce');
   }
 
   set nonce(nonce) {
@@ -191,9 +194,9 @@ class SalteAuthProfile {
    */
   saveItem(key, value) {
     if ([undefined, null].indexOf(value) !== -1) {
-      this.$getStorage().removeItem(key);
+      this.$storage.removeItem(key);
     } else {
-      this.$getStorage().setItem(key, value);
+      this.$storage.setItem(key, value);
     }
   }
 
@@ -202,10 +205,14 @@ class SalteAuthProfile {
    * @param {String} storageType the name of the storageType to use
    * @return {Storage} the storage api to save and pull values from
    */
-  $getStorage(storageType) {
+  get $storage() {
+    return this.$$getStorage(this.$$config.storageType);
+  }
+
+  $$getStorage(storageType) {
     if (storageType === 'local') {
       return localStorage;
-    } else if ([undefined, null, 'session'].indexOf(storageType) !== -1) {
+    } else if (storageType === 'session') {
       return sessionStorage;
     } else {
       throw new ReferenceError(`Unknown Storage Type (${storageType})`);
@@ -213,10 +220,27 @@ class SalteAuthProfile {
   }
 
   /**
+   * Transfers values from one storage type to the other
+   * @param {String} source the name of the storage type to pull from
+   * @param {String} destination the name of the storage type to push to
+   */
+  $$transfer(source, destination) {
+    const sourceStorage = this.$$getStorage(source);
+    const destinationStorage = this.$$getStorage(destination);
+
+    for (const key in sourceStorage) {
+      if (key.indexOf('salte.auth.') !== 0) continue;
+
+      destinationStorage.setItem(key, sourceStorage.getItem(key));
+      sourceStorage.removeItem(key);
+    }
+  }
+
+  /**
    * Clears all `salte.auth` values from localStorage
    */
   clear() {
-    for (const key in this.$getStorage()) {
+    for (const key in this.$storage) {
       if (key.indexOf('salte.auth.') === 0) {
         this.saveItem(key, undefined);
       }

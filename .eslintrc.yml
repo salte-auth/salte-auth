@@ -3,8 +3,6 @@ env:
   browser: true
 plugins:
   - compat
-globals:
-  Logging: true
 parserOptions:
   sourceType: module
 rules:

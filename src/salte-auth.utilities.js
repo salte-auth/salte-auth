@@ -1,4 +1,4 @@
-import { get, set } from 'lodash';
+import { assign, get, set } from 'lodash';
 
 class SalteAuthUtilities {
   /**
@@ -153,7 +153,7 @@ class SalteAuthUtilities {
     const iframe = document.createElement('iframe');
     iframe.setAttribute('owner', 'salte-auth');
     if (show) {
-      _.assign(iframe.style, {
+      assign(iframe.style, {
         position: 'fixed',
         top: 0,
         bottom: 0,

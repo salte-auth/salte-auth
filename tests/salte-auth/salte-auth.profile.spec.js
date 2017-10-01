@@ -248,16 +248,16 @@ describe('salte-auth.profile', () => {
       salte.auth.$config = {};
     });
 
-    it('should default to sessionStorage', () => {
-      expect(profile.$getStorage()).to.equal(sessionStorage);
+    it('should support using sessionStorage', () => {
+      expect(profile.$$getStorage('session')).to.equal(sessionStorage);
     });
 
     it('should support using localStorage', () => {
-      expect(profile.$getStorage('local')).to.equal(localStorage);
+      expect(profile.$$getStorage('local')).to.equal(localStorage);
     });
 
     it('should error if the "storageType" is invalid', () => {
-      expect(() => profile.$getStorage('bogus')).to.throw(ReferenceError, 'Unknown Storage Type (bogus)');
+      expect(() => profile.$$getStorage('bogus')).to.throw(ReferenceError, 'Unknown Storage Type (bogus)');
     });
   });
 
