@@ -11,7 +11,9 @@ describe('salte-auth', () => {
     sandbox.stub(uuid, 'v4').returns('33333333-3333-4333-b333-333333333333');
     sandbox.stub(window, 'setTimeout');
 
-    auth = new SalteAuth();
+    auth = new SalteAuth({
+      provider: 'auth0'
+    });
   });
 
   afterEach(() => {
@@ -242,6 +244,7 @@ describe('salte-auth', () => {
     });
 
     it('should throw an error if the provider was not specified', () => {
+      auth.$config.provider = null;
       expect(() => auth.provider).to.throw('A provider must be specified');
     });
   });
@@ -253,9 +256,21 @@ describe('salte-auth', () => {
         gateway: 'https://api.salte.io',
         redirectUrl: `${location.protocol}//${location.host}`,
         clientId: 'clPAMX8O88JBusd9u09DsmwQZrKor5ay',
-        scope: 'openid'
+        scope: 'openid',
+        provider: 'auth0'
       };
       expect(auth.accessTokenUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=clPAMX8O88JBusd9u09DsmwQZrKor5ay&scope=openid&prompt=none`);
+    });
+
+    it('should utilize authorizeUrl overrides', () => {
+      salte.auth.$config = {
+        gateway: 'https://mydomain.auth.us-east-1.amazoncognito.com',
+        redirectUrl: `${location.protocol}//${location.host}`,
+        clientId: 'clPAMX8O88JBusd9u09DsmwQZrKor5ay',
+        scope: 'openid',
+        provider: 'cognito'
+      };
+      expect(auth.accessTokenUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=clPAMX8O88JBusd9u09DsmwQZrKor5ay&scope=openid&prompt=none`);
     });
   });
 
@@ -266,9 +281,22 @@ describe('salte-auth', () => {
         responseType: 'id_token',
         redirectUrl: `${location.protocol}//${location.host}`,
         clientId: 'clPAMX8O88JBusd9u09DsmwQZrKor5ay',
-        scope: 'openid'
+        scope: 'openid',
+        provider: 'auth0'
       };
       expect(auth.authorizeUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=clPAMX8O88JBusd9u09DsmwQZrKor5ay&scope=openid`);
+    });
+
+    it('should utilize authorizeUrl overrides', () => {
+      salte.auth.$config = {
+        gateway: 'https://mydomain.auth.us-east-1.amazoncognito.com',
+        responseType: 'id_token',
+        redirectUrl: `${location.protocol}//${location.host}`,
+        clientId: 'clPAMX8O88JBusd9u09DsmwQZrKor5ay',
+        scope: 'openid',
+        provider: 'cognito'
+      };
+      expect(salte.auth.authorizeUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=clPAMX8O88JBusd9u09DsmwQZrKor5ay&scope=openid`);
     });
   });
 
@@ -298,7 +326,8 @@ describe('salte-auth', () => {
       sandbox.stub(auth.profile, 'clear');
       sandbox.stub(auth.utilities, 'createIframe').returns(Promise.resolve());
       salte.auth.$config = {
-        gateway: `${location.protocol}//${location.host}`
+        gateway: `${location.protocol}//${location.host}`,
+        provider: 'auth0'
       };
     });
 
@@ -347,12 +376,34 @@ describe('salte-auth', () => {
       sandbox.stub(auth, 'authorizeUrl').get(() => '');
       sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'validate');
+      sandbox.stub(auth.profile, '$$transfer');
+
+      const promise = auth.signInWithPopup();
+
+      expect(auth.profile.clear.callCount).to.equal(1);
+      expect(auth.$promises.login).to.equal(promise);
+      expect(auth.profile.$$transfer.callCount).to.equal(0);
+      return promise.then(() => {
+        expect(auth.profile.$$transfer.callCount).to.equal(1);
+        expect(auth.$promises.login).to.equal(null);
+      });
+    });
+
+    it('should bypass transfering storage when using "localStorage"', () => {
+      sandbox.stub(auth.profile, 'clear');
+      sandbox.stub(auth, 'authorizeUrl').get(() => '');
+      sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
+      sandbox.stub(auth.profile, 'validate');
+      sandbox.stub(auth.profile, '$$transfer');
+
+      auth.$config.storageType = 'local';
 
       const promise = auth.signInWithPopup();
 
       expect(auth.profile.clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
       return promise.then(() => {
+        expect(auth.profile.$$transfer.callCount).to.equal(0);
         expect(auth.$promises.login).to.equal(null);
       });
     });
@@ -499,7 +550,8 @@ describe('salte-auth', () => {
 
     it('should support using a popup to auto login', () => {
       auth.$config = {
-        loginType: 'popup'
+        loginType: 'popup',
+        provider: 'auth0'
       };
       sandbox.stub(auth, 'signInWithPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);

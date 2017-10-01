@@ -77,7 +77,12 @@ class SalteAuth {
     this.profile.localState = uuid.v4();
     this.profile.nonce = uuid.v4();
 
-    return this.utilities.createUrl(`${this.$config.gateway}/authorize`, assign({
+    let authorizeGateway = `${this.$config.gateway}/authorize`;
+    if (this.provider.authorizeUrl) {
+      authorizeGateway = this.provider.authorizeUrl.call(this, this.$config);
+    }
+
+    return this.utilities.createUrl(authorizeGateway, assign({
       'state': this.profile.localState,
       'nonce': this.profile.nonce,
       'response_type': 'token',
@@ -95,7 +100,12 @@ class SalteAuth {
     this.profile.localState = uuid.v4();
     this.profile.nonce = uuid.v4();
 
-    return this.utilities.createUrl(`${this.$config.gateway}/authorize`, assign({
+    let authorizeGateway = `${this.$config.gateway}/authorize`;
+    if (this.provider.authorizeUrl) {
+      authorizeGateway = this.provider.authorizeUrl.call(this, this.$config);
+    }
+
+    return this.utilities.createUrl(authorizeGateway, assign({
       'state': this.profile.localState,
       'nonce': this.profile.nonce,
       'response_type': this.$config.responseType,

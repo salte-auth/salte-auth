@@ -1,7 +1,10 @@
 class SalteAuthCognitoProvider {
+  static authorizeUrl(config) {
+    return `${config.gateway}/oauth2/authorize`;
+  }
+
   static deauthorizeUrl(config) {
-    const gateway = config.gateway.replace('/oauth2', '');
-    return this.utilities.createUrl(`${gateway}/logout`, {
+    return this.utilities.createUrl(`${config.gateway}/logout`, {
       'logout_uri': config.redirectUrl,
       'client_id': config.clientId
     });
