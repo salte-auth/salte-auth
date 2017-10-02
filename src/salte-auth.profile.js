@@ -1,4 +1,4 @@
-import { defaults, get, set } from 'lodash';
+import { defaults, find, get, set } from 'lodash';
 import moment from 'moment';
 
 /**
@@ -215,24 +215,63 @@ class SalteAuthProfile {
 
   /**
    * Verifies that we were logged in successfully and that all security checks pass
-   * @return {String} the error message
+   * @param {Boolean} accessTokenRequest if the request we're validating was an access token request
+   * @return {Object} the error message
    */
-  validate() {
+  validate(accessTokenRequest) {
     if (this.error) {
       return {
         code: this.error,
         description: this.errorDescription
       };
-    } else if (!this.accessToken && this.nonce !== this.userInfo.nonce) {
-      // TODO: Get Nonce validation working for Access Tokens
+    }
+
+    if (this.localState !== this.state) {
+      return {
+        code: 'invalid_state',
+        description: 'State provided by gateway did not match local state.'
+      };
+    }
+
+    if (accessTokenRequest) return;
+
+    if (this.nonce !== this.userInfo.nonce) {
       return {
         code: 'invalid_nonce',
         description: 'Nonce provided by gateway did not match local nonce.'
       };
-    } else if (this.localState !== this.state) {
+    }
+
+    if (Array.isArray(this.userInfo.aud)) {
+      if (!this.userInfo.azp) {
+        return {
+          code: 'invalid_azp',
+          description: 'Audience was returned as an array and AZP was not present on the ID Token.'
+        };
+      }
+
+      if (this.userInfo.azp !== this.$$config.clientId) {
+        return {
+          code: 'invalid_azp',
+          description: 'AZP does not match the Client ID.'
+        };
+      }
+
+
+      const aud = find(this.userInfo.aud, (audience) => {
+        return audience === this.$$config.clientId;
+      });
+
+      if (!aud) {
+        return {
+          code: 'invalid_aud',
+          description: 'None of the audience values matched the Client ID.'
+        };
+      }
+    } else if (this.userInfo.aud !== this.$$config.clientId) {
       return {
-        code: 'invalid_state',
-        description: 'State provided by gateway did not match local state.'
+        code: 'invalid_aud',
+        description: 'The audience did not match the Client ID.'
       };
     }
   }

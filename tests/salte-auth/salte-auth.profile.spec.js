@@ -97,7 +97,12 @@ describe('salte-auth.profile', () => {
   describe('getter(idTokenExpired)', () => {
     let clock;
     beforeEach(() => {
-      profile.idToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImV4cCI6Mn0.r83Cirelw0YWTtTKw3WgbasJnneHMkXaPkqmj4DH418';
+      profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true,
+        exp: 2
+      }))}.0`;
       clock = sandbox.useFakeTimers();
     });
 
@@ -151,17 +156,19 @@ describe('salte-auth.profile', () => {
 
   describe('getter(userInfo)', () => {
     it('should parse the "id_token"', () => {
-      profile.idToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ';
+      profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe'
+      }))}.0`;
       const userInfo = profile.userInfo;
       expect(userInfo).to.deep.equal({
         sub: '1234567890',
-        name: 'John Doe',
-        admin: true
+        name: 'John Doe'
       });
     });
 
     it('should return null if the "id_token" does not have three parts', () => {
-      profile.idToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9';
+      profile.idToken = '0.0';
       const userInfo = profile.userInfo;
       expect(userInfo).to.equal(null);
     });
@@ -174,12 +181,37 @@ describe('salte-auth.profile', () => {
 
   describe('function(validate)', () => {
     it('should return an null if there are no issues', () => {
-      profile.idToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsIm5vbmNlIjpudWxsfQ.MsykD5osfoXwKRr7IFz8XHgSkgIQTDHEtX432LS-QJc';
+      profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe',
+        nonce: null,
+        aud: '55555-55555'
+      }))}.0`;
       profile.nonce = null;
       profile.localState = null;
       profile.state = null;
+      profile.$$config.clientId = '55555-55555';
       const response = profile.validate();
       expect(response).to.be.undefined;
+    });
+
+    it('should return an error if none of the audiences match the "clientId"', () => {
+      profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe',
+        nonce: null,
+        aud: [
+          '55555-55555',
+          'test2'
+        ],
+        azp: '55555-55555'
+      }))}.0`;
+      profile.localState = null;
+      profile.state = null;
+      profile.nonce = null;
+      profile.$$config.clientId = '55555-55555';
+      const response = profile.validate();
+      expect(response).to.deep.equal(undefined);
     });
 
     it('should return an error if "error" is defined', () => {
@@ -192,19 +224,12 @@ describe('salte-auth.profile', () => {
       });
     });
 
-    it('should return an error if the "nonce" does not match the "id_token" nonce', () => {
-      profile.idToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ';
-      profile.nonce = '55555-55555';
-      const response = profile.validate();
-      expect(response).to.deep.equal({
-        code: 'invalid_nonce',
-        description: 'Nonce provided by gateway did not match local nonce.'
-      });
-    });
-
     it('should return an error if the "local-state" does not match the "state"', () => {
-      profile.idToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsIm5vbmNlIjpudWxsfQ.MsykD5osfoXwKRr7IFz8XHgSkgIQTDHEtX432LS-QJc';
-      profile.nonce = null;
+      profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe',
+        nonce: null
+      }))}.0`;
       const response = profile.validate();
       expect(response).to.deep.equal({
         code: 'invalid_state',
@@ -212,11 +237,108 @@ describe('salte-auth.profile', () => {
       });
     });
 
-    it('should skip "nonce" validation if the "access_token" is set', () => {
-      profile.accessToken = 'abcdefg';
+    it('should return an error if the "nonce" does not match the "id_token" nonce', () => {
+      profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe'
+      }))}.0`;
+      profile.nonce = '55555-55555';
       profile.localState = null;
       profile.state = null;
       const response = profile.validate();
+      expect(response).to.deep.equal({
+        code: 'invalid_nonce',
+        description: 'Nonce provided by gateway did not match local nonce.'
+      });
+    });
+
+    it('should return an error if the "aud" does not match the "clientId"', () => {
+      profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe',
+        nonce: null,
+        aud: '55555-55555'
+      }))}.0`;
+      profile.localState = null;
+      profile.state = null;
+      profile.nonce = null;
+      const response = profile.validate();
+      expect(response).to.deep.equal({
+        code: 'invalid_aud',
+        description: 'The audience did not match the Client ID.'
+      });
+    });
+
+    it('should return an error if there are multiple audiences and the azp is not present', () => {
+      profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true,
+        nonce: null,
+        aud: [
+          'test',
+          'test2'
+        ]
+      }))}.0`;
+      profile.localState = null;
+      profile.state = null;
+      profile.nonce = null;
+      const response = profile.validate();
+      expect(response).to.deep.equal({
+        code: 'invalid_azp',
+        description: 'Audience was returned as an array and AZP was not present on the ID Token.'
+      });
+    });
+
+    it('should return an error if there are multiple audiences and the azp does not match the client id', () => {
+      profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true,
+        nonce: null,
+        aud: [
+          'test',
+          'test2'
+        ],
+        azp: '55555-55555'
+      }))}.0`;
+      profile.localState = null;
+      profile.state = null;
+      profile.nonce = null;
+      const response = profile.validate();
+      expect(response).to.deep.equal({
+        code: 'invalid_azp',
+        description: 'AZP does not match the Client ID.'
+      });
+    });
+
+    it('should return an error if none of the audiences match the "clientId"', () => {
+      profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true,
+        nonce: null,
+        aud: [
+          'test',
+          'test2'
+        ],
+        azp: '55555-55555'
+      }))}.0`;
+      profile.localState = null;
+      profile.state = null;
+      profile.nonce = null;
+      profile.$$config.clientId = '55555-55555';
+      const response = profile.validate();
+      expect(response).to.deep.equal({
+        code: 'invalid_aud',
+        description: 'None of the audience values matched the Client ID.'
+      });
+    });
+
+    it('should skip "nonce" validation if the "access_token" is set', () => {
+      profile.localState = null;
+      profile.state = null;
+      const response = profile.validate(true);
       expect(response).to.be.undefined;
     });
   });

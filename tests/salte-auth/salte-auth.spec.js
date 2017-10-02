@@ -355,7 +355,10 @@ describe('salte-auth', () => {
     });
 
     it('should throw validation errors', () => {
-      auth.profile.idToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsIm5vbmNlIjpudWxsfQ.MsykD5osfoXwKRr7IFz8XHgSkgIQTDHEtX432LS-QJc';
+      auth.profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe'
+      }))}.0`;
 
       const promise = auth.signInWithIframe();
 
@@ -363,8 +366,8 @@ describe('salte-auth', () => {
         return error;
       }).then((error) => {
         expect(error).to.deep.equal({
-          code: 'invalid_nonce',
-          description: 'Nonce provided by gateway did not match local nonce.'
+          code: 'invalid_state',
+          description: 'State provided by gateway did not match local state.'
         });
       });
     });
@@ -427,7 +430,10 @@ describe('salte-auth', () => {
       sandbox.stub(auth, 'authorizeUrl').get(() => '');
       sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
 
-      auth.profile.idToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsIm5vbmNlIjpudWxsfQ.MsykD5osfoXwKRr7IFz8XHgSkgIQTDHEtX432LS-QJc';
+      auth.profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe'
+      }))}.0`;
 
       const promise = auth.signInWithPopup();
 
@@ -435,8 +441,8 @@ describe('salte-auth', () => {
         return error;
       }).then((error) => {
         expect(error).to.deep.equal({
-          code: 'invalid_nonce',
-          description: 'Nonce provided by gateway did not match local nonce.'
+          code: 'invalid_state',
+          description: 'State provided by gateway did not match local state.'
         });
       });
     });

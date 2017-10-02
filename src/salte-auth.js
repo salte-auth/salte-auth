@@ -17,7 +17,9 @@ import { SalteAuthUtilities } from './salte-auth.utilities.js';
  * @property {Boolean|String[]} routes The secured routes
  * @property {String[]} endpoints The secured endpoints
  * @property {('auth0'|'cognito'|'wso2')} provider The provider
+ * @property {('session'|'local')} storageType the web storage api to use for authentication
  */
+
 /** Salte Auth */
 class SalteAuth {
   /**
@@ -276,7 +278,7 @@ class SalteAuth {
       if (this.profile.accessTokenExpired) {
         return this.utilities.createIframe(this.accessTokenUrl).then(() => {
           this.$promises.token = null;
-          const error = this.profile.validate();
+          const error = this.profile.validate(true);
 
           if (error) {
             return Promise.reject(error);
