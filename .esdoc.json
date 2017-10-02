@@ -1,0 +1,19 @@
+{
+  "source": "./src",
+  "destination": "./docs",
+  "plugins": [{
+    "name": "esdoc-standard-plugin"
+  }, {
+    "name": "esdoc-member-plugin"
+  }, {
+    "name": "esdoc-importpath-plugin",
+    "option": {
+      "stripPackageName": true,
+      "replaces": [{
+        "from": "^src/", "to": "@salte-io/salte-auth/dist/"
+      }, {
+        "from": "/dist/salte-auth.js$", "to": ""
+      }]
+    }
+  }]
+}

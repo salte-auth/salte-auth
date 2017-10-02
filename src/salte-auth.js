@@ -1,14 +1,28 @@
 import { assign, get, set } from 'lodash';
 import uuid from 'uuid';
 
-import providers from './salte-auth.providers.js';
+import { Providers } from './salte-auth.providers.js';
 import { SalteAuthProfile } from './salte-auth.profile.js';
 import { SalteAuthUtilities } from './salte-auth.utilities.js';
 
+/**
+ * The configuration for salte auth
+ * @typedef {Object} Config
+ * @property {String} gateway The Gateway url
+ * @property {('id_token'|'id_token token')} responseType The response type
+ * @property {String} redirectUrl The redirect url
+*
+ * @property {String} clientId The client id of your identity provider
+ * @property {String} scope The scopes to pass
+ * @property {Boolean|String[]} routes The secured routes
+ * @property {String[]} endpoints The secured endpoints
+ * @property {('auth0'|'cognito'|'wso2')} provider The provider
+ */
+/** Salte Auth */
 class SalteAuth {
   /**
    * Sets up Salte Auth
-   * @param {Object} config the authentication config
+   * @param {Config} config configuration for salte auth
    */
   constructor(config) {
     if (window.salte.auth) {
@@ -16,10 +30,15 @@ class SalteAuth {
     }
     window.salte.auth = this;
 
+    /** @ignore */
     this.$promises = {};
+    /** @ignore */
     this.$config = config || {};
-    this.providers = providers;
+    /** @type {Providers} */
+    this.providers = Providers;
+    /** @type {SalteAuthProfile} */
     this.profile = new SalteAuthProfile(this.$config);
+    /** @type {SalteAuthUtilities} */
     this.utilities = new SalteAuthUtilities();
 
     if (this.utilities.iframe) {
@@ -57,6 +76,10 @@ class SalteAuth {
     }
   }
 
+  /**
+   * Returns the configured provider
+   * @type {Class|Object}
+   */
   get provider() {
     if (!this.$config.provider) {
       throw new ReferenceError('A provider must be specified');
@@ -73,6 +96,10 @@ class SalteAuth {
     return this.$config.provider;
   }
 
+  /**
+   * The authentication url to retrieve the access token
+   * @type {String}
+   */
   get accessTokenUrl() {
     this.profile.localState = uuid.v4();
     this.profile.nonce = uuid.v4();
@@ -94,7 +121,8 @@ class SalteAuth {
   }
 
   /**
-   * The computed authentication url
+   * The authentication url to retrieve the id token
+   * @type {String}
    */
   get authorizeUrl() {
     this.profile.localState = uuid.v4();
@@ -116,7 +144,8 @@ class SalteAuth {
   }
 
   /**
-   * The computed deauthentication url
+   * The url to logout of the configured provider
+   * @type {String}
    */
   get deauthorizeUrl() {
     return this.provider.deauthorizeUrl.call(this, this.$config);
@@ -214,13 +243,17 @@ class SalteAuth {
   }
 
   /**
-   * Unauthenticates using the redirect-based OAuth flow.
+   * Logs the user out of their configured identity provider.
    */
   signOutWithRedirect() {
     this.profile.clear();
     location.href = this.deauthorizeUrl;
   }
 
+  /**
+   * Authenticates, requests the access token, and returns it if necessary.
+   * @return {Promise<string>} a promise that resolves when we retrieve the access token
+   */
   retrieveAccessToken() {
     if (this.$promises.token) {
       return this.$promises.token;
@@ -258,6 +291,10 @@ class SalteAuth {
     return this.$promises.token;
   }
 
+  /**
+   * Checks if the current route is secured and authenticates the user if necessary
+   * @ignore
+   */
   $$onRouteChanged() {
     if (!this.utilities.isRouteSecure(location.href, this.$config.routes)) return;
 
@@ -267,4 +304,3 @@ class SalteAuth {
 
 set(window, 'salte.SalteAuth', get(window, 'salte.SalteAuth', SalteAuth));
 export { SalteAuth };
-export default get(window, 'salte.auth');

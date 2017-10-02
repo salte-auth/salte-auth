@@ -1,16 +1,20 @@
 import { defaults, get, set } from 'lodash';
 import moment from 'moment';
 
+/**
+ * All the profile information associated with the current authentication session
+ */
 class SalteAuthProfile {
   /**
    * Parses the current url for the authentication values
-   * @param {Object} config the authentication config
+   * @param {Config} config configuration for salte auth
    */
   constructor(config) {
     if (window.salte.SalteAuthProfile.$instance) {
       return window.salte.SalteAuthProfile.$instance;
     }
     window.salte.SalteAuthProfile.$instance = this;
+    /** @ignore */
     this.$$config = defaults(config, {
       storageType: 'session'
     });
@@ -56,6 +60,7 @@ class SalteAuthProfile {
   }
 
   /**
+   * Whether the ID Token has expired
    * @return {Boolean} true if the "id_token" has expired
    */
   get idTokenExpired() {
@@ -63,12 +68,17 @@ class SalteAuthProfile {
   }
 
   /**
+   * Whether the Access Token has expired
    * @return {Boolean} true if the "access_token" has expired
    */
   get accessTokenExpired() {
     return !this.accessToken || moment().unix() >= this.expiration;
   }
 
+  /**
+   * The type of Access Token that was returned by the identity provider
+   * @return {String} the type of access token
+   */
   get tokenType() {
     return this.$storage.getItem('salte.auth.token-type');
   }
@@ -79,7 +89,7 @@ class SalteAuthProfile {
 
   /**
    * The date and time that the access token will expire
-   * @return {Moment} the expiration time as a moment object
+   * @return {String} the expiration time as unix timestamp
    */
   get expiration() {
     return this.$storage.getItem('salte.auth.expiration');
@@ -89,6 +99,10 @@ class SalteAuthProfile {
     this.saveItem('salte.auth.expiration', expiration);
   }
 
+  /**
+   * The Access Token returned by the identity provider
+   * @return {String} the access token
+   */
   get accessToken() {
     return this.$storage.getItem('salte.auth.access-token');
   }
@@ -97,6 +111,10 @@ class SalteAuthProfile {
     this.saveItem('salte.auth.access-token', accessToken);
   }
 
+  /**
+   * The ID Token returned by the identity provider
+   * @return {String} the id token
+   */
   get idToken() {
     return this.$storage.getItem('salte.auth.id-token');
   }
@@ -105,6 +123,12 @@ class SalteAuthProfile {
     this.saveItem('salte.auth.id-token', idToken);
   }
 
+  /**
+   * The authentication state returned by the identity provider
+   * @return {String} the state value
+   *
+   * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
+   */
   get state() {
     return this.$storage.getItem('salte.auth.state');
   }
@@ -113,6 +137,12 @@ class SalteAuthProfile {
     this.saveItem('salte.auth.state', state);
   }
 
+  /**
+   * The locally generate authentication state
+   * @return {String} the local state value
+   *
+   * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
+   */
   get localState() {
     return this.$storage.getItem('salte.auth.local-state');
   }
@@ -121,6 +151,10 @@ class SalteAuthProfile {
     this.saveItem('salte.auth.local-state', localState);
   }
 
+  /**
+   * The error returned by the identity provider
+   * @return {String} the state value
+   */
   get error() {
     return this.$storage.getItem('salte.auth.error');
   }
@@ -129,6 +163,10 @@ class SalteAuthProfile {
     this.saveItem('salte.auth.error', error);
   }
 
+  /**
+   * The error description returned by the identity provider
+   * @return {String} a string that describes the error that occurred
+   */
   get errorDescription() {
     return this.$storage.getItem('salte.auth.error-description');
   }
@@ -137,6 +175,10 @@ class SalteAuthProfile {
     this.saveItem('salte.auth.error-description', errorDescription);
   }
 
+  /**
+   * The url the user originated from before authentication occurred
+   * @return {String} The url the user originated from before authentication occurred
+   */
   get redirectUrl() {
     return this.$storage.getItem('salte.auth.redirect-url');
   }
@@ -145,6 +187,10 @@ class SalteAuthProfile {
     this.saveItem('salte.auth.redirect-url', redirectUrl);
   }
 
+  /**
+   * Parses the User Info from the ID Token
+   * @return {String} The User Info from the ID Token
+   */
   get nonce() {
     return this.$storage.getItem('salte.auth.nonce');
   }
@@ -153,6 +199,10 @@ class SalteAuthProfile {
     this.saveItem('salte.auth.nonce', nonce);
   }
 
+  /**
+   * Parses the User Info from the ID Token
+   * @return {Object} The User Info from the ID Token
+   */
   get userInfo() {
     if (this.idToken) {
       const separatedToken = this.idToken.split('.');
@@ -202,13 +252,17 @@ class SalteAuthProfile {
 
   /**
    * Return the active Web Storage API
-   * @param {String} storageType the name of the storageType to use
    * @return {Storage} the storage api to save and pull values from
    */
   get $storage() {
     return this.$$getStorage(this.$$config.storageType);
   }
 
+  /**
+   * Determines which Web Storage API to return using the name provided
+   * @param {String} storageType the name of the storageType to use
+   * @return {Storage} the web storage api that matches the given string
+   */
   $$getStorage(storageType) {
     if (storageType === 'local') {
       return localStorage;
@@ -258,4 +312,3 @@ class SalteAuthProfile {
 
 set(window, 'salte.SalteAuthProfile', get(window, 'salte.SalteAuthProfile', SalteAuthProfile));
 export { SalteAuthProfile };
-export default get(window, 'salte.SalteAuthProfile.$instance');

@@ -17,7 +17,7 @@ describe('salte-auth', () => {
   });
 
   afterEach(() => {
-    auth.utilities.interceptors = {
+    auth.utilities.$interceptors = {
       fetch: [],
       xhr: []
     };
@@ -255,22 +255,22 @@ describe('salte-auth', () => {
       salte.auth.$config = {
         gateway: 'https://api.salte.io',
         redirectUrl: `${location.protocol}//${location.host}`,
-        clientId: 'clPAMX8O88JBusd9u09DsmwQZrKor5ay',
+        clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
         scope: 'openid',
         provider: 'auth0'
       };
-      expect(auth.accessTokenUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=clPAMX8O88JBusd9u09DsmwQZrKor5ay&scope=openid&prompt=none`);
+      expect(auth.accessTokenUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid&prompt=none`);
     });
 
     it('should utilize authorizeUrl overrides', () => {
       salte.auth.$config = {
         gateway: 'https://mydomain.auth.us-east-1.amazoncognito.com',
         redirectUrl: `${location.protocol}//${location.host}`,
-        clientId: 'clPAMX8O88JBusd9u09DsmwQZrKor5ay',
+        clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
         scope: 'openid',
         provider: 'cognito'
       };
-      expect(auth.accessTokenUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=clPAMX8O88JBusd9u09DsmwQZrKor5ay&scope=openid&prompt=none`);
+      expect(auth.accessTokenUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid&prompt=none`);
     });
   });
 
@@ -280,11 +280,11 @@ describe('salte-auth', () => {
         gateway: 'https://api.salte.io',
         responseType: 'id_token',
         redirectUrl: `${location.protocol}//${location.host}`,
-        clientId: 'clPAMX8O88JBusd9u09DsmwQZrKor5ay',
+        clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
         scope: 'openid',
         provider: 'auth0'
       };
-      expect(auth.authorizeUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=clPAMX8O88JBusd9u09DsmwQZrKor5ay&scope=openid`);
+      expect(auth.authorizeUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid`);
     });
 
     it('should utilize authorizeUrl overrides', () => {
@@ -292,11 +292,11 @@ describe('salte-auth', () => {
         gateway: 'https://mydomain.auth.us-east-1.amazoncognito.com',
         responseType: 'id_token',
         redirectUrl: `${location.protocol}//${location.host}`,
-        clientId: 'clPAMX8O88JBusd9u09DsmwQZrKor5ay',
+        clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
         scope: 'openid',
         provider: 'cognito'
       };
-      expect(salte.auth.authorizeUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=clPAMX8O88JBusd9u09DsmwQZrKor5ay&scope=openid`);
+      expect(salte.auth.authorizeUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid`);
     });
   });
 
@@ -306,7 +306,7 @@ describe('salte-auth', () => {
         gateway: 'https://api.salte.io',
         responseType: 'id_token',
         redirectUrl: `${location.protocol}//${location.host}`,
-        clientId: 'clPAMX8O88JBusd9u09DsmwQZrKor5ay',
+        clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
         scope: 'openid',
 
         provider: 'auth0'

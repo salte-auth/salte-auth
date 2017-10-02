@@ -200,7 +200,7 @@ describe('salte-auth.utilities', () => {
 
   describe('function(addXHRInterceptor)', () => {
     afterEach(() => {
-      utilities.interceptors.xhr = [];
+      utilities.$interceptors.xhr = [];
     });
 
     it('should intercept XHR requests', () => {
@@ -247,7 +247,7 @@ describe('salte-auth.utilities', () => {
     const fetch = window.fetch;
     afterEach(() => {
       window.fetch = fetch;
-      utilities.interceptors.fetch = [];
+      utilities.$interceptors.fetch = [];
     });
 
     it('should intercept Fetch requests', () => {

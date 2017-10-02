@@ -1,5 +1,5 @@
 {
-  "name": "salte-auth",
+  "name": "@salte-io/salte-auth",
   "version": "0.0.0-semantically-released.0",
   "main": "dist/salte-auth.min.js",
   "description": "OAuth 2.0 for the masses!",
@@ -29,7 +29,8 @@
     "build:dev": "webpack --progress --colors -d",
     "build:prod": "webpack --progress --colors -p",
     "report-coverage": "coveralls < coverage/lcov.info",
-    "semantic-release": "semantic-release pre && npm run build && npm publish && semantic-release post"
+    "semantic-release": "semantic-release pre && npm run build && npm publish && semantic-release post",
+    "docs": "esdoc"
   },
   "license": "MIT",
   "dependencies": {
@@ -44,6 +45,10 @@
     "coveralls": "^3.0.0",
     "cz-conventional-changelog": "^2.0.0",
     "deindent": "^0.1.0",
+    "esdoc": "^1.0.3",
+    "esdoc-importpath-plugin": "^1.0.1",
+    "esdoc-member-plugin": "^1.0.0",
+    "esdoc-standard-plugin": "^1.0.0",
     "eslint": "^4.0.0",
     "eslint-config-google": "^0.9.1",
     "eslint-loader": "^1.0.0",

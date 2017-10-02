@@ -1,8 +1,11 @@
 import { assign, get, set } from 'lodash';
 
+/**
+ * Basic utilities to support the authentication flow
+ */
 class SalteAuthUtilities {
   /**
-   * Parses the current url for the authentication values
+   * Wraps all XHR and Fetch (if available) requests to allow promise interceptors
    */
   constructor() {
     if (window.salte.SalteAuthUtilities.$instance) {
@@ -10,23 +13,26 @@ class SalteAuthUtilities {
     }
     window.salte.SalteAuthUtilities.$instance = this;
 
-    this.interceptors = {
+    /** @ignore */
+    this.$interceptors = {
       fetch: [],
       xhr: []
     };
 
     (function(open) {
       XMLHttpRequest.prototype.open = function(method, url) {
+        /** @ignore */
         this.$url = url;
         return open.call(this, method, url);
       };
     })(XMLHttpRequest.prototype.open);
 
+    const self = this;
     (function(send) {
       XMLHttpRequest.prototype.send = function(data) {
         const promises = [];
-        for (let i = 0; i < window.salte.SalteAuthUtilities.$instance.interceptors.xhr.length; i++) {
-          const interceptor = window.salte.SalteAuthUtilities.$instance.interceptors.xhr[i];
+        for (let i = 0; i < self.$interceptors.xhr.length; i++) {
+          const interceptor = self.$interceptors.xhr[i];
           promises.push(interceptor(this, data));
         }
         Promise.all(promises).then(() => {
@@ -44,8 +50,8 @@ class SalteAuthUtilities {
       (function(fetch) {
         window.fetch = function(input, options = {}) {
           const promises = [];
-          for (let i = 0; i < window.salte.SalteAuthUtilities.$instance.interceptors.fetch.length; i++) {
-            const interceptor = window.salte.SalteAuthUtilities.$instance.interceptors.fetch[i];
+          for (let i = 0; i < self.$interceptors.fetch.length; i++) {
+            const interceptor = self.$interceptors.fetch[i];
             promises.push(interceptor(input, options));
           }
           return Promise.all(promises).then(() => {
@@ -75,22 +81,30 @@ class SalteAuthUtilities {
     return url;
   }
 
+  /**
+   * Converts a url to an absolute url
+   * @param {String} path the url path to resolve to an absolute url
+   * @return {String} the absolutely resolved url
+   */
   resolveUrl(path) {
-    if (!this.$urlDocument) {
-      this.$urlDocument = document.implementation.createHTMLDocument('url');
-      this.$urlBase = this.$urlDocument.createElement('base');
-      this.$urlDocument.head.appendChild(this.$urlBase);
-      this.$urlAnchor = this.$urlDocument.createElement('a');
+    if (!this.$$urlDocument) {
+      /** @ignore */
+      this.$$urlDocument = document.implementation.createHTMLDocument('url');
+      /** @ignore */
+      this.$$urlBase = this.$$urlDocument.createElement('base');
+      /** @ignore */
+      this.$$urlAnchor = this.$$urlDocument.createElement('a');
+      this.$$urlDocument.head.appendChild(this.$$urlBase);
     }
-    this.$urlBase.href = window.location.protocol + '//' + window.location.host;
-    this.$urlAnchor.href = path.replace(/ /g, '%20');
-    return this.$urlAnchor.href;
+    this.$$urlBase.href = window.location.protocol + '//' + window.location.host;
+    this.$$urlAnchor.href = path.replace(/ /g, '%20');
+    return this.$$urlAnchor.href;
   }
 
   /**
    * Checks if the given url matches any of the test urls
    * @param {String} url The url to test
-   * @param {String|RegExp} tests The urls to match the test url against
+   * @param {Array<String|RegExp>} tests The urls to match the test url against
    * @return {Boolean} true if the url matches one of the tests
    */
   checkForMatchingUrl(url, tests = []) {
@@ -107,6 +121,12 @@ class SalteAuthUtilities {
     return false;
   }
 
+  /**
+   * Determines if the given route is a secured route
+   * @param {String} route the route to verify
+   * @param {Boolean|String[]} securedRoutes a list of routes that require authentication
+   * @return {Boolean} true if the route provided is a secured route
+   */
   isRouteSecure(route, securedRoutes) {
     if (securedRoutes === true) {
       return true;
@@ -188,7 +208,7 @@ class SalteAuthUtilities {
    * @param {Function} interceptor the interceptor function
    */
   addXHRInterceptor(interceptor) {
-    this.interceptors.xhr.push(interceptor);
+    this.$interceptors.xhr.push(interceptor);
   }
 
   /**
@@ -196,7 +216,7 @@ class SalteAuthUtilities {
    * @param {Function} interceptor the interceptor function
    */
   addFetchInterceptor(interceptor) {
-    this.interceptors.fetch.push(interceptor);
+    this.$interceptors.fetch.push(interceptor);
   }
 
   /**
@@ -210,6 +230,10 @@ class SalteAuthUtilities {
     return parent.document.querySelector('body > iframe[owner="salte-auth"]');
   }
 
+  /**
+   * Determines if the current window is a popup window opened by salte auth
+   * @return {Window} the window object
+   */
   get popup() {
     if (window.opener && window.name === 'salte-auth') {
       return window;
@@ -220,4 +244,3 @@ class SalteAuthUtilities {
 
 set(window, 'salte.SalteAuthUtilities', get(window, 'salte.SalteAuthUtilities', SalteAuthUtilities));
 export { SalteAuthUtilities };
-export default get(window, 'salte.SalteAuthUtilities.$instance');
