@@ -35,6 +35,7 @@ Or `require('@salte-io/salte-auth')` from your code.
 ```js
 import { SalteAuth } from '@salte-io/salte-auth';
 
+// Configure SalteAuth with Auth0's gateway url and clientId.
 const auth = new SalteAuth({
   gateway: 'https://salte-io.auth0.com',
   responseType: 'id_token',
@@ -51,7 +52,10 @@ const auth = new SalteAuth({
   ],
 
   provider: 'auth0'
-})
+});
+
+// Display an iframe to the user that allows them to login
+auth.signInWithIframe();
 ```
 
 [gitter-image]: https://badges.gitter.im/salte-io/salte-auth.svg
