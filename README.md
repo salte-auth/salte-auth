@@ -58,6 +58,10 @@ const auth = new SalteAuth({
 auth.signInWithIframe();
 ```
 
+## Documentation
+
+[Click here to view the documentation!](https://salte-io.github.io/salte-auth/)
+
 [gitter-image]: https://badges.gitter.im/salte-io/salte-auth.svg
 [gitter-url]: https://gitter.im/salte-io/salte-auth?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
