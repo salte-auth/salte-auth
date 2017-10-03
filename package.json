@@ -59,7 +59,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-spec-reporter": "^0.0.31",
     "karma-webpack": "^2.0.1",
-    "mocha": "^3.1.2",
+    "mocha": "^4.0.0",
     "phantomjs-prebuilt": "^2.1.13",
     "publish-latest": "^1.1.2",
     "semantic-release": "^8.0.0",
