@@ -1,4 +1,4 @@
-import { defaults, find, get, set } from 'lodash';
+import { defaultsDeep, find, get, set } from 'lodash';
 import moment from 'moment';
 
 /**
@@ -15,7 +15,13 @@ class SalteAuthProfile {
     }
     window.salte.SalteAuthProfile.$instance = this;
     /** @ignore */
-    this.$$config = defaults(config, {
+    this.$$config = defaultsDeep(config, {
+      validation: {
+        nonce: true,
+        state: true,
+        azp: true,
+        aud: true
+      },
       storageType: 'session'
     });
     if (location.hash) {
@@ -219,6 +225,10 @@ class SalteAuthProfile {
    * @return {Object} the error message
    */
   validate(accessTokenRequest) {
+    if (!this.$$config.validation) {
+      return;
+    }
+
     if (this.error) {
       return {
         code: this.error,
@@ -226,7 +236,7 @@ class SalteAuthProfile {
       };
     }
 
-    if (this.localState !== this.state) {
+    if (this.$$config.validation.state && this.localState !== this.state) {
       return {
         code: 'invalid_state',
         description: 'State provided by gateway did not match local state.'
@@ -235,7 +245,7 @@ class SalteAuthProfile {
 
     if (accessTokenRequest) return;
 
-    if (this.nonce !== this.userInfo.nonce) {
+    if (this.$$config.validation.nonce && this.nonce !== this.userInfo.nonce) {
       return {
         code: 'invalid_nonce',
         description: 'Nonce provided by gateway did not match local nonce.'
@@ -243,32 +253,36 @@ class SalteAuthProfile {
     }
 
     if (Array.isArray(this.userInfo.aud)) {
-      if (!this.userInfo.azp) {
-        return {
-          code: 'invalid_azp',
-          description: 'Audience was returned as an array and AZP was not present on the ID Token.'
-        };
+      if (this.$$config.validation.azp) {
+        if (!this.userInfo.azp) {
+          return {
+            code: 'invalid_azp',
+            description: 'Audience was returned as an array and AZP was not present on the ID Token.'
+          };
+        }
+
+        if (this.userInfo.azp !== this.$$config.clientId) {
+          return {
+            code: 'invalid_azp',
+            description: 'AZP does not match the Client ID.'
+          };
+        }
       }
 
-      if (this.userInfo.azp !== this.$$config.clientId) {
-        return {
-          code: 'invalid_azp',
-          description: 'AZP does not match the Client ID.'
-        };
+
+      if (this.$$config.validation.aud) {
+        const aud = find(this.userInfo.aud, (audience) => {
+          return audience === this.$$config.clientId;
+        });
+
+        if (!aud) {
+          return {
+            code: 'invalid_aud',
+            description: 'None of the audience values matched the Client ID.'
+          };
+        }
       }
-
-
-      const aud = find(this.userInfo.aud, (audience) => {
-        return audience === this.$$config.clientId;
-      });
-
-      if (!aud) {
-        return {
-          code: 'invalid_aud',
-          description: 'None of the audience values matched the Client ID.'
-        };
-      }
-    } else if (this.userInfo.aud !== this.$$config.clientId) {
+    } else if (this.$$config.validation.aud && this.userInfo.aud !== this.$$config.clientId) {
       return {
         code: 'invalid_aud',
         description: 'The audience did not match the Client ID.'

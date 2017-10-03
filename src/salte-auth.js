@@ -1,9 +1,18 @@
-import { assign, get, set } from 'lodash';
+import { assign, defaultsDeep, get, set } from 'lodash';
 import uuid from 'uuid';
 
 import { Providers } from './salte-auth.providers.js';
 import { SalteAuthProfile } from './salte-auth.profile.js';
 import { SalteAuthUtilities } from './salte-auth.utilities.js';
+
+/**
+ * Used to disable certain validations
+ * @typedef {Object} Validation
+ * @property {Boolean} nonce used to disable nonce validation
+ * @property {Boolean} state used to disable state validation
+ * @property {Boolean} azp used to disable azp validation
+ * @property {Boolean} aud used to disable aud validation
+ */
 
 /**
  * The configuration for salte auth
@@ -18,6 +27,7 @@ import { SalteAuthUtilities } from './salte-auth.utilities.js';
  * @property {String[]} endpoints The secured endpoints
  * @property {('auth0'|'cognito'|'wso2')} provider The provider
  * @property {('session'|'local')} storageType the web storage api to use for authentication
+ * @property {Boolean|Validation} validation used to disable validation
  */
 
 /** Salte Auth */
@@ -32,12 +42,17 @@ class SalteAuth {
     }
     window.salte.auth = this;
 
+    if (!config) {
+      throw new ReferenceError('A config must be provided.');
+    }
+
+    /** @type {Providers} */
+    this.providers = Providers;
     /** @ignore */
     this.$promises = {};
     /** @ignore */
-    this.$config = config || {};
-    /** @type {Providers} */
-    this.providers = Providers;
+    this.$config = config;
+    this.$config = defaultsDeep(config, this.provider.defaultConfig);
     /** @type {SalteAuthProfile} */
     this.profile = new SalteAuthProfile(this.$config);
     /** @type {SalteAuthUtilities} */

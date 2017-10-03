@@ -65,15 +65,15 @@ auth.signInWithIframe();
 [gitter-image]: https://badges.gitter.im/salte-io/salte-auth.svg
 [gitter-url]: https://gitter.im/salte-io/salte-auth?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
-[npm-version-image]: https://img.shields.io/npm/v/salte-auth.svg?style=flat
-[npm-downloads-image]: https://img.shields.io/npm/dm/salte-auth.svg?style=flat
-[npm-url]: https://npmjs.org/package/salte-auth
+[npm-version-image]: https://img.shields.io/npm/v/@salte-io/salte-auth.svg?style=flat
+[npm-downloads-image]: https://img.shields.io/npm/dm/@salte-io/salte-auth.svg?style=flat
+[npm-url]: https://npmjs.org/package/@salte-io/salte-auth
 
-[travis-ci-image]: https://img.shields.io/travis/salte-io/salte-auth/2.0-preview.svg?style=flat
+[travis-ci-image]: https://img.shields.io/travis/salte-io/salte-auth/master.svg?style=flat
 [travis-ci-url]: https://travis-ci.org/salte-io/salte-auth
 
-[coveralls-image]: https://img.shields.io/coveralls/salte-io/salte-auth/2.0-preview.svg
-[coveralls-url]: https://coveralls.io/github/salte-io/salte-auth?branch=2.0-preview
+[coveralls-image]: https://img.shields.io/coveralls/salte-io/salte-auth/master.svg
+[coveralls-url]: https://coveralls.io/github/salte-io/salte-auth?branch=master
 
 [commitizen-image]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
 [commitizen-url]: https://commitizen.github.io/cz-cli/

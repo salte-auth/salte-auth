@@ -341,6 +341,37 @@ describe('salte-auth.profile', () => {
       const response = profile.validate(true);
       expect(response).to.be.undefined;
     });
+
+    it('should skip individual validation if it is disabled', () => {
+      profile.idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true,
+        nonce: '55555-55555',
+        aud: [
+          '55555-55555'
+        ],
+        azp: '55555-55555'
+      }))}.0`;
+      profile.$$config.validation = {
+        nonce: false,
+        state: false,
+        azp: false,
+        aud: false
+      };
+      profile.localState = null;
+      profile.state = null;
+      const response = profile.validate();
+      expect(response).to.be.undefined;
+    });
+
+    it('should skip all validation if it is disabled', () => {
+      profile.$$config.validation = false;
+      profile.localState = null;
+      profile.state = null;
+      const response = profile.validate();
+      expect(response).to.be.undefined;
+    });
   });
 
   describe('function(saveItem)', () => {

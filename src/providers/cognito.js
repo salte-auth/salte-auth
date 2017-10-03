@@ -20,6 +20,15 @@ class SalteAuthCognitoProvider {
       'client_id': config.clientId
     });
   }
+
+  static get defaultConfig() {
+    return {
+      validation: {
+        // Amazon Cognito doesn't support nonce validation
+        nonce: false
+      }
+    };
+  }
 }
 
 export default SalteAuthCognitoProvider;

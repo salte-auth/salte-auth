@@ -29,7 +29,8 @@
     "build:dev": "webpack --progress --colors -d",
     "build:prod": "webpack --progress --colors -p",
     "report-coverage": "coveralls < coverage/lcov.info",
-    "semantic-release": "semantic-release pre && npm run build && npm publish && semantic-release post",
+    "publish-latest": "publish-latest --user-email bot@salte.io --user-name salte-bot",
+    "semantic-release": "semantic-release pre && npm run build && npm publish && npm run publish-latest && semantic-release post",
     "docs": "esdoc"
   },
   "license": "MIT",
@@ -53,7 +54,7 @@
     "eslint": "^4.0.0",
     "eslint-config-google": "^0.9.1",
     "eslint-loader": "^1.0.0",
-    "eslint-plugin-compat": "^1.0.0",
+    "eslint-plugin-compat": "^2.0.0",
     "eslint-plugin-mocha": "^4.0.0",
     "html-loader": "^0.5.1",
     "istanbul-instrumenter-loader": "^3.0.0",

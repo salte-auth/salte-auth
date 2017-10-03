@@ -48,22 +48,6 @@ module.exports = function(config) {
       base: 'SauceLabs',
       browserName: 'safari',
       version: '7'
-    },
-    iPhone7Safari: {
-      base: 'SauceLabs',
-      browserName: 'Safari',
-      platform: 'iOS',
-      platformVersion: '10.3',
-      deviceName: 'iPhone 7 Simulator',
-      deviceOrientation: 'portrait'
-    },
-    Android6Browser: {
-      base: 'SauceLabs',
-      browserName: 'Browser',
-      platform: 'Android',
-      version: '6.0',
-      deviceName: 'Android Emulator',
-      deviceOrientation: 'portrait'
     }
   };
 

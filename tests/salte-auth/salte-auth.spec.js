@@ -34,45 +34,55 @@ describe('salte-auth', () => {
       expect(new SalteAuth().bogus).to.equal('test');
     });
 
-    it('should allow passing an empty config', () => {
+    it('should not allow passing an empty config', () => {
       delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
 
-      auth = new SalteAuth();
-
-      expect(auth.$config).to.deep.equal({
-        storageType: 'session'
-      });
-      expect(auth.$config).to.deep.equal(auth.profile.$$config);
+      expect(() => new SalteAuth()).to.throw(ReferenceError.clear);
     });
 
-    it('should default storageType to "session"', () => {
+    it('should default storageType and validation', () => {
       delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        test: 'test'
+        provider: 'auth0'
       });
 
       expect(auth.$config).to.deep.equal({
-        test: 'test',
-        storageType: 'session'
+        provider: 'auth0',
+        storageType: 'session',
+        validation: {
+          aud: true,
+          azp: true,
+          nonce: true,
+          state: true
+        }
       });
       expect(auth.$config).to.deep.equal(auth.profile.$$config);
     });
 
-    it('should support overriding the storageType', () => {
+    it('should support overriding the storageType and validation', () => {
       delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        test: 'test',
-        storageType: 'local'
+        provider: 'auth0',
+        storageType: 'local',
+        validation: {
+          nonce: false
+        }
       });
 
       expect(auth.$config).to.deep.equal({
-        test: 'test',
-        storageType: 'local'
+        provider: 'auth0',
+        storageType: 'local',
+        validation: {
+          aud: true,
+          azp: true,
+          nonce: false,
+          state: true
+        }
       });
       expect(auth.$config).to.deep.equal(auth.profile.$$config);
     });
@@ -84,7 +94,9 @@ describe('salte-auth', () => {
       delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
 
-      auth = new SalteAuth();
+      auth = new SalteAuth({
+        provider: 'auth0'
+      });
 
       expect(auth.bogus).to.be.undefined;
       expect(window.salte.auth).to.be.instanceof(SalteAuth);
@@ -98,7 +110,9 @@ describe('salte-auth', () => {
       delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
 
-      auth = new SalteAuth();
+      auth = new SalteAuth({
+        provider: 'auth0'
+      });
 
       expect(parent.document.querySelector('[owner="salte-auth"]')).to.equal(null);
     });
@@ -113,7 +127,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        storageType: 'local'
+        storageType: 'local',
+        provider: 'auth0'
       });
 
       expect(popup.close.callCount).to.equal(0);
@@ -131,7 +146,9 @@ describe('salte-auth', () => {
       delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
 
-      auth = new SalteAuth();
+      auth = new SalteAuth({
+        provider: 'auth0'
+      });
 
       expect(popup.close.callCount).to.equal(0);
       setTimeout(() => {
@@ -149,7 +166,9 @@ describe('salte-auth', () => {
 
       delete window.salte.auth;
 
-      auth = new SalteAuth();
+      auth = new SalteAuth({
+        provider: 'auth0'
+      });
 
       expect(location.href).to.equal(url);
     });

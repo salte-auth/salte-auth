@@ -8,7 +8,6 @@ cache:
 branches:
   only:
     - master
-    - 2.0-preview
     - /^greenkeeper-.*$/
 before_install:
   - yarn global add greenkeeper-lockfile@1
@@ -30,7 +29,7 @@ deploy:
   github_token: $GH_TOKEN
   local_dir: docs
   on:
-    branch: 2.0-preview
+    branch: master
 notifications:
   email: change
 addons:

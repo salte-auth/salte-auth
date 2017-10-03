@@ -3,7 +3,9 @@ import { expect } from 'chai';
 import { SalteAuth } from '../../../src/salte-auth.js';
 import auth0 from '../../../src/providers/auth0.js';
 
-const auth = new SalteAuth();
+const auth = new SalteAuth({
+  provider: 'auth0'
+});
 
 describe('auth0', () => {
   describe('function(deauthorizeUrl)', () => {

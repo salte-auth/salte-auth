@@ -22,7 +22,11 @@ module.exports = {
   externals: [{
     moment: 'moment',
     uuid: 'uuid',
-    lodash: 'lodash'
+    lodash: {
+      root: '_',
+      commonjs: 'lodash',
+      amd: 'lodash'
+    }
   }],
   devtool: 'source-map',
   module: {

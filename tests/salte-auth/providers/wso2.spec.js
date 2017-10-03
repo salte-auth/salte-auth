@@ -3,7 +3,9 @@ import { expect } from 'chai';
 import { SalteAuth } from '../../../src/salte-auth.js';
 import wso2 from '../../../src/providers/wso2.js';
 
-const auth = new SalteAuth();
+const auth = new SalteAuth({
+  provider: 'wso2'
+});
 
 describe('wso2', () => {
   describe('function(deauthorizeUrl)', () => {
