@@ -20,7 +20,9 @@ module.exports = {
     umdNamedDefine: true
   },
   externals: [{
-    moment: 'moment'
+    moment: 'moment',
+    uuid: 'uuid',
+    lodash: 'lodash'
   }],
   devtool: 'source-map',
   module: {
