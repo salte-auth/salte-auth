@@ -39,6 +39,7 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       expect(() => new SalteAuth()).to.throw(ReferenceError.clear);
+      expect(window.salte.auth).to.be.undefined;
     });
 
     it('should default storageType and validation', () => {

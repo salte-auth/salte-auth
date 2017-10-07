@@ -40,7 +40,6 @@ class SalteAuth {
     if (window.salte.auth) {
       return window.salte.auth;
     }
-    window.salte.auth = this;
 
     if (!config) {
       throw new ReferenceError('A config must be provided.');
@@ -91,6 +90,7 @@ class SalteAuth {
       document.addEventListener('click', this.$$onRouteChanged.bind(this));
       setTimeout(this.$$onRouteChanged.bind(this));
     }
+    window.salte.auth = this;
   }
 
   /**
