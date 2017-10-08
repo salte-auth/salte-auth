@@ -11,7 +11,6 @@ class SalteAuthUtilities {
     if (window.salte.SalteAuthUtilities.$instance) {
       return window.salte.SalteAuthUtilities.$instance;
     }
-    window.salte.SalteAuthUtilities.$instance = this;
 
     /** @ignore */
     this.$interceptors = {
@@ -60,6 +59,7 @@ class SalteAuthUtilities {
         };
       })(fetch);
     }
+    window.salte.SalteAuthUtilities.$instance = this;
   }
 
   /**

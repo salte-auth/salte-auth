@@ -2207,6 +2207,10 @@ esdoc-member-plugin@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/esdoc-member-plugin/-/esdoc-member-plugin-1.0.0.tgz#7038f57785861a52a8937f3f7b91f35ef421cde3"
 
+esdoc-plugin-require-coverage@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/esdoc-plugin-require-coverage/-/esdoc-plugin-require-coverage-0.1.2.tgz#ce8a6673f866077b2baa98d62af28ed8a23ab26c"
+
 esdoc-publish-html-plugin@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/esdoc-publish-html-plugin/-/esdoc-publish-html-plugin-1.1.0.tgz#093f8337aca169022572cb387ffcc3f470b02513"

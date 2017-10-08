@@ -340,7 +340,7 @@ describe('salte-auth', () => {
     });
   });
 
-  describe('function(signInWithIframe)', () => {
+  describe('function(loginWithIframe)', () => {
     beforeEach(() => {
       auth.profile.clear();
       sandbox.stub(auth.profile, 'clear');
@@ -351,10 +351,10 @@ describe('salte-auth', () => {
       };
     });
 
-    it('should resolve when we have signed in', () => {
+    it('should resolve when we have logged in', () => {
       sandbox.stub(auth.profile, 'validate');
 
-      const promise = auth.signInWithIframe();
+      const promise = auth.loginWithIframe();
 
       expect(auth.profile.clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
@@ -366,8 +366,8 @@ describe('salte-auth', () => {
     it('should prevent duplicate promises', () => {
       sandbox.stub(auth.profile, 'validate');
 
-      const promise = auth.signInWithIframe();
-      const duplicatePromise = auth.signInWithIframe();
+      const promise = auth.loginWithIframe();
+      const duplicatePromise = auth.loginWithIframe();
 
       expect(promise).to.equal(duplicatePromise);
 
@@ -380,7 +380,7 @@ describe('salte-auth', () => {
         name: 'John Doe'
       }))}.0`;
 
-      const promise = auth.signInWithIframe();
+      const promise = auth.loginWithIframe();
 
       return promise.catch((error) => {
         return error;
@@ -393,15 +393,15 @@ describe('salte-auth', () => {
     });
   });
 
-  describe('function(signInWithPopup)', () => {
-    it('should resolve when we have signed in', () => {
+  describe('function(loginWithPopup)', () => {
+    it('should resolve when we have logged in', () => {
       sandbox.stub(auth.profile, 'clear');
       sandbox.stub(auth, 'authorizeUrl').get(() => '');
       sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'validate');
       sandbox.stub(auth.profile, '$$transfer');
 
-      const promise = auth.signInWithPopup();
+      const promise = auth.loginWithPopup();
 
       expect(auth.profile.clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
@@ -421,7 +421,7 @@ describe('salte-auth', () => {
 
       auth.$config.storageType = 'local';
 
-      const promise = auth.signInWithPopup();
+      const promise = auth.loginWithPopup();
 
       expect(auth.profile.clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
@@ -437,8 +437,8 @@ describe('salte-auth', () => {
       sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'validate');
 
-      const promise = auth.signInWithPopup();
-      const duplicatePromise = auth.signInWithPopup();
+      const promise = auth.loginWithPopup();
+      const duplicatePromise = auth.loginWithPopup();
 
       expect(promise).to.equal(duplicatePromise);
 
@@ -455,7 +455,7 @@ describe('salte-auth', () => {
         name: 'John Doe'
       }))}.0`;
 
-      const promise = auth.signInWithPopup();
+      const promise = auth.loginWithPopup();
 
       return promise.catch((error) => {
         return error;
@@ -468,12 +468,12 @@ describe('salte-auth', () => {
     });
   });
 
-  describe('function(signInWithRedirect)', () => {
-    it('should resolve when we have signed in', () => {
+  describe('function(loginWithRedirect)', () => {
+    it('should resolve when we have logged in', () => {
       sandbox.stub(auth.profile, 'clear');
       sandbox.stub(auth, 'authorizeUrl').get(() => location.href);
 
-      auth.signInWithRedirect();
+      auth.loginWithRedirect();
 
       expect(auth.profile.clear.callCount).to.equal(1);
       expect(auth.profile.redirectUrl).to.equal(location.href);
@@ -481,13 +481,13 @@ describe('salte-auth', () => {
     });
   });
 
-  describe('function(signOutWithIframe)', () => {
-    it('should resolve when we have signed in', () => {
+  describe('function(logoutWithIframe)', () => {
+    it('should resolve when we have logged out', () => {
       sandbox.stub(auth.profile, 'clear');
       sandbox.stub(auth, 'deauthorizeUrl').get(() => '');
       sandbox.stub(auth.utilities, 'createIframe').returns(Promise.resolve());
 
-      const promise = auth.signOutWithIframe();
+      const promise = auth.logoutWithIframe();
 
       expect(auth.profile.clear.callCount).to.equal(1);
       expect(auth.$promises.logout).to.equal(promise);
@@ -501,8 +501,8 @@ describe('salte-auth', () => {
       sandbox.stub(auth, 'deauthorizeUrl').get(() => '');
       sandbox.stub(auth.utilities, 'createIframe').returns(Promise.resolve());
 
-      const promise = auth.signOutWithIframe();
-      const duplicatePromise = auth.signOutWithIframe();
+      const promise = auth.logoutWithIframe();
+      const duplicatePromise = auth.logoutWithIframe();
 
       expect(promise).to.equal(duplicatePromise);
 
@@ -510,13 +510,13 @@ describe('salte-auth', () => {
     });
   });
 
-  describe('function(signOutWithPopup)', () => {
-    it('should resolve when we have signed in', () => {
+  describe('function(logoutWithPopup)', () => {
+    it('should resolve when we have logged out', () => {
       sandbox.stub(auth.profile, 'clear');
       sandbox.stub(auth, 'deauthorizeUrl').get(() => '');
       sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
 
-      const promise = auth.signOutWithPopup();
+      const promise = auth.logoutWithPopup();
 
       expect(auth.profile.clear.callCount).to.equal(1);
       expect(auth.$promises.logout).to.equal(promise);
@@ -531,8 +531,8 @@ describe('salte-auth', () => {
       sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'validate');
 
-      const promise = auth.signOutWithPopup();
-      const duplicatePromise = auth.signOutWithPopup();
+      const promise = auth.logoutWithPopup();
+      const duplicatePromise = auth.logoutWithPopup();
 
       expect(promise).to.equal(duplicatePromise);
 
@@ -540,12 +540,12 @@ describe('salte-auth', () => {
     });
   });
 
-  describe('function(signOutWithRedirect)', () => {
-    it('should resolve when we have signed in', () => {
+  describe('function(logoutWithRedirect)', () => {
+    it('should resolve when we have logged out', () => {
       sandbox.stub(auth.profile, 'clear');
       sandbox.stub(auth, 'deauthorizeUrl').get(() => location.href);
 
-      auth.signOutWithRedirect();
+      auth.logoutWithRedirect();
 
       expect(auth.profile.clear.callCount).to.equal(1);
       expect(auth.$promises.logout).to.be.undefined;
@@ -554,7 +554,7 @@ describe('salte-auth', () => {
 
   describe('function(retrieveAccessToken)', () => {
     it('should default to using an iframe for auto logging in', () => {
-      sandbox.stub(auth, 'signInWithIframe').returns(Promise.resolve());
+      sandbox.stub(auth, 'loginWithIframe').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
       sandbox.stub(auth.profile, 'accessTokenExpired').get(() => true);
       sandbox.stub(auth.profile, 'clearErrors');
@@ -567,7 +567,7 @@ describe('salte-auth', () => {
 
       expect(auth.$promises.token).to.equal(promise);
       return promise.then((accessToken) => {
-        expect(auth.signInWithIframe.callCount).to.equal(1);
+        expect(auth.loginWithIframe.callCount).to.equal(1);
         expect(auth.profile.clearErrors.callCount).to.equal(1);
         expect(accessToken).to.equal('55555-55555');
         expect(auth.$promises.token).to.equal(null);
@@ -579,7 +579,7 @@ describe('salte-auth', () => {
         loginType: 'popup',
         provider: 'auth0'
       };
-      sandbox.stub(auth, 'signInWithPopup').returns(Promise.resolve());
+      sandbox.stub(auth, 'loginWithPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
       sandbox.stub(auth.profile, 'accessTokenExpired').get(() => true);
       sandbox.stub(auth.profile, 'clearErrors');
@@ -592,7 +592,7 @@ describe('salte-auth', () => {
 
       expect(auth.$promises.token).to.equal(promise);
       return promise.then((accessToken) => {
-        expect(auth.signInWithPopup.callCount).to.equal(1);
+        expect(auth.loginWithPopup.callCount).to.equal(1);
         expect(auth.profile.clearErrors.callCount).to.equal(1);
         expect(accessToken).to.equal('55555-55555');
         expect(auth.$promises.token).to.equal(null);
@@ -634,7 +634,7 @@ describe('salte-auth', () => {
     });
 
     it('should prevent duplicate promises', () => {
-      sandbox.stub(auth, 'signInWithIframe').returns(Promise.resolve());
+      sandbox.stub(auth, 'loginWithIframe').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
       sandbox.stub(auth.profile, 'accessTokenExpired').get(() => true);
       sandbox.stub(auth.profile, 'clearErrors');

@@ -21,6 +21,9 @@ class SalteAuthCognitoProvider {
     });
   }
 
+  /**
+   * Provides a set of default config options required for cognito
+   */
   static get defaultConfig() {
     return {
       validation: {

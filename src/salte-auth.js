@@ -173,7 +173,7 @@ class SalteAuth {
    * Authenticates using the iframe-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish authenticating
    */
-  signInWithIframe() {
+  loginWithIframe() {
     if (this.$promises.login) {
       return this.$promises.login;
     }
@@ -195,7 +195,7 @@ class SalteAuth {
    * Authenticates using the popup-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish authenticating
    */
-  signInWithPopup() {
+  loginWithPopup() {
     if (this.$promises.login) {
       return this.$promises.login;
     }
@@ -220,7 +220,7 @@ class SalteAuth {
   /**
    * Authenticates using the redirect-based OAuth flow.
    */
-  signInWithRedirect() {
+  loginWithRedirect() {
     this.profile.clear();
     this.profile.redirectUrl = location.href;
     location.href = this.authorizeUrl;
@@ -231,7 +231,7 @@ class SalteAuth {
    * Unauthenticates using the iframe-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish deauthenticating
    */
-  signOutWithIframe() {
+  logoutWithIframe() {
     if (this.$promises.logout) {
       return this.$promises.logout;
     }
@@ -247,7 +247,7 @@ class SalteAuth {
    * Unauthenticates using the popup-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish deauthenticating
    */
-  signOutWithPopup() {
+  logoutWithPopup() {
     if (this.$promises.logout) {
       return this.$promises.logout;
     }
@@ -263,7 +263,7 @@ class SalteAuth {
   /**
    * Logs the user out of their configured identity provider.
    */
-  signOutWithRedirect() {
+  logoutWithRedirect() {
     this.profile.clear();
     location.href = this.deauthorizeUrl;
   }
@@ -280,9 +280,9 @@ class SalteAuth {
     this.$promises.token = Promise.resolve();
     if (this.profile.idTokenExpired) {
       if (this.$config.loginType === 'popup') {
-        this.$promises.token = this.signInWithPopup();
+        this.$promises.token = this.loginWithPopup();
       } else if ([undefined, null, 'iframe'].indexOf(this.$config.loginType) !== -1) {
-        this.$promises.token = this.signInWithIframe();
+        this.$promises.token = this.loginWithIframe();
       } else {
         this.$promises.token = null;
         return Promise.reject(new ReferenceError(`Invaid Login Type (${this.$config.loginType})`));

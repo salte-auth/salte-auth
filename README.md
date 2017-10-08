@@ -55,7 +55,7 @@ const auth = new SalteAuth({
 });
 
 // Display an iframe to the user that allows them to login
-auth.signInWithIframe();
+auth.loginWithIframe();
 ```
 
 ## Documentation

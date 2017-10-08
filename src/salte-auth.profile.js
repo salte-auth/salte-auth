@@ -13,7 +13,6 @@ class SalteAuthProfile {
     if (window.salte.SalteAuthProfile.$instance) {
       return window.salte.SalteAuthProfile.$instance;
     }
-    window.salte.SalteAuthProfile.$instance = this;
     /** @ignore */
     this.$$config = defaultsDeep(config, {
       validation: {
@@ -32,6 +31,7 @@ class SalteAuthProfile {
         this.parse(key, value);
       }
     }
+    window.salte.SalteAuthProfile.$instance = this;
   }
 
   /**

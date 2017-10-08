@@ -53,11 +53,11 @@
                 var type = document.querySelector('[name="type"]:checked').value
                 switch (type) {
                     case 'redirect':
-                        return auth.signInWithRedirect();
+                        return auth.loginWithRedirect();
                     case 'popup':
-                        return auth.signInWithPopup();
+                        return auth.loginWithPopup();
                     case 'iframe':
-                        return auth.signInWithIframe();
+                        return auth.loginWithIframe();
                 }
             });
 
@@ -65,11 +65,11 @@
                 var type = document.querySelector('[name="type"]:checked').value
                 switch (type) {
                     case 'redirect':
-                        return auth.signOutWithRedirect();
+                        return auth.logoutWithRedirect();
                     case 'popup':
-                        return auth.signOutWithPopup();
+                        return auth.logoutWithPopup();
                     case 'iframe':
-                        return auth.signOutWithIframe();
+                        return auth.logoutWithIframe();
                 }
             });
 
