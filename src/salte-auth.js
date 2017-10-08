@@ -67,7 +67,7 @@ class SalteAuth {
       }
       setTimeout(this.utilities.popup.close);
     } else if (this.profile.redirectUrl && location.href !== this.profile.redirectUrl) {
-      history.pushState({}, null, this.profile.redirectUrl);
+      location.href = this.profile.redirectUrl;
       this.profile.redirectUrl = undefined;
     } else {
       this.utilities.addXHRInterceptor((request, data) => {

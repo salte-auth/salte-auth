@@ -158,7 +158,7 @@ describe('salte-auth', () => {
     });
 
     it('should redirect to the "redirectUrl"', () => {
-      const url = `${location.href}?test=test`;
+      const url = `${location.protocol}//${location.host}${location.pathname}#test=test`;
       sandbox.stub(auth.profile, 'redirectUrl')
         .get(() => url)
         .set((redirectUrl) => {
