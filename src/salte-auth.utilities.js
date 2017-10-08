@@ -124,7 +124,7 @@ class SalteAuthUtilities {
   /**
    * Determines if the given route is a secured route
    * @param {String} route the route to verify
-   * @param {Boolean|String[]} securedRoutes a list of routes that require authentication
+   * @param {Boolean|Array<String>} securedRoutes a list of routes that require authentication
    * @return {Boolean} true if the route provided is a secured route
    */
   isRouteSecure(route, securedRoutes) {

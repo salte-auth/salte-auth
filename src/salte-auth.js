@@ -6,31 +6,32 @@ import { SalteAuthProfile } from './salte-auth.profile.js';
 import { SalteAuthUtilities } from './salte-auth.utilities.js';
 
 /**
- * Used to disable certain validations
+ * Disable certain security validations if your provider doesn't support them.
  * @typedef {Object} Validation
- * @property {Boolean} nonce used to disable nonce validation
- * @property {Boolean} state used to disable state validation
- * @property {Boolean} azp used to disable azp validation
- * @property {Boolean} aud used to disable aud validation
+ * @property {Boolean} [nonce=true] Passing false will disable nonce validation, leaving you vulnerable to replay attacks.
+ * @property {Boolean} [state=true] Passing false will disable state validation, leaving you vulnerable to XSRF attacks.
+ * @property {Boolean} [azp=true] Passing false will disable azp validation.
+ * @property {Boolean} [aud=true] Passing false will disable aud validation.
  */
 
 /**
  * The configuration for salte auth
  * @typedef {Object} Config
- * @property {String} gateway The Gateway url
- * @property {('id_token'|'id_token token')} responseType The response type
- * @property {String} redirectUrl The redirect url
-*
+ * @property {String} gateway The base url of your identity provider.
+ * @property {('id_token'|'id_token token')} responseType The response type to authenticate with.
+ * @property {String} redirectUrl The redirect url specified in your identity provider.
  * @property {String} clientId The client id of your identity provider
- * @property {String} scope The scopes to pass
- * @property {Boolean|String[]} routes The secured routes
- * @property {String[]} endpoints The secured endpoints
- * @property {('auth0'|'cognito'|'wso2')} provider The provider
- * @property {('session'|'local')} storageType the web storage api to use for authentication
- * @property {Boolean|Validation} validation used to disable validation
+ * @property {String} scope A list of space-delimited claims used to determine what user information is provided and what access is given. Most providers require 'openid'.
+ * @property {Boolean|Array<String>} routes A list of secured routes. If true is provided then all routes are secured.
+ * @property {Array<String|RegExp>} endpoints A list of secured endpoints.
+ * @property {('auth0'|'cognito'|'wso2')} provider The identity provider you're using.
+ * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
+ * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
  */
 
-/** Salte Auth */
+/**
+ * Authentication Controller
+ */
 class SalteAuth {
   /**
    * Sets up Salte Auth
