@@ -259,8 +259,8 @@ describe('salte-auth', () => {
     });
 
     it('should throw an error if the provider is unsupported', () => {
-      auth.$config.provider = 'azure';
-      expect(() => auth.provider).to.throw('Unknown Provider (azure)');
+      auth.$config.provider = 'bogus';
+      expect(() => auth.provider).to.throw('Unknown Provider (bogus)');
     });
 
     it('should throw an error if the provider was not specified', () => {

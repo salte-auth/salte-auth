@@ -1,4 +1,5 @@
 import auth0 from './providers/auth0.js';
+import azure from './providers/azure.js';
 import cognito from './providers/cognito.js';
 import wso2 from './providers/wso2.js';
 
@@ -12,6 +13,14 @@ class Providers {
    */
   static get auth0() {
     return auth0;
+  }
+
+  /**
+   * Provider for Azure's Active Directory
+   * @type {SalteAuthAzureProvider}
+   */
+  static get azure() {
+    return azure;
   }
 
   /**

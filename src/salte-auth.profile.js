@@ -28,7 +28,7 @@ class SalteAuthProfile {
       for (let i = 0; i < params.length; i++) {
         const param = params[i];
         const [key, value] = param.split('=');
-        this.parse(key, value);
+        this.parse(key, decodeURIComponent(value));
       }
     }
     window.salte.SalteAuthProfile.$instance = this;

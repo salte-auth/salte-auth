@@ -31,23 +31,59 @@
             </label>
         </div>
         <script>
-            let auth = new salte.SalteAuth({
-                gateway: 'https://salte-io.auth0.com',
-                responseType: 'id_token',
-                redirectUrl: location.protocol + '//' + location.host,
-                clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
-                scope: 'openid',
+            var configs = {
+                auth0: {
+                    gateway: 'https://salte-io.auth0.com',
+                    responseType: 'id_token',
+                    redirectUrl: location.protocol + '//' + location.host,
+                    clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
+                    scope: 'openid',
 
-                routes: [
-                    'http://localhost:8080/account'
-                ],
+                    routes: [
+                        'http://localhost:8080/account'
+                    ],
 
-                endpoints: [
-                    'https://jsonplaceholder.typicode.com/posts/1'
-                ],
+                    endpoints: [
+                        'https://jsonplaceholder.typicode.com/posts/1'
+                    ],
 
-                provider: 'auth0'
-            });
+                    provider: 'auth0'
+                },
+
+                adfs: {
+                    gateway: 'https://login.microsoftonline.com/3f6df7ce-5830-4280-ae97-8e4016d1c6d0',
+                    responseType: 'id_token',
+                    redirectUrl: location.protocol + '//' + location.host,
+                    clientId: '6a54731e-3d14-4cc4-aba9-0041a591a3b1',
+                    scope: 'openid',
+
+                    routes: [
+                        'http://localhost:8080/account'
+                    ],
+
+                    endpoints: [
+                        'https://jsonplaceholder.typicode.com/posts/1'
+                    ],
+
+                    queryParams: {
+                        resource: 'https://graph.windows.net/'
+                    },
+
+                    loginType: 'popup',
+
+                    provider: 'azuread'
+                }
+            };
+
+            var providerMatch = location.search.match(/provider=([^&]+)/);
+            var provider = providerMatch ? providerMatch[1] : 'auth0';
+            var config = configs[provider];
+            if (provider !== sessionStorage.getItem('salte.demo.provider')) {
+                sessionStorage.clear();
+                sessionStorage.setItem('salte.demo.provider', provider);
+            }
+
+            var auth = new salte.SalteAuth(config);
 
             document.querySelector('#login').addEventListener('click', function() {
                 var type = document.querySelector('[name="type"]:checked').value

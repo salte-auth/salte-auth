@@ -9,6 +9,12 @@ describe('salte-auth.providers', () => {
     });
   });
 
+  describe('getter(azure)', () => {
+    it('should return the azure provider', () => {
+      expect(Providers.azure).to.not.be.undefined;
+    });
+  });
+
   describe('getter(cognito)', () => {
     it('should return the cognito provider', () => {
       expect(Providers.cognito).to.not.be.undefined;
