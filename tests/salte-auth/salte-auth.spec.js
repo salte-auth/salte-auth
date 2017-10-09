@@ -38,7 +38,7 @@ describe('salte-auth', () => {
       delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
 
-      expect(() => new SalteAuth()).to.throw(ReferenceError.clear);
+      expect(() => new SalteAuth()).to.throw(ReferenceError);
       expect(window.salte.auth).to.be.undefined;
     });
 
@@ -159,6 +159,7 @@ describe('salte-auth', () => {
 
     it('should redirect to the "redirectUrl"', () => {
       const url = `${location.protocol}//${location.host}${location.pathname}#test=test`;
+      sandbox.stub(auth.profile, 'validate').returns(undefined);
       sandbox.stub(auth.profile, 'redirectUrl')
         .get(() => url)
         .set((redirectUrl) => {
@@ -172,6 +173,28 @@ describe('salte-auth', () => {
       });
 
       expect(location.href).to.equal(url);
+    });
+
+    it('should validate for errors when redirecting', (done) => {
+      sandbox.stub(auth.profile, 'validate').returns({
+        code: 'stuff_broke',
+        description: 'what did you break!'
+      });
+      sandbox.stub(auth.profile, 'redirectUrl')
+        .get(() => 'error');
+
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        provider: 'auth0',
+        redirectErrorCallback: (error) => {
+          expect(error).to.deep.equal({
+            code: 'stuff_broke',
+            description: 'what did you break!'
+          });
+          done();
+        }
+      });
     });
   });
 
@@ -472,12 +495,20 @@ describe('salte-auth', () => {
     it('should resolve when we have logged in', () => {
       sandbox.stub(auth.profile, 'clear');
       sandbox.stub(auth, 'loginUrl').get(() => location.href);
+      auth.$config.redirectErrorCallback = sandbox.stub();
 
       auth.loginWithRedirect();
 
       expect(auth.profile.clear.callCount).to.equal(1);
       expect(auth.profile.redirectUrl).to.equal(location.href);
       expect(auth.$promises.logout).to.be.undefined;
+    });
+
+    it('should require a "redirectErrorCallback" to be provided', () => {
+      sandbox.stub(auth.profile, 'clear');
+      sandbox.stub(auth, 'loginUrl').get(() => location.href);
+
+      expect(() => auth.loginWithRedirect()).to.throw(ReferenceError);
     });
   });
 

@@ -25,6 +25,7 @@ import { SalteAuthUtilities } from './salte-auth.utilities.js';
  * @property {Boolean|Array<String>} routes A list of secured routes. If true is provided then all routes are secured.
  * @property {Array<String|RegExp>} endpoints A list of secured endpoints.
  * @property {('auth0'|'cognito'|'wso2')} provider The identity provider you're using.
+ * @property {Function} [redirectErrorCallback] A callback that's used when an error occurs during a redirect login
  * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
  */
@@ -67,8 +68,14 @@ class SalteAuth {
       }
       setTimeout(this.utilities.popup.close);
     } else if (this.profile.redirectUrl && location.href !== this.profile.redirectUrl) {
-      location.href = this.profile.redirectUrl;
-      this.profile.redirectUrl = undefined;
+      const error = this.profile.validate();
+      if (error) {
+        this.profile.clear();
+        this.$config.redirectErrorCallback(error);
+      } else {
+        location.href = this.profile.redirectUrl;
+        this.profile.redirectUrl = undefined;
+      }
     } else {
       this.utilities.addXHRInterceptor((request, data) => {
         if (this.utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
@@ -184,6 +191,7 @@ class SalteAuth {
       const error = this.profile.validate();
 
       if (error) {
+        this.profile.clear();
         return Promise.reject(error);
       }
     });
@@ -210,6 +218,7 @@ class SalteAuth {
       const error = this.profile.validate();
 
       if (error) {
+        this.profile.clear();
         return Promise.reject(error);
       }
     });
@@ -221,8 +230,12 @@ class SalteAuth {
    * Authenticates using the redirect-based OAuth flow.
    */
   loginWithRedirect() {
+    if (!this.$config.redirectErrorCallback) {
+      throw new ReferenceError('A redirectErrorCallback is required to invoke "loginWithRedirect"!');
+    }
+
     this.profile.clear();
-    this.profile.redirectUrl = location.href;
+    this.profile.redirectUrl = this.profile.redirectUrl || location.href;
     location.href = this.loginUrl;
     // TODO: How do we validate that we logged in successfully?
   }

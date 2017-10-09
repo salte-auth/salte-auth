@@ -150,7 +150,7 @@ describe('salte-auth.profile', () => {
   describe('setter(redirectUrl)', () => {
     it('should set sessionStorage', () => {
       profile.redirectUrl = location.href;
-      expect(sessionStorage.getItem('salte.auth.redirect-url')).to.equal(location.href);
+      expect(sessionStorage.getItem('salte.auth.$redirect-url')).to.equal(location.href);
     });
   });
 
@@ -416,6 +416,7 @@ describe('salte-auth.profile', () => {
 
   describe('function(clear)', () => {
     beforeEach(() => {
+      sessionStorage.setItem('salte.auth.$test', '123');
       sessionStorage.setItem('salte.auth.id_token', '12345-12345-12345');
       sessionStorage.setItem('salte.auth.bogus', '12345');
       sessionStorage.setItem('bogus', '12345');
@@ -424,6 +425,7 @@ describe('salte-auth.profile', () => {
     it('should remove all "salte.auth" items from sessionStorage', () => {
       profile.clear();
 
+      expect(sessionStorage.getItem('salte.auth.$test')).to.equal('123');
       expect(sessionStorage.getItem('salte.auth.id_token')).to.equal(null);
       expect(sessionStorage.getItem('salte.auth.bogus')).to.equal(null);
       expect(sessionStorage.getItem('bogus')).to.equal('12345');

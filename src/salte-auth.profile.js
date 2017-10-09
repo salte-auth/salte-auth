@@ -186,11 +186,11 @@ class SalteAuthProfile {
    * @return {String} The url the user originated from before authentication occurred
    */
   get redirectUrl() {
-    return this.$storage.getItem('salte.auth.redirect-url');
+    return this.$storage.getItem('salte.auth.$redirect-url');
   }
 
   set redirectUrl(redirectUrl) {
-    this.saveItem('salte.auth.redirect-url', redirectUrl);
+    this.saveItem('salte.auth.$redirect-url', redirectUrl);
   }
 
   /**
@@ -348,7 +348,7 @@ class SalteAuthProfile {
    */
   clear() {
     for (const key in this.$storage) {
-      if (key.indexOf('salte.auth.') === 0) {
+      if (key.match(/^salte\.auth\.[^$]/)) {
         this.saveItem(key, undefined);
       }
     }
