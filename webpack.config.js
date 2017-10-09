@@ -21,7 +21,6 @@ module.exports = {
   },
   externals: [{
     moment: 'moment',
-    uuid: 'uuid',
     lodash: {
       root: '_',
       commonjs: 'lodash',

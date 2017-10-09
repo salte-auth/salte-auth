@@ -31,7 +31,6 @@
   ],
   "dependencies": {
     "moment": "moment/moment#^2.0.0",
-    "lodash": "lodash/lodash#^4.0.0",
-    "node-uuid": "kelektiv/node-uuid#^3.0.0"
+    "lodash": "lodash/lodash#^4.0.0"
   }
 }
