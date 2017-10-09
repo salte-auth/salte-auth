@@ -157,7 +157,7 @@ describe('salte-auth', () => {
       });
     });
 
-    it('should redirect to the "redirectUrl"', () => {
+    it('should redirect to the "redirectUrl"', (done) => {
       const url = `${location.protocol}//${location.host}${location.pathname}#test=test`;
       sandbox.stub(auth.profile, '$validate').returns(undefined);
       sandbox.stub(auth.profile, '$redirectUrl')
@@ -169,7 +169,11 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        redirectLoginCallback: (error) => {
+          expect(error).to.deep.equal(undefined);
+          done();
+        }
       });
 
       expect(location.href).to.equal(url);
@@ -187,7 +191,7 @@ describe('salte-auth', () => {
 
       auth = new SalteAuth({
         provider: 'auth0',
-        redirectErrorCallback: (error) => {
+        redirectLoginCallback: (error) => {
           expect(error).to.deep.equal({
             code: 'stuff_broke',
             description: 'what did you break!'
@@ -495,7 +499,7 @@ describe('salte-auth', () => {
     it('should resolve when we have logged in', () => {
       sandbox.stub(auth.profile, '$clear');
       sandbox.stub(auth, '$loginUrl').get(() => location.href);
-      auth.$config.redirectErrorCallback = sandbox.stub();
+      auth.$config.redirectLoginCallback = sandbox.stub();
 
       auth.loginWithRedirect();
 
@@ -504,7 +508,7 @@ describe('salte-auth', () => {
       expect(auth.$promises.logout).to.be.undefined;
     });
 
-    it('should require a "redirectErrorCallback" to be provided', () => {
+    it('should require a "redirectLoginCallback" to be provided', () => {
       sandbox.stub(auth.profile, '$clear');
       sandbox.stub(auth, '$loginUrl').get(() => location.href);
 
