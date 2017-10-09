@@ -14,7 +14,7 @@ OAuth 2.0 for the masses!
 
 ## Install
 
-You can install this package either with `npm`.
+You can install this package either with `npm` or with `bower`.
 
 ## npm
 
@@ -25,10 +25,22 @@ $ npm install @salte-io/salte-auth
 Then add a `<script>` to your index.html:
 
 ```html
-<script src="/node_modules/@salte-io/salte-auth.js"></script>
+<script src="/node_modules/@salte-io/dist/salte-auth.js"></script>
 ```
 
 Or `require('@salte-io/salte-auth')` from your code.
+
+## bower
+
+```sh
+$ bower install salte-io/salte-auth
+```
+
+Then add a `<script>` to your index.html:
+
+```html
+<script src="/bower_components/salte-auth/dist/salte-auth.js"></script>
+```
 
 ## Usage
 
