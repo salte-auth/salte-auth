@@ -62,6 +62,8 @@ auth.loginWithIframe();
 
 [Click here to view the documentation!](https://salte-io.github.io/salte-auth/)
 
+**Use private or undocumented methods at your own risk, as they will not require a major version bump when breaking changes are made!**
+
 [gitter-image]: https://badges.gitter.im/salte-io/salte-auth.svg
 [gitter-url]: https://gitter.im/salte-io/salte-auth?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
