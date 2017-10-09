@@ -47,46 +47,64 @@ class SalteAuth {
       throw new ReferenceError('A config must be provided.');
     }
 
-    /** @type {Providers} */
-    this.providers = Providers;
-    /** @ignore */
+    /**
+     * The supported identity providers
+     * @type {Providers}
+     * @private
+     */
+    this.$providers = Providers;
+    /**
+     * The active authentication promises
+     * @private
+     */
     this.$promises = {};
-    /** @ignore */
+    /**
+     * The configuration for salte auth
+     * @private
+     */
     this.$config = config;
-    this.$config = defaultsDeep(config, this.provider.defaultConfig);
-    /** @type {SalteAuthProfile} */
-    this.profile = new SalteAuthProfile(this.$config);
-    /** @type {SalteAuthUtilities} */
-    this.utilities = new SalteAuthUtilities();
+    this.$config = defaultsDeep(config, this.$provider.defaultConfig);
+    /**
+     * Various utility functions for salte auth
+     * @type {SalteAuthUtilities}
+     * @private
+     */
+    this.$utilities = new SalteAuthUtilities();
 
-    if (this.utilities.iframe) {
-      parent.document.body.removeChild(this.utilities.iframe);
-    } else if (this.utilities.popup) {
+    /**
+     * The user profile for salte auth
+     * @type {SalteAuthProfile}
+     */
+    this.profile = new SalteAuthProfile(this.$config);
+
+    if (this.$utilities.$iframe) {
+      parent.document.body.removeChild(this.$utilities.$iframe);
+    } else if (this.$utilities.$popup) {
       // We need to utilize local storage to retain our parsed values
       if (this.$config.storageType === 'session') {
         this.profile.$$transfer('session', 'local');
       }
-      setTimeout(this.utilities.popup.close);
-    } else if (this.profile.redirectUrl && location.href !== this.profile.redirectUrl) {
-      const error = this.profile.validate();
+      setTimeout(this.$utilities.$popup.close);
+    } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
+      const error = this.profile.$validate();
       if (error) {
-        this.profile.clear();
+        this.profile.$clear();
         this.$config.redirectErrorCallback(error);
       } else {
-        location.href = this.profile.redirectUrl;
-        this.profile.redirectUrl = undefined;
+        location.href = this.profile.$redirectUrl;
+        this.profile.$redirectUrl = undefined;
       }
     } else {
-      this.utilities.addXHRInterceptor((request, data) => {
-        if (this.utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
+      this.$utilities.addXHRInterceptor((request, data) => {
+        if (this.$utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
           return this.retrieveAccessToken().then((accessToken) => {
             request.setRequestHeader('Authorization', `Bearer ${accessToken}`);
           });
         }
       });
 
-      this.utilities.addFetchInterceptor((input, options) => {
-        if (this.utilities.checkForMatchingUrl(input, this.$config.endpoints)) {
+      this.$utilities.addFetchInterceptor((input, options) => {
+        if (this.$utilities.checkForMatchingUrl(input, this.$config.endpoints)) {
           return this.retrieveAccessToken().then((accessToken) => {
             options.headers = options.headers || {};
             options.headers.Authorization = `Bearer ${accessToken}`;
@@ -104,14 +122,15 @@ class SalteAuth {
   /**
    * Returns the configured provider
    * @type {Class|Object}
+   * @private
    */
-  get provider() {
+  get $provider() {
     if (!this.$config.provider) {
       throw new ReferenceError('A provider must be specified');
     }
 
     if (typeof this.$config.provider === 'string') {
-      const provider = this.providers[this.$config.provider];
+      const provider = this.$providers[this.$config.provider];
       if (!provider) {
         throw new ReferenceError(`Unknown Provider (${this.$config.provider})`);
       }
@@ -124,19 +143,20 @@ class SalteAuth {
   /**
    * The authentication url to retrieve the access token
    * @type {String}
+   * @private
    */
-  get accessTokenUrl() {
-    this.profile.localState = uuid.v4();
-    this.profile.nonce = uuid.v4();
+  get $accessTokenUrl() {
+    this.profile.$localState = uuid.v4();
+    this.profile.$nonce = uuid.v4();
 
     let authorizeEndpoint = `${this.$config.gateway}/authorize`;
-    if (this.provider.authorizeEndpoint) {
-      authorizeEndpoint = this.provider.authorizeEndpoint.call(this, this.$config);
+    if (this.$provider.authorizeEndpoint) {
+      authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
     }
 
-    return this.utilities.createUrl(authorizeEndpoint, assign({
-      'state': this.profile.localState,
-      'nonce': this.profile.nonce,
+    return this.$utilities.createUrl(authorizeEndpoint, assign({
+      'state': this.profile.$localState,
+      'nonce': this.profile.$nonce,
       'response_type': 'token',
       'redirect_uri': this.$config.redirectUrl,
       'client_id': this.$config.clientId,
@@ -148,19 +168,20 @@ class SalteAuth {
   /**
    * The authentication url to retrieve the id token
    * @type {String}
+   * @private
    */
-  get loginUrl() {
-    this.profile.localState = uuid.v4();
-    this.profile.nonce = uuid.v4();
+  get $loginUrl() {
+    this.profile.$localState = uuid.v4();
+    this.profile.$nonce = uuid.v4();
 
     let authorizeEndpoint = `${this.$config.gateway}/authorize`;
-    if (this.provider.authorizeEndpoint) {
-      authorizeEndpoint = this.provider.authorizeEndpoint.call(this, this.$config);
+    if (this.$provider.authorizeEndpoint) {
+      authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
     }
 
-    return this.utilities.createUrl(authorizeEndpoint, assign({
-      'state': this.profile.localState,
-      'nonce': this.profile.nonce,
+    return this.$utilities.createUrl(authorizeEndpoint, assign({
+      'state': this.profile.$localState,
+      'nonce': this.profile.$nonce,
       'response_type': this.$config.responseType,
       'redirect_uri': this.$config.redirectUrl,
       'client_id': this.$config.clientId,
@@ -171,9 +192,10 @@ class SalteAuth {
   /**
    * The url to logout of the configured provider
    * @type {String}
+   * @private
    */
-  get deauthorizeUrl() {
-    return this.provider.deauthorizeUrl.call(this, this.$config);
+  get $deauthorizeUrl() {
+    return this.$provider.deauthorizeUrl.call(this, this.$config);
   }
 
   /**
@@ -185,13 +207,13 @@ class SalteAuth {
       return this.$promises.login;
     }
 
-    this.profile.clear();
-    this.$promises.login = this.utilities.createIframe(this.loginUrl, true).then(() => {
+    this.profile.$clear();
+    this.$promises.login = this.$utilities.createIframe(this.$loginUrl, true).then(() => {
       this.$promises.login = null;
-      const error = this.profile.validate();
+      const error = this.profile.$validate();
 
       if (error) {
-        this.profile.clear();
+        this.profile.$clear();
         return Promise.reject(error);
       }
     });
@@ -208,17 +230,17 @@ class SalteAuth {
       return this.$promises.login;
     }
 
-    this.profile.clear();
-    this.$promises.login = this.utilities.openPopup(this.loginUrl).then(() => {
+    this.profile.$clear();
+    this.$promises.login = this.$utilities.openPopup(this.$loginUrl).then(() => {
       this.$promises.login = null;
       // We need to utilize local storage to retain our parsed values
       if (this.$config.storageType === 'session') {
         this.profile.$$transfer('local', 'session');
       }
-      const error = this.profile.validate();
+      const error = this.profile.$validate();
 
       if (error) {
-        this.profile.clear();
+        this.profile.$clear();
         return Promise.reject(error);
       }
     });
@@ -234,10 +256,9 @@ class SalteAuth {
       throw new ReferenceError('A redirectErrorCallback is required to invoke "loginWithRedirect"!');
     }
 
-    this.profile.clear();
-    this.profile.redirectUrl = this.profile.redirectUrl || location.href;
-    location.href = this.loginUrl;
-    // TODO: How do we validate that we logged in successfully?
+    this.profile.$clear();
+    this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
+    location.href = this.$loginUrl;
   }
 
   /**
@@ -249,8 +270,8 @@ class SalteAuth {
       return this.$promises.logout;
     }
 
-    this.profile.clear();
-    this.$promises.logout = this.utilities.createIframe(this.deauthorizeUrl).then(() => {
+    this.profile.$clear();
+    this.$promises.logout = this.$utilities.createIframe(this.$deauthorizeUrl).then(() => {
       this.$promises.logout = null;
     });
     return this.$promises.logout;
@@ -265,8 +286,8 @@ class SalteAuth {
       return this.$promises.logout;
     }
 
-    this.profile.clear();
-    this.$promises.logout = this.utilities.openPopup(this.deauthorizeUrl).then(() => {
+    this.profile.$clear();
+    this.$promises.logout = this.$utilities.openPopup(this.$deauthorizeUrl).then(() => {
       this.$promises.logout = null;
     });
 
@@ -277,8 +298,8 @@ class SalteAuth {
    * Logs the user out of their configured identity provider.
    */
   logoutWithRedirect() {
-    this.profile.clear();
-    location.href = this.deauthorizeUrl;
+    this.profile.$clear();
+    location.href = this.$deauthorizeUrl;
   }
 
   /**
@@ -303,20 +324,20 @@ class SalteAuth {
     }
 
     this.$promises.token = this.$promises.token.then(() => {
-      this.profile.clearErrors();
+      this.profile.$clearErrors();
       if (this.profile.accessTokenExpired) {
-        return this.utilities.createIframe(this.accessTokenUrl).then(() => {
+        return this.$utilities.createIframe(this.$accessTokenUrl).then(() => {
           this.$promises.token = null;
-          const error = this.profile.validate(true);
+          const error = this.profile.$validate(true);
 
           if (error) {
             return Promise.reject(error);
           }
-          return this.profile.accessToken;
+          return this.profile.$accessToken;
         });
       }
       this.$promises.token = null;
-      return this.profile.accessToken;
+      return this.profile.$accessToken;
     });
 
     return this.$promises.token;
@@ -327,7 +348,7 @@ class SalteAuth {
    * @ignore
    */
   $$onRouteChanged() {
-    if (!this.utilities.isRouteSecure(location.href, this.$config.routes)) return;
+    if (!this.$utilities.isRouteSecure(location.href, this.$config.routes)) return;
 
     this.retrieveAccessToken();
   }

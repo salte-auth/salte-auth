@@ -6,7 +6,7 @@ class SalteAuthWSO2Provider {
    * @return {String} the deauthorization url
    */
   static deauthorizeUrl(config) {
-    return this.utilities.createUrl(`${config.gateway}/commonauth`, {
+    return this.$utilities.createUrl(`${config.gateway}/commonauth`, {
       'commonAuthLogout': true,
       'type': 'oidc',
       'commonAuthCallerPath': config.redirectUrl,

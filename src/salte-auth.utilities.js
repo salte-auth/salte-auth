@@ -222,8 +222,9 @@ class SalteAuthUtilities {
   /**
    * Checks if the current window is an iframe
    * @return {HTMLIFrameElement} true if the current window is an iframe.
+   * @private
    */
-  get iframe() {
+  get $iframe() {
     if (window.self === window.top) {
       return null;
     }
@@ -233,8 +234,9 @@ class SalteAuthUtilities {
   /**
    * Determines if the current window is a popup window opened by salte auth
    * @return {Window} the window object
+   * @private
    */
-  get popup() {
+  get $popup() {
     if (window.opener && window.name === 'salte-auth') {
       return window;
     }

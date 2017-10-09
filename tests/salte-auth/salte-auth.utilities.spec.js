@@ -283,7 +283,7 @@ describe('salte-auth.utilities', () => {
     });
   });
 
-  describe('getter(iframe)', () => {
+  describe('getter($iframe)', () => {
     let iframe;
     const self = window.self;
     beforeEach(() => {
@@ -298,22 +298,22 @@ describe('salte-auth.utilities', () => {
     });
 
     it('should return the iframe if we are in an iframe and the iframe is owned by "salte-auth"', () => {
-      expect(utilities.iframe).to.equal(iframe);
+      expect(utilities.$iframe).to.equal(iframe);
     });
 
     it('should return "null" if we are not inside an iframe', () => {
       window.self = window.top;
-      expect(utilities.iframe).to.equal(null);
+      expect(utilities.$iframe).to.equal(null);
     });
 
     it('should return "null" if we are in an iframe but the iframe is not owned by "salte-auth"', () => {
       iframe.removeAttribute('owner');
       window.self = window.top;
-      expect(utilities.iframe).to.equal(null);
+      expect(utilities.$iframe).to.equal(null);
     });
   });
 
-  describe('getter(popup)', () => {
+  describe('getter($popup)', () => {
     const opener = window.opener;
     const name = window.name;
     afterEach(() => {
@@ -324,19 +324,19 @@ describe('salte-auth.utilities', () => {
     it('should return true if we are inside a popup window named "salte-auth"', () => {
       window.opener = true;
       window.name = 'salte-auth';
-      expect(utilities.popup).to.be.instanceof(Window);
+      expect(utilities.$popup).to.be.instanceof(Window);
     });
 
     it('should return false if we are inside a popup window not named "salte-auth', () => {
       window.opener = true;
       window.name = 'something-else';
-      expect(utilities.popup).to.equal(null);
+      expect(utilities.$popup).to.equal(null);
     });
 
     it('should return false if we are not inside a popup window', () => {
       window.opener = false;
       window.name = 'salte-auth';
-      expect(utilities.popup).to.equal(null);
+      expect(utilities.$popup).to.equal(null);
     });
   });
 });

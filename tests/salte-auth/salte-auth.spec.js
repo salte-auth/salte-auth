@@ -17,11 +17,11 @@ describe('salte-auth', () => {
   });
 
   afterEach(() => {
-    auth.utilities.$interceptors = {
+    auth.$utilities.$interceptors = {
       fetch: [],
       xhr: []
     };
-    auth.profile.clear();
+    auth.profile.$clear();
     delete window.salte.SalteAuthProfile.$instance;
     delete window.salte.auth;
     sandbox.restore();
@@ -122,7 +122,7 @@ describe('salte-auth', () => {
       const popup = {
         close: sandbox.stub()
       };
-      sandbox.stub(auth.utilities, 'popup').get(() => popup);
+      sandbox.stub(auth.$utilities, '$popup').get(() => popup);
 
       delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
@@ -142,7 +142,7 @@ describe('salte-auth', () => {
       const popup = {
         close: sandbox.stub()
       };
-      sandbox.stub(auth.utilities, 'popup').get(() => popup);
+      sandbox.stub(auth.$utilities, '$popup').get(() => popup);
 
       delete window.salte.SalteAuthProfile.$instance;
       delete window.salte.auth;
@@ -159,8 +159,8 @@ describe('salte-auth', () => {
 
     it('should redirect to the "redirectUrl"', () => {
       const url = `${location.protocol}//${location.host}${location.pathname}#test=test`;
-      sandbox.stub(auth.profile, 'validate').returns(undefined);
-      sandbox.stub(auth.profile, 'redirectUrl')
+      sandbox.stub(auth.profile, '$validate').returns(undefined);
+      sandbox.stub(auth.profile, '$redirectUrl')
         .get(() => url)
         .set((redirectUrl) => {
           expect(redirectUrl).to.equal(undefined);
@@ -176,11 +176,11 @@ describe('salte-auth', () => {
     });
 
     it('should validate for errors when redirecting', (done) => {
-      sandbox.stub(auth.profile, 'validate').returns({
+      sandbox.stub(auth.profile, '$validate').returns({
         code: 'stuff_broke',
         description: 'what did you break!'
       });
-      sandbox.stub(auth.profile, 'redirectUrl')
+      sandbox.stub(auth.profile, '$redirectUrl')
         .get(() => 'error');
 
       delete window.salte.auth;
@@ -207,7 +207,7 @@ describe('salte-auth', () => {
         ]
       };
 
-      auth.utilities.addFetchInterceptor((input, options) => {
+      auth.$utilities.addFetchInterceptor((input, options) => {
         return Promise.resolve().then(() => {
           expect(options.headers.Authorization).to.equal('Bearer 55555-55555');
         });
@@ -217,7 +217,7 @@ describe('salte-auth', () => {
     });
 
     it('should not request a new access token if we do not need to be authenticated', () => {
-      auth.utilities.addFetchInterceptor((input, options) => {
+      auth.$utilities.addFetchInterceptor((input, options) => {
         return Promise.resolve().then(() => {
           expect(options.headers).to.be.undefined;
         });
@@ -270,30 +270,30 @@ describe('salte-auth', () => {
     });
   });
 
-  describe('getter(provider)', () => {
+  describe('getter($provider)', () => {
     it('should return a provider', () => {
       auth.$config.provider = 'auth0';
-      expect(auth.provider).to.not.be.undefined;
+      expect(auth.$provider).to.not.be.undefined;
     });
 
     it('should support custom providers', () => {
       auth.$config.provider = class {};
-      expect(auth.provider).to.equal(auth.$config.provider);
+      expect(auth.$provider).to.equal(auth.$config.provider);
     });
 
     it('should throw an error if the provider is unsupported', () => {
       auth.$config.provider = 'bogus';
-      expect(() => auth.provider).to.throw('Unknown Provider (bogus)');
+      expect(() => auth.$provider).to.throw('Unknown Provider (bogus)');
     });
 
     it('should throw an error if the provider was not specified', () => {
       auth.$config.provider = null;
-      expect(() => auth.provider).to.throw('A provider must be specified');
+      expect(() => auth.$provider).to.throw('A provider must be specified');
     });
   });
 
   // TODO: Make this more thorough by including more config params
-  describe('getter(accessTokenUrl)', () => {
+  describe('getter($accessTokenUrl)', () => {
     it('should compute the accessTokenUrl', () => {
       salte.auth.$config = {
         gateway: 'https://api.salte.io',
@@ -302,7 +302,7 @@ describe('salte-auth', () => {
         scope: 'openid',
         provider: 'auth0'
       };
-      expect(auth.accessTokenUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid&prompt=none`);
+      expect(auth.$accessTokenUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid&prompt=none`);
     });
 
     it('should utilize authorizeUrl overrides', () => {
@@ -313,11 +313,11 @@ describe('salte-auth', () => {
         scope: 'openid',
         provider: 'cognito'
       };
-      expect(auth.accessTokenUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid&prompt=none`);
+      expect(auth.$accessTokenUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid&prompt=none`);
     });
   });
 
-  describe('getter(loginUrl)', () => {
+  describe('getter($loginUrl)', () => {
     it('should compute the loginUrl', () => {
       salte.auth.$config = {
         gateway: 'https://api.salte.io',
@@ -327,7 +327,7 @@ describe('salte-auth', () => {
         scope: 'openid',
         provider: 'auth0'
       };
-      expect(auth.loginUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid`);
+      expect(auth.$loginUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid`);
     });
 
     it('should utilize authorizeEndpoint overrides', () => {
@@ -339,11 +339,11 @@ describe('salte-auth', () => {
         scope: 'openid',
         provider: 'cognito'
       };
-      expect(salte.auth.loginUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid`);
+      expect(salte.auth.$loginUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid`);
     });
   });
 
-  describe('getter(deauthorizeUrl)', () => {
+  describe('getter($deauthorizeUrl)', () => {
     it('should compute the deauthorizeUrl', (done) => {
       salte.auth.$config = {
         gateway: 'https://api.salte.io',
@@ -354,20 +354,20 @@ describe('salte-auth', () => {
 
         provider: 'auth0'
       };
-      sandbox.stub(auth.provider, 'deauthorizeUrl').callsFake(function(config) {
+      sandbox.stub(auth.$provider, 'deauthorizeUrl').callsFake(function(config) {
         expect(this).to.be.an.instanceof(SalteAuth);
         expect(config).to.deep.equal(salte.auth.$config);
         done();
       });
-      auth.deauthorizeUrl;
+      auth.$deauthorizeUrl;
     });
   });
 
   describe('function(loginWithIframe)', () => {
     beforeEach(() => {
-      auth.profile.clear();
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth.utilities, 'createIframe').returns(Promise.resolve());
+      auth.profile.$clear();
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
       salte.auth.$config = {
         gateway: `${location.protocol}//${location.host}`,
         provider: 'auth0'
@@ -375,11 +375,11 @@ describe('salte-auth', () => {
     });
 
     it('should resolve when we have logged in', () => {
-      sandbox.stub(auth.profile, 'validate');
+      sandbox.stub(auth.profile, '$validate');
 
       const promise = auth.loginWithIframe();
 
-      expect(auth.profile.clear.callCount).to.equal(1);
+      expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
       return promise.then(() => {
         expect(auth.$promises.login).to.equal(null);
@@ -387,7 +387,7 @@ describe('salte-auth', () => {
     });
 
     it('should prevent duplicate promises', () => {
-      sandbox.stub(auth.profile, 'validate');
+      sandbox.stub(auth.profile, '$validate');
 
       const promise = auth.loginWithIframe();
       const duplicatePromise = auth.loginWithIframe();
@@ -398,7 +398,7 @@ describe('salte-auth', () => {
     });
 
     it('should throw validation errors', () => {
-      auth.profile.idToken = `0.${btoa(JSON.stringify({
+      auth.profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe'
       }))}.0`;
@@ -418,15 +418,15 @@ describe('salte-auth', () => {
 
   describe('function(loginWithPopup)', () => {
     it('should resolve when we have logged in', () => {
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'loginUrl').get(() => '');
-      sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
-      sandbox.stub(auth.profile, 'validate');
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$validate');
       sandbox.stub(auth.profile, '$$transfer');
 
       const promise = auth.loginWithPopup();
 
-      expect(auth.profile.clear.callCount).to.equal(1);
+      expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
       expect(auth.profile.$$transfer.callCount).to.equal(0);
       return promise.then(() => {
@@ -436,17 +436,17 @@ describe('salte-auth', () => {
     });
 
     it('should bypass transfering storage when using "localStorage"', () => {
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'loginUrl').get(() => '');
-      sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
-      sandbox.stub(auth.profile, 'validate');
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$validate');
       sandbox.stub(auth.profile, '$$transfer');
 
       auth.$config.storageType = 'local';
 
       const promise = auth.loginWithPopup();
 
-      expect(auth.profile.clear.callCount).to.equal(1);
+      expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
       return promise.then(() => {
         expect(auth.profile.$$transfer.callCount).to.equal(0);
@@ -455,10 +455,10 @@ describe('salte-auth', () => {
     });
 
     it('should prevent duplicate promises', () => {
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'loginUrl').get(() => '');
-      sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
-      sandbox.stub(auth.profile, 'validate');
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$validate');
 
       const promise = auth.loginWithPopup();
       const duplicatePromise = auth.loginWithPopup();
@@ -469,11 +469,11 @@ describe('salte-auth', () => {
     });
 
     it('should throw validation errors', () => {
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'loginUrl').get(() => '');
-      sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
 
-      auth.profile.idToken = `0.${btoa(JSON.stringify({
+      auth.profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe'
       }))}.0`;
@@ -493,20 +493,20 @@ describe('salte-auth', () => {
 
   describe('function(loginWithRedirect)', () => {
     it('should resolve when we have logged in', () => {
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'loginUrl').get(() => location.href);
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => location.href);
       auth.$config.redirectErrorCallback = sandbox.stub();
 
       auth.loginWithRedirect();
 
-      expect(auth.profile.clear.callCount).to.equal(1);
-      expect(auth.profile.redirectUrl).to.equal(location.href);
+      expect(auth.profile.$clear.callCount).to.equal(1);
+      expect(auth.profile.$redirectUrl).to.equal(location.href);
       expect(auth.$promises.logout).to.be.undefined;
     });
 
     it('should require a "redirectErrorCallback" to be provided', () => {
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'loginUrl').get(() => location.href);
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => location.href);
 
       expect(() => auth.loginWithRedirect()).to.throw(ReferenceError);
     });
@@ -514,13 +514,13 @@ describe('salte-auth', () => {
 
   describe('function(logoutWithIframe)', () => {
     it('should resolve when we have logged out', () => {
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'deauthorizeUrl').get(() => '');
-      sandbox.stub(auth.utilities, 'createIframe').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
 
       const promise = auth.logoutWithIframe();
 
-      expect(auth.profile.clear.callCount).to.equal(1);
+      expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.logout).to.equal(promise);
       return promise.then(() => {
         expect(auth.$promises.logout).to.equal(null);
@@ -528,9 +528,9 @@ describe('salte-auth', () => {
     });
 
     it('should prevent duplicate promises', () => {
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'deauthorizeUrl').get(() => '');
-      sandbox.stub(auth.utilities, 'createIframe').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
 
       const promise = auth.logoutWithIframe();
       const duplicatePromise = auth.logoutWithIframe();
@@ -543,13 +543,13 @@ describe('salte-auth', () => {
 
   describe('function(logoutWithPopup)', () => {
     it('should resolve when we have logged out', () => {
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'deauthorizeUrl').get(() => '');
-      sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
 
       const promise = auth.logoutWithPopup();
 
-      expect(auth.profile.clear.callCount).to.equal(1);
+      expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.logout).to.equal(promise);
       return promise.then(() => {
         expect(auth.$promises.logout).to.equal(null);
@@ -557,10 +557,10 @@ describe('salte-auth', () => {
     });
 
     it('should prevent duplicate promises', () => {
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'deauthorizeUrl').get(() => '');
-      sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
-      sandbox.stub(auth.profile, 'validate');
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$validate');
 
       const promise = auth.logoutWithPopup();
       const duplicatePromise = auth.logoutWithPopup();
@@ -573,12 +573,12 @@ describe('salte-auth', () => {
 
   describe('function(logoutWithRedirect)', () => {
     it('should resolve when we have logged out', () => {
-      sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'deauthorizeUrl').get(() => location.href);
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => location.href);
 
       auth.logoutWithRedirect();
 
-      expect(auth.profile.clear.callCount).to.equal(1);
+      expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.logout).to.be.undefined;
     });
   });
@@ -588,18 +588,18 @@ describe('salte-auth', () => {
       sandbox.stub(auth, 'loginWithIframe').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
       sandbox.stub(auth.profile, 'accessTokenExpired').get(() => true);
-      sandbox.stub(auth.profile, 'clearErrors');
-      sandbox.stub(auth.profile, 'validate');
-      sandbox.stub(auth.utilities, 'createIframe').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$clearErrors');
+      sandbox.stub(auth.profile, '$validate');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
 
       const promise = auth.retrieveAccessToken();
 
-      auth.profile.accessToken = '55555-55555';
+      auth.profile.$accessToken = '55555-55555';
 
       expect(auth.$promises.token).to.equal(promise);
       return promise.then((accessToken) => {
         expect(auth.loginWithIframe.callCount).to.equal(1);
-        expect(auth.profile.clearErrors.callCount).to.equal(1);
+        expect(auth.profile.$clearErrors.callCount).to.equal(1);
         expect(accessToken).to.equal('55555-55555');
         expect(auth.$promises.token).to.equal(null);
       });
@@ -613,18 +613,18 @@ describe('salte-auth', () => {
       sandbox.stub(auth, 'loginWithPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
       sandbox.stub(auth.profile, 'accessTokenExpired').get(() => true);
-      sandbox.stub(auth.profile, 'clearErrors');
-      sandbox.stub(auth.profile, 'validate');
-      sandbox.stub(auth.utilities, 'createIframe').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$clearErrors');
+      sandbox.stub(auth.profile, '$validate');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
 
       const promise = auth.retrieveAccessToken();
 
-      auth.profile.accessToken = '55555-55555';
+      auth.profile.$accessToken = '55555-55555';
 
       expect(auth.$promises.token).to.equal(promise);
       return promise.then((accessToken) => {
         expect(auth.loginWithPopup.callCount).to.equal(1);
-        expect(auth.profile.clearErrors.callCount).to.equal(1);
+        expect(auth.profile.$clearErrors.callCount).to.equal(1);
         expect(accessToken).to.equal('55555-55555');
         expect(auth.$promises.token).to.equal(null);
       });
@@ -633,15 +633,15 @@ describe('salte-auth', () => {
     it('should bypass fetching the tokens if they have not expired', () => {
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
       sandbox.stub(auth.profile, 'accessTokenExpired').get(() => false);
-      sandbox.stub(auth.profile, 'clearErrors');
+      sandbox.stub(auth.profile, '$clearErrors');
 
       const promise = auth.retrieveAccessToken();
 
-      auth.profile.accessToken = '55555-55555';
+      auth.profile.$accessToken = '55555-55555';
 
       expect(auth.$promises.token).to.equal(promise);
       return promise.then((accessToken) => {
-        expect(auth.profile.clearErrors.callCount).to.equal(1);
+        expect(auth.profile.$clearErrors.callCount).to.equal(1);
         expect(accessToken).to.equal('55555-55555');
         expect(auth.$promises.token).to.equal(null);
       });
@@ -668,14 +668,14 @@ describe('salte-auth', () => {
       sandbox.stub(auth, 'loginWithIframe').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
       sandbox.stub(auth.profile, 'accessTokenExpired').get(() => true);
-      sandbox.stub(auth.profile, 'clearErrors');
-      sandbox.stub(auth.profile, 'validate');
-      sandbox.stub(auth.utilities, 'createIframe').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$clearErrors');
+      sandbox.stub(auth.profile, '$validate');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
 
       const promise = auth.retrieveAccessToken();
       const duplicatePromise = auth.retrieveAccessToken();
 
-      auth.profile.accessToken = '55555-55555';
+      auth.profile.$accessToken = '55555-55555';
 
       expect(promise).to.equal(duplicatePromise);
       return promise;
@@ -684,10 +684,10 @@ describe('salte-auth', () => {
     it('should throw validation errors', () => {
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
       sandbox.stub(auth.profile, 'accessTokenExpired').get(() => true);
-      sandbox.stub(auth.profile, 'clearErrors');
-      sandbox.stub(auth.utilities, 'createIframe').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$clearErrors');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
 
-      auth.profile.accessToken = '55555-55555';
+      auth.profile.$accessToken = '55555-55555';
 
       const promise = auth.retrieveAccessToken();
 

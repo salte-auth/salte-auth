@@ -45,51 +45,51 @@ describe('salte-auth.profile', () => {
     it('should support parsing hash parameters', () => {
       history.replaceState(null, '', `${location.protocol}//${location.host}${location.pathname}#state=55555-55555`);
       profile = new SalteAuthProfile();
-      expect(profile.state).to.equal('55555-55555');
+      expect(profile.$state).to.equal('55555-55555');
     });
   });
 
-  describe('function(parse)', () => {
+  describe('function($parse)', () => {
     it('should parse the token_type', () => {
-      profile.parse('token_type', 'access');
-      expect(profile.tokenType).to.equal('access');
+      profile.$parse('token_type', 'access');
+      expect(profile.$tokenType).to.equal('access');
     });
 
     it('should parse the expires_in', () => {
       sandbox.useFakeTimers();
-      profile.parse('expires_in', 5000);
-      expect(profile.expiration).to.equal('5000');
+      profile.$parse('expires_in', 5000);
+      expect(profile.$expiration).to.equal('5000');
     });
 
     it('should parse the access_token', () => {
-      profile.parse('access_token', '12345-12345-12435');
-      expect(profile.accessToken).to.equal('12345-12345-12435');
+      profile.$parse('access_token', '12345-12345-12435');
+      expect(profile.$accessToken).to.equal('12345-12345-12435');
     });
 
     it('should parse the id_token', () => {
-      profile.parse('id_token', '12345.12345.12345');
-      expect(profile.idToken).to.equal('12345.12345.12345');
+      profile.$parse('id_token', '12345.12345.12345');
+      expect(profile.$idToken).to.equal('12345.12345.12345');
     });
 
     it('should parse the state', () => {
-      profile.parse('state', '55555-555555');
-      expect(profile.state).to.equal('55555-555555');
+      profile.$parse('state', '55555-555555');
+      expect(profile.$state).to.equal('55555-555555');
     });
 
     it('should parse the error', () => {
-      profile.parse('error', 'your-fault');
-      expect(profile.error).to.equal('your-fault');
+      profile.$parse('error', 'your-fault');
+      expect(profile.$error).to.equal('your-fault');
     });
 
     it('should parse the error_description', () => {
-      profile.parse('error_description', 'Look what you did!');
-      expect(profile.errorDescription).to.equal('Look what you did!');
+      profile.$parse('error_description', 'Look what you did!');
+      expect(profile.$errorDescription).to.equal('Look what you did!');
     });
 
     it('should ignore scope', () => {
       const warn = sandbox.stub(console, 'warn');
       expect(warn.callCount).to.equal(0);
-      profile.parse('scope', 'opendid');
+      profile.$parse('scope', 'opendid');
       expect(warn.callCount).to.equal(0);
     });
   });
@@ -97,7 +97,7 @@ describe('salte-auth.profile', () => {
   describe('getter(idTokenExpired)', () => {
     let clock;
     beforeEach(() => {
-      profile.idToken = `0.${btoa(JSON.stringify({
+      profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe',
         admin: true,
@@ -107,7 +107,7 @@ describe('salte-auth.profile', () => {
     });
 
     it('should be expired if the "id_token" is empty', () => {
-      profile.idToken = null;
+      profile.$idToken = null;
       expect(profile.idTokenExpired).to.equal(true);
     });
 
@@ -123,11 +123,11 @@ describe('salte-auth.profile', () => {
 
   describe('getter(accessTokenExpired)', () => {
     beforeEach(() => {
-      profile.accessToken = '55555-555555';
+      profile.$accessToken = '55555-555555';
     });
 
     it('should be expired if the "access_token" is empty', () => {
-      profile.accessToken = null;
+      profile.$accessToken = null;
       expect(profile.accessTokenExpired).to.equal(true);
     });
 
@@ -136,27 +136,27 @@ describe('salte-auth.profile', () => {
     });
 
     it('should not be expired if the "access_token" is present and the "expiration" is in the future', () => {
-      profile.expiration = moment().add(1, 'hour').unix();
+      profile.$expiration = moment().add(1, 'hour').unix();
       expect(profile.accessTokenExpired).to.equal(false);
     });
   });
 
   describe('getter(redirectUrl)', () => {
     it('should be authenticated if the token has not expired', () => {
-      expect(profile.redirectUrl).to.equal(null);
+      expect(profile.$redirectUrl).to.equal(null);
     });
   });
 
   describe('setter(redirectUrl)', () => {
     it('should set sessionStorage', () => {
-      profile.redirectUrl = location.href;
+      profile.$redirectUrl = location.href;
       expect(sessionStorage.getItem('salte.auth.$redirect-url')).to.equal(location.href);
     });
   });
 
   describe('getter(userInfo)', () => {
     it('should parse the "id_token"', () => {
-      profile.idToken = `0.${btoa(JSON.stringify({
+      profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe'
       }))}.0`;
@@ -168,7 +168,7 @@ describe('salte-auth.profile', () => {
     });
 
     it('should return null if the "id_token" does not have three parts', () => {
-      profile.idToken = '0.0';
+      profile.$idToken = '0.0';
       const userInfo = profile.userInfo;
       expect(userInfo).to.equal(null);
     });
@@ -179,24 +179,24 @@ describe('salte-auth.profile', () => {
     });
   });
 
-  describe('function(validate)', () => {
+  describe('function($validate)', () => {
     it('should return an null if there are no issues', () => {
-      profile.idToken = `0.${btoa(JSON.stringify({
+      profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe',
         nonce: null,
         aud: '55555-55555'
       }))}.0`;
-      profile.nonce = null;
-      profile.localState = null;
-      profile.state = null;
+      profile.$nonce = null;
+      profile.$localState = null;
+      profile.$state = null;
       profile.$$config.clientId = '55555-55555';
-      const response = profile.validate();
-      expect(response).to.be.undefined;
+      const response = profile.$validate();
+      expect(response).to.deep.equal(undefined);
     });
 
-    it('should return an error if none of the audiences match the "clientId"', () => {
-      profile.idToken = `0.${btoa(JSON.stringify({
+    it('should not return an error if one  of the audiences matches the "clientId"', () => {
+      profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe',
         nonce: null,
@@ -206,18 +206,18 @@ describe('salte-auth.profile', () => {
         ],
         azp: '55555-55555'
       }))}.0`;
-      profile.localState = null;
-      profile.state = null;
-      profile.nonce = null;
+      profile.$localState = null;
+      profile.$state = null;
+      profile.$nonce = null;
       profile.$$config.clientId = '55555-55555';
-      const response = profile.validate();
+      const response = profile.$validate();
       expect(response).to.deep.equal(undefined);
     });
 
     it('should return an error if "error" is defined', () => {
-      profile.error = 'your-fault';
-      profile.errorDescription = 'Look what you did!';
-      const response = profile.validate();
+      profile.$error = 'your-fault';
+      profile.$errorDescription = 'Look what you did!';
+      const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'your-fault',
         description: 'Look what you did!'
@@ -225,12 +225,12 @@ describe('salte-auth.profile', () => {
     });
 
     it('should return an error if the "local-state" does not match the "state"', () => {
-      profile.idToken = `0.${btoa(JSON.stringify({
+      profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe',
         nonce: null
       }))}.0`;
-      const response = profile.validate();
+      const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'invalid_state',
         description: 'State provided by gateway did not match local state.'
@@ -238,14 +238,14 @@ describe('salte-auth.profile', () => {
     });
 
     it('should return an error if the "nonce" does not match the "id_token" nonce', () => {
-      profile.idToken = `0.${btoa(JSON.stringify({
+      profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe'
       }))}.0`;
-      profile.nonce = '55555-55555';
-      profile.localState = null;
-      profile.state = null;
-      const response = profile.validate();
+      profile.$nonce = '55555-55555';
+      profile.$localState = null;
+      profile.$state = null;
+      const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'invalid_nonce',
         description: 'Nonce provided by gateway did not match local nonce.'
@@ -253,16 +253,16 @@ describe('salte-auth.profile', () => {
     });
 
     it('should return an error if the "aud" does not match the "clientId"', () => {
-      profile.idToken = `0.${btoa(JSON.stringify({
+      profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe',
         nonce: null,
         aud: '55555-55555'
       }))}.0`;
-      profile.localState = null;
-      profile.state = null;
-      profile.nonce = null;
-      const response = profile.validate();
+      profile.$localState = null;
+      profile.$state = null;
+      profile.$nonce = null;
+      const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'invalid_aud',
         description: 'The audience did not match the Client ID.'
@@ -270,7 +270,7 @@ describe('salte-auth.profile', () => {
     });
 
     it('should return an error if there are multiple audiences and the azp is not present', () => {
-      profile.idToken = `0.${btoa(JSON.stringify({
+      profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe',
         admin: true,
@@ -280,10 +280,10 @@ describe('salte-auth.profile', () => {
           'test2'
         ]
       }))}.0`;
-      profile.localState = null;
-      profile.state = null;
-      profile.nonce = null;
-      const response = profile.validate();
+      profile.$localState = null;
+      profile.$state = null;
+      profile.$nonce = null;
+      const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'invalid_azp',
         description: 'Audience was returned as an array and AZP was not present on the ID Token.'
@@ -291,7 +291,7 @@ describe('salte-auth.profile', () => {
     });
 
     it('should return an error if there are multiple audiences and the azp does not match the client id', () => {
-      profile.idToken = `0.${btoa(JSON.stringify({
+      profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe',
         admin: true,
@@ -302,10 +302,10 @@ describe('salte-auth.profile', () => {
         ],
         azp: '55555-55555'
       }))}.0`;
-      profile.localState = null;
-      profile.state = null;
-      profile.nonce = null;
-      const response = profile.validate();
+      profile.$localState = null;
+      profile.$state = null;
+      profile.$nonce = null;
+      const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'invalid_azp',
         description: 'AZP does not match the Client ID.'
@@ -313,7 +313,7 @@ describe('salte-auth.profile', () => {
     });
 
     it('should return an error if none of the audiences match the "clientId"', () => {
-      profile.idToken = `0.${btoa(JSON.stringify({
+      profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe',
         admin: true,
@@ -324,11 +324,11 @@ describe('salte-auth.profile', () => {
         ],
         azp: '55555-55555'
       }))}.0`;
-      profile.localState = null;
-      profile.state = null;
-      profile.nonce = null;
+      profile.$localState = null;
+      profile.$state = null;
+      profile.$nonce = null;
       profile.$$config.clientId = '55555-55555';
-      const response = profile.validate();
+      const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'invalid_aud',
         description: 'None of the audience values matched the Client ID.'
@@ -336,14 +336,14 @@ describe('salte-auth.profile', () => {
     });
 
     it('should skip "nonce" validation if the "access_token" is set', () => {
-      profile.localState = null;
-      profile.state = null;
-      const response = profile.validate(true);
+      profile.$localState = null;
+      profile.$state = null;
+      const response = profile.$validate(true);
       expect(response).to.be.undefined;
     });
 
     it('should skip individual validation if it is disabled', () => {
-      profile.idToken = `0.${btoa(JSON.stringify({
+      profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
         name: 'John Doe',
         admin: true,
@@ -359,39 +359,39 @@ describe('salte-auth.profile', () => {
         azp: false,
         aud: false
       };
-      profile.localState = null;
-      profile.state = null;
-      const response = profile.validate();
+      profile.$localState = null;
+      profile.$state = null;
+      const response = profile.$validate();
       expect(response).to.be.undefined;
     });
 
     it('should skip all validation if it is disabled', () => {
       profile.$$config.validation = false;
-      profile.localState = null;
-      profile.state = null;
-      const response = profile.validate();
+      profile.$localState = null;
+      profile.$state = null;
+      const response = profile.$validate();
       expect(response).to.be.undefined;
     });
   });
 
-  describe('function(saveItem)', () => {
+  describe('function($saveItem)', () => {
     it('should save to sessionStorage', () => {
-      profile.saveItem('bogus', 'bogus');
+      profile.$saveItem('bogus', 'bogus');
       expect(sessionStorage.getItem('bogus')).to.equal('bogus');
     });
 
     it('should allow other falsy values', () => {
-      profile.saveItem('bogus', '');
+      profile.$saveItem('bogus', '');
       expect(sessionStorage.getItem('bogus')).to.equal('');
     });
 
     it('should delete items from sessionStorage when undefined', () => {
-      profile.saveItem('bogus', undefined);
+      profile.$saveItem('bogus', undefined);
       expect(sessionStorage.getItem('bogus')).to.equal(null);
     });
 
     it('should delete items from sessionStorage when undefined', () => {
-      profile.saveItem('bogus', undefined);
+      profile.$saveItem('bogus', undefined);
       expect(sessionStorage.getItem('bogus')).to.equal(null);
     });
   });
@@ -414,7 +414,7 @@ describe('salte-auth.profile', () => {
     });
   });
 
-  describe('function(clear)', () => {
+  describe('function($clear)', () => {
     beforeEach(() => {
       sessionStorage.setItem('salte.auth.$test', '123');
       sessionStorage.setItem('salte.auth.id_token', '12345-12345-12345');
@@ -423,7 +423,7 @@ describe('salte-auth.profile', () => {
     });
 
     it('should remove all "salte.auth" items from sessionStorage', () => {
-      profile.clear();
+      profile.$clear();
 
       expect(sessionStorage.getItem('salte.auth.$test')).to.equal('123');
       expect(sessionStorage.getItem('salte.auth.id_token')).to.equal(null);
@@ -432,7 +432,7 @@ describe('salte-auth.profile', () => {
     });
   });
 
-  describe('function(clearErrors)', () => {
+  describe('function($clearErrors)', () => {
     beforeEach(() => {
       sessionStorage.setItem('salte.auth.id_token', '12345-12345-12345');
       sessionStorage.setItem('salte.auth.bogus', '12345');
@@ -442,7 +442,7 @@ describe('salte-auth.profile', () => {
     });
 
     it('should remove all "salte.auth" items from sessionStorage', () => {
-      profile.clearErrors();
+      profile.$clearErrors();
 
       expect(sessionStorage.getItem('salte.auth.id_token')).to.equal('12345-12345-12345');
       expect(sessionStorage.getItem('salte.auth.bogus')).to.equal('12345');

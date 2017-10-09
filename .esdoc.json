@@ -15,10 +15,5 @@
         "from": "/dist/salte-auth.js$", "to": ""
       }]
     }
-  }, {
-    "name": "esdoc-plugin-require-coverage",
-    "option": {
-      "required": 100
-    }
   }]
 }

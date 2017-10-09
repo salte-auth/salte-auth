@@ -28,7 +28,7 @@ class SalteAuthProfile {
       for (let i = 0; i < params.length; i++) {
         const param = params[i];
         const [key, value] = param.split('=');
-        this.parse(key, decodeURIComponent(value));
+        this.$parse(key, decodeURIComponent(value));
       }
     }
     window.salte.SalteAuthProfile.$instance = this;
@@ -38,29 +38,30 @@ class SalteAuthProfile {
    * Parse a key-value pair
    * @param {String} key the key to parse
    * @param {Object} value the matching value to parse
+   * @private
    */
-  parse(key, value) {
+  $parse(key, value) {
     switch (key) {
       case 'token_type':
-        this.tokenType = value;
+        this.$tokenType = value;
         break;
       case 'expires_in':
-        this.expiration = moment().add(value, 's').unix();
+        this.$expiration = moment().add(value, 's').unix();
         break;
       case 'access_token':
-        this.accessToken = value;
+        this.$accessToken = value;
         break;
       case 'id_token':
-        this.idToken = value;
+        this.$idToken = value;
         break;
       case 'state':
-        this.state = value;
+        this.$state = value;
         break;
       case 'error':
-        this.error = value;
+        this.$error = value;
         break;
       case 'error_description':
-        this.errorDescription = value;
+        this.$errorDescription = value;
         break;
     }
   }
@@ -70,7 +71,7 @@ class SalteAuthProfile {
    * @return {Boolean} true if the "id_token" has expired
    */
   get idTokenExpired() {
-    return !this.idToken || moment().unix() >= this.userInfo.exp;
+    return !this.$idToken || moment().unix() >= this.userInfo.exp;
   }
 
   /**
@@ -78,131 +79,141 @@ class SalteAuthProfile {
    * @return {Boolean} true if the "access_token" has expired
    */
   get accessTokenExpired() {
-    return !this.accessToken || moment().unix() >= this.expiration;
+    return !this.$accessToken || moment().unix() >= this.$expiration;
   }
 
   /**
    * The type of Access Token that was returned by the identity provider
    * @return {String} the type of access token
+   * @private
    */
-  get tokenType() {
+  get $tokenType() {
     return this.$storage.getItem('salte.auth.token-type');
   }
 
-  set tokenType(tokenType) {
-    this.saveItem('salte.auth.token-type', tokenType);
+  set $tokenType(tokenType) {
+    this.$saveItem('salte.auth.token-type', tokenType);
   }
 
   /**
    * The date and time that the access token will expire
    * @return {String} the expiration time as unix timestamp
+   * @private
    */
-  get expiration() {
+  get $expiration() {
     return this.$storage.getItem('salte.auth.expiration');
   }
 
-  set expiration(expiration) {
-    this.saveItem('salte.auth.expiration', expiration);
+  set $expiration(expiration) {
+    this.$saveItem('salte.auth.expiration', expiration);
   }
 
   /**
    * The Access Token returned by the identity provider
    * @return {String} the access token
+   * @private
    */
-  get accessToken() {
+  get $accessToken() {
     return this.$storage.getItem('salte.auth.access-token');
   }
 
-  set accessToken(accessToken) {
-    this.saveItem('salte.auth.access-token', accessToken);
+  set $accessToken(accessToken) {
+    this.$saveItem('salte.auth.access-token', accessToken);
   }
 
   /**
    * The ID Token returned by the identity provider
    * @return {String} the id token
+   * @private
    */
-  get idToken() {
+  get $idToken() {
     return this.$storage.getItem('salte.auth.id-token');
   }
 
-  set idToken(idToken) {
-    this.saveItem('salte.auth.id-token', idToken);
+  set $idToken(idToken) {
+    this.$saveItem('salte.auth.id-token', idToken);
   }
 
   /**
    * The authentication state returned by the identity provider
    * @return {String} the state value
+   * @private
    *
    * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
    */
-  get state() {
+  get $state() {
     return this.$storage.getItem('salte.auth.state');
   }
 
-  set state(state) {
-    this.saveItem('salte.auth.state', state);
+  set $state(state) {
+    this.$saveItem('salte.auth.state', state);
   }
 
   /**
    * The locally generate authentication state
    * @return {String} the local state value
+   * @private
    *
    * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
    */
-  get localState() {
+  get $localState() {
     return this.$storage.getItem('salte.auth.local-state');
   }
 
-  set localState(localState) {
-    this.saveItem('salte.auth.local-state', localState);
+  set $localState(localState) {
+    this.$saveItem('salte.auth.local-state', localState);
   }
 
   /**
    * The error returned by the identity provider
    * @return {String} the state value
+   * @private
    */
-  get error() {
+  get $error() {
     return this.$storage.getItem('salte.auth.error');
   }
 
-  set error(error) {
-    this.saveItem('salte.auth.error', error);
+  set $error(error) {
+    this.$saveItem('salte.auth.error', error);
   }
 
   /**
    * The error description returned by the identity provider
    * @return {String} a string that describes the error that occurred
+   * @private
    */
-  get errorDescription() {
+  get $errorDescription() {
     return this.$storage.getItem('salte.auth.error-description');
   }
 
-  set errorDescription(errorDescription) {
-    this.saveItem('salte.auth.error-description', errorDescription);
+  set $errorDescription(errorDescription) {
+    this.$saveItem('salte.auth.error-description', errorDescription);
   }
 
   /**
    * The url the user originated from before authentication occurred
    * @return {String} The url the user originated from before authentication occurred
+   * @private
    */
-  get redirectUrl() {
+  get $redirectUrl() {
     return this.$storage.getItem('salte.auth.$redirect-url');
   }
 
-  set redirectUrl(redirectUrl) {
-    this.saveItem('salte.auth.$redirect-url', redirectUrl);
+  set $redirectUrl(redirectUrl) {
+    this.$saveItem('salte.auth.$redirect-url', redirectUrl);
   }
 
   /**
    * Parses the User Info from the ID Token
    * @return {String} The User Info from the ID Token
+   * @private
    */
-  get nonce() {
+  get $nonce() {
     return this.$storage.getItem('salte.auth.nonce');
   }
 
-  set nonce(nonce) {
-    this.saveItem('salte.auth.nonce', nonce);
+  set $nonce(nonce) {
+    this.$saveItem('salte.auth.nonce', nonce);
   }
 
   /**
@@ -210,8 +221,8 @@ class SalteAuthProfile {
    * @return {Object} The User Info from the ID Token
    */
   get userInfo() {
-    if (this.idToken) {
-      const separatedToken = this.idToken.split('.');
+    if (this.$idToken) {
+      const separatedToken = this.$idToken.split('.');
       if (separatedToken.length === 3) {
         return JSON.parse(atob(separatedToken[1]));
       }
@@ -223,20 +234,21 @@ class SalteAuthProfile {
    * Verifies that we were logged in successfully and that all security checks pass
    * @param {Boolean} accessTokenRequest if the request we're validating was an access token request
    * @return {Object} the error message
+   * @private
    */
-  validate(accessTokenRequest) {
+  $validate(accessTokenRequest) {
     if (!this.$$config.validation) {
       return;
     }
 
-    if (this.error) {
+    if (this.$error) {
       return {
-        code: this.error,
-        description: this.errorDescription
+        code: this.$error,
+        description: this.$errorDescription
       };
     }
 
-    if (this.$$config.validation.state && this.localState !== this.state) {
+    if (this.$$config.validation.state && this.$localState !== this.$state) {
       return {
         code: 'invalid_state',
         description: 'State provided by gateway did not match local state.'
@@ -245,7 +257,7 @@ class SalteAuthProfile {
 
     if (accessTokenRequest) return;
 
-    if (this.$$config.validation.nonce && this.nonce !== this.userInfo.nonce) {
+    if (this.$$config.validation.nonce && this.$nonce !== this.userInfo.nonce) {
       return {
         code: 'invalid_nonce',
         description: 'Nonce provided by gateway did not match local nonce.'
@@ -294,8 +306,9 @@ class SalteAuthProfile {
    * Saves a value to the Web Storage API
    * @param {String} key The key to save to
    * @param {*} value The value to save, if this is undefined or null it will delete the key
+   * @private
    */
-  saveItem(key, value) {
+  $saveItem(key, value) {
     if ([undefined, null].indexOf(value) !== -1) {
       this.$storage.removeItem(key);
     } else {
@@ -306,6 +319,7 @@ class SalteAuthProfile {
   /**
    * Return the active Web Storage API
    * @return {Storage} the storage api to save and pull values from
+   * @private
    */
   get $storage() {
     return this.$$getStorage(this.$$config.storageType);
@@ -315,6 +329,7 @@ class SalteAuthProfile {
    * Determines which Web Storage API to return using the name provided
    * @param {String} storageType the name of the storageType to use
    * @return {Storage} the web storage api that matches the given string
+   * @ignore
    */
   $$getStorage(storageType) {
     if (storageType === 'local') {
@@ -330,6 +345,7 @@ class SalteAuthProfile {
    * Transfers values from one storage type to the other
    * @param {String} source the name of the storage type to pull from
    * @param {String} destination the name of the storage type to push to
+   * @ignore
    */
   $$transfer(source, destination) {
     const sourceStorage = this.$$getStorage(source);
@@ -345,21 +361,23 @@ class SalteAuthProfile {
 
   /**
    * Clears all `salte.auth` values from localStorage
+   * @private
    */
-  clear() {
+  $clear() {
     for (const key in this.$storage) {
       if (key.match(/^salte\.auth\.[^$]/)) {
-        this.saveItem(key, undefined);
+        this.$saveItem(key, undefined);
       }
     }
   }
 
   /**
    * Clears all `salte.auth` error values from localStorage
+   * @private
    */
-  clearErrors() {
-    this.error = undefined;
-    this.errorDescription = undefined;
+  $clearErrors() {
+    this.$error = undefined;
+    this.$errorDescription = undefined;
   }
 }
 

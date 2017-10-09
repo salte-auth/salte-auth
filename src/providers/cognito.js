@@ -15,7 +15,7 @@ class SalteAuthCognitoProvider {
    * @return {String} the deauthorization url
    */
   static deauthorizeUrl(config) {
-    return this.utilities.createUrl(`${config.gateway}/logout`, {
+    return this.$utilities.createUrl(`${config.gateway}/logout`, {
       'logout_uri': config.redirectUrl,
       'client_id': config.clientId
     });
