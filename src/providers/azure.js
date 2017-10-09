@@ -1,11 +1,11 @@
 /** Provider for Azure's Active Directory */
 class SalteAuthAzureProvider {
   /**
-   * Computes the authorization url
+   * Computes the authorization endpoint
    * @param {Config} config configuration for salte auth
-   * @return {String} the authorization url
+   * @return {String} the authorization endpoint
    */
-  static authorizeUrl(config) {
+  static authorizeEndpoint(config) {
     return `${config.gateway}/oauth2/authorize`;
   }
 

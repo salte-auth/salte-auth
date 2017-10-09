@@ -122,12 +122,12 @@ class SalteAuth {
     this.profile.localState = uuid.v4();
     this.profile.nonce = uuid.v4();
 
-    let authorizeGateway = `${this.$config.gateway}/authorize`;
-    if (this.provider.authorizeUrl) {
-      authorizeGateway = this.provider.authorizeUrl.call(this, this.$config);
+    let authorizeEndpoint = `${this.$config.gateway}/authorize`;
+    if (this.provider.authorizeEndpoint) {
+      authorizeEndpoint = this.provider.authorizeEndpoint.call(this, this.$config);
     }
 
-    return this.utilities.createUrl(authorizeGateway, assign({
+    return this.utilities.createUrl(authorizeEndpoint, assign({
       'state': this.profile.localState,
       'nonce': this.profile.nonce,
       'response_type': 'token',
@@ -142,16 +142,16 @@ class SalteAuth {
    * The authentication url to retrieve the id token
    * @type {String}
    */
-  get authorizeUrl() {
+  get loginUrl() {
     this.profile.localState = uuid.v4();
     this.profile.nonce = uuid.v4();
 
-    let authorizeGateway = `${this.$config.gateway}/authorize`;
-    if (this.provider.authorizeUrl) {
-      authorizeGateway = this.provider.authorizeUrl.call(this, this.$config);
+    let authorizeEndpoint = `${this.$config.gateway}/authorize`;
+    if (this.provider.authorizeEndpoint) {
+      authorizeEndpoint = this.provider.authorizeEndpoint.call(this, this.$config);
     }
 
-    return this.utilities.createUrl(authorizeGateway, assign({
+    return this.utilities.createUrl(authorizeEndpoint, assign({
       'state': this.profile.localState,
       'nonce': this.profile.nonce,
       'response_type': this.$config.responseType,
@@ -179,7 +179,7 @@ class SalteAuth {
     }
 
     this.profile.clear();
-    this.$promises.login = this.utilities.createIframe(this.authorizeUrl, true).then(() => {
+    this.$promises.login = this.utilities.createIframe(this.loginUrl, true).then(() => {
       this.$promises.login = null;
       const error = this.profile.validate();
 
@@ -201,7 +201,7 @@ class SalteAuth {
     }
 
     this.profile.clear();
-    this.$promises.login = this.utilities.openPopup(this.authorizeUrl).then(() => {
+    this.$promises.login = this.utilities.openPopup(this.loginUrl).then(() => {
       this.$promises.login = null;
       // We need to utilize local storage to retain our parsed values
       if (this.$config.storageType === 'session') {
@@ -223,7 +223,7 @@ class SalteAuth {
   loginWithRedirect() {
     this.profile.clear();
     this.profile.redirectUrl = location.href;
-    location.href = this.authorizeUrl;
+    location.href = this.loginUrl;
     // TODO: How do we validate that we logged in successfully?
   }
 

@@ -8,9 +8,9 @@ const auth = new SalteAuth({
 });
 
 describe('cognito', () => {
-  describe('function(authorizeUrl)', () => {
-    it('should create a login url', () => {
-      expect(cognito.authorizeUrl.call(auth, {
+  describe('function(authorizeEndpoint)', () => {
+    it('should create a authorize endpoint', () => {
+      expect(cognito.authorizeEndpoint.call(auth, {
         gateway: 'https://mydomain.auth.us-east-1.amazoncognito.com'
       })).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize`);
     });

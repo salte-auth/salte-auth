@@ -8,9 +8,9 @@ const auth = new SalteAuth({
 });
 
 describe('azure', () => {
-  describe('function(authorizeUrl)', () => {
-    it('should create a login url', () => {
-      expect(azure.authorizeUrl.call(auth, {
+  describe('function(authorizeEndpoint)', () => {
+    it('should create a authorize endpoint', () => {
+      expect(azure.authorizeEndpoint.call(auth, {
         gateway: 'https://login.microsoftonline.com/my-tenant'
       })).to.equal(`https://login.microsoftonline.com/my-tenant/oauth2/authorize`);
     });

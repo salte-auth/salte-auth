@@ -294,8 +294,8 @@ describe('salte-auth', () => {
     });
   });
 
-  describe('getter(authorizeUrl)', () => {
-    it('should compute the authorizeUrl', () => {
+  describe('getter(loginUrl)', () => {
+    it('should compute the loginUrl', () => {
       salte.auth.$config = {
         gateway: 'https://api.salte.io',
         responseType: 'id_token',
@@ -304,10 +304,10 @@ describe('salte-auth', () => {
         scope: 'openid',
         provider: 'auth0'
       };
-      expect(auth.authorizeUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid`);
+      expect(auth.loginUrl).to.equal(`https://api.salte.io/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid`);
     });
 
-    it('should utilize authorizeUrl overrides', () => {
+    it('should utilize authorizeEndpoint overrides', () => {
       salte.auth.$config = {
         gateway: 'https://mydomain.auth.us-east-1.amazoncognito.com',
         responseType: 'id_token',
@@ -316,7 +316,7 @@ describe('salte-auth', () => {
         scope: 'openid',
         provider: 'cognito'
       };
-      expect(salte.auth.authorizeUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid`);
+      expect(salte.auth.loginUrl).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid`);
     });
   });
 
@@ -396,7 +396,7 @@ describe('salte-auth', () => {
   describe('function(loginWithPopup)', () => {
     it('should resolve when we have logged in', () => {
       sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'authorizeUrl').get(() => '');
+      sandbox.stub(auth, 'loginUrl').get(() => '');
       sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'validate');
       sandbox.stub(auth.profile, '$$transfer');
@@ -414,7 +414,7 @@ describe('salte-auth', () => {
 
     it('should bypass transfering storage when using "localStorage"', () => {
       sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'authorizeUrl').get(() => '');
+      sandbox.stub(auth, 'loginUrl').get(() => '');
       sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'validate');
       sandbox.stub(auth.profile, '$$transfer');
@@ -433,7 +433,7 @@ describe('salte-auth', () => {
 
     it('should prevent duplicate promises', () => {
       sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'authorizeUrl').get(() => '');
+      sandbox.stub(auth, 'loginUrl').get(() => '');
       sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'validate');
 
@@ -447,7 +447,7 @@ describe('salte-auth', () => {
 
     it('should throw validation errors', () => {
       sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'authorizeUrl').get(() => '');
+      sandbox.stub(auth, 'loginUrl').get(() => '');
       sandbox.stub(auth.utilities, 'openPopup').returns(Promise.resolve());
 
       auth.profile.idToken = `0.${btoa(JSON.stringify({
@@ -471,7 +471,7 @@ describe('salte-auth', () => {
   describe('function(loginWithRedirect)', () => {
     it('should resolve when we have logged in', () => {
       sandbox.stub(auth.profile, 'clear');
-      sandbox.stub(auth, 'authorizeUrl').get(() => location.href);
+      sandbox.stub(auth, 'loginUrl').get(() => location.href);
 
       auth.loginWithRedirect();
 
