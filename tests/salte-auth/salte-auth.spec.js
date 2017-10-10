@@ -418,6 +418,21 @@ describe('salte-auth', () => {
         });
       });
     });
+
+    it('should handle the iframe failing', () => {
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      auth.$utilities.createIframe.restore();
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.reject('Iframe Failed!'));
+
+      const promise = auth.loginWithIframe();
+
+      return promise.catch((error) => {
+        return error;
+      }).then((error) => {
+        expect(error).to.deep.equal('Iframe Failed!');
+        expect(auth.$promises.login).to.deep.equal(null);
+      });
+    });
   });
 
   describe('function(loginWithPopup)', () => {
@@ -491,6 +506,26 @@ describe('salte-auth', () => {
           code: 'invalid_state',
           description: 'State provided by gateway did not match local state.'
         });
+      });
+    });
+
+    it('should handle a popup being blocked', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.reject('Popup blocked!'));
+
+      auth.profile.$idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe'
+      }))}.0`;
+
+      const promise = auth.loginWithPopup();
+
+      return promise.catch((error) => {
+        return error;
+      }).then((error) => {
+        expect(error).to.deep.equal('Popup blocked!');
+        expect(auth.$promises.login).to.deep.equal(null);
       });
     });
   });
@@ -702,6 +737,23 @@ describe('salte-auth', () => {
           code: 'invalid_state',
           description: 'State provided by gateway did not match local state.'
         });
+      });
+    });
+
+    it('should handle the login being blocked', () => {
+      auth.$config = {
+        loginType: 'popup',
+        provider: 'auth0'
+      };
+      sandbox.stub(auth, 'loginWithPopup').returns(Promise.reject('Popup blocked!'));
+      sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
+
+      const promise = auth.retrieveAccessToken();
+
+      expect(auth.$promises.token).to.equal(promise);
+      return promise.catch((error) => {
+        expect(error).to.deep.equal('Popup blocked!');
+        expect(auth.$promises.token).to.equal(null);
       });
     });
   });
