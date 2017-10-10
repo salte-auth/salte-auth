@@ -216,6 +216,9 @@ class SalteAuth {
         this.profile.$clear();
         return Promise.reject(error);
       }
+    }).catch((error) => {
+      this.$promises.login = null;
+      return Promise.reject(error);
     });
 
     return this.$promises.login;
@@ -243,6 +246,9 @@ class SalteAuth {
         this.profile.$clear();
         return Promise.reject(error);
       }
+    }).catch((error) => {
+      this.$promises.login = null;
+      return Promise.reject(error);
     });
 
     return this.$promises.login;
@@ -338,6 +344,9 @@ class SalteAuth {
       }
       this.$promises.token = null;
       return this.profile.$accessToken;
+    }).catch((error) => {
+      this.$promises.token = null;
+      return Promise.reject(error);
     });
 
     return this.$promises.token;
