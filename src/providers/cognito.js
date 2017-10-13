@@ -6,7 +6,7 @@ class SalteAuthCognitoProvider {
    * @return {String} the authorization endpoint
    */
   static authorizeEndpoint(config) {
-    return `${config.gateway}/oauth2/authorize`;
+    return `${config.providerUrl}/oauth2/authorize`;
   }
 
   /**
@@ -15,7 +15,7 @@ class SalteAuthCognitoProvider {
    * @return {String} the deauthorization url
    */
   static deauthorizeUrl(config) {
-    return this.$utilities.createUrl(`${config.gateway}/logout`, {
+    return this.$utilities.createUrl(`${config.providerUrl}/logout`, {
       'logout_uri': config.redirectUrl,
       'client_id': config.clientId
     });

@@ -11,7 +11,7 @@ describe('azure', () => {
   describe('function(authorizeEndpoint)', () => {
     it('should create a authorize endpoint', () => {
       expect(azure.authorizeEndpoint.call(auth, {
-        gateway: 'https://login.microsoftonline.com/my-tenant'
+        providerUrl: 'https://login.microsoftonline.com/my-tenant'
       })).to.equal(`https://login.microsoftonline.com/my-tenant/oauth2/authorize`);
     });
   });
@@ -19,7 +19,7 @@ describe('azure', () => {
   describe('function(deauthorizeUrl)', () => {
     it('should create a logout url', () => {
       const url = azure.deauthorizeUrl.call(auth, {
-        gateway: 'https://login.microsoftonline.com/my-tenant',
+        providerUrl: 'https://login.microsoftonline.com/my-tenant',
         redirectUrl: `${location.protocol}//${location.host}`
       });
       expect(url).to.equal(`https://login.microsoftonline.com/my-tenant/oauth2/logout?post_logout_redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}`);

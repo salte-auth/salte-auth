@@ -25,6 +25,7 @@
     "test:sauce": "karma start karma.ci.conf.js",
     "tdd": "karma start",
     "start": "webpack-dev-server -d --config webpack.server.config.js",
+    "start:https": "webpack-dev-server -d --https --port 443 --config webpack.server.config.js",
     "start:docs": "watch 'yarn run docs' 'src' & http-server docs",
     "build": "npm run build:dev && npm run build:prod",
     "build:dev": "webpack --progress --colors -d",

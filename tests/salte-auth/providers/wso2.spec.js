@@ -11,7 +11,7 @@ describe('wso2', () => {
   describe('function(deauthorizeUrl)', () => {
     it('should create a logout url', () => {
       const url = wso2.deauthorizeUrl.call(auth, {
-        gateway: 'https://api.salte.io',
+        providerUrl: 'https://api.salte.io',
         redirectUrl: `${location.protocol}//${location.host}`,
         relyingParty: 'test123'
       });

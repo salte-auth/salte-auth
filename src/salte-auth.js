@@ -17,7 +17,7 @@ import { SalteAuthUtilities } from './salte-auth.utilities.js';
 /**
  * The configuration for salte auth
  * @typedef {Object} Config
- * @property {String} gateway The base url of your identity provider.
+ * @property {String} providerUrl The base url of your identity provider.
  * @property {('id_token'|'id_token token')} responseType The response type to authenticate with.
  * @property {String} redirectUrl The redirect url specified in your identity provider.
  * @property {String} clientId The client id of your identity provider
@@ -149,7 +149,7 @@ class SalteAuth {
     this.profile.$localState = uuid.v4();
     this.profile.$nonce = uuid.v4();
 
-    let authorizeEndpoint = `${this.$config.gateway}/authorize`;
+    let authorizeEndpoint = `${this.$config.providerUrl}/authorize`;
     if (this.$provider.authorizeEndpoint) {
       authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
     }
@@ -174,7 +174,7 @@ class SalteAuth {
     this.profile.$localState = uuid.v4();
     this.profile.$nonce = uuid.v4();
 
-    let authorizeEndpoint = `${this.$config.gateway}/authorize`;
+    let authorizeEndpoint = `${this.$config.providerUrl}/authorize`;
     if (this.$provider.authorizeEndpoint) {
       authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
     }

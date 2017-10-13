@@ -300,7 +300,7 @@ describe('salte-auth', () => {
   describe('getter($accessTokenUrl)', () => {
     it('should compute the accessTokenUrl', () => {
       salte.auth.$config = {
-        gateway: 'https://api.salte.io',
+        providerUrl: 'https://api.salte.io',
         redirectUrl: `${location.protocol}//${location.host}`,
         clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
         scope: 'openid',
@@ -311,7 +311,7 @@ describe('salte-auth', () => {
 
     it('should utilize authorizeUrl overrides', () => {
       salte.auth.$config = {
-        gateway: 'https://mydomain.auth.us-east-1.amazoncognito.com',
+        providerUrl: 'https://mydomain.auth.us-east-1.amazoncognito.com',
         redirectUrl: `${location.protocol}//${location.host}`,
         clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
         scope: 'openid',
@@ -324,7 +324,7 @@ describe('salte-auth', () => {
   describe('getter($loginUrl)', () => {
     it('should compute the loginUrl', () => {
       salte.auth.$config = {
-        gateway: 'https://api.salte.io',
+        providerUrl: 'https://api.salte.io',
         responseType: 'id_token',
         redirectUrl: `${location.protocol}//${location.host}`,
         clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
@@ -336,7 +336,7 @@ describe('salte-auth', () => {
 
     it('should utilize authorizeEndpoint overrides', () => {
       salte.auth.$config = {
-        gateway: 'https://mydomain.auth.us-east-1.amazoncognito.com',
+        providerUrl: 'https://mydomain.auth.us-east-1.amazoncognito.com',
         responseType: 'id_token',
         redirectUrl: `${location.protocol}//${location.host}`,
         clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
@@ -350,7 +350,7 @@ describe('salte-auth', () => {
   describe('getter($deauthorizeUrl)', () => {
     it('should compute the deauthorizeUrl', (done) => {
       salte.auth.$config = {
-        gateway: 'https://api.salte.io',
+        providerUrl: 'https://api.salte.io',
         responseType: 'id_token',
         redirectUrl: `${location.protocol}//${location.host}`,
         clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
@@ -373,7 +373,7 @@ describe('salte-auth', () => {
       sandbox.stub(auth.profile, '$clear');
       sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
       salte.auth.$config = {
-        gateway: `${location.protocol}//${location.host}`,
+        providerUrl: `${location.protocol}//${location.host}`,
         provider: 'auth0'
       };
     });
@@ -414,7 +414,7 @@ describe('salte-auth', () => {
       }).then((error) => {
         expect(error).to.deep.equal({
           code: 'invalid_state',
-          description: 'State provided by gateway did not match local state.'
+          description: 'State provided by identity provider did not match local state.'
         });
       });
     });
@@ -504,7 +504,7 @@ describe('salte-auth', () => {
       }).then((error) => {
         expect(error).to.deep.equal({
           code: 'invalid_state',
-          description: 'State provided by gateway did not match local state.'
+          description: 'State provided by identity provider did not match local state.'
         });
       });
     });
@@ -734,8 +734,8 @@ describe('salte-auth', () => {
         return error;
       }).then((error) => {
         expect(error).to.deep.equal({
-          code: 'invalid_state',
-          description: 'State provided by gateway did not match local state.'
+          code: 'login_canceled',
+          description: 'User likely canceled the login or something unexpected occurred.'
         });
       });
     });

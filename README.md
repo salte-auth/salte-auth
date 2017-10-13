@@ -47,9 +47,9 @@ Then add a `<script>` to your index.html:
 ```js
 import { SalteAuth } from '@salte-io/salte-auth';
 
-// Configure SalteAuth with Auth0's gateway url and clientId.
+// Configure SalteAuth with Auth0's url and client id.
 const auth = new SalteAuth({
-  gateway: 'https://salte-io.auth0.com',
+  providerUrl: 'https://salte-io.auth0.com',
   responseType: 'id_token',
   redirectUrl: location.origin,
   clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',

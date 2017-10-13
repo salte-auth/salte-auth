@@ -248,10 +248,17 @@ class SalteAuthProfile {
       };
     }
 
+    if (!this.$idToken) {
+      return {
+        code: 'login_canceled',
+        description: 'User likely canceled the login or something unexpected occurred.'
+      };
+    }
+
     if (this.$$config.validation.state && this.$localState !== this.$state) {
       return {
         code: 'invalid_state',
-        description: 'State provided by gateway did not match local state.'
+        description: 'State provided by identity provider did not match local state.'
       };
     }
 
@@ -260,7 +267,7 @@ class SalteAuthProfile {
     if (this.$$config.validation.nonce && this.$nonce !== this.userInfo.nonce) {
       return {
         code: 'invalid_nonce',
-        description: 'Nonce provided by gateway did not match local nonce.'
+        description: 'Nonce provided by identity provider did not match local nonce.'
       };
     }
 

@@ -224,6 +224,14 @@ describe('salte-auth.profile', () => {
       });
     });
 
+    it('should return an error if no "id_token" is defined', () => {
+      const response = profile.$validate();
+      expect(response).to.deep.equal({
+        code: 'login_canceled',
+        description: 'User likely canceled the login or something unexpected occurred.'
+      });
+    });
+
     it('should return an error if the "local-state" does not match the "state"', () => {
       profile.$idToken = `0.${btoa(JSON.stringify({
         sub: '1234567890',
@@ -233,7 +241,7 @@ describe('salte-auth.profile', () => {
       const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'invalid_state',
-        description: 'State provided by gateway did not match local state.'
+        description: 'State provided by identity provider did not match local state.'
       });
     });
 
@@ -248,7 +256,7 @@ describe('salte-auth.profile', () => {
       const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'invalid_nonce',
-        description: 'Nonce provided by gateway did not match local nonce.'
+        description: 'Nonce provided by identity provider did not match local nonce.'
       });
     });
 
@@ -336,10 +344,15 @@ describe('salte-auth.profile', () => {
     });
 
     it('should skip "nonce" validation if the "access_token" is set', () => {
+      profile.$idToken = `0.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe',
+        admin: true
+      }))}.0`;
       profile.$localState = null;
       profile.$state = null;
       const response = profile.$validate(true);
-      expect(response).to.be.undefined;
+      expect(response).to.deep.equal(undefined);
     });
 
     it('should skip individual validation if it is disabled', () => {

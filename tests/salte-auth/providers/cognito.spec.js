@@ -11,7 +11,7 @@ describe('cognito', () => {
   describe('function(authorizeEndpoint)', () => {
     it('should create a authorize endpoint', () => {
       expect(cognito.authorizeEndpoint.call(auth, {
-        gateway: 'https://mydomain.auth.us-east-1.amazoncognito.com'
+        providerUrl: 'https://mydomain.auth.us-east-1.amazoncognito.com'
       })).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize`);
     });
   });
@@ -19,7 +19,7 @@ describe('cognito', () => {
   describe('function(deauthorizeUrl)', () => {
     it('should create a logout url', () => {
       const url = cognito.deauthorizeUrl.call(auth, {
-        gateway: 'https://mydomain.auth.us-east-1.amazoncognito.com',
+        providerUrl: 'https://mydomain.auth.us-east-1.amazoncognito.com',
         redirectUrl: `${location.protocol}//${location.host}`,
         clientId: '33333333-3333-4333-b333-333333333333'
       });
