@@ -111,11 +111,17 @@ describe('salte-auth.profile', () => {
     });
 
     it('should be expired if the "exp" is in the past', () => {
+      clock.tick(2001);
+      expect(profile.idTokenExpired).to.equal(true);
+    });
+
+    it('should be expired if the "exp" is now', () => {
       clock.tick(2000);
       expect(profile.idTokenExpired).to.equal(true);
     });
 
     it('should not be expired if the "id_token" is present and the "exp" is in the future', () => {
+      clock.tick(1999);
       expect(profile.idTokenExpired).to.equal(false);
     });
   });
