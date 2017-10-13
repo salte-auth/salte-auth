@@ -70,7 +70,7 @@ class SalteAuthProfile {
    * @return {Boolean} true if the "id_token" has expired
    */
   get idTokenExpired() {
-    return !this.$idToken || Date.now() >= this.userInfo.exp;
+    return !this.$idToken || Date.now() >= (this.userInfo.exp * 1000);
   }
 
   /**
