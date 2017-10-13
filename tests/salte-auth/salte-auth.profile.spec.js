@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import moment from 'moment';
 
 import { SalteAuthProfile } from '../../src/salte-auth.profile.js';
 
@@ -136,7 +135,7 @@ describe('salte-auth.profile', () => {
     });
 
     it('should not be expired if the "access_token" is present and the "expiration" is in the future', () => {
-      profile.$expiration = moment().add(1, 'hour').unix();
+      profile.$expiration = Date.now() + 100;
       expect(profile.accessTokenExpired).to.equal(false);
     });
   });

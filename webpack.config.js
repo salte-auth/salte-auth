@@ -20,7 +20,6 @@ module.exports = {
     umdNamedDefine: true
   },
   externals: [{
-    moment: 'moment',
     lodash: {
       root: '_',
       commonjs: 'lodash',

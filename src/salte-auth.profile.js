@@ -1,5 +1,4 @@
 import { defaultsDeep, find, get, set } from 'lodash';
-import moment from 'moment';
 
 /**
  * All the profile information associated with the current authentication session
@@ -46,7 +45,7 @@ class SalteAuthProfile {
         this.$tokenType = value;
         break;
       case 'expires_in':
-        this.$expiration = moment().add(value, 's').unix();
+        this.$expiration = Date.now() + value;
         break;
       case 'access_token':
         this.$accessToken = value;
@@ -71,7 +70,7 @@ class SalteAuthProfile {
    * @return {Boolean} true if the "id_token" has expired
    */
   get idTokenExpired() {
-    return !this.$idToken || moment().unix() >= this.userInfo.exp;
+    return !this.$idToken || Date.now() >= this.userInfo.exp;
   }
 
   /**
@@ -79,7 +78,7 @@ class SalteAuthProfile {
    * @return {Boolean} true if the "access_token" has expired
    */
   get accessTokenExpired() {
-    return !this.$accessToken || moment().unix() >= this.$expiration;
+    return !this.$accessToken || Date.now() >= this.$expiration;
   }
 
   /**
