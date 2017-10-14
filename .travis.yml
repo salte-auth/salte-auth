@@ -1,6 +1,6 @@
 sudo: false
 language: node_js
-node_js: node
+node_js: stable
 cache:
   yarn: true
   directories:
@@ -16,10 +16,20 @@ script:
   - yarn run lint
   - yarn run test:sauce
   - yarn run test
+  - yarn run docs
 after_script: greenkeeper-lockfile-upload
 after_success:
   - yarn run report-coverage
   - yarn run semantic-release
+deploy:
+  provider: pages
+  skip_cleanup: true
+  email: bot@salte.io
+  name: Salte Bot
+  github_token: $GH_TOKEN
+  local_dir: docs
+  on:
+    branch: master
 notifications:
   email: change
 addons:
