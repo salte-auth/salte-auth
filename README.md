@@ -19,64 +19,78 @@ You can install this package either with `npm` or with `bower`.
 ## npm
 
 ```sh
-$ npm install salte-auth
+$ npm install @salte-io/salte-auth
 ```
+
 Then add a `<script>` to your index.html:
+
 ```html
-<script src="/node_modules/salte-auth/salte-auth.js"></script>
+<script src="/node_modules/@salte-io/dist/salte-auth.js"></script>
 ```
-Or `require('salte-auth')` from your code.
+
+Or `require('@salte-io/salte-auth')` from your code.
 
 ## bower
 
 ```sh
 $ bower install salte-io/salte-auth
 ```
+
 Then add a `<script>` to your index.html:
+
 ```html
-<script src="/bower_components/salte-auth/salte-auth.js"></script>
+<script src="/bower_components/salte-auth/dist/salte-auth.js"></script>
 ```
 
-## License
+## Usage
 
-The MIT License
+```js
+import { SalteAuth } from '@salte-io/salte-auth';
 
-Copyright (c) 2016 Salte. https://www.salte.io
+// Configure SalteAuth with Auth0's url and client id.
+const auth = new SalteAuth({
+  providerUrl: 'https://salte-io.auth0.com',
+  responseType: 'id_token',
+  redirectUrl: location.origin,
+  clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
+  scope: 'openid',
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  routes: [
+      'http://localhost:8080/account'
+  ],
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  endpoints: [
+      'https://jsonplaceholder.typicode.com/posts/1'
+  ],
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+  provider: 'auth0'
+});
 
+// Display an iframe to the user that allows them to login
+auth.loginWithIframe();
+```
+
+## Documentation
+
+[Click here to view the documentation!](https://salte-io.github.io/salte-auth/)
+
+**Use private or undocumented methods at your own risk, as they will not require a major version bump when breaking changes are made!**
 
 [gitter-image]: https://badges.gitter.im/salte-io/salte-auth.svg
 [gitter-url]: https://gitter.im/salte-io/salte-auth?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
-[npm-version-image]: http://img.shields.io/npm/v/salte-auth.svg?style=flat
-[npm-downloads-image]: http://img.shields.io/npm/dm/salte-auth.svg?style=flat
-[npm-url]: https://npmjs.org/package/salte-auth
+[npm-version-image]: https://img.shields.io/npm/v/@salte-io/salte-auth.svg?style=flat
+[npm-downloads-image]: https://img.shields.io/npm/dm/@salte-io/salte-auth.svg?style=flat
+[npm-url]: https://npmjs.org/package/@salte-io/salte-auth
 
 [travis-ci-image]: https://img.shields.io/travis/salte-io/salte-auth/master.svg?style=flat
 [travis-ci-url]: https://travis-ci.org/salte-io/salte-auth
 
 [coveralls-image]: https://img.shields.io/coveralls/salte-io/salte-auth/master.svg
-[coveralls-url]: https://coveralls.io/github/salte-io/salte-auth
+[coveralls-url]: https://coveralls.io/github/salte-io/salte-auth?branch=master
 
 [commitizen-image]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
-[commitizen-url]: http://commitizen.github.io/cz-cli/
+[commitizen-url]: https://commitizen.github.io/cz-cli/
 
 [semantic-release-url]: https://github.com/semantic-release/semantic-release
 [semantic-release-image]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
