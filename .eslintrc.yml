@@ -1,13 +1,12 @@
 extends: google
 env:
   browser: true
-  serviceworker: true
-  worker: true
-globals:
-  Logging: true
+plugins:
+  - compat
 parserOptions:
   sourceType: module
 rules:
+  compat/compat: 2
   comma-dangle:
     - error
     - arrays: never
@@ -28,6 +27,9 @@ rules:
   prefer-const: 2
   no-confusing-arrow: 2
   prefer-arrow-callback: 2
-  consistent-this:
-    - error
-    - window.AuthenticationContext
+  switch-colon-spacing: 0
+settings:
+  polyfills:
+    - fetch
+
+
