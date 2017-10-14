@@ -114,7 +114,7 @@ class SalteAuthUtilities {
       if (test instanceof RegExp) {
         return !!resolvedUrl.match(test);
       } else {
-        return resolvedUrl.indexOf(test) !== -1;
+        return resolvedUrl.indexOf(this.resolveUrl(test)) === 0;
       }
     }
 

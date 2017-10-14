@@ -94,8 +94,16 @@ describe('salte-auth.utilities', () => {
 
   describe('function(checkForMatchingUrl)', () => {
     it('should support strings', () => {
-      const match = utilities.checkForMatchingUrl(location.href, [
-        location.host
+      const match = utilities.checkForMatchingUrl('https://google.com/api', [
+        'https://google.com/api'
+      ]);
+
+      expect(match).to.equal(true);
+    });
+
+    it('should support relative strings', () => {
+      const match = utilities.checkForMatchingUrl(`${location.protocol}//${location.host}/api`, [
+        '/api'
       ]);
 
       expect(match).to.equal(true);
@@ -130,7 +138,7 @@ describe('salte-auth.utilities', () => {
     it('should support passing an array of secure routes', () => {
       const checkForMatchingUrlSpy = sandbox.spy(utilities, 'checkForMatchingUrl');
       expect(utilities.isRouteSecure('http://localhost:9876', [
-        'localhost'
+        '/'
       ])).to.equal(true);
       // Verify we're using our url match checker for arrays
       expect(checkForMatchingUrlSpy.callCount).to.equal(1);
