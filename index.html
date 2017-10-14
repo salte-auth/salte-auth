@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Salte Auth Demo</title>
+        <script src="salte-auth.js"></script>
+        <style>
+            .vertical {
+                display: flex;
+                flex-direction: column;
+                padding: 5px;
+            }
+
+            .vertical > * {
+                margin: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <button id="login">Login</button>
+        <button id="logout">Logout</button>
+        <button id="navigate">Navigate</button>
+        <div class="vertical">
+            <label>
+                <input type="radio" name="type" value="redirect" checked> Redirect
+            </label>
+            <label>
+                <input type="radio" name="type" value="popup"> Popup
+            </label>
+            <label>
+                <input type="radio" name="type" value="iframe"> Iframe
+            </label>
+        </div>
+        <script>
+            var configs = {
+                auth0: {
+                    providerUrl: 'https://salte-io.auth0.com',
+                    responseType: 'id_token',
+                    clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC'
+                },
+
+                adfs: {
+                    providerUrl: 'https://login.microsoftonline.com/3f6df7ce-5830-4280-ae97-8e4016d1c6d0',
+                    responseType: 'id_token',
+                    clientId: '6a54731e-3d14-4cc4-aba9-0041a591a3b1',
+
+                    queryParams: {
+                        resource: 'https://graph.windows.net/'
+                    },
+
+                    loginType: 'popup'
+                },
+
+                cognito: {
+                    providerUrl: 'https://salte-auth-demo.auth.us-west-2.amazoncognito.com',
+                    responseType: 'token',
+                    clientId: '7vks25s7ek55rdpspnms32cq09',
+
+                    loginType: 'popup'
+                }
+            };
+
+            var providerMatch = location.search.match(/provider=([^&]+)/);
+            var provider = providerMatch ? providerMatch[1] : 'auth0';
+
+            var config = Object.assign(configs[provider], {
+                redirectUrl: location.protocol + '//' + location.host,
+                scope: 'openid',
+
+                routes: [
+                    'http://localhost:8080/account'
+                ],
+
+                endpoints: [
+                    'https://jsonplaceholder.typicode.com/posts/1'
+                ],
+
+                redirectLoginCallback: function(error) {
+                    console.log(error);
+                },
+
+                provider
+            });
+
+            if (provider !== sessionStorage.getItem('salte.demo.provider')) {
+                sessionStorage.clear();
+                sessionStorage.setItem('salte.demo.provider', provider);
+            }
+
+            var auth = new salte.SalteAuth(config);
+
+            document.querySelector('#login').addEventListener('click', function() {
+                var type = document.querySelector('[name="type"]:checked').value
+                switch (type) {
+                    case 'redirect':
+                        return auth.loginWithRedirect();
+                    case 'popup':
+                        return auth.loginWithPopup();
+                    case 'iframe':
+                        return auth.loginWithIframe();
+                }
+            });
+
+            document.querySelector('#logout').addEventListener('click', function() {
+                var type = document.querySelector('[name="type"]:checked').value
+                switch (type) {
+                    case 'redirect':
+                        return auth.logoutWithRedirect();
+                    case 'popup':
+                        return auth.logoutWithPopup();
+                    case 'iframe':
+                        return auth.logoutWithIframe();
+                }
+            });
+
+            document.querySelector('#navigate').addEventListener('click', function() {
+                if (location.pathname === '/') {
+                    history.pushState({}, '', location.protocol + '//' + location.host + '/account');
+                } else {
+                    history.pushState({}, '', location.protocol + '//' + location.host);
+                }
+            });
+
+            fetch('https://jsonplaceholder.typicode.com/posts/1').then(function(response) {
+                return response.json();
+            }).then(function(data) {
+                console.log(data);
+            }).catch(function(error) {
+                console.error(error);
+            });
+
+            var request = new XMLHttpRequest();
+            request.addEventListener('error', function(event) {
+                console.error(event.detail);
+            });
+            request.addEventListener('load', function(event) {
+                console.log(JSON.parse(this.responseText));
+            });
+            request.open('GET', 'https://jsonplaceholder.typicode.com/posts/2');
+            request.send();
+        </script>
+    </body>
+</html>
