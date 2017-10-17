@@ -64,7 +64,7 @@
     "karma-chrome-launcher": "^2.0.0",
     "karma-coverage": "^1.0.0",
     "karma-mocha": "^1.0.0",
-    "karma-mocha-reporter": "2.2.3",
+    "karma-mocha-reporter": "2.2.5",
     "karma-polyfill": "^1.0.0",
     "karma-sauce-launcher": "^1.0.0",
     "karma-sinon": "^1.0.0",
