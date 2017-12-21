@@ -60,7 +60,7 @@
     "html-loader": "^0.5.1",
     "http-server": "^0.10.0",
     "istanbul-instrumenter-loader": "^3.0.0",
-    "karma": "^1.0.0",
+    "karma": "^2.0.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-coverage": "^1.0.0",
     "karma-mocha": "^1.0.0",
