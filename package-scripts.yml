@@ -1,0 +1,50 @@
+scripts:
+  lint:
+    default:
+      script: eslint src/**/*.js tests/**/*.js
+      description: Checks for any formatting errors
+    reformat:
+      script: prettier src/**/*.js tests/**/*.js && eslint --fix src/**/*.js tests/**/*.js
+      description: Checks for any formatting errors and attempts to fix them
+  test:
+    default:
+      script: karma start --single-run
+      description: Executes the Test Suite
+    tdd:
+      script: karma start
+      description: Watches for changes and executes the Test Suite accordingly
+    sauce:
+      script: karma start karma.ci.conf.js
+      description: Executes the Test Suite on Sauce Labs
+  serve:
+    default:
+      script: webpack-dev-server -d --config webpack.server.config.js
+      description: Starts a server at http://localhost:8080
+    https:
+      script: webpack-dev-server -d --https --port 443 --config webpack.server.config.js
+      description: Starts a server at https://localhost
+    docs:
+      script: watch 'nps docs' 'src' & http-server docs
+      description: Starts a server for previewing the documentation
+  build:
+    default:
+      script: nps build.dev && nps build.prod
+      description: Builds both a minified and unminified artifact
+    dev:
+      script: webpack --progress --colors -d
+      description: Builds an unminified artifact
+    prod:
+      script: webpack --progress --colors -p
+      description: Builds a minified artifact
+  report-coverage:
+    script: coveralls < coverage/lcov.info
+    description: Reports code coverage information to Coveralls
+  publish-latest:
+    script: publish-latest --user-email bot@salte.io --user-name salte-bot
+    description: Publishes the latest artifact to a latest branch on GitHub
+  semantic-release:
+    script: semantic-release
+    description: Publishes the artifact to NPM and GitHub
+  docs:
+    script: esdoc
+    description: Creates documentation based upon JSDoc and ESDoc comments

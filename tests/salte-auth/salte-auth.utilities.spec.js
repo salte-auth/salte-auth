@@ -30,7 +30,9 @@ describe('salte-auth.utilities', () => {
       utilities = new SalteAuthUtilities();
 
       expect(utilities.bogus).to.be.undefined;
-      expect(window.salte.SalteAuthUtilities.$instance).to.be.instanceof(SalteAuthUtilities);
+      expect(window.salte.SalteAuthUtilities.$instance).to.be.instanceof(
+        SalteAuthUtilities
+      );
     });
   });
 
@@ -84,11 +86,15 @@ describe('salte-auth.utilities', () => {
 
   describe('function(resolveUrl)', () => {
     it('should support paths', () => {
-      expect(utilities.resolveUrl('/api/test')).to.equal(`${window.location.protocol}//${window.location.host}/api/test`);
+      expect(utilities.resolveUrl('/api/test')).to.equal(
+        `${window.location.protocol}//${window.location.host}/api/test`
+      );
     });
 
     it('should support full urls', () => {
-      expect(utilities.resolveUrl('https://api.salte.io/api/test')).to.equal('https://api.salte.io/api/test');
+      expect(utilities.resolveUrl('https://api.salte.io/api/test')).to.equal(
+        'https://api.salte.io/api/test'
+      );
     });
   });
 
@@ -102,9 +108,10 @@ describe('salte-auth.utilities', () => {
     });
 
     it('should support relative strings', () => {
-      const match = utilities.checkForMatchingUrl(`${location.protocol}//${location.host}/api`, [
-        '/api'
-      ]);
+      const match = utilities.checkForMatchingUrl(
+        `${location.protocol}//${location.host}/api`,
+        ['/api']
+      );
 
       expect(match).to.equal(true);
     });
@@ -132,14 +139,19 @@ describe('salte-auth.utilities', () => {
 
   describe('function(isRouteSecure)', () => {
     it('should support globally requiring authentication', () => {
-      expect(utilities.isRouteSecure('http://localhost:9876', true)).to.equal(true);
+      expect(utilities.isRouteSecure('http://localhost:9876', true)).to.equal(
+        true
+      );
     });
 
     it('should support passing an array of secure routes', () => {
-      const checkForMatchingUrlSpy = sandbox.spy(utilities, 'checkForMatchingUrl');
-      expect(utilities.isRouteSecure('http://localhost:9876', [
-        '/'
-      ])).to.equal(true);
+      const checkForMatchingUrlSpy = sandbox.spy(
+        utilities,
+        'checkForMatchingUrl'
+      );
+      expect(utilities.isRouteSecure('http://localhost:9876', ['/'])).to.equal(
+        true
+      );
       // Verify we're using our url match checker for arrays
       expect(checkForMatchingUrlSpy.callCount).to.equal(1);
     });
@@ -173,12 +185,16 @@ describe('salte-auth.utilities', () => {
 
       const promise = utilities.openPopup('https://www.google.com');
 
-      return promise.catch((error) => {
-        return error;
-      }).then((error) => {
-        expect(error).to.be.instanceof(ReferenceError);
-        expect(error.message).to.equal('We were unable to open the popup window, its likely that the request was blocked.');
-      });
+      return promise
+        .catch(error => {
+          return error;
+        })
+        .then(error => {
+          expect(error).to.be.instanceof(ReferenceError);
+          expect(error.message).to.equal(
+            'We were unable to open the popup window, its likely that the request was blocked.'
+          );
+        });
     });
   });
 
@@ -213,21 +229,31 @@ describe('salte-auth.utilities', () => {
 
     it('should intercept XHR requests', () => {
       const promises = [];
-      promises.push(new Promise((resolve) => {
-        utilities.addXHRInterceptor((request, data) => {
-          expect(data).to.be.undefined;
-          resolve();
-        });
-      }));
+      promises.push(
+        new Promise(resolve => {
+          utilities.addXHRInterceptor((request, data) => {
+            expect(data).to.be.undefined;
+            resolve();
+          });
+        })
+      );
 
       const request = new XMLHttpRequest();
-      promises.push(new Promise((resolve) => {
-        request.addEventListener('load', function() {
-          expect(this.responseText).to.contain('This is the execution context.');
-          resolve();
-        });
-      }));
-      request.open('GET', `${location.protocol}//${location.host}/context.html`, false);
+      promises.push(
+        new Promise(resolve => {
+          request.addEventListener('load', function() {
+            expect(this.responseText).to.contain(
+              'This is the execution context.'
+            );
+            resolve();
+          });
+        })
+      );
+      request.open(
+        'GET',
+        `${location.protocol}//${location.host}/context.html`,
+        false
+      );
       request.send();
       return Promise.all(promises);
     });
@@ -239,13 +265,19 @@ describe('salte-auth.utilities', () => {
       });
 
       const request = new XMLHttpRequest();
-      promises.push(new Promise((resolve) => {
-        request.addEventListener('error', (event) => {
-          expect(event.detail).to.equal('Stuff broke!');
-          resolve();
-        });
-      }));
-      request.open('GET', `${location.protocol}//${location.host}/context.html`, false);
+      promises.push(
+        new Promise(resolve => {
+          request.addEventListener('error', event => {
+            expect(event.detail).to.equal('Stuff broke!');
+            resolve();
+          });
+        })
+      );
+      request.open(
+        'GET',
+        `${location.protocol}//${location.host}/context.html`,
+        false
+      );
       request.send();
       return Promise.all(promises);
     });

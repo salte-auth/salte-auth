@@ -9,18 +9,15 @@ branches:
   only:
     - master
     - /^greenkeeper/.*$/
-before_install:
-  - yarn global add greenkeeper-lockfile@1
-before_script: greenkeeper-lockfile-update
 script:
-  - yarn run lint
-  - yarn run test:sauce
-  - yarn run test
-  - yarn run docs
-after_script: greenkeeper-lockfile-upload
+  - yarn start lint
+  - yarn start test.sauce
+  - yarn start test
+  - yarn start docs
+  - yarn start build
 after_success:
-  - yarn run report-coverage
-  - yarn run semantic-release
+  - yarn start report-coverage
+  - yarn start semantic-release
 deploy:
   provider: pages
   skip_cleanup: true
