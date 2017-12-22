@@ -1,6 +1,6 @@
 {
   "name": "@salte-io/salte-auth",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "main": "dist/salte-auth.min.js",
   "description": "OAuth 2.0 for the masses!",
   "homepage": "https://github.com/salte-io/salte-auth",
@@ -20,20 +20,10 @@
     "url": "https://github.com/salte-io/salte-auth.git"
   },
   "scripts": {
-    "lint": "eslint src/**/*.js tests/**/*.js",
-    "test": "karma start --single-run",
-    "test:sauce": "karma start karma.ci.conf.js",
-    "tdd": "karma start",
-    "start": "webpack-dev-server -d --config webpack.server.config.js",
-    "start:https": "webpack-dev-server -d --https --port 443 --config webpack.server.config.js",
-    "start:docs": "watch 'yarn run docs' 'src' & http-server docs",
-    "build": "npm run build:dev && npm run build:prod",
-    "build:dev": "webpack --progress --colors -d",
-    "build:prod": "webpack --progress --colors -p",
-    "report-coverage": "coveralls < coverage/lcov.info",
-    "publish-latest": "publish-latest --user-email bot@salte.io --user-name salte-bot",
-    "semantic-release": "semantic-release pre && npm run build && npm publish && npm run publish-latest && semantic-release post",
-    "docs": "esdoc"
+    "start": "nps",
+    "prepublishOnly": "yarn start build",
+    "postpublish": "publish-latest --user-email bot@salte.io --user-name salte-bot",
+    "precommit": "remove-lockfiles && lint-staged"
   },
   "license": "MIT",
   "dependencies": {
@@ -59,32 +49,45 @@
     "eslint-plugin-mocha": "^4.0.0",
     "html-loader": "^0.5.1",
     "http-server": "^0.10.0",
+    "husky": "^0.14.3",
     "istanbul-instrumenter-loader": "^3.0.0",
-    "karma": "^1.0.0",
+    "karma": "^2.0.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-coverage": "^1.0.0",
     "karma-mocha": "^1.0.0",
-    "karma-mocha-reporter": "2.2.3",
+    "karma-mocha-reporter": "2.2.5",
     "karma-polyfill": "^1.0.0",
     "karma-sauce-launcher": "^1.0.0",
     "karma-sinon": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.0",
+    "lint-staged": "^6.0.0",
     "mocha": "^4.0.0",
+    "nps": "^5.7.1",
+    "prettier": "^1.9.2",
     "promise-polyfill": "^6.0.2",
-    "semantic-release": "^8.0.0",
+    "publish-latest": "^1.1.2",
+    "remove-lockfiles": "^1.4.2",
+    "semantic-release": "^11.0.2",
     "sinon": "^4.0.0",
     "unfetch": "^3.0.0",
     "uuid": "^3.0.0",
     "watch": "^1.0.2",
     "webpack": "^3.0.0",
     "webpack-dev-server": "^2.0.0",
-    "yargs": "^9.0.0"
+    "yargs": "^10.0.3"
   },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
   },
   "publishConfig": {
     "access": "public"

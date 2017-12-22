@@ -25,6 +25,8 @@ $ npm install @salte-io/salte-auth
 Then add a `<script>` to your index.html:
 
 ```html
+<!-- Lodash is a dependency of "salte-auth" -->
+<script src="/node_modules/lodash/dist/lodash.js"></script>
 <script src="/node_modules/@salte-io/dist/salte-auth.js"></script>
 ```
 
@@ -39,7 +41,17 @@ $ bower install salte-io/salte-auth
 Then add a `<script>` to your index.html:
 
 ```html
+<!-- Lodash is a dependency of "salte-auth" -->
+<script src="/bower_components/lodash/dist/lodash.js"></script>
 <script src="/bower_components/salte-auth/dist/salte-auth.js"></script>
+```
+
+### HTML Imports (Polymer 1.x - 2.x)
+
+We also support HTML Imports:
+
+```html
+<link rel="import" href="/bower_components/salte-auth/salte-auth.html">
 ```
 
 ## Usage
@@ -49,10 +61,10 @@ import { SalteAuth } from '@salte-io/salte-auth';
 
 // Configure SalteAuth with Auth0's url and client id.
 const auth = new SalteAuth({
-  providerUrl: 'https://salte-io.auth0.com',
+  providerUrl: 'https://salte.auth0.com',
   responseType: 'id_token',
   redirectUrl: location.origin,
-  clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
+  clientId: '4YoYZLd9NWnSsYdKZlnWP9r5BN0b0Tgd',
   scope: 'openid',
 
   routes: [

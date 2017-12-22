@@ -31,5 +31,6 @@ rules:
 settings:
   polyfills:
     - fetch
+    - promises
 
 

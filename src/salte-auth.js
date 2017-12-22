@@ -24,7 +24,7 @@ import { SalteAuthUtilities } from './salte-auth.utilities.js';
  * @property {String} scope A list of space-delimited claims used to determine what user information is provided and what access is given. Most providers require 'openid'.
  * @property {Boolean|Array<String>} routes A list of secured routes. If true is provided then all routes are secured.
  * @property {Array<String|RegExp>} endpoints A list of secured endpoints.
- * @property {('auth0'|'cognito'|'wso2')} provider The identity provider you're using.
+ * @property {('auth0'|'azure'|'cognito'|'wso2')} provider The identity provider you're using.
  * @property {Function} [redirectLoginCallback] A callback that is invoked when a redirect login fails or succeeds.
  * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.

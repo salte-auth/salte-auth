@@ -19,30 +19,36 @@ module.exports = {
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
-  externals: [{
-    lodash: {
-      root: '_',
-      commonjs: 'lodash',
-      commonjs2: 'lodash',
-      amd: 'lodash'
+  externals: [
+    {
+      lodash: {
+        root: '_',
+        commonjs: 'lodash',
+        commonjs2: 'lodash',
+        amd: 'lodash'
+      }
     }
-  }],
+  ],
   devtool: 'source-map',
   module: {
-    rules: [{
-      enforce: 'pre',
-      test: /\.js$/,
-      exclude: /node_modules/,
-      loader: 'eslint-loader'
-    }, {
-      test: /\.js$/,
-      exclude: /node_modules/,
-      loader: 'babel-loader'
-    }, {
-      test: /\.html$/,
-      exclude: /node_modules/,
-      loader: 'html-loader'
-    }]
+    rules: [
+      {
+        enforce: 'pre',
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'eslint-loader'
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader'
+      },
+      {
+        test: /\.html$/,
+        exclude: /node_modules/,
+        loader: 'html-loader'
+      }
+    ]
   },
   plugins: [
     new webpack.BannerPlugin({
