@@ -30,6 +30,6 @@
     "tests"
   ],
   "dependencies": {
-    "lodash": "lodash/lodash#^4.0.0"
+    "lodash": "^4.0.0"
   }
 }
