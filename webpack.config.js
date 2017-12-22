@@ -54,7 +54,7 @@ module.exports = {
     new webpack.BannerPlugin({
       banner: deindent(`
         /**
-         * ${packageJson.name} JavaScript Library
+         * ${packageJson.name} JavaScript Library v${packageJson.version}
          *
          * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
          *
