@@ -38,11 +38,19 @@ describe('salte-auth.profile', () => {
       profile = new SalteAuthProfile();
 
       expect(profile.bogus).to.be.undefined;
-      expect(window.salte.SalteAuthProfile.$instance).to.be.instanceof(SalteAuthProfile);
+      expect(window.salte.SalteAuthProfile.$instance).to.be.instanceof(
+        SalteAuthProfile
+      );
     });
 
     it('should support parsing hash parameters', () => {
-      history.replaceState(null, '', `${location.protocol}//${location.host}${location.pathname}#state=55555-55555`);
+      history.replaceState(
+        null,
+        '',
+        `${location.protocol}//${location.host}${
+          location.pathname
+        }#state=55555-55555`
+      );
       profile = new SalteAuthProfile();
       expect(profile.$state).to.equal('55555-55555');
     });
@@ -96,12 +104,14 @@ describe('salte-auth.profile', () => {
   describe('getter(idTokenExpired)', () => {
     let clock;
     beforeEach(() => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe',
-        admin: true,
-        exp: 2
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          admin: true,
+          exp: 2
+        })
+      )}.0`;
       clock = sandbox.useFakeTimers();
     });
 
@@ -155,16 +165,20 @@ describe('salte-auth.profile', () => {
   describe('setter(redirectUrl)', () => {
     it('should set sessionStorage', () => {
       profile.$redirectUrl = location.href;
-      expect(sessionStorage.getItem('salte.auth.$redirect-url')).to.equal(location.href);
+      expect(sessionStorage.getItem('salte.auth.$redirect-url')).to.equal(
+        location.href
+      );
     });
   });
 
   describe('getter(userInfo)', () => {
     it('should parse the "id_token"', () => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe'
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`;
       const userInfo = profile.userInfo;
       expect(userInfo).to.deep.equal({
         sub: '1234567890',
@@ -186,12 +200,14 @@ describe('salte-auth.profile', () => {
 
   describe('function($validate)', () => {
     it('should return an null if there are no issues', () => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe',
-        nonce: null,
-        aud: '55555-55555'
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          nonce: null,
+          aud: '55555-55555'
+        })
+      )}.0`;
       profile.$nonce = null;
       profile.$localState = null;
       profile.$state = null;
@@ -201,16 +217,15 @@ describe('salte-auth.profile', () => {
     });
 
     it('should not return an error if one  of the audiences matches the "clientId"', () => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe',
-        nonce: null,
-        aud: [
-          '55555-55555',
-          'test2'
-        ],
-        azp: '55555-55555'
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          nonce: null,
+          aud: ['55555-55555', 'test2'],
+          azp: '55555-55555'
+        })
+      )}.0`;
       profile.$localState = null;
       profile.$state = null;
       profile.$nonce = null;
@@ -233,45 +248,54 @@ describe('salte-auth.profile', () => {
       const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'login_canceled',
-        description: 'User likely canceled the login or something unexpected occurred.'
+        description:
+          'User likely canceled the login or something unexpected occurred.'
       });
     });
 
     it('should return an error if the "local-state" does not match the "state"', () => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe',
-        nonce: null
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          nonce: null
+        })
+      )}.0`;
       const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'invalid_state',
-        description: 'State provided by identity provider did not match local state.'
+        description:
+          'State provided by identity provider did not match local state.'
       });
     });
 
     it('should return an error if the "nonce" does not match the "id_token" nonce', () => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe'
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`;
       profile.$nonce = '55555-55555';
       profile.$localState = null;
       profile.$state = null;
       const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'invalid_nonce',
-        description: 'Nonce provided by identity provider did not match local nonce.'
+        description:
+          'Nonce provided by identity provider did not match local nonce.'
       });
     });
 
     it('should return an error if the "aud" does not match the "clientId"', () => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe',
-        nonce: null,
-        aud: '55555-55555'
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          nonce: null,
+          aud: '55555-55555'
+        })
+      )}.0`;
       profile.$localState = null;
       profile.$state = null;
       profile.$nonce = null;
@@ -283,38 +307,37 @@ describe('salte-auth.profile', () => {
     });
 
     it('should return an error if there are multiple audiences and the azp is not present', () => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe',
-        admin: true,
-        nonce: null,
-        aud: [
-          'test',
-          'test2'
-        ]
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          admin: true,
+          nonce: null,
+          aud: ['test', 'test2']
+        })
+      )}.0`;
       profile.$localState = null;
       profile.$state = null;
       profile.$nonce = null;
       const response = profile.$validate();
       expect(response).to.deep.equal({
         code: 'invalid_azp',
-        description: 'Audience was returned as an array and AZP was not present on the ID Token.'
+        description:
+          'Audience was returned as an array and AZP was not present on the ID Token.'
       });
     });
 
     it('should return an error if there are multiple audiences and the azp does not match the client id', () => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe',
-        admin: true,
-        nonce: null,
-        aud: [
-          'test',
-          'test2'
-        ],
-        azp: '55555-55555'
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          admin: true,
+          nonce: null,
+          aud: ['test', 'test2'],
+          azp: '55555-55555'
+        })
+      )}.0`;
       profile.$localState = null;
       profile.$state = null;
       profile.$nonce = null;
@@ -326,17 +349,16 @@ describe('salte-auth.profile', () => {
     });
 
     it('should return an error if none of the audiences match the "clientId"', () => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe',
-        admin: true,
-        nonce: null,
-        aud: [
-          'test',
-          'test2'
-        ],
-        azp: '55555-55555'
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          admin: true,
+          nonce: null,
+          aud: ['test', 'test2'],
+          azp: '55555-55555'
+        })
+      )}.0`;
       profile.$localState = null;
       profile.$state = null;
       profile.$nonce = null;
@@ -349,11 +371,13 @@ describe('salte-auth.profile', () => {
     });
 
     it('should skip "nonce" validation if the "access_token" is set', () => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe',
-        admin: true
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          admin: true
+        })
+      )}.0`;
       profile.$localState = null;
       profile.$state = null;
       const response = profile.$validate(true);
@@ -361,16 +385,16 @@ describe('salte-auth.profile', () => {
     });
 
     it('should skip individual validation if it is disabled', () => {
-      profile.$idToken = `0.${btoa(JSON.stringify({
-        sub: '1234567890',
-        name: 'John Doe',
-        admin: true,
-        nonce: '55555-55555',
-        aud: [
-          '55555-55555'
-        ],
-        azp: '55555-55555'
-      }))}.0`;
+      profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          admin: true,
+          nonce: '55555-55555',
+          aud: ['55555-55555'],
+          azp: '55555-55555'
+        })
+      )}.0`;
       profile.$$config.validation = {
         nonce: false,
         state: false,
@@ -428,7 +452,10 @@ describe('salte-auth.profile', () => {
     });
 
     it('should error if the "storageType" is invalid', () => {
-      expect(() => profile.$$getStorage('bogus')).to.throw(ReferenceError, 'Unknown Storage Type (bogus)');
+      expect(() => profile.$$getStorage('bogus')).to.throw(
+        ReferenceError,
+        'Unknown Storage Type (bogus)'
+      );
     });
   });
 
@@ -462,11 +489,15 @@ describe('salte-auth.profile', () => {
     it('should remove all "salte.auth" items from sessionStorage', () => {
       profile.$clearErrors();
 
-      expect(sessionStorage.getItem('salte.auth.id_token')).to.equal('12345-12345-12345');
+      expect(sessionStorage.getItem('salte.auth.id_token')).to.equal(
+        '12345-12345-12345'
+      );
       expect(sessionStorage.getItem('salte.auth.bogus')).to.equal('12345');
       expect(sessionStorage.getItem('bogus')).to.equal('12345');
       expect(sessionStorage.getItem('error')).to.equal('your-fault');
-      expect(sessionStorage.getItem('error_description')).to.equal('Look what you did!');
+      expect(sessionStorage.getItem('error_description')).to.equal(
+        'Look what you did!'
+      );
     });
   });
 });

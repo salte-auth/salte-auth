@@ -10,8 +10,8 @@ class SalteAuthAuth0Provider {
    */
   static deauthorizeUrl(config) {
     return this.$utilities.createUrl(`${config.providerUrl}/v2/logout`, {
-      'returnTo': config.redirectUrl,
-      'client_id': config.clientId
+      returnTo: config.redirectUrl,
+      client_id: config.clientId
     });
   }
 }
