@@ -16,7 +16,7 @@ class SalteAuthAzureProvider {
    */
   static deauthorizeUrl(config) {
     return this.$utilities.createUrl(`${config.providerUrl}/oauth2/logout`, {
-      'post_logout_redirect_uri': config.redirectUrl
+      post_logout_redirect_uri: config.redirectUrl
     });
   }
 }

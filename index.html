@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Salte Auth Demo</title>
-        <script src="salte-auth.js"></script>
+        <script src="/salte-auth.js"></script>
         <style>
             .vertical {
                 display: flex;
@@ -33,12 +33,12 @@
         <script>
             var configs = {
                 auth0: {
-                    providerUrl: 'https://salte-io.auth0.com',
+                    providerUrl: 'https://salte.auth0.com',
                     responseType: 'id_token',
-                    clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC'
+                    clientId: '4YoYZLd9NWnSsYdKZlnWP9r5BN0b0Tgd'
                 },
 
-                adfs: {
+                azure: {
                     providerUrl: 'https://login.microsoftonline.com/3f6df7ce-5830-4280-ae97-8e4016d1c6d0',
                     responseType: 'id_token',
                     clientId: '6a54731e-3d14-4cc4-aba9-0041a591a3b1',
@@ -51,9 +51,9 @@
                 },
 
                 cognito: {
-                    providerUrl: 'https://salte-auth-demo.auth.us-west-2.amazoncognito.com',
+                    providerUrl: 'https://salte-auth-demo.auth.us-east-1.amazoncognito.com',
                     responseType: 'token',
-                    clientId: '7vks25s7ek55rdpspnms32cq09',
+                    clientId: '51jmkg1t5h3ob58a1birdke2hm',
 
                     loginType: 'popup'
                 }
