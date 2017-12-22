@@ -14,7 +14,6 @@ script:
   - yarn start test.sauce
   - yarn start test
   - yarn start docs
-  - yarn start build
 after_success:
   - yarn start report-coverage
   - yarn start semantic-release

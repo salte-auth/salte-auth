@@ -39,9 +39,6 @@ scripts:
   report-coverage:
     script: coveralls < coverage/lcov.info
     description: Reports code coverage information to Coveralls
-  publish-latest:
-    script: publish-latest --user-email bot@salte.io --user-name salte-bot
-    description: Publishes the latest artifact to a latest branch on GitHub
   semantic-release:
     script: semantic-release
     description: Publishes the artifact to NPM and GitHub

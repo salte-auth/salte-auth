@@ -21,6 +21,8 @@
   },
   "scripts": {
     "start": "nps",
+    "prepublish": "yarn start build",
+    "postpublish": "publish-latest --user-email bot@salte.io --user-name salte-bot",
     "precommit": "remove-lockfiles && lint-staged"
   },
   "license": "MIT",
