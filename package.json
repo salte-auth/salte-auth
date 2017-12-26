@@ -63,7 +63,7 @@
     "karma-webpack": "^2.0.0",
     "mocha": "^4.0.0",
     "nps": "^5.7.1",
-    "promise-polyfill": "^6.0.2",
+    "promise-polyfill": "^7.0.0",
     "publish-latest": "^1.1.2",
     "remove-lockfiles": "^1.4.2",
     "semantic-release": "^11.0.2",
