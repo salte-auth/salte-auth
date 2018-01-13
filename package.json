@@ -66,7 +66,7 @@
     "promise-polyfill": "^7.0.0",
     "publish-latest": "^1.1.2",
     "remove-lockfiles": "^1.4.2",
-    "semantic-release": "^11.0.2",
+    "semantic-release": "^12.2.2",
     "sinon": "^4.0.0",
     "unfetch": "^3.0.0",
     "uuid": "^3.0.0",
