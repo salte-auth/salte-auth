@@ -48,7 +48,7 @@
     "eslint-plugin-compat": "^2.0.0",
     "eslint-plugin-mocha": "^4.0.0",
     "html-loader": "^0.5.1",
-    "http-server": "^0.10.0",
+    "http-server": "^0.11.0",
     "husky": "^0.14.3",
     "istanbul-instrumenter-loader": "^3.0.0",
     "karma": "^2.0.0",
