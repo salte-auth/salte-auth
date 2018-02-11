@@ -26,9 +26,6 @@
     "precommit": "remove-lockfiles"
   },
   "license": "MIT",
-  "dependencies": {
-    "lodash": "^4.0.0"
-  },
   "devDependencies": {
     "babel-core": "^6.0.0",
     "babel-loader": "^7.0.0",

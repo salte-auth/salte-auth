@@ -1,4 +1,7 @@
-import { assign, defaultsDeep, get, set } from 'lodash';
+import assign from 'lodash/assign';
+import defaultsDeep from 'lodash/defaultsDeep';
+import get from 'lodash/get';
+import set from 'lodash/set';
 import uuid from 'uuid';
 
 import { Providers } from './salte-auth.providers.js';
