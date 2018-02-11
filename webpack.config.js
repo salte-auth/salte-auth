@@ -19,16 +19,6 @@ module.exports = {
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
-  externals: [
-    {
-      lodash: {
-        root: '_',
-        commonjs: 'lodash',
-        commonjs2: 'lodash',
-        amd: 'lodash'
-      }
-    }
-  ],
   devtool: 'source-map',
   module: {
     rules: [

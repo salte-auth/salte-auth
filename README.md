@@ -25,8 +25,6 @@ $ npm install @salte-io/salte-auth
 Then add a `<script>` to your index.html:
 
 ```html
-<!-- Lodash is a dependency of "salte-auth" -->
-<script src="/node_modules/lodash/dist/lodash.js"></script>
 <script src="/node_modules/@salte-io/dist/salte-auth.js"></script>
 ```
 
@@ -41,8 +39,6 @@ $ bower install salte-io/salte-auth
 Then add a `<script>` to your index.html:
 
 ```html
-<!-- Lodash is a dependency of "salte-auth" -->
-<script src="/bower_components/lodash/dist/lodash.js"></script>
 <script src="/bower_components/salte-auth/dist/salte-auth.js"></script>
 ```
 
