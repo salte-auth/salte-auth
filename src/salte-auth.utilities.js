@@ -1,4 +1,6 @@
-import { assign, get, set } from 'lodash';
+import assign from 'lodash/assign';
+import get from 'lodash/get';
+import set from 'lodash/set';
 
 /**
  * Basic utilities to support the authentication flow
