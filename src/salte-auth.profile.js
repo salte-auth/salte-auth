@@ -1,4 +1,7 @@
-import { defaultsDeep, find, get, set } from 'lodash';
+import defaultsDeep from 'lodash/defaultsDeep';
+import find from 'lodash/find';
+import get from 'lodash/get';
+import set from 'lodash/set';
 
 /**
  * All the profile information associated with the current authentication session

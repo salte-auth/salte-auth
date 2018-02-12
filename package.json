@@ -1,6 +1,6 @@
 {
   "name": "@salte-io/salte-auth",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "main": "dist/salte-auth.min.js",
   "description": "OAuth 2.0 for the masses!",
   "homepage": "https://github.com/salte-io/salte-auth",
@@ -26,9 +26,6 @@
     "precommit": "remove-lockfiles"
   },
   "license": "MIT",
-  "dependencies": {
-    "lodash": "^4.0.0"
-  },
   "devDependencies": {
     "babel-core": "^6.0.0",
     "babel-loader": "^7.0.0",

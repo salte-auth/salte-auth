@@ -28,8 +28,5 @@
     "bower_components",
     "test",
     "tests"
-  ],
-  "dependencies": {
-    "lodash": "^4.0.0"
-  }
+  ]
 }
