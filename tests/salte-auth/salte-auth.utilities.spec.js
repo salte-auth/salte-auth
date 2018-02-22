@@ -198,6 +198,41 @@ describe('salte-auth.utilities', () => {
     });
   });
 
+  describe('function(openNewTab)', () => {
+    it('should open a new tab', () => {
+      sandbox.stub(window, 'open').returns({
+        closed: false,
+        focus() {},
+        close() {
+          this.closed = true;
+        }
+      });
+
+      const promise = utilities.openNewTab('https://www.google.com');
+
+      setTimeout(() => {
+        window.open.firstCall.returnValue.close();
+      }, 200);
+
+      return promise;
+    });
+
+    it('should handle blocked tabs', () => {
+      sandbox.stub(window, 'open').returns(null);
+
+      const promise = utilities.openNewTab('https://www.google.com');
+
+      return promise.catch(error => {
+        return error;
+      }).then(error => {
+        expect(error).to.be.instanceof(ReferenceError);
+        expect(error.message).to.equal(
+          'We were unable to open the new tab, its likely that the request was blocked.'
+        );
+      });
+    });
+  });
+
   describe('function(createIframe)', () => {
     it('should create a hidden iframe', () => {
       const promise = utilities.createIframe('https://www.google.com');
