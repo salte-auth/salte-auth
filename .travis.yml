@@ -11,7 +11,7 @@ branches:
     - /^greenkeeper/.*$/
 script:
   - yarn start lint
-  - yarn start test.sauce
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then yarn start test.sauce; fi
   - yarn start test
   - yarn start docs
 after_success:
@@ -28,6 +28,3 @@ deploy:
     branch: master
 notifications:
   email: change
-addons:
-  jwt:
-    secure: VL4NEo40OGQX6tEDr8qjNPIDNHuXafWucHCgSTTcIGBdGcdzf9g+EZULhGkcyz9UypMbEvxP6JAlBZHVE04/vG1I8kQ4o3ayG2v09Tl2zzTeRpJNAVwlufUyz+zWG5+S3/NWzCAG9LYOQucbDX1DZgUhgyfAGNJavTgIK2BNAiumb3pSsh1Cw0paSf7uWYCtDTB/KKJedkyMwjftmtBkbLNKa0SD2mBlKb/ZJYro7CC0g3BKD+9tmHrOsX1wiSFxSxUHPBHccfab9SGduXfe1pXenNrJ+H8EtddqnIRz9CaT3mMSSJwtV3PIycQ8DemkqPUOiO4X2Q+bx2uaLHlESK+XOeWI1AO43YEUF0qDGnmXHkpyvIJr0v9w5bjz4U4T2f0hcQDx5tdMPCLc1LcfmtS+g+oO9fHbjPHjkNlnhOOezt+wgLFN/QXcpMo6SuJJHM1y/0KQ6kgaVUAiDatMVtlPbL/fvje92MqmbMpgCrAr9Wx+T4uMhfCzFnpDz8sXtbL1gnDcOf7fzRS05lLi6EfSg/9+oteQn+6DauShN7rDiiq7zY/Dwe55dZNYAJqWUw1yyt42Bt/aMQtiKkifosCJc/JhMPX8T22dAUhO8hCRvc2EMXa+5sE0boQJE+KBebIguJfSWwWl0Cay9YNY5H0AqWfuHsvGq1OgG1U2xzg=
