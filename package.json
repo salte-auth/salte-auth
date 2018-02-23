@@ -1,6 +1,6 @@
 {
   "name": "@salte-io/salte-auth",
-  "version": "2.0.4",
+  "version": "2.1.0",
   "main": "dist/salte-auth.min.js",
   "description": "OAuth 2.0 for the masses!",
   "homepage": "https://github.com/salte-io/salte-auth",
@@ -58,6 +58,7 @@
     "karma-sinon": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.0",
+    "lodash": "^4.0.0",
     "mocha": "^5.0.0",
     "nps": "^5.7.1",
     "promise-polyfill": "^7.0.0",

@@ -590,6 +590,112 @@ describe('salte-auth', () => {
         });
     });
 
+  describe('function(loginWithNewTab)', () => {
+    it('should resolve when we have logged in', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$validate');
+      sandbox.stub(auth.profile, '$$transfer');
+
+      const promise = auth.loginWithNewTab();
+
+      expect(auth.profile.$clear.callCount).to.equal(1);
+      expect(auth.$promises.login).to.equal(promise);
+      expect(auth.profile.$$transfer.callCount).to.equal(0);
+      return promise.then(() => {
+        expect(auth.profile.$$transfer.callCount).to.equal(1);
+        expect(auth.$promises.login).to.equal(null);
+      });
+    });
+
+    it('should bypass transfering storage when using "localStorage"', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$validate');
+      sandbox.stub(auth.profile, '$$transfer');
+
+      auth.$config.storageType = 'local';
+
+      const promise = auth.loginWithNewTab();
+
+      expect(auth.profile.$clear.callCount).to.equal(1);
+      expect(auth.$promises.login).to.equal(promise);
+      return promise.then(() => {
+        expect(auth.profile.$$transfer.callCount).to.equal(0);
+        expect(auth.$promises.login).to.equal(null);
+      });
+    });
+
+    it('should prevent duplicate promises', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$validate');
+
+      const promise = auth.loginWithNewTab();
+      const duplicatePromise = auth.loginWithNewTab();
+
+      expect(promise).to.equal(duplicatePromise);
+
+      return promise;
+    });
+
+    it('should throw validation errors', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
+
+      auth.profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`;
+
+      const promise = auth.loginWithNewTab();
+
+      return promise
+        .catch(error => {
+          return error;
+        })
+        .then(error => {
+          expect(error).to.deep.equal({
+            code: 'invalid_state',
+            description:
+              'State provided by identity provider did not match local state.'
+          });
+        });
+    });
+
+    it('should handle a popup being blocked', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox
+        .stub(auth.$utilities, 'openNewTab')
+        .returns(Promise.reject('New Tab blocked!'));
+
+      auth.profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`;
+
+      const promise = auth.loginWithNewTab();
+
+      return promise
+        .catch(error => {
+          return error;
+        })
+        .then(error => {
+          expect(error).to.deep.equal('New Tab blocked!');
+          expect(auth.$promises.login).to.deep.equal(null);
+        });
+    });
+  });
+
   describe('function(loginWithRedirect)', () => {
     it('should resolve when we have logged in', () => {
       sandbox.stub(auth.profile, '$clear');
@@ -663,6 +769,36 @@ describe('salte-auth', () => {
 
       const promise = auth.logoutWithPopup();
       const duplicatePromise = auth.logoutWithPopup();
+
+      expect(promise).to.equal(duplicatePromise);
+
+      return promise;
+    });
+  });
+
+  describe('function(logoutWithNewTab)', () => {
+    it('should resolve when we have logged out', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
+
+      const promise = auth.logoutWithNewTab();
+
+      expect(auth.profile.$clear.callCount).to.equal(1);
+      expect(auth.$promises.logout).to.equal(promise);
+      return promise.then(() => {
+        expect(auth.$promises.logout).to.equal(null);
+      });
+    });
+
+    it('should prevent duplicate promises', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$validate');
+
+      const promise = auth.logoutWithNewTab();
+      const duplicatePromise = auth.logoutWithNewTab();
 
       expect(promise).to.equal(duplicatePromise);
 

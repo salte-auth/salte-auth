@@ -258,6 +258,36 @@ class SalteAuth {
   }
 
   /**
+   * Authenticates using the tab-based OAuth flow.
+   * @return {Promise} a promise that resolves when we finish authenticating
+   */
+  loginWithNewTab() {
+    if (this.$promises.login) {
+      return this.$promises.login;
+    }
+
+    this.profile.$clear();
+    this.$promises.login = this.$utilities.openNewTab(this.$loginUrl).then(() => {
+      this.$promises.login = null;
+      // We need to utilize local storage to retain our parsed values
+      if (this.$config.storageType === 'session') {
+        this.profile.$$transfer('local', 'session');
+      }
+      const error = this.profile.$validate();
+
+      if (error) {
+        this.profile.$clear();
+        return Promise.reject(error);
+      }
+    }).catch((error) => {
+      this.$promises.login = null;
+      return Promise.reject(error);
+    });
+
+    return this.$promises.login;
+  }
+
+  /**
    * Authenticates using the redirect-based OAuth flow.
    */
   loginWithRedirect() {
@@ -297,6 +327,23 @@ class SalteAuth {
 
     this.profile.$clear();
     this.$promises.logout = this.$utilities.openPopup(this.$deauthorizeUrl).then(() => {
+      this.$promises.logout = null;
+    });
+
+    return this.$promises.logout;
+  }
+
+  /**
+   * Unauthenticates using the tab-based OAuth flow.
+   * @return {Promise} a promise that resolves when we finish deauthenticating
+   */
+  logoutWithNewTab() {
+    if (this.$promises.logout) {
+      return this.$promises.logout;
+    }
+
+    this.profile.$clear();
+    this.$promises.logout = this.$utilities.openNewTab(this.$deauthorizeUrl).then(() => {
       this.$promises.logout = null;
     });
 
