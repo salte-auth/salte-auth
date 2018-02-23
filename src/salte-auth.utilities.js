@@ -155,10 +155,32 @@ class SalteAuthUtilities {
     }
 
     popupWindow.focus();
-    // TODO: Find a better way of tracking when a Popup Window closes.
+    // TODO: Find a better way of tracking when a Window closes.
     return new Promise((resolve) => {
       const checker = setInterval(() => {
         if (!popupWindow.closed) return;
+        clearInterval(checker);
+        setTimeout(resolve);
+      }, 100);
+    });
+  }
+
+  /**
+   * Opens a new tab
+   * @param {String} url the url to be loaded
+   * @return {Promise} resolves when the tab is closed
+   */
+  openNewTab(url) {
+    const tabWindow = window.open(url, '_blank');
+    if (!tabWindow) {
+      return Promise.reject(new ReferenceError('We were unable to open the new tab, its likely that the request was blocked.'));
+    }
+
+    tabWindow.focus();
+    // TODO: Find a better way of tracking when a Window closes.
+    return new Promise((resolve) => {
+      const checker = setInterval(() => {
+        if (!tabWindow.closed) return;
         clearInterval(checker);
         setTimeout(resolve);
       }, 100);

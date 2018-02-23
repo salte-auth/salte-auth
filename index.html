@@ -27,6 +27,9 @@
                 <input type="radio" name="type" value="popup"> Popup
             </label>
             <label>
+                <input type="radio" name="type" value="tab"> New Tab
+            </label>
+            <label>
                 <input type="radio" name="type" value="iframe"> Iframe
             </label>
         </div>
@@ -89,12 +92,14 @@
             var auth = new salte.SalteAuth(config);
 
             document.querySelector('#login').addEventListener('click', function() {
-                var type = document.querySelector('[name="type"]:checked').value
+                var type = document.querySelector('[name="type"]:checked').value;
                 switch (type) {
                     case 'redirect':
                         return auth.loginWithRedirect();
                     case 'popup':
                         return auth.loginWithPopup();
+                    case 'tab':
+                        return auth.loginWithNewTab();
                     case 'iframe':
                         return auth.loginWithIframe();
                 }
@@ -107,6 +112,8 @@
                         return auth.logoutWithRedirect();
                     case 'popup':
                         return auth.logoutWithPopup();
+                    case 'tab':
+                        return auth.logoutWithNewTab();
                     case 'iframe':
                         return auth.logoutWithIframe();
                 }
