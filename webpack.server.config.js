@@ -5,6 +5,7 @@ config.entry['salte-auth'].push('../index.html');
 config.devtool = 'inline-source-map';
 config.devServer = {
   host: '0.0.0.0',
+  port: '8081',
   historyApiFallback: true,
   disableHostCheck: true
 };
