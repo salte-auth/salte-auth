@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const deindent = require('deindent');
 const packageJson = require('./package.json');
-const args = require('yargs').argv;
+const { argv: args } = require('yargs');
 
 const isProd = args.p;
 
@@ -21,24 +21,15 @@ module.exports = {
   },
   devtool: 'source-map',
   module: {
-    rules: [
-      {
-        enforce: 'pre',
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'eslint-loader'
-      },
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader'
-      },
-      {
-        test: /\.html$/,
-        exclude: /node_modules/,
-        loader: 'html-loader'
-      }
-    ]
+    rules: [{
+      test: /\.js$/,
+      exclude: /node_modules/,
+      loader: 'babel-loader'
+    }, {
+      test: /\.html$/,
+      exclude: /node_modules/,
+      loader: 'html-loader'
+    }]
   },
   plugins: [
     new webpack.BannerPlugin({
