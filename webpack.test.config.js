@@ -6,15 +6,6 @@ module.exports = {
   },
   module: {
     rules: [{
-      enforce: 'pre',
-      test: /\.js$/,
-      include: /tests/,
-      loader: 'eslint-loader',
-      options: {
-        emitError: ci,
-        failOnError: ci
-      }
-    }, {
       test: /\.js$/,
       exclude: /node_modules/,
       loader: 'babel-loader'
