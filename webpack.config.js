@@ -4,7 +4,7 @@ const deindent = require('deindent');
 const packageJson = require('./package.json');
 const { argv: args } = require('yargs');
 
-const isProd = args.p;
+const isProd = args.mode === 'production';
 
 module.exports = {
   context: path.join(__dirname, 'src'),
@@ -30,6 +30,9 @@ module.exports = {
       exclude: /node_modules/,
       loader: 'html-loader'
     }]
+  },
+  optimization: {
+    minimize: isProd ? true : false
   },
   plugins: [
     new webpack.BannerPlugin({
