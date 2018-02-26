@@ -15,5 +15,8 @@ module.exports = {
       loader: 'html-loader'
     }]
   },
-  devtool: 'inline-source-map'
+  devtool: 'inline-source-map',
+  optimization: {
+    minimize: false
+  }
 };
