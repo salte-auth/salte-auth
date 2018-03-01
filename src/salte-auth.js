@@ -303,7 +303,7 @@ class SalteAuth {
     // NOTE: This prevents the other login types from racing "loginWithRedirect".
     // Without this someone could potentially call login somewhere else before
     // the app has a change to redirect. Which could result in an invalid state.
-    this.$promises.login = new Promise((resolve) => setTimeout(resolve));
+    this.$promises.login = new Promise(() => {});
 
     this.profile.$clear();
     this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
