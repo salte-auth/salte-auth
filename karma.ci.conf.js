@@ -43,15 +43,15 @@ module.exports = function(config) {
       base: 'SauceLabs',
       browserName: 'safari',
       version: '8'
-    }
+    },
     // TODO: For some reason Safari 7 gets fails to load
     // the test page, every other browser seems to work fine.
-    // Safari7: {
-    //   base: 'SauceLabs',
-    //   browserName: 'safari',
-    //   platform: 'OS X 10.9',
-    //   version: '7'
-    // }
+    Safari7: {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      platform: 'OS X 10.9',
+      version: '7'
+    }
   };
 
   const karmaConfig = {
