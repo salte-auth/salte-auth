@@ -289,7 +289,7 @@ class SalteAuth {
 
   /**
    * Authenticates using the redirect-based OAuth flow.
-   * @return {Promise} a promise that resolves on
+   * @return {Promise} a promise that resolves on the next event loop
    */
   loginWithRedirect() {
     if (!this.$config.redirectLoginCallback) {
