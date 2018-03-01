@@ -697,6 +697,10 @@ describe('salte-auth', () => {
   });
 
   describe('function(loginWithRedirect)', () => {
+    beforeEach(() => {
+      window.setTimeout.restore();
+    });
+
     it('should resolve when we have logged in', () => {
       sandbox.stub(auth.profile, '$clear');
       sandbox.stub(auth, '$loginUrl').get(() => location.href);
@@ -707,6 +711,22 @@ describe('salte-auth', () => {
       expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.profile.$redirectUrl).to.equal(location.href);
       expect(auth.$promises.logout).to.be.undefined;
+    });
+
+    it('should prevent duplicate promises', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => location.href);
+      auth.$config.redirectLoginCallback = sandbox.stub();
+
+      const promise = auth.loginWithRedirect();
+      const duplicatePromise = auth.loginWithRedirect();
+
+      expect(promise).to.equal(duplicatePromise);
+
+      expect(auth.profile.$clear.callCount).to.equal(1);
+      expect(auth.profile.$redirectUrl).to.equal(location.href);
+
+      return promise;
     });
 
     it('should require a "redirectLoginCallback" to be provided', () => {
