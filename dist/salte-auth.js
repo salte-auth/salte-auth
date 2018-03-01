@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.1.2
+ * @salte-io/salte-auth JavaScript Library v2.1.3
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7102,6 +7102,7 @@ var SalteAuth = function () {
 
     /**
      * Authenticates using the redirect-based OAuth flow.
+     * @return {Promise} a promise that resolves on
      */
 
   }, {
@@ -7111,9 +7112,22 @@ var SalteAuth = function () {
         throw new ReferenceError('A redirectLoginCallback is required to invoke "loginWithRedirect"!');
       }
 
+      if (this.$promises.login) {
+        return this.$promises.login;
+      }
+
+      // NOTE: This prevents the other login types from racing "loginWithRedirect".
+      // Without this someone could potentially call login somewhere else before
+      // the app has a change to redirect. Which could result in an invalid state.
+      this.$promises.login = new Promise(function (resolve) {
+        return setTimeout(resolve);
+      });
+
       this.profile.$clear();
       this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
       location.href = this.$loginUrl;
+
+      return this.$promises.login;
     }
 
     /**
