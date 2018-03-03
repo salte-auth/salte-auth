@@ -21,7 +21,8 @@ module.exports = function(config) {
 
     polyfills: [
       'fetch',
-      'Promise'
+      'Promise',
+      'URL'
     ],
 
     files: [

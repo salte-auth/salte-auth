@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { Providers } from '../../src/salte-auth.providers.js';
+import Providers from '../../src/salte-auth.providers.js';
 
 describe('salte-auth.providers', () => {
   describe('getter(auth0)', () => {

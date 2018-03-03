@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.1.4
+ * @salte-io/salte-auth JavaScript Library v2.1.5
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -6962,7 +6962,7 @@ var SalteAuth = function () {
       if (error) {
         this.profile.$clear();
       } else {
-        location.href = this.profile.$redirectUrl;
+        this.$utilities.$navigate(this.profile.$redirectUrl);
         this.profile.$redirectUrl = undefined;
       }
       this.$config.redirectLoginCallback(error);
@@ -6975,11 +6975,10 @@ var SalteAuth = function () {
         }
       });
 
-      this.$utilities.addFetchInterceptor(function (input, options) {
-        if (_this.$utilities.checkForMatchingUrl(input, _this.$config.endpoints)) {
+      this.$utilities.addFetchInterceptor(function (request) {
+        if (_this.$utilities.checkForMatchingUrl(request.url, _this.$config.endpoints)) {
           return _this.retrieveAccessToken().then(function (accessToken) {
-            options.headers = options.headers || {};
-            options.headers.Authorization = 'Bearer ' + accessToken;
+            request.headers.set('Authorization', 'Bearer ' + accessToken);
           });
         }
       });
@@ -7123,7 +7122,7 @@ var SalteAuth = function () {
 
       this.profile.$clear();
       this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
-      location.href = this.$loginUrl;
+      this.$utilities.$navigate(this.$loginUrl);
 
       return this.$promises.login;
     }
@@ -7201,7 +7200,7 @@ var SalteAuth = function () {
     key: 'logoutWithRedirect',
     value: function logoutWithRedirect() {
       this.profile.$clear();
-      location.href = this.$deauthorizeUrl;
+      this.$utilities.$navigate(this.$deauthorizeUrl);
     }
 
     /**
@@ -7356,6 +7355,7 @@ var SalteAuth = function () {
 
 (0, _set2.default)(window, 'salte.SalteAuth', (0, _get2.default)(window, 'salte.SalteAuth', SalteAuth));
 exports.SalteAuth = SalteAuth;
+exports.default = SalteAuth;
 
 /***/ }),
 
@@ -7386,14 +7386,6 @@ var _find = __webpack_require__(/*! lodash/find */ "../node_modules/lodash/find.
 
 var _find2 = _interopRequireDefault(_find);
 
-var _get = __webpack_require__(/*! lodash/get */ "../node_modules/lodash/get.js");
-
-var _get2 = _interopRequireDefault(_get);
-
-var _set = __webpack_require__(/*! lodash/set */ "../node_modules/lodash/set.js");
-
-var _set2 = _interopRequireDefault(_set);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -7409,9 +7401,6 @@ var SalteAuthProfile = function () {
   function SalteAuthProfile(config) {
     _classCallCheck(this, SalteAuthProfile);
 
-    if (window.salte.SalteAuthProfile.$instance) {
-      return window.salte.SalteAuthProfile.$instance;
-    }
     /** @ignore */
     this.$$config = (0, _defaultsDeep2.default)(config, {
       validation: {
@@ -7435,7 +7424,6 @@ var SalteAuthProfile = function () {
         this.$parse(key, decodeURIComponent(value));
       }
     }
-    window.salte.SalteAuthProfile.$instance = this;
   }
 
   /**
@@ -7850,8 +7838,8 @@ var SalteAuthProfile = function () {
   return SalteAuthProfile;
 }();
 
-(0, _set2.default)(window, 'salte.SalteAuthProfile', (0, _get2.default)(window, 'salte.SalteAuthProfile', SalteAuthProfile));
 exports.SalteAuthProfile = SalteAuthProfile;
+exports.default = SalteAuthProfile;
 
 /***/ }),
 
@@ -7951,6 +7939,7 @@ var Providers = function () {
 ;
 
 exports.Providers = Providers;
+exports.default = Providers;
 
 /***/ }),
 
@@ -7975,14 +7964,6 @@ var _assign = __webpack_require__(/*! lodash/assign */ "../node_modules/lodash/a
 
 var _assign2 = _interopRequireDefault(_assign);
 
-var _get = __webpack_require__(/*! lodash/get */ "../node_modules/lodash/get.js");
-
-var _get2 = _interopRequireDefault(_get);
-
-var _set = __webpack_require__(/*! lodash/set */ "../node_modules/lodash/set.js");
-
-var _set2 = _interopRequireDefault(_set);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -7996,10 +7977,6 @@ var SalteAuthUtilities = function () {
    */
   function SalteAuthUtilities() {
     _classCallCheck(this, SalteAuthUtilities);
-
-    if (window.salte.SalteAuthUtilities.$instance) {
-      return window.salte.SalteAuthUtilities.$instance;
-    }
 
     /** @ignore */
     this.$interceptors = {
@@ -8038,15 +8015,15 @@ var SalteAuthUtilities = function () {
 
     if (window.fetch) {
       (function (fetch) {
-        window.fetch = function (input) {
+        window.fetch = function (input, options) {
           var _this2 = this;
 
-          var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+          var request = input instanceof Request ? input : new Request(input, options);
 
           var promises = [];
           for (var i = 0; i < self.$interceptors.fetch.length; i++) {
             var interceptor = self.$interceptors.fetch[i];
-            promises.push(interceptor(input, options));
+            promises.push(interceptor(request));
           }
           return Promise.all(promises).then(function () {
             return fetch.call(_this2, input, options);
@@ -8054,7 +8031,6 @@ var SalteAuthUtilities = function () {
         };
       })(fetch);
     }
-    window.salte.SalteAuthUtilities.$instance = this;
   }
 
   /**
@@ -8279,6 +8255,19 @@ var SalteAuthUtilities = function () {
      */
 
   }, {
+    key: '$navigate',
+
+
+    /**
+     * Navigates to the url provided.
+     * @param {String} url the url to navigate to
+     * @private
+     */
+    /* istanbul ignore next */
+    value: function $navigate(url) {
+      location.href = url;
+    }
+  }, {
     key: '$iframe',
     get: function get() {
       if (window.self === window.top) {
@@ -8306,8 +8295,8 @@ var SalteAuthUtilities = function () {
   return SalteAuthUtilities;
 }();
 
-(0, _set2.default)(window, 'salte.SalteAuthUtilities', (0, _get2.default)(window, 'salte.SalteAuthUtilities', SalteAuthUtilities));
 exports.SalteAuthUtilities = SalteAuthUtilities;
+exports.default = SalteAuthUtilities;
 
 /***/ }),
 

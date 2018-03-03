@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { SalteAuthProfile } from '../../src/salte-auth.profile.js';
+import SalteAuthProfile from '../../src/salte-auth.profile.js';
 
 describe('salte-auth.profile', () => {
   let sandbox, profile;
@@ -12,35 +12,20 @@ describe('salte-auth.profile', () => {
 
   afterEach(() => {
     sandbox.restore();
-    delete window.salte.SalteAuthProfile.$instance;
   });
 
   describe('function(constructor)', () => {
     beforeEach(() => {
-      delete window.salte.SalteAuthProfile.$instance;
       sessionStorage.clear();
-    });
-
-    it('should be a singleton', () => {
-      profile = new SalteAuthProfile();
-      profile.bogus = 'test';
-
-      expect(profile.bogus).to.equal('test');
-      expect(new SalteAuthProfile().bogus).to.equal('test');
     });
 
     it('should recreate the path to the instance', () => {
       profile.bogus = 'test';
       expect(profile.bogus).to.equal('test');
 
-      delete window.salte.SalteAuthProfile.$instance;
-
       profile = new SalteAuthProfile();
 
       expect(profile.bogus).to.be.undefined;
-      expect(window.salte.SalteAuthProfile.$instance).to.be.instanceof(
-        SalteAuthProfile
-      );
     });
 
     it('should support parsing hash parameters', () => {
@@ -439,10 +424,6 @@ describe('salte-auth.profile', () => {
   });
 
   describe('getter($storage)', () => {
-    afterEach(() => {
-      salte.auth.$config = {};
-    });
-
     it('should support using sessionStorage', () => {
       expect(profile.$$getStorage('session')).to.equal(sessionStorage);
     });
