@@ -93,7 +93,7 @@ class SalteAuth {
       if (error) {
         this.profile.$clear();
       } else {
-        location.href = this.profile.$redirectUrl;
+        this.$utilities.$navigate(this.profile.$redirectUrl);
         this.profile.$redirectUrl = undefined;
       }
       this.$config.redirectLoginCallback(error);
@@ -106,11 +106,10 @@ class SalteAuth {
         }
       });
 
-      this.$utilities.addFetchInterceptor((input, options) => {
-        if (this.$utilities.checkForMatchingUrl(input, this.$config.endpoints)) {
+      this.$utilities.addFetchInterceptor((request) => {
+        if (this.$utilities.checkForMatchingUrl(request.url, this.$config.endpoints)) {
           return this.retrieveAccessToken().then((accessToken) => {
-            options.headers = options.headers || {};
-            options.headers.Authorization = `Bearer ${accessToken}`;
+            request.headers.set('Authorization', `Bearer ${accessToken}`);
           });
         }
       });
@@ -307,7 +306,7 @@ class SalteAuth {
 
     this.profile.$clear();
     this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
-    location.href = this.$loginUrl;
+    this.$utilities.$navigate(this.$loginUrl);
 
     return this.$promises.login;
   }
@@ -367,7 +366,7 @@ class SalteAuth {
    */
   logoutWithRedirect() {
     this.profile.$clear();
-    location.href = this.$deauthorizeUrl;
+    this.$utilities.$navigate(this.$deauthorizeUrl);
   }
 
   /**
@@ -427,3 +426,4 @@ class SalteAuth {
 
 set(window, 'salte.SalteAuth', get(window, 'salte.SalteAuth', SalteAuth));
 export { SalteAuth };
+export default SalteAuth;

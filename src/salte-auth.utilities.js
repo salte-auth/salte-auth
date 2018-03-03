@@ -1,6 +1,4 @@
 import assign from 'lodash/assign';
-import get from 'lodash/get';
-import set from 'lodash/set';
 
 /**
  * Basic utilities to support the authentication flow
@@ -10,10 +8,6 @@ class SalteAuthUtilities {
    * Wraps all XHR and Fetch (if available) requests to allow promise interceptors
    */
   constructor() {
-    if (window.salte.SalteAuthUtilities.$instance) {
-      return window.salte.SalteAuthUtilities.$instance;
-    }
-
     /** @ignore */
     this.$interceptors = {
       fetch: [],
@@ -49,11 +43,13 @@ class SalteAuthUtilities {
 
     if (window.fetch) {
       (function(fetch) {
-        window.fetch = function(input, options = {}) {
+        window.fetch = function(input, options) {
+          const request = input instanceof Request ? input : new Request(input, options);
+
           const promises = [];
           for (let i = 0; i < self.$interceptors.fetch.length; i++) {
             const interceptor = self.$interceptors.fetch[i];
-            promises.push(interceptor(input, options));
+            promises.push(interceptor(request));
           }
           return Promise.all(promises).then(() => {
             return fetch.call(this, input, options);
@@ -61,7 +57,6 @@ class SalteAuthUtilities {
         };
       })(fetch);
     }
-    window.salte.SalteAuthUtilities.$instance = this;
   }
 
   /**
@@ -266,7 +261,17 @@ class SalteAuthUtilities {
     }
     return null;
   }
+
+  /**
+   * Navigates to the url provided.
+   * @param {String} url the url to navigate to
+   * @private
+   */
+  /* istanbul ignore next */
+  $navigate(url) {
+    location.href = url;
+  }
 }
 
-set(window, 'salte.SalteAuthUtilities', get(window, 'salte.SalteAuthUtilities', SalteAuthUtilities));
 export { SalteAuthUtilities };
+export default SalteAuthUtilities;

@@ -1,16 +1,14 @@
 import { expect } from 'chai';
 
-import { SalteAuth } from '../../../src/salte-auth.js';
+import SalteAuthUtilities from '../../../src/salte-auth.utilities.js';
 import wso2 from '../../../src/providers/wso2.js';
 
-const auth = new SalteAuth({
-  provider: 'wso2'
-});
-
 describe('wso2', () => {
+  const utilities = new SalteAuthUtilities();
+
   describe('function(deauthorizeUrl)', () => {
     it('should create a logout url', () => {
-      const url = wso2.deauthorizeUrl.call(auth, {
+      const url = wso2.deauthorizeUrl.call({ $utilities: utilities }, {
         providerUrl: 'https://api.salte.io',
         redirectUrl: `${location.protocol}//${location.host}`,
         relyingParty: 'test123'
