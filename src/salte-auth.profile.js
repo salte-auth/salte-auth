@@ -1,7 +1,5 @@
 import defaultsDeep from 'lodash/defaultsDeep';
 import find from 'lodash/find';
-import get from 'lodash/get';
-import set from 'lodash/set';
 
 /**
  * All the profile information associated with the current authentication session
@@ -12,9 +10,6 @@ class SalteAuthProfile {
    * @param {Config} config configuration for salte auth
    */
   constructor(config) {
-    if (window.salte.SalteAuthProfile.$instance) {
-      return window.salte.SalteAuthProfile.$instance;
-    }
     /** @ignore */
     this.$$config = defaultsDeep(config, {
       validation: {
@@ -33,7 +28,6 @@ class SalteAuthProfile {
         this.$parse(key, decodeURIComponent(value));
       }
     }
-    window.salte.SalteAuthProfile.$instance = this;
   }
 
   /**
@@ -390,5 +384,5 @@ class SalteAuthProfile {
   }
 }
 
-set(window, 'salte.SalteAuthProfile', get(window, 'salte.SalteAuthProfile', SalteAuthProfile));
 export { SalteAuthProfile };
+export default SalteAuthProfile;
