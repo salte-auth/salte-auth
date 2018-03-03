@@ -1,16 +1,14 @@
 import { expect } from 'chai';
 
-import { SalteAuth } from '../../../src/salte-auth.js';
+import SalteAuthUtilities from '../../../src/salte-auth.utilities.js';
 import azure from '../../../src/providers/azure.js';
 
-const auth = new SalteAuth({
-  provider: 'azure'
-});
-
 describe('azure', () => {
+  const utilities = new SalteAuthUtilities();
+
   describe('function(authorizeEndpoint)', () => {
     it('should create a authorize endpoint', () => {
-      expect(azure.authorizeEndpoint.call(auth, {
+      expect(azure.authorizeEndpoint.call({ $utilities: utilities }, {
         providerUrl: 'https://login.microsoftonline.com/my-tenant'
       })).to.equal(`https://login.microsoftonline.com/my-tenant/oauth2/authorize`);
     });
@@ -18,7 +16,7 @@ describe('azure', () => {
 
   describe('function(deauthorizeUrl)', () => {
     it('should create a logout url', () => {
-      const url = azure.deauthorizeUrl.call(auth, {
+      const url = azure.deauthorizeUrl.call({ $utilities: utilities }, {
         providerUrl: 'https://login.microsoftonline.com/my-tenant',
         redirectUrl: `${location.protocol}//${location.host}`
       });
