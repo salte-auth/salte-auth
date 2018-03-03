@@ -43,11 +43,13 @@ class SalteAuthUtilities {
 
     if (window.fetch) {
       (function(fetch) {
-        window.fetch = function(input, options = {}) {
+        window.fetch = function(input, options) {
+          const request = input instanceof Request ? input : new Request(input, options);
+
           const promises = [];
           for (let i = 0; i < self.$interceptors.fetch.length; i++) {
             const interceptor = self.$interceptors.fetch[i];
-            promises.push(interceptor(input, options));
+            promises.push(interceptor(request));
           }
           return Promise.all(promises).then(() => {
             return fetch.call(this, input, options);

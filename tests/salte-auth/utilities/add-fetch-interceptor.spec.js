@@ -5,9 +5,9 @@ import SalteAuthUtilities from '../../../src/salte-auth.utilities.js';
 describe('function(addFetchInterceptor)', () => {
   let sandbox, utilities;
   beforeEach(() => {
-    utilities = new SalteAuthUtilities();
     sandbox = sinon.createSandbox();
-    sandbox.stub(window, 'fetch');
+    sandbox.stub(window, 'fetch').returns(Promise.resolve());
+    utilities = new SalteAuthUtilities();
   });
 
   afterEach(() => {
@@ -16,11 +16,14 @@ describe('function(addFetchInterceptor)', () => {
 
   it('should intercept Fetch requests', () => {
     const url = `${location.protocol}//${location.host}/context.html`;
-    utilities.addFetchInterceptor((input, options) => {
-      expect(input).to.equal(url);
-      expect(options).to.deep.equal({
-        method: 'POST'
-      });
+    utilities.addFetchInterceptor((request) => {
+      expect(request.url).to.equal(url);
+      expect(request.method).to.equal('POST');
+      request.headers.set('Authorization', 'test');
+    });
+
+    utilities.addFetchInterceptor((request) => {
+      expect(request.headers.get('Authorization')).to.equal('test');
     });
 
     return fetch(url, {
@@ -28,14 +31,38 @@ describe('function(addFetchInterceptor)', () => {
     });
   });
 
-  it('should default the options if none are provided', () => {
+  it('should support the Request class', () => {
     const url = `${location.protocol}//${location.host}/context.html`;
-    utilities.addFetchInterceptor((input, options) => {
-      expect(input).to.equal(url);
-      expect(options).to.deep.equal({});
+    utilities.addFetchInterceptor((request) => {
+      expect(request.url).to.equal(url);
+      expect(request.method).to.equal('POST');
+      request.headers.set('Authorization', 'test');
     });
 
-    return fetch(url);
+    utilities.addFetchInterceptor((request) => {
+      expect(request.headers.get('Authorization')).to.equal('test');
+    });
+
+    return fetch(new Request(url, {
+      method: 'POST'
+    }));
+  });
+
+  it('should support the URL class', () => {
+    const url = `${location.protocol}//${location.host}/context.html`;
+    utilities.addFetchInterceptor((request) => {
+      expect(request.url).to.equal(url);
+      expect(request.method).to.equal('POST');
+      request.headers.set('Authorization', 'test');
+    });
+
+    utilities.addFetchInterceptor((request) => {
+      expect(request.headers.get('Authorization')).to.equal('test');
+    });
+
+    return fetch(new URL(url), {
+      method: 'POST'
+    });
   });
 
   it('should support fetch not being available', () => {
