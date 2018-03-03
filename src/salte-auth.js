@@ -106,11 +106,10 @@ class SalteAuth {
         }
       });
 
-      this.$utilities.addFetchInterceptor((input, options) => {
-        if (this.$utilities.checkForMatchingUrl(input, this.$config.endpoints)) {
+      this.$utilities.addFetchInterceptor((request) => {
+        if (this.$utilities.checkForMatchingUrl(request.url, this.$config.endpoints)) {
           return this.retrieveAccessToken().then((accessToken) => {
-            options.headers = options.headers || {};
-            options.headers.Authorization = `Bearer ${accessToken}`;
+            request.headers.set('Authorization', `Bearer ${accessToken}`);
           });
         }
       });
