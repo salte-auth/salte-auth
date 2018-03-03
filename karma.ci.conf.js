@@ -65,7 +65,8 @@ module.exports = function(config) {
 
     polyfill: [
       'Promise',
-      'fetch'
+      'fetch',
+      'URL'
     ],
 
     files: [

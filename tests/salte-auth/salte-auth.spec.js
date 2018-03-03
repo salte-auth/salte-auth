@@ -214,9 +214,9 @@ describe('salte-auth', () => {
         .stub(auth, 'retrieveAccessToken')
         .returns(Promise.resolve('55555-55555'));
 
-      auth.$utilities.addFetchInterceptor((input, options) => {
+      auth.$utilities.addFetchInterceptor((request) => {
         return Promise.resolve().then(() => {
-          expect(options.headers.Authorization).to.equal('Bearer 55555-55555');
+          expect(request.headers.get('Authorization')).to.equal('Bearer 55555-55555');
         });
       });
 
@@ -224,9 +224,9 @@ describe('salte-auth', () => {
     });
 
     it('should not request a new access token if we do not need to be authenticated', () => {
-      auth.$utilities.addFetchInterceptor((input, options) => {
+      auth.$utilities.addFetchInterceptor((request) => {
         return Promise.resolve().then(() => {
-          expect(options.headers).to.be.undefined;
+          expect(request.headers.get('Authorization')).to.equal(null);
         });
       });
 
