@@ -852,29 +852,6 @@ describe('salte-auth', () => {
       });
     });
 
-    it('should support using a popup to auto login', () => {
-      auth.$config.loginType = 'popup';
-
-      sandbox.stub(auth, 'loginWithPopup').returns(Promise.resolve());
-      sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
-      sandbox.stub(auth.profile, 'accessTokenExpired').get(() => true);
-      sandbox.stub(auth.profile, '$clearErrors');
-      sandbox.stub(auth.profile, '$validate');
-      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
-
-      const promise = auth.retrieveAccessToken();
-
-      auth.profile.$accessToken = '55555-55555';
-
-      expect(auth.$promises.token).to.equal(promise);
-      return promise.then(accessToken => {
-        expect(auth.loginWithPopup.callCount).to.equal(1);
-        expect(auth.profile.$clearErrors.callCount).to.equal(1);
-        expect(accessToken).to.equal('55555-55555');
-        expect(auth.$promises.token).to.equal(null);
-      });
-    });
-
     it('should bypass fetching the tokens if they have not expired', () => {
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
       sandbox.stub(auth.profile, 'accessTokenExpired').get(() => false);
@@ -905,7 +882,7 @@ describe('salte-auth', () => {
           return error;
         })
         .then(error => {
-          expect(error.message).to.equal('Invaid Login Type (redirect)');
+          expect(error.message).to.equal('Invalid Login Type (redirect)');
           expect(auth.$promises.token).to.equal(null);
         });
     });
