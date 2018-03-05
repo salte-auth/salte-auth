@@ -57,18 +57,18 @@ import { SalteAuth } from '@salte-io/salte-auth';
 
 // Configure SalteAuth with Auth0's url and client id.
 const auth = new SalteAuth({
-  providerUrl: 'https://salte.auth0.com',
+  providerUrl: 'https://salte-alpha.auth0.com',
   responseType: 'id_token',
   redirectUrl: location.origin,
-  clientId: '4YoYZLd9NWnSsYdKZlnWP9r5BN0b0Tgd',
+  clientId: 'mM6h2LHJikwdbkvdoiyE8kHhL7gcV8Wb',
   scope: 'openid',
 
   routes: [
-      'http://localhost:8080/account'
+    'http://localhost:8080/account'
   ],
 
   endpoints: [
-      'https://jsonplaceholder.typicode.com/posts/1'
+    'https://jsonplaceholder.typicode.com/posts/1'
   ],
 
   provider: 'auth0'
