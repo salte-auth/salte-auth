@@ -380,13 +380,11 @@ class SalteAuth {
 
     this.$promises.token = Promise.resolve();
     if (this.profile.idTokenExpired) {
-      if (this.$config.loginType === 'popup') {
-        this.$promises.token = this.loginWithPopup();
-      } else if ([undefined, null, 'iframe'].indexOf(this.$config.loginType) !== -1) {
+      if ([undefined, null, 'iframe'].indexOf(this.$config.loginType) !== -1) {
         this.$promises.token = this.loginWithIframe();
       } else {
         this.$promises.token = null;
-        return Promise.reject(new ReferenceError(`Invaid Login Type (${this.$config.loginType})`));
+        return Promise.reject(new ReferenceError(`Invalid Login Type (${this.$config.loginType})`));
       }
     }
 
