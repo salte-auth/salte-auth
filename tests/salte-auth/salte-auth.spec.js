@@ -920,23 +920,6 @@ describe('salte-auth', () => {
         expect(error.code).to.equal('login_canceled');
       });
     });
-
-    it('should handle the login being blocked', () => {
-      auth.$config.loginType = 'popup';
-
-      sandbox
-        .stub(auth, 'loginWithPopup')
-        .returns(Promise.reject('Popup blocked!'));
-      sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
-
-      const promise = auth.retrieveAccessToken();
-
-      expect(auth.$promises.token).to.equal(promise);
-      return promise.catch(error => {
-        expect(error).to.deep.equal('Popup blocked!');
-        expect(auth.$promises.token).to.equal(null);
-      });
-    });
   });
 
   describe('function($$onRouteChanged)', () => {
