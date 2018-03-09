@@ -1,6 +1,6 @@
 {
   "name": "@salte-io/salte-auth",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "main": "dist/salte-auth.min.js",
   "description": "OAuth 2.0 for the masses!",
   "homepage": "https://github.com/salte-io/salte-auth",
@@ -63,7 +63,7 @@
     "promise-polyfill": "^7.0.0",
     "publish-latest": "^1.1.2",
     "remove-lockfiles": "^2.0.0",
-    "semantic-release": "^12.2.2",
+    "semantic-release": "^12.0.0",
     "sinon": "^4.0.0",
     "unfetch": "^3.0.0",
     "uuid": "^3.0.0",
