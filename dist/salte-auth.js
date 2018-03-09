@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.1.6
+ * @salte-io/salte-auth JavaScript Library v2.1.7
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
