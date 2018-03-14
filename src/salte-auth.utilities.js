@@ -171,6 +171,7 @@ class SalteAuthUtilities {
       return Promise.reject(new ReferenceError('We were unable to open the new tab, its likely that the request was blocked.'));
     }
 
+    tabWindow.name = 'salte-auth';
     tabWindow.focus();
     // TODO: Find a better way of tracking when a Window closes.
     return new Promise((resolve) => {
