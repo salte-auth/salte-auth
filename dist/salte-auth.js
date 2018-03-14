@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.1.7
+ * @salte-io/salte-auth JavaScript Library v2.1.8
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -8170,6 +8170,7 @@ var SalteAuthUtilities = function () {
         return Promise.reject(new ReferenceError('We were unable to open the new tab, its likely that the request was blocked.'));
       }
 
+      tabWindow.name = 'salte-auth';
       tabWindow.focus();
       // TODO: Find a better way of tracking when a Window closes.
       return new Promise(function (resolve) {
