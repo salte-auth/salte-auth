@@ -63,6 +63,7 @@ class SalteAuth {
     this.$promises = {};
     /**
      * The configuration for salte auth
+     * @type {Config}
      * @private
      */
     this.$config = config;
@@ -118,6 +119,8 @@ class SalteAuth {
       document.addEventListener('click', this.$$onRouteChanged.bind(this));
       setTimeout(this.$$onRouteChanged.bind(this));
     }
+
+    // TODO(v3.0.0): Revoke singleton status from `salte-auth`.
     window.salte.auth = this;
   }
 
@@ -203,6 +206,13 @@ class SalteAuth {
   /**
    * Authenticates using the iframe-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithIframe().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
    */
   loginWithIframe() {
     if (this.$promises.login) {
@@ -229,6 +239,13 @@ class SalteAuth {
   /**
    * Authenticates using the popup-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithPopup().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
    */
   loginWithPopup() {
     if (this.$promises.login) {
@@ -259,6 +276,13 @@ class SalteAuth {
   /**
    * Authenticates using the tab-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithNewTab().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
    */
   loginWithNewTab() {
     if (this.$promises.login) {
@@ -288,7 +312,10 @@ class SalteAuth {
 
   /**
    * Authenticates using the redirect-based OAuth flow.
-   * @return {Promise} a promise that resolves on the next event loop
+   * @return {Promise} a promise intended to block future login attempts.
+   *
+   * @example
+   * auth.loginWithRedirect(); // Don't bother with utilizing the promise here, it never resolves.
    */
   loginWithRedirect() {
     if (!this.$config.redirectLoginCallback) {
@@ -314,6 +341,13 @@ class SalteAuth {
   /**
    * Unauthenticates using the iframe-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithIframe().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
    */
   logoutWithIframe() {
     if (this.$promises.logout) {
@@ -330,6 +364,13 @@ class SalteAuth {
   /**
    * Unauthenticates using the popup-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithPopup().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
    */
   logoutWithPopup() {
     if (this.$promises.logout) {
@@ -347,6 +388,13 @@ class SalteAuth {
   /**
    * Unauthenticates using the tab-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithNewTab().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
    */
   logoutWithNewTab() {
     if (this.$promises.logout) {
@@ -363,6 +411,9 @@ class SalteAuth {
 
   /**
    * Logs the user out of their configured identity provider.
+   *
+   * @example
+   * auth.logoutWithRedirect();
    */
   logoutWithRedirect() {
     this.profile.$clear();
