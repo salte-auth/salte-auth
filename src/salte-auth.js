@@ -62,6 +62,11 @@ class SalteAuth {
      */
     this.$promises = {};
     /**
+     * The registered listeners
+     * @private
+     */
+    this.$listeners = {};
+    /**
      * The configuration for salte auth
      * @type {Config}
      * @private
@@ -97,7 +102,19 @@ class SalteAuth {
         this.$utilities.$navigate(this.profile.$redirectUrl);
         this.profile.$redirectUrl = undefined;
       }
-      this.$config.redirectLoginCallback(error);
+
+      // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
+      this.$config.redirectLoginCallback && this.$config.redirectLoginCallback(error);
+
+      // Delay for an event loop to give users time to register a listener.
+      setTimeout(() => {
+        const action = this.profile.$actions(this.profile.$state);
+        if (action === 'login') {
+          this.$fire('login', error);
+        } else if (action === 'logout') {
+          this.$fire('logout', error);
+        }
+      });
     } else {
       this.$utilities.addXHRInterceptor((request, data) => {
         if (this.$utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
@@ -122,6 +139,10 @@ class SalteAuth {
 
     // TODO(v3.0.0): Revoke singleton status from `salte-auth`.
     window.salte.auth = this;
+
+    if (this.$config.redirectLoginCallback) {
+      console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
+    }
   }
 
   /**
@@ -204,12 +225,78 @@ class SalteAuth {
   }
 
   /**
-   * Authenticates using the iframe-based OAuth flow.
-   * @return {Promise} a promise that resolves when we finish authenticating
+   * Listens for an event to be invoked.
+   * @param {('login'|'logout')} eventType the event to listen for.
+   * @param {Function} callback A callback that fires when the specified event occurs.
    *
    * @example
-   * auth.loginWithIframe().then(() => {
-   *   console.log('success!');
+   * auth.on('login', (error, user) => {
+   *   if (error) {
+   *     console.log('something bad happened!');
+   *   }
+   *
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * });
+   */
+  on(eventType, callback) {
+    if (!['login', 'logout'].includes(eventType)) {
+      throw new ReferenceError(`Unknown Event Type (${eventType})`);
+    } else if (typeof callback !== 'function') {
+      throw new ReferenceError('Invalid callback provided!');
+    }
+
+    this.$listeners[eventType] = this.$listeners[eventType] || [];
+    this.$listeners[eventType].push(callback);
+  }
+
+  /**
+   * Deregister a callback previously registered.
+   * @param {('login'|'logout')} eventType the event to deregister.
+   * @param {Function} callback A callback that fires when the specified event occurs.
+   *
+   * @example
+   * const someFunction = function() {};
+   *
+   * auth.on('login', someFunction);
+   *
+   * auth.off('login', someFunction);
+   */
+  off(eventType, callback) {
+    if (!['login', 'logout'].includes(eventType)) {
+      throw new ReferenceError(`Unknown Event Type (${eventType})`);
+    } else if (typeof callback !== 'function') {
+      throw new ReferenceError('Invalid callback provided!');
+    }
+
+    const eventListeners = this.$listeners[eventType];
+    if (!eventListeners || !eventListeners.length) return;
+
+    const index = eventListeners.indexOf(callback);
+    eventListeners.splice(index, 1);
+  }
+
+  /**
+   * Fires off an event to a given set of listeners
+   * @param {String} eventType The event that occurred.
+   * @param {Error} error The error tied to this event.
+   * @param {*} data The data tied to this event.
+   * @private
+   */
+  $fire(eventType, error, data) {
+    const eventListeners = this.$listeners[eventType];
+
+    if (!eventListeners || !eventListeners.length) return;
+
+    eventListeners.forEach((listener) => listener(error, data));
+  }
+
+  /**
+   * Authenticates using the iframe-based OAuth flow.
+   * @return {Promise<Object>} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithIframe().then((user) => {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
    * }).catch((error) => {
    *   console.error('Whoops something went wrong!', error);
    * });
@@ -228,8 +315,13 @@ class SalteAuth {
         this.profile.$clear();
         return Promise.reject(error);
       }
+
+      const user = this.profile.userInfo;
+      this.$fire('login', null, user);
+      return user;
     }).catch((error) => {
       this.$promises.login = null;
+      this.$fire('login', error);
       return Promise.reject(error);
     });
 
@@ -238,11 +330,11 @@ class SalteAuth {
 
   /**
    * Authenticates using the popup-based OAuth flow.
-   * @return {Promise} a promise that resolves when we finish authenticating
+   * @return {Promise<Object>} a promise that resolves when we finish authenticating
    *
    * @example
-   * auth.loginWithPopup().then(() => {
-   *   console.log('success!');
+   * auth.loginWithPopup().then((user) => {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
    * }).catch((error) => {
    *   console.error('Whoops something went wrong!', error);
    * });
@@ -265,8 +357,13 @@ class SalteAuth {
         this.profile.$clear();
         return Promise.reject(error);
       }
+
+      const user = this.profile.userInfo;
+      this.$fire('login', null, user);
+      return user;
     }).catch((error) => {
       this.$promises.login = null;
+      this.$fire('login', error);
       return Promise.reject(error);
     });
 
@@ -275,11 +372,11 @@ class SalteAuth {
 
   /**
    * Authenticates using the tab-based OAuth flow.
-   * @return {Promise} a promise that resolves when we finish authenticating
+   * @return {Promise<Object>} a promise that resolves when we finish authenticating
    *
    * @example
-   * auth.loginWithNewTab().then(() => {
-   *   console.log('success!');
+   * auth.loginWithNewTab().then((user) => {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
    * }).catch((error) => {
    *   console.error('Whoops something went wrong!', error);
    * });
@@ -302,8 +399,13 @@ class SalteAuth {
         this.profile.$clear();
         return Promise.reject(error);
       }
+
+      const user = this.profile.userInfo;
+      this.$fire('login', null, user);
+      return user;
     }).catch((error) => {
       this.$promises.login = null;
+      this.$fire('login', error);
       return Promise.reject(error);
     });
 
@@ -318,8 +420,8 @@ class SalteAuth {
    * auth.loginWithRedirect(); // Don't bother with utilizing the promise here, it never resolves.
    */
   loginWithRedirect() {
-    if (!this.$config.redirectLoginCallback) {
-      throw new ReferenceError('A redirectLoginCallback is required to invoke "loginWithRedirect"!');
+    if (this.$config.redirectLoginCallback) {
+      console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
     }
 
     if (this.$promises.login) {
@@ -333,7 +435,10 @@ class SalteAuth {
 
     this.profile.$clear();
     this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
-    this.$utilities.$navigate(this.$loginUrl);
+    const url = this.$loginUrl;
+
+    this.profile.$actions(this.profile.$localState, 'login');
+    this.$utilities.$navigate(url);
 
     return this.$promises.login;
   }
@@ -357,6 +462,11 @@ class SalteAuth {
     this.profile.$clear();
     this.$promises.logout = this.$utilities.createIframe(this.$deauthorizeUrl).then(() => {
       this.$promises.logout = null;
+      this.$fire('logout');
+    }).catch((error) => {
+      this.$promises.logout = null;
+      this.$fire('logout', error);
+      return Promise.reject(error);
     });
     return this.$promises.logout;
   }
@@ -380,6 +490,11 @@ class SalteAuth {
     this.profile.$clear();
     this.$promises.logout = this.$utilities.openPopup(this.$deauthorizeUrl).then(() => {
       this.$promises.logout = null;
+      this.$fire('logout');
+    }).catch((error) => {
+      this.$promises.logout = null;
+      this.$fire('logout', error);
+      return Promise.reject(error);
     });
 
     return this.$promises.logout;
@@ -404,6 +519,11 @@ class SalteAuth {
     this.profile.$clear();
     this.$promises.logout = this.$utilities.openNewTab(this.$deauthorizeUrl).then(() => {
       this.$promises.logout = null;
+      this.$fire('logout');
+    }).catch((error) => {
+      this.$promises.logout = null;
+      this.$fire('logout', error);
+      return Promise.reject(error);
     });
 
     return this.$promises.logout;
@@ -417,7 +537,10 @@ class SalteAuth {
    */
   logoutWithRedirect() {
     this.profile.$clear();
-    this.$utilities.$navigate(this.$deauthorizeUrl);
+    const url = this.$deauthorizeUrl;
+
+    this.profile.$actions(this.profile.$localState, 'logout');
+    this.$utilities.$navigate(url);
   }
 
   /**
