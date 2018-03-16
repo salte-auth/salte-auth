@@ -213,6 +213,21 @@ class SalteAuthProfile {
   }
 
   /**
+   * Sets or Gets an action based on whether a action was passed.
+   * @param {String} state The state this action is tied to.
+   * @param {String} action The action to store.
+   * @return {String|undefined} Returns a string if an action wasn't provided.
+   * @private
+   */
+  $actions(state, action) {
+    if (action) {
+      this.$saveItem(`salte.auth.action.${state}`, action);
+    } else {
+      return this.$storage.getItem(`salte.auth.action.${state}`);
+    }
+  }
+
+  /**
    * Parses the User Info from the ID Token
    * @return {Object} The User Info from the ID Token
    */
