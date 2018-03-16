@@ -12,6 +12,8 @@ describe('salte-auth', () => {
     sandbox = sinon.sandbox.create();
     sandbox.stub(uuid, 'v4').returns('33333333-3333-4333-b333-333333333333');
     sandbox.stub(window, 'setTimeout');
+    // NOTE: Stubbing console so we don't get spammed.
+    sandbox.stub(console, 'warn');
     // NOTE: We're just stubbing these so we can restore it later!
     sandbox.stub(window, 'fetch').callThrough();
     sandbox.stub(XMLHttpRequest.prototype, 'open').callThrough();
@@ -166,9 +168,9 @@ describe('salte-auth', () => {
           expect(redirectUrl).to.equal(undefined);
         });
 
-        delete window.salte.auth;
+      delete window.salte.auth;
 
-        auth = new SalteAuth({
+      auth = new SalteAuth({
         provider: 'auth0',
         redirectLoginCallback: error => {
           expect(error).to.deep.equal(undefined);
@@ -177,6 +179,70 @@ describe('salte-auth', () => {
       });
 
       expect(location.href).to.equal(url);
+    });
+
+    it('should fire off a "login" event if we failed to login via a redirect', () => {
+      window.setTimeout.restore();
+
+      sandbox.stub(SalteAuthProfile.prototype, '$validate').returns({
+        code: 'stuff_broke',
+        description: 'what did you break!'
+      });
+      sandbox.stub(SalteAuthProfile.prototype, '$redirectUrl').get(() => 'error');
+      sandbox.stub(SalteAuthProfile.prototype, '$state').get(() => 'bogus');
+
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        provider: 'auth0'
+      });
+
+      auth.profile.$actions('bogus', 'login');
+
+      return new Promise((resolve, reject) => {
+        auth.on('login', (error) => {
+          if (error) return resolve(error);
+
+          return reject('Promise unexpectedly resolved');
+        });
+      }).then((error) => {
+        expect(error).to.deep.equal({
+          code: 'stuff_broke',
+          description: 'what did you break!'
+        });
+      });
+    });
+
+    it('should fire off a "logout" event if we failed to logout via a redirect', () => {
+      window.setTimeout.restore();
+
+      sandbox.stub(SalteAuthProfile.prototype, '$validate').returns({
+        code: 'stuff_broke',
+        description: 'what did you break!'
+      });
+      sandbox.stub(SalteAuthProfile.prototype, '$redirectUrl').get(() => 'error');
+      sandbox.stub(SalteAuthProfile.prototype, '$state').get(() => 'bogus');
+
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        provider: 'auth0'
+      });
+
+      auth.profile.$actions('bogus', 'logout');
+
+      return new Promise((resolve, reject) => {
+        auth.on('logout', (error) => {
+          if (error) return resolve(error);
+
+          return reject('Promise unexpectedly resolved');
+        });
+      }).then((error) => {
+        expect(error).to.deep.equal({
+          code: 'stuff_broke',
+          description: 'what did you break!'
+        });
+      });
     });
 
     it('should validate for errors when redirecting', done => {
@@ -444,6 +510,50 @@ describe('salte-auth', () => {
     });
   });
 
+  describe('function(on)', () => {
+    it('should register a listener', () => {
+      const reference = function() {};
+      auth.on('login', reference);
+
+      expect(auth.$listeners).to.deep.equal({
+        login: [reference]
+      });
+    });
+
+    it('should throw an error if an invalid event type is provided', () => {
+      expect(() => auth.on('bogus')).to.throw(ReferenceError);
+    });
+
+    it('should throw an error if an invalid callback is provided', () => {
+      expect(() => auth.on('login')).to.throw(ReferenceError);
+    });
+  });
+
+  describe('function(off)', () => {
+    it('should deregister a listener', () => {
+      const reference = function() {};
+      auth.on('login', reference);
+
+      expect(auth.$listeners).to.deep.equal({
+        login: [reference]
+      });
+
+      auth.off('login', reference);
+
+      expect(auth.$listeners).to.deep.equal({
+        login: []
+      });
+    });
+
+    it('should throw an error if an invalid event type is provided', () => {
+      expect(() => auth.off('bogus')).to.throw(ReferenceError);
+    });
+
+    it('should throw an error if an invalid callback is provided', () => {
+      expect(() => auth.off('login')).to.throw(ReferenceError);
+    });
+  });
+
   describe('function(loginWithIframe)', () => {
     beforeEach(() => {
       auth.profile.$clear();
@@ -463,8 +573,56 @@ describe('salte-auth', () => {
 
       expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
-      return promise.then(() => {
+      return promise.then((user) => {
+        expect(user).to.deep.equal(auth.profile.userInfo);
         expect(auth.$promises.login).to.equal(null);
+      });
+    });
+
+    it('should fire off a "login" event when successful', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('login', (error, user) => {
+          if (error) return reject(error);
+
+          return resolve(user);
+        });
+      });
+
+      sandbox.stub(auth.profile, '$validate');
+
+      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`);
+
+      auth.loginWithIframe();
+
+      return promise.then((user) => {
+        expect(user).to.deep.equal(auth.profile.userInfo);
+      });
+    });
+
+    it('should fire off a "login" event on failures', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('login', (error, user) => {
+          if (error) return resolve(error);
+
+          return Promise.reject('Promise unexpectedly resolved.');
+        });
+      });
+
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      auth.$utilities.createIframe.restore();
+      sandbox
+        .stub(auth.$utilities, 'createIframe')
+        .returns(Promise.reject('Iframe Failed!'));
+
+      auth.loginWithIframe();
+
+      return promise.then((error) => {
+        expect(error).to.equal('Iframe Failed!');
       });
     });
 
@@ -526,9 +684,69 @@ describe('salte-auth', () => {
       expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
       expect(auth.profile.$$transfer.callCount).to.equal(0);
-      return promise.then(() => {
+
+      return promise.then((user) => {
+        expect(user).to.deep.equal(auth.profile.userInfo);
         expect(auth.profile.$$transfer.callCount).to.equal(1);
         expect(auth.$promises.login).to.equal(null);
+      });
+    });
+
+    it('should fire off a "login" event when successful', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('login', (error, user) => {
+          if (error) return reject(error);
+
+          return resolve(user);
+        });
+      });
+
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$validate');
+      sandbox.stub(auth.profile, '$$transfer');
+
+      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`);
+
+      auth.loginWithPopup();
+
+      return promise.then((user) => {
+        expect(user).to.deep.equal(auth.profile.userInfo);
+      });
+    });
+
+    it('should fire off a "login" event on failures', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('login', (error, user) => {
+          if (error) return resolve(error);
+
+          return Promise.reject('Promise unexpectedly resolved.');
+        });
+      });
+
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox
+        .stub(auth.$utilities, 'openPopup')
+        .returns(Promise.reject('Popup blocked!'));
+
+      auth.profile.$idToken = `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`;
+
+      auth.loginWithPopup();
+
+      return promise.then((error) => {
+        expect(error).to.equal('Popup blocked!');
       });
     });
 
@@ -622,9 +840,69 @@ describe('salte-auth', () => {
       expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
       expect(auth.profile.$$transfer.callCount).to.equal(0);
-      return promise.then(() => {
+
+      return promise.then((user) => {
+        expect(user).to.deep.equal(auth.profile.userInfo);
         expect(auth.profile.$$transfer.callCount).to.equal(1);
         expect(auth.$promises.login).to.equal(null);
+      });
+    });
+
+    it('should fire off a "login" event when successful', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('login', (error, user) => {
+          if (error) return reject(error);
+
+          return resolve(user);
+        });
+      });
+
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
+      sandbox.stub(auth.profile, '$validate');
+      sandbox.stub(auth.profile, '$$transfer');
+
+      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`);
+
+      auth.loginWithNewTab();
+
+      return promise.then((user) => {
+        expect(user).to.deep.equal(auth.profile.userInfo);
+      });
+    });
+
+    it('should fire off a "login" event on failures', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('login', (error, user) => {
+          if (error) return resolve(error);
+
+          return Promise.reject('Promise unexpectedly resolved.');
+        });
+      });
+
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$loginUrl').get(() => '');
+      sandbox
+        .stub(auth.$utilities, 'openNewTab')
+        .returns(Promise.reject('New Tab blocked!'));
+
+      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`);
+
+      auth.loginWithNewTab();
+
+      return promise.then((error) => {
+        expect(error).to.equal('New Tab blocked!');
       });
     });
 
@@ -734,8 +1012,14 @@ describe('salte-auth', () => {
       expect(auth.profile.$redirectUrl).to.equal(location.href);
     });
 
-    it('should require a "redirectLoginCallback" to be provided', () => {
-      expect(() => auth.loginWithRedirect()).to.throw(ReferenceError);
+    it('should log a deprecation warning if the user utilizes "redirectLoginCallback".', () => {
+      auth.$config.redirectLoginCallback = sandbox.stub();
+
+      expect(console.warn.callCount).to.equal(0);
+
+      auth.loginWithRedirect();
+
+      expect(console.warn.callCount).to.equal(1);
     });
   });
 
@@ -754,6 +1038,44 @@ describe('salte-auth', () => {
       });
     });
 
+    it('should fire off a "logout" event when successful', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('logout', (error, user) => {
+          if (error) return reject(error);
+
+          return resolve(user);
+        });
+      });
+
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
+
+      auth.logoutWithIframe();
+
+      return promise;
+    });
+
+    it('should fire off a "logout" event on failures', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('logout', (error, user) => {
+          if (error) return resolve(error);
+
+          return Promise.reject('Promise unexpectedly resolved.');
+        });
+      });
+
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.reject('Iframe blocked!'));
+
+      auth.logoutWithIframe();
+
+      return promise.then((error) => {
+        expect(error).to.equal('Iframe blocked!');
+      });
+    });
+
     it('should prevent duplicate promises', () => {
       sandbox.stub(auth.profile, '$clear');
       sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
@@ -765,6 +1087,17 @@ describe('salte-auth', () => {
       expect(promise).to.equal(duplicatePromise);
 
       return promise;
+    });
+
+    it('should support failures', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.reject('Iframe blocked!'));
+
+      return auth.logoutWithIframe().catch((error) => error).then((error) => {
+        expect(error).to.equal('Iframe blocked!');
+        expect(auth.$promises.logout).to.equal(null);
+      });
     });
   });
 
@@ -783,6 +1116,44 @@ describe('salte-auth', () => {
       });
     });
 
+    it('should fire off a "logout" event when successful', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('logout', (error, user) => {
+          if (error) return reject(error);
+
+          return resolve(user);
+        });
+      });
+
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
+
+      auth.logoutWithPopup();
+
+      return promise;
+    });
+
+    it('should fire off a "logout" event on failures', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('logout', (error, user) => {
+          if (error) return resolve(error);
+
+          return Promise.reject('Promise unexpectedly resolved.');
+        });
+      });
+
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.reject('Popup blocked!'));
+
+      auth.logoutWithPopup();
+
+      return promise.then((error) => {
+        expect(error).to.equal('Popup blocked!');
+      });
+    });
+
     it('should prevent duplicate promises', () => {
       sandbox.stub(auth.profile, '$clear');
       sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
@@ -795,6 +1166,17 @@ describe('salte-auth', () => {
       expect(promise).to.equal(duplicatePromise);
 
       return promise;
+    });
+
+    it('should support failures', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.reject('Popup blocked!'));
+
+      return auth.logoutWithPopup().catch((error) => error).then((error) => {
+        expect(error).to.equal('Popup blocked!');
+        expect(auth.$promises.logout).to.equal(null);
+      });
     });
   });
 
@@ -813,6 +1195,44 @@ describe('salte-auth', () => {
       });
     });
 
+    it('should fire off a "logout" event when successful', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('logout', (error, user) => {
+          if (error) return reject(error);
+
+          return resolve(user);
+        });
+      });
+
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
+
+      auth.logoutWithNewTab();
+
+      return promise;
+    });
+
+    it('should fire off a "logout" event on failures', () => {
+      const promise = new Promise((resolve, reject) => {
+        auth.on('logout', (error, user) => {
+          if (error) return resolve(error);
+
+          return Promise.reject('Promise unexpectedly resolved.');
+        });
+      });
+
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.reject('New Tab blocked!'));
+
+      auth.logoutWithNewTab();
+
+      return promise.then((error) => {
+        expect(error).to.equal('New Tab blocked!');
+      });
+    });
+
     it('should prevent duplicate promises', () => {
       sandbox.stub(auth.profile, '$clear');
       sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
@@ -825,6 +1245,17 @@ describe('salte-auth', () => {
       expect(promise).to.equal(duplicatePromise);
 
       return promise;
+    });
+
+    it('should support failures', () => {
+      sandbox.stub(auth.profile, '$clear');
+      sandbox.stub(auth, '$deauthorizeUrl').get(() => '');
+      sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.reject('New Tab blocked!'));
+
+      return auth.logoutWithNewTab().catch((error) => error).then((error) => {
+        expect(error).to.equal('New Tab blocked!');
+        expect(auth.$promises.logout).to.equal(null);
+      });
     });
   });
 
