@@ -77,10 +77,6 @@
                     'https://jsonplaceholder.typicode.com/posts/1'
                 ],
 
-                redirectLoginCallback: function(error) {
-                    console.log(error);
-                },
-
                 provider
             });
 
@@ -90,6 +86,22 @@
             }
 
             var auth = new salte.SalteAuth(config);
+
+            auth.on('login', function(error, user) {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log(user);
+                }
+            });
+
+            auth.on('logout', function(error, user) {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log(user);
+                }
+            });
 
             document.querySelector('#login').addEventListener('click', function() {
                 var type = document.querySelector('[name="type"]:checked').value;
