@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.2.0
+ * @salte-io/salte-auth JavaScript Library v2.2.1
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7040,7 +7040,7 @@ var SalteAuth = function () {
      * });
      */
     value: function on(eventType, callback) {
-      if (!['login', 'logout'].indexOf(eventType) === -1) {
+      if (['login', 'logout'].indexOf(eventType) === -1) {
         throw new ReferenceError('Unknown Event Type (' + eventType + ')');
       } else if (typeof callback !== 'function') {
         throw new ReferenceError('Invalid callback provided!');
@@ -7066,7 +7066,7 @@ var SalteAuth = function () {
   }, {
     key: 'off',
     value: function off(eventType, callback) {
-      if (!['login', 'logout'].indexOf(eventType) === -1) {
+      if (['login', 'logout'].indexOf(eventType) === -1) {
         throw new ReferenceError('Unknown Event Type (' + eventType + ')');
       } else if (typeof callback !== 'function') {
         throw new ReferenceError('Invalid callback provided!');
