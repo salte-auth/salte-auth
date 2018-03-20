@@ -239,7 +239,7 @@ class SalteAuth {
    * });
    */
   on(eventType, callback) {
-    if (!['login', 'logout'].indexOf(eventType) === -1) {
+    if (['login', 'logout'].indexOf(eventType) === -1) {
       throw new ReferenceError(`Unknown Event Type (${eventType})`);
     } else if (typeof callback !== 'function') {
       throw new ReferenceError('Invalid callback provided!');
@@ -262,7 +262,7 @@ class SalteAuth {
    * auth.off('login', someFunction);
    */
   off(eventType, callback) {
-    if (!['login', 'logout'].indexOf(eventType) === -1) {
+    if (['login', 'logout'].indexOf(eventType) === -1) {
       throw new ReferenceError(`Unknown Event Type (${eventType})`);
     } else if (typeof callback !== 'function') {
       throw new ReferenceError('Invalid callback provided!');
