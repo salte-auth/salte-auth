@@ -245,6 +245,28 @@ describe('salte-auth', () => {
       });
     });
 
+    it('should do nothing if the action is unknown', () => {
+      window.setTimeout.restore();
+
+      sandbox.stub(SalteAuthProfile.prototype, '$validate').returns({
+        code: 'stuff_broke',
+        description: 'what did you break!'
+      });
+      sandbox.stub(SalteAuthProfile.prototype, '$redirectUrl').get(() => 'error');
+      sandbox.stub(SalteAuthProfile.prototype, '$state').get(() => 'bogus');
+      sandbox.stub(SalteAuth.prototype, 'on');
+
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        provider: 'auth0'
+      });
+
+      auth.profile.$actions('bogus', 'bogus');
+
+      expect(auth.on.callCount).to.equal(0);
+    });
+
     it('should validate for errors when redirecting', done => {
       sandbox.stub(SalteAuthProfile.prototype, '$validate').returns({
         code: 'stuff_broke',
@@ -521,11 +543,11 @@ describe('salte-auth', () => {
     });
 
     it('should throw an error if an invalid event type is provided', () => {
-      expect(() => auth.on('bogus')).to.throw(ReferenceError);
+      expect(() => auth.on('bogus')).to.throw(ReferenceError, 'Unknown Event Type (bogus)');
     });
 
     it('should throw an error if an invalid callback is provided', () => {
-      expect(() => auth.on('login')).to.throw(ReferenceError);
+      expect(() => auth.on('login')).to.throw(ReferenceError, 'Invalid callback provided!');
     });
   });
 
@@ -546,11 +568,11 @@ describe('salte-auth', () => {
     });
 
     it('should throw an error if an invalid event type is provided', () => {
-      expect(() => auth.off('bogus')).to.throw(ReferenceError);
+      expect(() => auth.off('bogus')).to.throw(ReferenceError, 'Unknown Event Type (bogus)');
     });
 
     it('should throw an error if an invalid callback is provided', () => {
-      expect(() => auth.off('login')).to.throw(ReferenceError);
+      expect(() => auth.off('login')).to.throw(ReferenceError, 'Invalid callback provided!');
     });
   });
 
