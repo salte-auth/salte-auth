@@ -64,7 +64,7 @@
     "publish-latest": "^1.1.2",
     "remove-lockfiles": "^2.0.0",
     "semantic-release": "^12.0.0",
-    "sinon": "^4.0.0",
+    "sinon": "^5.0.0",
     "unfetch": "^3.0.0",
     "uuid": "^3.0.0",
     "watch": "^1.0.2",
