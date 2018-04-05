@@ -9,7 +9,7 @@ describe('salte-auth', () => {
   let sandbox, auth;
 
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sandbox.stub(uuid, 'v4').returns('33333333-3333-4333-b333-333333333333');
     sandbox.stub(window, 'setTimeout');
     // NOTE: Stubbing console so we don't get spammed.
