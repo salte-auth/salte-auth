@@ -33,6 +33,7 @@
                 <input type="radio" name="type" value="iframe"> Iframe
             </label>
         </div>
+        <script src="https://cdn.polyfill.io/v2/polyfill.js?features=Object.assign,fetch&gated"></script>
         <script>
             var configs = {
                 auth0: {
@@ -77,7 +78,7 @@
                     'https://jsonplaceholder.typicode.com/posts/1'
                 ],
 
-                provider
+                provider: provider
             });
 
             if (provider !== sessionStorage.getItem('salte.demo.provider')) {
