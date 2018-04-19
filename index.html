@@ -1,161 +1,285 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Salte Auth Demo</title>
-        <script src="/salte-auth.js"></script>
-        <style>
-            .vertical {
-                display: flex;
-                flex-direction: column;
-                padding: 5px;
-            }
 
-            .vertical > * {
-                margin: 5px;
-            }
-        </style>
-    </head>
-    <body>
-        <button id="login">Login</button>
-        <button id="logout">Logout</button>
-        <button id="navigate">Navigate</button>
-        <div class="vertical">
-            <label>
-                <input type="radio" name="type" value="redirect" checked> Redirect
-            </label>
-            <label>
-                <input type="radio" name="type" value="popup"> Popup
-            </label>
-            <label>
-                <input type="radio" name="type" value="tab"> New Tab
-            </label>
-            <label>
-                <input type="radio" name="type" value="iframe"> Iframe
-            </label>
-        </div>
-        <script>
-            var configs = {
-                auth0: {
-                    providerUrl: 'https://salte-alpha.auth0.com',
-                    responseType: 'id_token',
-                    clientId: 'mM6h2LHJikwdbkvdoiyE8kHhL7gcV8Wb'
-                },
+<head>
+  <title>Salte Auth Demo</title>
+  <script src="/salte-auth.js"></script>
+  <script src="/node_modules/moment/min/moment.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Helvetica', 'Arial', 'sans-serif';
+      line-height: 1;
+    }
 
-                azure: {
-                    providerUrl: 'https://login.microsoftonline.com/3f6df7ce-5830-4280-ae97-8e4016d1c6d0',
-                    responseType: 'id_token',
-                    clientId: '6a54731e-3d14-4cc4-aba9-0041a591a3b1',
+    #nav {
+      display: flex;
+      align-items: center;
+      position: sticky;
+      padding: 20px;
+      margin: 0 -5px;
+      background: #212121;
+      color: white;
+    }
 
-                    queryParams: {
-                        resource: 'https://graph.windows.net/'
-                    },
+    #nav > * {
+      margin: 0 5px;
+    }
 
-                    loginType: 'popup'
-                },
+    #footer {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      margin: 0 -5px;
+      background: #212121;
+      color: white;
+    }
 
-                cognito: {
-                    providerUrl: 'https://salte-auth-demo.auth.us-east-1.amazoncognito.com',
-                    responseType: 'token',
-                    clientId: '51jmkg1t5h3ob58a1birdke2hm',
+    .content {
+      padding: 10px;
+    }
 
-                    loginType: 'popup'
-                }
-            };
+    #login-type {
+      margin-right: auto;
+    }
 
-            var providerMatch = location.search.match(/provider=([^&]+)/);
-            var provider = providerMatch ? providerMatch[1] : 'auth0';
+    a,
+    a:visited,
+    a:active {
+      color: inherit;
+      text-decoration: inherit;
+    }
 
-            var config = Object.assign(configs[provider], {
-                redirectUrl: location.protocol + '//' + location.host,
-                scope: 'openid',
+    a:hover {
+      text-decoration: underline;
+    }
 
-                routes: [
-                    'http://localhost:8080/account'
-                ],
+    .vertical {
+      display: flex;
+      flex-direction: column;
+      padding: 5px;
+    }
 
-                endpoints: [
-                    'https://jsonplaceholder.typicode.com/posts/1'
-                ],
+    .vertical > * {
+      margin: 5px;
+    }
+  </style>
+</head>
 
-                provider
-            });
+<body>
+  <div id="nav">
+    <select id="provider" name="provider">
+      <option value="auth0">Auth0</option>
+      <option value="azure">Azure</option>
+      <option value="cognito">Cognito</option>
+    </select>
+    <select id="login-type" name="login-type">
+      <option value="redirect">Redirect</option>
+      <option value="popup">Popup</option>
+      <option value="tab">New Tab</option>
+      <option value="tab">Iframe</option>
+    </select>
+    <label for="secured">Secured</label>
+    <input id="secured" name="secured" type="checkbox">
+  </div>
 
-            if (provider !== sessionStorage.getItem('salte.demo.provider')) {
-                sessionStorage.clear();
-                sessionStorage.setItem('salte.demo.provider', provider);
-            }
+  <div class="content">
+    <button id="login">Login</button>
+    <button id="logout">Logout</button>
+    <button id="navigate">Navigate</button>
+  </div>
 
-            var auth = new salte.SalteAuth(config);
+  <div id="footer">
+    <div id="expiration"></div>
+    <pre id="user-info"></pre>
+  </div>
 
-            auth.on('login', function(error, user) {
-                if (error) {
-                    console.error(error);
-                } else {
-                    console.log(user);
-                }
-            });
+  <script src="https://cdn.polyfill.io/v2/polyfill.js?features=Object.assign,URL,Array.prototype.reduce,fetch&gated"></script>
+  <script>
+    var elements = {
+      provider: document.getElementById('provider'),
+      loginType: document.getElementById('login-type'),
+      secured: document.getElementById('secured'),
+      footer: document.getElementById('footer'),
+      userInfo: document.getElementById('user-info'),
+      expiration: document.getElementById('expiration'),
+      login: document.getElementById('login'),
+      logout: document.getElementById('logout'),
+      navigate: document.getElementById('navigate')
+    };
 
-            auth.on('logout', function(error, user) {
-                if (error) {
-                    console.error(error);
-                } else {
-                    console.log(user);
-                }
-            });
+    var configs = {
+      auth0: {
+        providerUrl: 'https://salte-alpha.auth0.com',
+        responseType: 'id_token',
+        clientId: 'mM6h2LHJikwdbkvdoiyE8kHhL7gcV8Wb'
+      },
 
-            document.querySelector('#login').addEventListener('click', function() {
-                var type = document.querySelector('[name="type"]:checked').value;
-                switch (type) {
-                    case 'redirect':
-                        return auth.loginWithRedirect();
-                    case 'popup':
-                        return auth.loginWithPopup();
-                    case 'tab':
-                        return auth.loginWithNewTab();
-                    case 'iframe':
-                        return auth.loginWithIframe();
-                }
-            });
+      azure: {
+        providerUrl: 'https://login.microsoftonline.com/3f6df7ce-5830-4280-ae97-8e4016d1c6d0',
+        responseType: 'id_token',
+        clientId: 'c679f65f-8070-4719-8798-31c6fc256736',
 
-            document.querySelector('#logout').addEventListener('click', function() {
-                var type = document.querySelector('[name="type"]:checked').value
-                switch (type) {
-                    case 'redirect':
-                        return auth.logoutWithRedirect();
-                    case 'popup':
-                        return auth.logoutWithPopup();
-                    case 'tab':
-                        return auth.logoutWithNewTab();
-                    case 'iframe':
-                        return auth.logoutWithIframe();
-                }
-            });
+        queryParams: {
+          resource: 'https://graph.windows.net/'
+        }
+      },
 
-            document.querySelector('#navigate').addEventListener('click', function() {
-                if (location.pathname === '/') {
-                    history.pushState({}, '', location.protocol + '//' + location.host + '/account');
-                } else {
-                    history.pushState({}, '', location.protocol + '//' + location.host);
-                }
-            });
+      cognito: {
+        providerUrl: 'https://salte-auth-demo.auth.us-east-1.amazoncognito.com',
+        responseType: 'token',
+        clientId: '51jmkg1t5h3ob58a1birdke2hm'
+      }
+    };
 
-            fetch('https://jsonplaceholder.typicode.com/posts/1').then(function(response) {
-                return response.json();
-            }).then(function(data) {
-                console.log(data);
-            }).catch(function(error) {
-                console.error(error);
-            });
+    var queryParams = Object.assign({
+      provider: sessionStorage.getItem('salte.demo.provider') || 'auth0',
+      'login-type': 'redirect',
+      secured: false
+    }, location.search.replace(/^\?/, '').split('&').reduce(function(r, a) {
+      var match = a.match(/([^=]+)(?:=([^&]+))?/);
+      var key = match && match[1] || null;
+      var value = match && match[2] || null;
+      if (value === 'false') {
+        r[key] = false;
+      } else if (value === 'true') {
+        r[key] = true;
+      } else {
+        r[key] = value;
+      }
+      return r;
+    }, {}));
 
-            var request = new XMLHttpRequest();
-            request.addEventListener('error', function(event) {
-                console.error(event.detail);
-            });
-            request.addEventListener('load', function(event) {
-                console.log(JSON.parse(this.responseText));
-            });
-            request.open('GET', 'https://jsonplaceholder.typicode.com/posts/2');
-            request.send();
-        </script>
-    </body>
+    elements.provider.value = queryParams.provider;
+    elements.loginType.value = queryParams['login-type'];
+    elements.secured.checked = queryParams.secured;
+
+    function updateParamsOnChange() {
+      var url = new URL(location.href);
+      var value = this.type === 'checkbox' ? this.checked : this.value;
+      if ([undefined, null].includes(value)) {
+        url.searchParams.delete(this.name);
+      } else {
+        url.searchParams.set(this.name, value);
+      }
+      location = url.toString();
+    }
+
+    function refreshUserInfo(error) {
+      if (error) {
+        console.error(error);
+      }
+
+      var userInfo = auth.profile.userInfo;
+      if (userInfo) {
+        elements.footer.style.display = '';
+        elements.userInfo.innerText = JSON.stringify(userInfo, null, 2);
+
+        if (window.expirationRefresh) {
+          clearInterval(window.expirationRefresh);
+        }
+
+        window.expirationRefresh = setInterval(window.requestAnimationFrame(function() {
+          elements.expiration.innerText = 'Expiration Time: ' + moment.duration(salte.auth.profile.userInfo.exp * 1000 - Date.now()).humanize();
+        }), 1000);
+      } else {
+        elements.footer.style.display = 'none';
+      }
+    }
+
+    elements.provider.addEventListener('change', updateParamsOnChange);
+    elements.loginType.addEventListener('change', updateParamsOnChange);
+    elements.secured.addEventListener('change', updateParamsOnChange);
+
+    var config = Object.assign(configs[queryParams.provider], {
+      redirectUrl: location.protocol + '//' + location.host,
+      scope: 'openid',
+
+      provider: queryParams.provider
+    });
+
+    if (queryParams.secured) {
+      config = Object.assign(config, {
+        routes: [
+          'http://localhost:8081/account'
+        ],
+
+        endpoints: [
+          'https://jsonplaceholder.typicode.com/posts/1'
+        ]
+      });
+    }
+
+    if (queryParams.provider !== sessionStorage.getItem('salte.demo.provider')) {
+      sessionStorage.clear();
+      sessionStorage.setItem('salte.demo.provider', queryParams.provider);
+    }
+
+    var auth = new salte.SalteAuth(config);
+
+    if (!auth.profile.$idTokenExpired) refreshUserInfo();
+    auth.on('login', refreshUserInfo);
+    auth.on('refresh', refreshUserInfo);
+    auth.on('logout', refreshUserInfo);
+
+    elements.login.addEventListener('click', function () {
+      switch (queryParams['login-type']) {
+        case 'redirect':
+          return auth.loginWithRedirect();
+        case 'popup':
+          return auth.loginWithPopup();
+        case 'tab':
+          return auth.loginWithNewTab();
+        case 'iframe':
+          return auth.loginWithIframe();
+      }
+    });
+
+    elements.logout.addEventListener('click', function () {
+      switch (queryParams['login-type']) {
+        case 'redirect':
+          return auth.logoutWithRedirect();
+        case 'popup':
+          return auth.logoutWithPopup();
+        case 'tab':
+          return auth.logoutWithNewTab();
+        case 'iframe':
+          return auth.logoutWithIframe();
+      }
+    });
+
+    elements.navigate.addEventListener('click', function () {
+      var url = new URL(location.href);
+      if (location.pathname === '/') {
+        url.pathname = '/account';
+      } else {
+        url.pathname = '/';
+      }
+      history.pushState({}, '', url.toString());
+    });
+
+    fetch('https://jsonplaceholder.typicode.com/posts/1').then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      console.log(data);
+    }).catch(function (error) {
+      console.error(error);
+    });
+
+    var request = new XMLHttpRequest();
+    request.addEventListener('error', function (event) {
+      console.error(event.detail);
+    });
+    request.addEventListener('load', function (event) {
+      console.log(JSON.parse(this.responseText));
+    });
+    request.open('GET', 'https://jsonplaceholder.typicode.com/posts/2');
+    request.send();
+  </script>
+</body>
+
 </html>
