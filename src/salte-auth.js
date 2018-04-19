@@ -62,6 +62,11 @@ class SalteAuth {
      */
     this.$promises = {};
     /**
+     * The active authentication timeouts
+     * @private
+     */
+    this.$timeouts = {};
+    /**
      * The registered listeners
      * @private
      */
@@ -143,6 +148,26 @@ class SalteAuth {
     if (this.$config.redirectLoginCallback) {
       console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
     }
+
+    this.on('login', (error, user) => {
+      if (error) return;
+
+      this.$$refreshToken();
+    });
+
+    this.on('refresh', (error, user) => {
+      if (error) return;
+
+      this.$$refreshToken();
+    });
+
+    this.on('logout', (error, user) => {
+      clearTimeout(this.$timeouts.refresh);
+    });
+
+    if (!this.profile.idTokenExpired) {
+      this.$$refreshToken();
+    }
   }
 
   /**
@@ -193,10 +218,11 @@ class SalteAuth {
 
   /**
    * The authentication url to retrieve the id token
-   * @type {String}
+   * @param {Boolean} refresh Whether this request is intended to refresh the token.
+   * @return {String} the computed login url
    * @private
    */
-  get $loginUrl() {
+  $loginUrl(refresh) {
     this.profile.$localState = uuid.v4();
     this.profile.$nonce = uuid.v4();
 
@@ -211,7 +237,8 @@ class SalteAuth {
       'response_type': this.$config.responseType,
       'redirect_uri': this.$config.redirectUrl,
       'client_id': this.$config.clientId,
-      'scope': this.$config.scope
+      'scope': this.$config.scope,
+      'prompt': refresh ? 'none' : undefined
     }, this.$config.queryParams));
   }
 
@@ -226,7 +253,7 @@ class SalteAuth {
 
   /**
    * Listens for an event to be invoked.
-   * @param {('login'|'logout')} eventType the event to listen for.
+   * @param {('login'|'logout'|'refresh')} eventType the event to listen for.
    * @param {Function} callback A callback that fires when the specified event occurs.
    *
    * @example
@@ -239,7 +266,7 @@ class SalteAuth {
    * });
    */
   on(eventType, callback) {
-    if (['login', 'logout'].indexOf(eventType) === -1) {
+    if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
       throw new ReferenceError(`Unknown Event Type (${eventType})`);
     } else if (typeof callback !== 'function') {
       throw new ReferenceError('Invalid callback provided!');
@@ -251,7 +278,7 @@ class SalteAuth {
 
   /**
    * Deregister a callback previously registered.
-   * @param {('login'|'logout')} eventType the event to deregister.
+   * @param {('login'|'logout'|'refresh')} eventType the event to deregister.
    * @param {Function} callback A callback that fires when the specified event occurs.
    *
    * @example
@@ -262,7 +289,7 @@ class SalteAuth {
    * auth.off('login', someFunction);
    */
   off(eventType, callback) {
-    if (['login', 'logout'].indexOf(eventType) === -1) {
+    if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
       throw new ReferenceError(`Unknown Event Type (${eventType})`);
     } else if (typeof callback !== 'function') {
       throw new ReferenceError('Invalid callback provided!');
@@ -292,6 +319,7 @@ class SalteAuth {
 
   /**
    * Authenticates using the iframe-based OAuth flow.
+   * @param {Boolean} refresh Whether this request is intended to refresh the token.
    * @return {Promise<Object>} a promise that resolves when we finish authenticating
    *
    * @example
@@ -301,13 +329,13 @@ class SalteAuth {
    *   console.error('Whoops something went wrong!', error);
    * });
    */
-  loginWithIframe() {
+  loginWithIframe(refresh) {
     if (this.$promises.login) {
       return this.$promises.login;
     }
 
     this.profile.$clear();
-    this.$promises.login = this.$utilities.createIframe(this.$loginUrl, true).then(() => {
+    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(refresh), true).then(() => {
       this.$promises.login = null;
       const error = this.profile.$validate();
 
@@ -317,7 +345,9 @@ class SalteAuth {
       }
 
       const user = this.profile.userInfo;
-      this.$fire('login', null, user);
+      if (!refresh) {
+        this.$fire('login', null, user);
+      }
       return user;
     }).catch((error) => {
       this.$promises.login = null;
@@ -345,7 +375,7 @@ class SalteAuth {
     }
 
     this.profile.$clear();
-    this.$promises.login = this.$utilities.openPopup(this.$loginUrl).then(() => {
+    this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(() => {
       this.$promises.login = null;
       // We need to utilize local storage to retain our parsed values
       if (this.$config.storageType === 'session') {
@@ -387,7 +417,7 @@ class SalteAuth {
     }
 
     this.profile.$clear();
-    this.$promises.login = this.$utilities.openNewTab(this.$loginUrl).then(() => {
+    this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(() => {
       this.$promises.login = null;
       // We need to utilize local storage to retain our parsed values
       if (this.$config.storageType === 'session') {
@@ -435,7 +465,7 @@ class SalteAuth {
 
     this.profile.$clear();
     this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
-    const url = this.$loginUrl;
+    const url = this.$loginUrl();
 
     this.profile.$actions(this.profile.$localState, 'login');
     this.$utilities.$navigate(url);
@@ -541,6 +571,49 @@ class SalteAuth {
 
     this.profile.$actions(this.profile.$localState, 'logout');
     this.$utilities.$navigate(url);
+  }
+
+  /**
+   * Refreshes the users tokens and renews their session.
+   * @return {Promise} a promise that resolves when we finish renewing the users tokens.
+   */
+  refreshToken() {
+    if (this.$promises.token) {
+      return this.$promises.token;
+    }
+
+    this.$promises.token = this.loginWithIframe(true).then((user) => {
+      this.$promises.token = null;
+      const error = this.profile.$validate(true);
+
+      if (error) {
+        return Promise.reject(error);
+      }
+      this.$promises.token = null;
+      this.$fire('refresh', null, user);
+      return user;
+    }).catch((error) => {
+      this.$promises.token = null;
+      this.$fire('refresh', error);
+      return Promise.reject(error);
+    });
+
+    return this.$promises.token;
+  }
+
+  /**
+   * Registers a timeout that will automatically refresh the id token
+   */
+  $$refreshToken() {
+    if (this.$timeouts.refresh !== undefined) {
+      clearTimeout(this.$timeouts.refresh);
+    }
+
+    this.$timeouts.refresh = setTimeout(() => {
+      this.refreshToken().catch((error) => {
+        console.error(error);
+      });
+    }, Math.max((this.profile.userInfo.exp * 1000) - Date.now() - 60000, 0));
   }
 
   /**

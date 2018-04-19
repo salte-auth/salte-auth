@@ -4,6 +4,7 @@
 <head>
   <title>Salte Auth Demo</title>
   <script src="/salte-auth.js"></script>
+  <script src="/node_modules/moment/min/moment.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -27,7 +28,7 @@
 
     #footer {
       display: flex;
-      align-items: center;
+      flex-direction: column;
       position: fixed;
       bottom: 0;
       left: 0;
@@ -93,6 +94,7 @@
   </div>
 
   <div id="footer">
+    <div id="expiration"></div>
     <pre id="user-info"></pre>
   </div>
 
@@ -103,7 +105,11 @@
       loginType: document.getElementById('login-type'),
       secured: document.getElementById('secured'),
       footer: document.getElementById('footer'),
-      userInfo: document.getElementById('user-info')
+      userInfo: document.getElementById('user-info'),
+      expiration: document.getElementById('expiration'),
+      login: document.getElementById('login'),
+      logout: document.getElementById('logout'),
+      navigate: document.getElementById('navigate')
     };
 
     var configs = {
@@ -131,7 +137,7 @@
     };
 
     var queryParams = Object.assign({
-      provider: 'auth0',
+      provider: sessionStorage.getItem('salte.demo.provider') || 'auth0',
       'login-type': 'redirect',
       secured: false
     }, location.search.replace(/^\?/, '').split('&').reduce(function(r, a) {
@@ -172,6 +178,14 @@
       if (userInfo) {
         elements.footer.style.display = '';
         elements.userInfo.innerText = JSON.stringify(userInfo, null, 2);
+
+        if (window.expirationRefresh) {
+          clearInterval(window.expirationRefresh);
+        }
+
+        window.expirationRefresh = setInterval(window.requestAnimationFrame(function() {
+          elements.expiration.innerText = 'Expiration Time: ' + moment.duration(salte.auth.profile.userInfo.exp * 1000 - Date.now()).humanize();
+        }), 1000);
       } else {
         elements.footer.style.display = 'none';
       }
@@ -209,9 +223,10 @@
 
     if (!auth.profile.$idTokenExpired) refreshUserInfo();
     auth.on('login', refreshUserInfo);
+    auth.on('refresh', refreshUserInfo);
     auth.on('logout', refreshUserInfo);
 
-    document.querySelector('#login').addEventListener('click', function () {
+    elements.login.addEventListener('click', function () {
       switch (queryParams['login-type']) {
         case 'redirect':
           return auth.loginWithRedirect();
@@ -224,7 +239,7 @@
       }
     });
 
-    document.querySelector('#logout').addEventListener('click', function () {
+    elements.logout.addEventListener('click', function () {
       switch (queryParams['login-type']) {
         case 'redirect':
           return auth.logoutWithRedirect();
@@ -237,7 +252,7 @@
       }
     });
 
-    document.querySelector('#navigate').addEventListener('click', function () {
+    elements.navigate.addEventListener('click', function () {
       var url = new URL(location.href);
       if (location.pathname === '/') {
         url.pathname = '/account';
