@@ -5,7 +5,7 @@ import SalteAuthProfile from '../../src/salte-auth.profile.js';
 describe('salte-auth.profile', () => {
   let sandbox, profile;
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sessionStorage.clear();
     profile = new SalteAuthProfile();
   });

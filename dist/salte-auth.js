@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.2.1
+ * @salte-io/salte-auth JavaScript Library v2.3.0
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -6931,6 +6931,11 @@ var SalteAuth = function () {
      */
     this.$promises = {};
     /**
+     * The active authentication timeouts
+     * @private
+     */
+    this.$timeouts = {};
+    /**
      * The registered listeners
      * @private
      */
@@ -7012,6 +7017,26 @@ var SalteAuth = function () {
     if (this.$config.redirectLoginCallback) {
       console.warn('The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.');
     }
+
+    this.on('login', function (error, user) {
+      if (error) return;
+
+      _this.$$refreshToken();
+    });
+
+    this.on('refresh', function (error, user) {
+      if (error) return;
+
+      _this.$$refreshToken();
+    });
+
+    this.on('logout', function (error, user) {
+      clearTimeout(_this.$timeouts.refresh);
+    });
+
+    if (!this.profile.idTokenExpired) {
+      this.$$refreshToken();
+    }
   }
 
   /**
@@ -7022,12 +7047,48 @@ var SalteAuth = function () {
 
 
   _createClass(SalteAuth, [{
+    key: '$loginUrl',
+
+
+    /**
+     * The authentication url to retrieve the id token
+     * @param {Boolean} refresh Whether this request is intended to refresh the token.
+     * @return {String} the computed login url
+     * @private
+     */
+    value: function $loginUrl(refresh) {
+      this.profile.$localState = _uuid2.default.v4();
+      this.profile.$nonce = _uuid2.default.v4();
+
+      var authorizeEndpoint = this.$config.providerUrl + '/authorize';
+      if (this.$provider.authorizeEndpoint) {
+        authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
+      }
+
+      return this.$utilities.createUrl(authorizeEndpoint, (0, _assign2.default)({
+        'state': this.profile.$localState,
+        'nonce': this.profile.$nonce,
+        'response_type': this.$config.responseType,
+        'redirect_uri': this.$config.redirectUrl,
+        'client_id': this.$config.clientId,
+        'scope': this.$config.scope,
+        'prompt': refresh ? 'none' : undefined
+      }, this.$config.queryParams));
+    }
+
+    /**
+     * The url to logout of the configured provider
+     * @type {String}
+     * @private
+     */
+
+  }, {
     key: 'on',
 
 
     /**
      * Listens for an event to be invoked.
-     * @param {('login'|'logout')} eventType the event to listen for.
+     * @param {('login'|'logout'|'refresh')} eventType the event to listen for.
      * @param {Function} callback A callback that fires when the specified event occurs.
      *
      * @example
@@ -7040,7 +7101,7 @@ var SalteAuth = function () {
      * });
      */
     value: function on(eventType, callback) {
-      if (['login', 'logout'].indexOf(eventType) === -1) {
+      if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
         throw new ReferenceError('Unknown Event Type (' + eventType + ')');
       } else if (typeof callback !== 'function') {
         throw new ReferenceError('Invalid callback provided!');
@@ -7052,7 +7113,7 @@ var SalteAuth = function () {
 
     /**
      * Deregister a callback previously registered.
-     * @param {('login'|'logout')} eventType the event to deregister.
+     * @param {('login'|'logout'|'refresh')} eventType the event to deregister.
      * @param {Function} callback A callback that fires when the specified event occurs.
      *
      * @example
@@ -7066,7 +7127,7 @@ var SalteAuth = function () {
   }, {
     key: 'off',
     value: function off(eventType, callback) {
-      if (['login', 'logout'].indexOf(eventType) === -1) {
+      if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
         throw new ReferenceError('Unknown Event Type (' + eventType + ')');
       } else if (typeof callback !== 'function') {
         throw new ReferenceError('Invalid callback provided!');
@@ -7101,6 +7162,7 @@ var SalteAuth = function () {
 
     /**
      * Authenticates using the iframe-based OAuth flow.
+     * @param {Boolean} refresh Whether this request is intended to refresh the token.
      * @return {Promise<Object>} a promise that resolves when we finish authenticating
      *
      * @example
@@ -7113,7 +7175,7 @@ var SalteAuth = function () {
 
   }, {
     key: 'loginWithIframe',
-    value: function loginWithIframe() {
+    value: function loginWithIframe(refresh) {
       var _this2 = this;
 
       if (this.$promises.login) {
@@ -7121,7 +7183,7 @@ var SalteAuth = function () {
       }
 
       this.profile.$clear();
-      this.$promises.login = this.$utilities.createIframe(this.$loginUrl, true).then(function () {
+      this.$promises.login = this.$utilities.createIframe(this.$loginUrl(refresh), true).then(function () {
         _this2.$promises.login = null;
         var error = _this2.profile.$validate();
 
@@ -7131,7 +7193,9 @@ var SalteAuth = function () {
         }
 
         var user = _this2.profile.userInfo;
-        _this2.$fire('login', null, user);
+        if (!refresh) {
+          _this2.$fire('login', null, user);
+        }
         return user;
       }).catch(function (error) {
         _this2.$promises.login = null;
@@ -7164,7 +7228,7 @@ var SalteAuth = function () {
       }
 
       this.profile.$clear();
-      this.$promises.login = this.$utilities.openPopup(this.$loginUrl).then(function () {
+      this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(function () {
         _this3.$promises.login = null;
         // We need to utilize local storage to retain our parsed values
         if (_this3.$config.storageType === 'session') {
@@ -7211,7 +7275,7 @@ var SalteAuth = function () {
       }
 
       this.profile.$clear();
-      this.$promises.login = this.$utilities.openNewTab(this.$loginUrl).then(function () {
+      this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(function () {
         _this4.$promises.login = null;
         // We need to utilize local storage to retain our parsed values
         if (_this4.$config.storageType === 'session') {
@@ -7262,7 +7326,7 @@ var SalteAuth = function () {
 
       this.profile.$clear();
       this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
-      var url = this.$loginUrl;
+      var url = this.$loginUrl();
 
       this.profile.$actions(this.profile.$localState, 'login');
       this.$utilities.$navigate(url);
@@ -7389,6 +7453,59 @@ var SalteAuth = function () {
     }
 
     /**
+     * Refreshes the users tokens and renews their session.
+     * @return {Promise} a promise that resolves when we finish renewing the users tokens.
+     */
+
+  }, {
+    key: 'refreshToken',
+    value: function refreshToken() {
+      var _this8 = this;
+
+      if (this.$promises.token) {
+        return this.$promises.token;
+      }
+
+      this.$promises.token = this.loginWithIframe(true).then(function (user) {
+        _this8.$promises.token = null;
+        var error = _this8.profile.$validate(true);
+
+        if (error) {
+          return Promise.reject(error);
+        }
+        _this8.$promises.token = null;
+        _this8.$fire('refresh', null, user);
+        return user;
+      }).catch(function (error) {
+        _this8.$promises.token = null;
+        _this8.$fire('refresh', error);
+        return Promise.reject(error);
+      });
+
+      return this.$promises.token;
+    }
+
+    /**
+     * Registers a timeout that will automatically refresh the id token
+     */
+
+  }, {
+    key: '$$refreshToken',
+    value: function $$refreshToken() {
+      var _this9 = this;
+
+      if (this.$timeouts.refresh !== undefined) {
+        clearTimeout(this.$timeouts.refresh);
+      }
+
+      this.$timeouts.refresh = setTimeout(function () {
+        _this9.refreshToken().catch(function (error) {
+          console.error(error);
+        });
+      }, Math.max(this.profile.userInfo.exp * 1000 - Date.now() - 60000, 0));
+    }
+
+    /**
      * Authenticates, requests the access token, and returns it if necessary.
      * @return {Promise<string>} a promise that resolves when we retrieve the access token
      */
@@ -7396,7 +7513,7 @@ var SalteAuth = function () {
   }, {
     key: 'retrieveAccessToken',
     value: function retrieveAccessToken() {
-      var _this8 = this;
+      var _this10 = this;
 
       if (this.$promises.token) {
         return this.$promises.token;
@@ -7413,22 +7530,22 @@ var SalteAuth = function () {
       }
 
       this.$promises.token = this.$promises.token.then(function () {
-        _this8.profile.$clearErrors();
-        if (_this8.profile.accessTokenExpired) {
-          return _this8.$utilities.createIframe(_this8.$accessTokenUrl).then(function () {
-            _this8.$promises.token = null;
-            var error = _this8.profile.$validate(true);
+        _this10.profile.$clearErrors();
+        if (_this10.profile.accessTokenExpired) {
+          return _this10.$utilities.createIframe(_this10.$accessTokenUrl).then(function () {
+            _this10.$promises.token = null;
+            var error = _this10.profile.$validate(true);
 
             if (error) {
               return Promise.reject(error);
             }
-            return _this8.profile.$accessToken;
+            return _this10.profile.$accessToken;
           });
         }
-        _this8.$promises.token = null;
-        return _this8.profile.$accessToken;
+        _this10.$promises.token = null;
+        return _this10.profile.$accessToken;
       }).catch(function (error) {
-        _this8.$promises.token = null;
+        _this10.$promises.token = null;
         return Promise.reject(error);
       });
 
@@ -7492,40 +7609,6 @@ var SalteAuth = function () {
         'prompt': 'none'
       }, this.$config.queryParams));
     }
-
-    /**
-     * The authentication url to retrieve the id token
-     * @type {String}
-     * @private
-     */
-
-  }, {
-    key: '$loginUrl',
-    get: function get() {
-      this.profile.$localState = _uuid2.default.v4();
-      this.profile.$nonce = _uuid2.default.v4();
-
-      var authorizeEndpoint = this.$config.providerUrl + '/authorize';
-      if (this.$provider.authorizeEndpoint) {
-        authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
-      }
-
-      return this.$utilities.createUrl(authorizeEndpoint, (0, _assign2.default)({
-        'state': this.profile.$localState,
-        'nonce': this.profile.$nonce,
-        'response_type': this.$config.responseType,
-        'redirect_uri': this.$config.redirectUrl,
-        'client_id': this.$config.clientId,
-        'scope': this.$config.scope
-      }, this.$config.queryParams));
-    }
-
-    /**
-     * The url to logout of the configured provider
-     * @type {String}
-     * @private
-     */
-
   }, {
     key: '$deauthorizeUrl',
     get: function get() {

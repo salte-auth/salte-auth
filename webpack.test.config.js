@@ -1,5 +1,3 @@
-const ci = process.env.CI === 'true';
-
 module.exports = {
   output: {
     pathinfo: true
@@ -15,6 +13,7 @@ module.exports = {
       loader: 'html-loader'
     }]
   },
+  mode: 'development',
   devtool: 'inline-source-map',
   optimization: {
     minimize: false
