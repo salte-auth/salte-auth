@@ -1673,6 +1673,8 @@ describe('salte-auth', () => {
     it('should refresh the token if we hide the page', () => {
       const promise = Promise.resolve();
 
+      window.setTimeout.restore();
+      sandbox.stub(window, 'setTimeout').callsFake((cb) => cb());
       sandbox.stub(auth, '$$refreshToken');
       sandbox.stub(auth, 'refreshToken').returns(promise);
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
@@ -1693,6 +1695,8 @@ describe('salte-auth', () => {
     it('should reactivate the automatic refresh when the page is shown', () => {
       const promise = Promise.resolve();
 
+      window.setTimeout.restore();
+      sandbox.stub(window, 'setTimeout').callsFake((cb) => cb());
       sandbox.stub(auth, '$$refreshToken');
       sandbox.stub(auth, 'refreshToken').returns(promise);
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
