@@ -303,11 +303,11 @@ describe('salte-auth', () => {
       });
 
       const promise = new Promise((resolve) => {
-        window.addEventListener('visibilitychange', resolve);
+        document.addEventListener('visibilitychange', resolve);
       });
 
       expect(auth.$$onVisibilityChanged.callCount).to.equal(0);
-      window.dispatchEvent(new CustomEvent('visibilitychange'));
+      document.dispatchEvent(new CustomEvent('visibilitychange'));
       return promise.then(() => {
         expect(auth.$$onVisibilityChanged.callCount).to.equal(1);
       });
@@ -1671,10 +1671,10 @@ describe('salte-auth', () => {
     it('should refresh the token if we hide the page', () => {
       const promise = Promise.resolve();
 
-      sandbox.stub(document, 'hidden').get(() => true);
       sandbox.stub(auth, '$$refreshToken');
       sandbox.stub(auth, 'refreshToken').returns(promise);
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
+      sandbox.stub(auth.$utilities, '$hidden').get(() => true);
 
       expect(auth.refreshToken.callCount).to.equal(0);
       expect(auth.$$refreshToken.callCount).to.equal(0);
@@ -1688,13 +1688,13 @@ describe('salte-auth', () => {
       });
     });
 
-    it('should reactive the automatic refresh when the page is shown', () => {
+    it('should reactivate the automatic refresh when the page is shown', () => {
       const promise = Promise.resolve();
 
-      sandbox.stub(document, 'hidden').get(() => false);
       sandbox.stub(auth, '$$refreshToken');
       sandbox.stub(auth, 'refreshToken').returns(promise);
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
+      sandbox.stub(auth.$utilities, '$hidden').get(() => false);
 
       expect(auth.refreshToken.callCount).to.equal(0);
       expect(auth.$$refreshToken.callCount).to.equal(0);
