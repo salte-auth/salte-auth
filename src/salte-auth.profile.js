@@ -25,8 +25,8 @@ class SalteAuthProfile {
       storageType: 'session'
     });
     if (location.hash) {
-      logger(`Hash detected, parsing... (${location.hash})`);
       const params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
+      logger(`Hash detected, parsing...`, params);
       for (let i = 0; i < params.length; i++) {
         const param = params[i];
         const [key, value] = param.split('=');
