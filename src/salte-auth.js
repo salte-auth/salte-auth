@@ -161,7 +161,7 @@ class SalteAuth {
         this.$$refreshToken();
       }
 
-      window.addEventListener('visibilitychange', this.$$onVisibilityChanged.bind(this), {
+      document.addEventListener('visibilitychange', this.$$onVisibilityChanged.bind(this), {
         passive: true
       });
     }
@@ -679,7 +679,7 @@ class SalteAuth {
   $$onVisibilityChanged() {
     if (this.profile.idTokenExpired) return;
 
-    if (document.hidden) {
+    if (this.$utilities.$hidden) {
       this.refreshToken().then(() => {
         clearTimeout(this.$timeouts.refresh);
         this.$timeouts.refresh = null;

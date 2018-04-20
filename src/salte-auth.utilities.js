@@ -264,6 +264,15 @@ class SalteAuthUtilities {
   }
 
   /**
+   * Determines if the page is currently hidden
+   * @return {Boolean} true if the page is hidden
+   * @private
+   */
+  get $hidden() {
+    return document.hidden;
+  }
+
+  /**
    * Navigates to the url provided.
    * @param {String} url the url to navigate to
    * @private
