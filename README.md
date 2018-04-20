@@ -78,6 +78,10 @@ const auth = new SalteAuth({
 auth.loginWithIframe();
 ```
 
+## Debugging
+
+Debug logging can be enabled by setting a `localStorage` variable of `debug` to `salte-io:auth*`.
+
 ## Documentation
 
 [Click here to view the documentation!](https://salte-io.github.io/salte-auth/)

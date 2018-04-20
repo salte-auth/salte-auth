@@ -1,6 +1,6 @@
 {
   "name": "@salte-io/salte-auth",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "main": "dist/salte-auth.min.js",
   "description": "OAuth 2.0 for the masses!",
   "homepage": "https://github.com/salte-io/salte-auth",
@@ -33,6 +33,7 @@
     "chai": "^4.0.0",
     "coveralls": "^3.0.0",
     "cz-conventional-changelog": "^2.0.0",
+    "debug": "^3.0.0",
     "deindent": "^0.1.0",
     "esdoc": "^1.0.3",
     "esdoc-importpath-plugin": "^1.0.1",

@@ -3,10 +3,13 @@ import defaultsDeep from 'lodash/defaultsDeep';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import uuid from 'uuid';
+import debug from 'debug';
 
 import { Providers } from './salte-auth.providers.js';
 import { SalteAuthProfile } from './salte-auth.profile.js';
 import { SalteAuthUtilities } from './salte-auth.utilities.js';
+
+const logger = debug('salte-io:auth');
 
 /**
  * Disable certain security validations if your provider doesn't support them.
@@ -92,18 +95,24 @@ class SalteAuth {
     this.profile = new SalteAuthProfile(this.$config);
 
     if (this.$utilities.$iframe) {
+      logger('Detected iframe, removing...');
       parent.document.body.removeChild(this.$utilities.$iframe);
     } else if (this.$utilities.$popup) {
+      logger('Popup detected!');
       // We need to utilize local storage to retain our parsed values
       if (this.$config.storageType === 'session') {
+        logger('Transfering from session to local storage...');
         this.profile.$$transfer('session', 'local');
       }
+      logger('Closing popup...');
       setTimeout(this.$utilities.$popup.close);
     } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
+      logger('Redirect detected!');
       const error = this.profile.$validate();
       if (error) {
         this.profile.$clear();
       } else {
+        logger(`Navigating to Redirect URL... (${this.profile.$redirectUrl})`);
         this.$utilities.$navigate(this.profile.$redirectUrl);
         this.profile.$redirectUrl = undefined;
       }
@@ -121,6 +130,7 @@ class SalteAuth {
         }
       });
     } else {
+      logger('Setting up interceptors...');
       this.$utilities.addXHRInterceptor((request, data) => {
         if (this.$utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
           return this.retrieveAccessToken().then((accessToken) => {
@@ -137,10 +147,12 @@ class SalteAuth {
         }
       });
 
+      logger('Setting up route change detectors...');
       window.addEventListener('popstate', this.$$onRouteChanged.bind(this), { passive: true });
       document.addEventListener('click', this.$$onRouteChanged.bind(this), { passive: true });
       setTimeout(this.$$onRouteChanged.bind(this));
 
+      logger('Setting up automatic renewal of token...');
       this.on('login', (error, user) => {
         if (error) return;
 
@@ -626,12 +638,15 @@ class SalteAuth {
    */
   retrieveAccessToken() {
     if (this.$promises.token) {
+      logger('Existing token request detected, resolving...');
       return this.$promises.token;
     }
 
     this.$promises.token = Promise.resolve();
     if (this.profile.idTokenExpired) {
+      logger('id token has expired, reauthenticating...');
       if ([undefined, null, 'iframe'].indexOf(this.$config.loginType) !== -1) {
+        logger('Initiating the iframe flow...');
         this.$promises.token = this.loginWithIframe();
       } else {
         this.$promises.token = null;
@@ -642,6 +657,7 @@ class SalteAuth {
     this.$promises.token = this.$promises.token.then(() => {
       this.profile.$clearErrors();
       if (this.profile.accessTokenExpired) {
+        logger('Access token has expired, renewing...');
         return this.$utilities.createIframe(this.$accessTokenUrl).then(() => {
           this.$promises.token = null;
           const error = this.profile.$validate(true);
@@ -667,8 +683,10 @@ class SalteAuth {
    * @ignore
    */
   $$onRouteChanged() {
+    logger('Route change detected, determining if the route is secured...');
     if (!this.$utilities.isRouteSecure(location.href, this.$config.routes)) return;
 
+    logger('Route is secure, verifying tokens...');
     this.retrieveAccessToken();
   }
 
@@ -677,14 +695,18 @@ class SalteAuth {
    * @ignore
    */
   $$onVisibilityChanged() {
+    logger('Visibility change detected, determining if the id token has expired...');
     if (this.profile.idTokenExpired) return;
 
     if (this.$utilities.$hidden) {
+      logger('Page is hidden, refreshing the token...');
       this.refreshToken().then(() => {
+        logger('Disabling automatic renewal of the token...');
         clearTimeout(this.$timeouts.refresh);
         this.$timeouts.refresh = null;
       });
     } else {
+      logger('Page is visible restarting automatic token renewal...');
       this.$$refreshToken();
     }
   }
