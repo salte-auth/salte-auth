@@ -33,6 +33,7 @@
     "chai": "^4.0.0",
     "coveralls": "^3.0.0",
     "cz-conventional-changelog": "^2.0.0",
+    "debug": "^3.0.0",
     "deindent": "^0.1.0",
     "esdoc": "^1.0.3",
     "esdoc-importpath-plugin": "^1.0.1",
