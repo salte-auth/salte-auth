@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.3.2
+ * @salte-io/salte-auth JavaScript Library v2.3.3
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -8402,20 +8402,23 @@ var SalteAuth = function () {
     value: function $$onVisibilityChanged() {
       var _this11 = this;
 
-      logger('Visibility change detected, determining if the id token has expired...');
-      if (this.profile.idTokenExpired) return;
+      logger('Visibility change detected, deferring to the next event loop...');
+      setTimeout(function () {
+        logger('Determining if the id token has expired...');
+        if (_this11.profile.idTokenExpired) return;
 
-      if (this.$utilities.$hidden) {
-        logger('Page is hidden, refreshing the token...');
-        this.refreshToken().then(function () {
-          logger('Disabling automatic renewal of the token...');
-          clearTimeout(_this11.$timeouts.refresh);
-          _this11.$timeouts.refresh = null;
-        });
-      } else {
-        logger('Page is visible restarting automatic token renewal...');
-        this.$$refreshToken();
-      }
+        if (_this11.$utilities.$hidden) {
+          logger('Page is hidden, refreshing the token...');
+          _this11.refreshToken().then(function () {
+            logger('Disabling automatic renewal of the token...');
+            clearTimeout(_this11.$timeouts.refresh);
+            _this11.$timeouts.refresh = null;
+          });
+        } else {
+          logger('Page is visible restarting automatic token renewal...');
+          _this11.$$refreshToken();
+        }
+      });
     }
   }, {
     key: '$provider',
@@ -8539,8 +8542,8 @@ var SalteAuthProfile = function () {
       storageType: 'session'
     });
     if (location.hash) {
-      logger('Hash detected, parsing... (' + location.hash + ')');
       var params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
+      logger('Hash detected, parsing...', params);
       for (var i = 0; i < params.length; i++) {
         var param = params[i];
 
