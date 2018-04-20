@@ -1,5 +1,8 @@
 import defaultsDeep from 'lodash/defaultsDeep';
 import find from 'lodash/find';
+import debug from 'debug';
+
+const logger = debug('salte-io:auth.profile');
 
 /**
  * All the profile information associated with the current authentication session
@@ -10,6 +13,7 @@ class SalteAuthProfile {
    * @param {Config} config configuration for salte auth
    */
   constructor(config) {
+    logger('Appending defaults to config...');
     /** @ignore */
     this.$$config = defaultsDeep(config, {
       validation: {
@@ -21,6 +25,7 @@ class SalteAuthProfile {
       storageType: 'session'
     });
     if (location.hash) {
+      logger(`Hash detected, parsing... (${location.hash})`);
       const params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
       for (let i = 0; i < params.length; i++) {
         const param = params[i];
@@ -249,6 +254,7 @@ class SalteAuthProfile {
    */
   $validate(accessTokenRequest) {
     if (!this.$$config.validation) {
+      logger('Validation is disabled, skipping...');
       return;
     }
 
