@@ -307,7 +307,9 @@ describe('salte-auth', () => {
       });
 
       expect(auth.$$onVisibilityChanged.callCount).to.equal(0);
-      document.dispatchEvent(new CustomEvent('visibilitychange'));
+      const event = document.createEvent('Event');
+      event.initEvent('visibilitychange', false, true);
+      document.dispatchEvent(event);
       return promise.then(() => {
         expect(auth.$$onVisibilityChanged.callCount).to.equal(1);
       });
