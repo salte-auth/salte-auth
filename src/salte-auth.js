@@ -695,20 +695,23 @@ class SalteAuth {
    * @ignore
    */
   $$onVisibilityChanged() {
-    logger('Visibility change detected, determining if the id token has expired...');
-    if (this.profile.idTokenExpired) return;
+    logger('Visibility change detected, deferring to the next event loop...');
+    setTimeout(() => {
+      logger('Determining if the id token has expired...');
+      if (this.profile.idTokenExpired) return;
 
-    if (this.$utilities.$hidden) {
-      logger('Page is hidden, refreshing the token...');
-      this.refreshToken().then(() => {
-        logger('Disabling automatic renewal of the token...');
-        clearTimeout(this.$timeouts.refresh);
-        this.$timeouts.refresh = null;
-      });
-    } else {
-      logger('Page is visible restarting automatic token renewal...');
-      this.$$refreshToken();
-    }
+      if (this.$utilities.$hidden) {
+        logger('Page is hidden, refreshing the token...');
+        this.refreshToken().then(() => {
+          logger('Disabling automatic renewal of the token...');
+          clearTimeout(this.$timeouts.refresh);
+          this.$timeouts.refresh = null;
+        });
+      } else {
+        logger('Page is visible restarting automatic token renewal...');
+        this.$$refreshToken();
+      }
+    });
   }
 }
 
