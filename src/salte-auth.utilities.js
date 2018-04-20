@@ -219,7 +219,7 @@ class SalteAuthUtilities {
     return new Promise((resolve) => {
       iframe.addEventListener('DOMNodeRemoved', () => {
         setTimeout(resolve);
-      });
+      }, { passive: true });
     });
   }
 
