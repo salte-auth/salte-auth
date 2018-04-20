@@ -27,7 +27,7 @@ describe('function(addXHRInterceptor)', () => {
             'This is the execution context.'
           );
           resolve();
-        });
+        }, { passive: true });
       })
     );
 
@@ -48,7 +48,7 @@ describe('function(addXHRInterceptor)', () => {
         request.addEventListener('error', event => {
           expect(event.detail).to.equal('Stuff broke!');
           resolve();
-        });
+        }, { passive: true });
       })
     );
     request.open('GET', `${location.protocol}//${location.host}/context.html`, false);
