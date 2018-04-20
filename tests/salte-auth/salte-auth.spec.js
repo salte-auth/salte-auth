@@ -266,7 +266,7 @@ describe('salte-auth', () => {
 
       auth.profile.$actions('bogus', 'bogus');
 
-      expect(auth.on.callCount).to.equal(3);
+      expect(auth.on.callCount).to.equal(0);
     });
 
     it('should validate for errors when redirecting', done => {
@@ -290,6 +290,31 @@ describe('salte-auth', () => {
       });
 
       expect(location.href).to.equal(url);
+    });
+
+    it('should disable automatic token renewal when the screen loses visibility', () => {
+      sandbox.stub(SalteAuth.prototype, '$$onVisibilityChanged');
+      sandbox.stub(SalteAuthProfile.prototype, '$redirectUrl').get(() => false);
+      sandbox.stub(SalteAuthUtilities.prototype, '$iframe').get(() => false);
+      sandbox.stub(SalteAuthUtilities.prototype, '$popup').get(() => false);
+
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        provider: 'auth0'
+      });
+
+      const promise = new Promise((resolve) => {
+        document.addEventListener('visibilitychange', resolve);
+      });
+
+      expect(auth.$$onVisibilityChanged.callCount).to.equal(0);
+      const event = document.createEvent('Event');
+      event.initEvent('visibilitychange', false, true);
+      document.dispatchEvent(event);
+      return promise.then(() => {
+        expect(auth.$$onVisibilityChanged.callCount).to.equal(1);
+      });
     });
   });
 
@@ -362,7 +387,7 @@ describe('salte-auth', () => {
           'Bearer 55555-55555'
         ]);
         done();
-      });
+      }, { passive: true });
 
       request.open('GET', '/');
       request.send();
@@ -389,7 +414,7 @@ describe('salte-auth', () => {
       request.addEventListener('load', () => {
         expect(setRequestHeaderSpy.callCount).to.equal(0);
         done();
-      });
+      }, { passive: true });
 
       request.open('GET', '/');
       request.send();
@@ -1650,6 +1675,48 @@ describe('salte-auth', () => {
       auth.$$onRouteChanged();
 
       expect(auth.retrieveAccessToken.callCount).to.equal(0);
+    });
+  });
+
+  describe('function($$onVisibilityChanged)', () => {
+    it('should refresh the token if we hide the page', () => {
+      const promise = Promise.resolve();
+
+      sandbox.stub(auth, '$$refreshToken');
+      sandbox.stub(auth, 'refreshToken').returns(promise);
+      sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
+      sandbox.stub(auth.$utilities, '$hidden').get(() => true);
+
+      expect(auth.refreshToken.callCount).to.equal(0);
+      expect(auth.$$refreshToken.callCount).to.equal(0);
+
+      auth.$$onVisibilityChanged();
+
+      return promise.then(() => {
+        expect(auth.refreshToken.callCount).to.equal(1);
+        expect(auth.$$refreshToken.callCount).to.equal(0);
+        expect(auth.$timeouts.refresh).to.equal(null);
+      });
+    });
+
+    it('should reactivate the automatic refresh when the page is shown', () => {
+      const promise = Promise.resolve();
+
+      sandbox.stub(auth, '$$refreshToken');
+      sandbox.stub(auth, 'refreshToken').returns(promise);
+      sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
+      sandbox.stub(auth.$utilities, '$hidden').get(() => false);
+
+      expect(auth.refreshToken.callCount).to.equal(0);
+      expect(auth.$$refreshToken.callCount).to.equal(0);
+
+      auth.$$onVisibilityChanged();
+
+      return promise.then(() => {
+        expect(auth.refreshToken.callCount).to.equal(0);
+        expect(auth.$$refreshToken.callCount).to.equal(1);
+        expect(auth.$timeouts.refresh).to.equal(undefined);
+      });
     });
   });
 });

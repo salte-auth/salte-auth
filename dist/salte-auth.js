@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.3.0
+ * @salte-io/salte-auth JavaScript Library v2.3.1
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7006,9 +7006,33 @@ var SalteAuth = function () {
         }
       });
 
-      window.addEventListener('popstate', this.$$onRouteChanged.bind(this));
-      document.addEventListener('click', this.$$onRouteChanged.bind(this));
+      window.addEventListener('popstate', this.$$onRouteChanged.bind(this), { passive: true });
+      document.addEventListener('click', this.$$onRouteChanged.bind(this), { passive: true });
       setTimeout(this.$$onRouteChanged.bind(this));
+
+      this.on('login', function (error, user) {
+        if (error) return;
+
+        _this.$$refreshToken();
+      });
+
+      this.on('refresh', function (error, user) {
+        if (error) return;
+
+        _this.$$refreshToken();
+      });
+
+      this.on('logout', function (error, user) {
+        clearTimeout(_this.$timeouts.refresh);
+      });
+
+      if (!this.profile.idTokenExpired) {
+        this.$$refreshToken();
+      }
+
+      document.addEventListener('visibilitychange', this.$$onVisibilityChanged.bind(this), {
+        passive: true
+      });
     }
 
     // TODO(v3.0.0): Revoke singleton status from `salte-auth`.
@@ -7016,26 +7040,6 @@ var SalteAuth = function () {
 
     if (this.$config.redirectLoginCallback) {
       console.warn('The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.');
-    }
-
-    this.on('login', function (error, user) {
-      if (error) return;
-
-      _this.$$refreshToken();
-    });
-
-    this.on('refresh', function (error, user) {
-      if (error) return;
-
-      _this.$$refreshToken();
-    });
-
-    this.on('logout', function (error, user) {
-      clearTimeout(_this.$timeouts.refresh);
-    });
-
-    if (!this.profile.idTokenExpired) {
-      this.$$refreshToken();
     }
   }
 
@@ -7563,6 +7567,28 @@ var SalteAuth = function () {
       if (!this.$utilities.isRouteSecure(location.href, this.$config.routes)) return;
 
       this.retrieveAccessToken();
+    }
+
+    /**
+     * Disables automatic refresh of the token if the page is no longer visible
+     * @ignore
+     */
+
+  }, {
+    key: '$$onVisibilityChanged',
+    value: function $$onVisibilityChanged() {
+      var _this11 = this;
+
+      if (this.profile.idTokenExpired) return;
+
+      if (this.$utilities.$hidden) {
+        this.refreshToken().then(function () {
+          clearTimeout(_this11.$timeouts.refresh);
+          _this11.$timeouts.refresh = null;
+        });
+      } else {
+        this.$$refreshToken();
+      }
     }
   }, {
     key: '$provider',
@@ -8507,7 +8533,7 @@ var SalteAuthUtilities = function () {
       return new Promise(function (resolve) {
         iframe.addEventListener('DOMNodeRemoved', function () {
           setTimeout(resolve);
-        });
+        }, { passive: true });
       });
     }
 
@@ -8574,6 +8600,18 @@ var SalteAuthUtilities = function () {
         return window;
       }
       return null;
+    }
+
+    /**
+     * Determines if the page is currently hidden
+     * @return {Boolean} true if the page is hidden
+     * @private
+     */
+
+  }, {
+    key: '$hidden',
+    get: function get() {
+      return document.hidden;
     }
   }]);
 

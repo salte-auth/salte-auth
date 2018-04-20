@@ -219,7 +219,7 @@ class SalteAuthUtilities {
     return new Promise((resolve) => {
       iframe.addEventListener('DOMNodeRemoved', () => {
         setTimeout(resolve);
-      });
+      }, { passive: true });
     });
   }
 
@@ -261,6 +261,15 @@ class SalteAuthUtilities {
       return window;
     }
     return null;
+  }
+
+  /**
+   * Determines if the page is currently hidden
+   * @return {Boolean} true if the page is hidden
+   * @private
+   */
+  get $hidden() {
+    return document.hidden;
   }
 
   /**

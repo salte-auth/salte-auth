@@ -137,9 +137,33 @@ class SalteAuth {
         }
       });
 
-      window.addEventListener('popstate', this.$$onRouteChanged.bind(this));
-      document.addEventListener('click', this.$$onRouteChanged.bind(this));
+      window.addEventListener('popstate', this.$$onRouteChanged.bind(this), { passive: true });
+      document.addEventListener('click', this.$$onRouteChanged.bind(this), { passive: true });
       setTimeout(this.$$onRouteChanged.bind(this));
+
+      this.on('login', (error, user) => {
+        if (error) return;
+
+        this.$$refreshToken();
+      });
+
+      this.on('refresh', (error, user) => {
+        if (error) return;
+
+        this.$$refreshToken();
+      });
+
+      this.on('logout', (error, user) => {
+        clearTimeout(this.$timeouts.refresh);
+      });
+
+      if (!this.profile.idTokenExpired) {
+        this.$$refreshToken();
+      }
+
+      document.addEventListener('visibilitychange', this.$$onVisibilityChanged.bind(this), {
+        passive: true
+      });
     }
 
     // TODO(v3.0.0): Revoke singleton status from `salte-auth`.
@@ -147,26 +171,6 @@ class SalteAuth {
 
     if (this.$config.redirectLoginCallback) {
       console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
-    }
-
-    this.on('login', (error, user) => {
-      if (error) return;
-
-      this.$$refreshToken();
-    });
-
-    this.on('refresh', (error, user) => {
-      if (error) return;
-
-      this.$$refreshToken();
-    });
-
-    this.on('logout', (error, user) => {
-      clearTimeout(this.$timeouts.refresh);
-    });
-
-    if (!this.profile.idTokenExpired) {
-      this.$$refreshToken();
     }
   }
 
@@ -666,6 +670,23 @@ class SalteAuth {
     if (!this.$utilities.isRouteSecure(location.href, this.$config.routes)) return;
 
     this.retrieveAccessToken();
+  }
+
+  /**
+   * Disables automatic refresh of the token if the page is no longer visible
+   * @ignore
+   */
+  $$onVisibilityChanged() {
+    if (this.profile.idTokenExpired) return;
+
+    if (this.$utilities.$hidden) {
+      this.refreshToken().then(() => {
+        clearTimeout(this.$timeouts.refresh);
+        this.$timeouts.refresh = null;
+      });
+    } else {
+      this.$$refreshToken();
+    }
   }
 }
 
