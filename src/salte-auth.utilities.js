@@ -1,4 +1,7 @@
 import assign from 'lodash/assign';
+import debug from 'debug';
+
+const logger = debug('salte-io:auth.utilities');
 
 /**
  * Basic utilities to support the authentication flow
@@ -14,6 +17,7 @@ class SalteAuthUtilities {
       xhr: []
     };
 
+    logger('Setting up wrappers for XMLHttpRequest...');
     (function(open) {
       XMLHttpRequest.prototype.open = function(method, url) {
         /** @ignore */
@@ -42,6 +46,7 @@ class SalteAuthUtilities {
     })(XMLHttpRequest.prototype.send);
 
     if (window.fetch) {
+      logger('Fetch detected, setting up wrappers...');
       (function(fetch) {
         window.fetch = function(input, options) {
           const request = input instanceof Request ? input : new Request(input, options);
