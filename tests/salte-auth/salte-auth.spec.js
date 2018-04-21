@@ -1611,6 +1611,16 @@ describe('salte-auth', () => {
         });
     });
 
+    it('should fail if automatic login is disabled', () => {
+      auth.$config.loginType = false;
+
+      const promise = auth.retrieveAccessToken();
+
+      return promise.catch((error) => error).then((error) => {
+        expect(error.message).to.equal('Automatic login is disabled, please login before making any requests!');
+      });
+    });
+
     it('should prevent duplicate promises', () => {
       sandbox.stub(auth, 'loginWithIframe').returns(Promise.resolve());
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
