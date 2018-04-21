@@ -83,8 +83,12 @@
       <option value="tab">New Tab</option>
       <option value="tab">Iframe</option>
     </select>
-    <label for="secured">Secured</label>
-    <input id="secured" name="secured" type="checkbox">
+    <select id="secured" name="secured">
+      <option value="not-secured">Not Secured</option>
+      <option value="all-routes">Secure All Routes</option>
+      <option value="all-endpoints">Secure All Endpoints</option>
+      <option value="all">Fully Secured</option>
+    </select>
   </div>
 
   <div class="content">
@@ -139,7 +143,7 @@
     var queryParams = Object.assign({
       provider: sessionStorage.getItem('salte.demo.provider') || 'auth0',
       'login-type': 'redirect',
-      secured: false
+      secured: 'not-secured'
     }, location.search.replace(/^\?/, '').split('&').reduce(function(r, a) {
       var match = a.match(/([^=]+)(?:=([^&]+))?/);
       var key = match && match[1] || null;
@@ -156,7 +160,7 @@
 
     elements.provider.value = queryParams.provider;
     elements.loginType.value = queryParams['login-type'];
-    elements.secured.checked = queryParams.secured;
+    elements.secured.value = queryParams.secured;
 
     function updateParamsOnChange() {
       var url = new URL(location.href);
@@ -202,15 +206,15 @@
       provider: queryParams.provider
     });
 
-    if (queryParams.secured) {
+    if (['all', 'all-routes'].includes(queryParams.secured)) {
       config = Object.assign(config, {
-        routes: [
-          'http://localhost:8081/account'
-        ],
+        routes: true
+      });
+    }
 
-        endpoints: [
-          'https://jsonplaceholder.typicode.com/posts/1'
-        ]
+    if (['all', 'all-endpoints'].includes(queryParams.secured)) {
+      config = Object.assign(config, {
+        endpoints: ['https://jsonplaceholder.typicode.com']
       });
     }
 
