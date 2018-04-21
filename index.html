@@ -203,7 +203,9 @@
       redirectUrl: location.protocol + '//' + location.host,
       scope: 'openid',
 
-      provider: queryParams.provider
+      provider: queryParams.provider,
+
+      loginType: 'redirect'
     });
 
     if (['all', 'all-routes'].includes(queryParams.secured)) {
