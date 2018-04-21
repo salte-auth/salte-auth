@@ -31,7 +31,7 @@ const logger = debug('salte-io:auth');
  * @property {Boolean|Array<String>} routes A list of secured routes. If true is provided then all routes are secured.
  * @property {Array<String|RegExp>} endpoints A list of secured endpoints.
  * @property {('auth0'|'azure'|'cognito'|'wso2')} provider The identity provider you're using.
- * @property {('iframe'|false)} [loginType='iframe'] The automated login type to use.
+ * @property {('iframe'|'redirect'|false)} [loginType='iframe'] The automated login type to use.
  * @property {Function} [redirectLoginCallback] A callback that is invoked when a redirect login fails or succeeds.
  * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
@@ -651,6 +651,8 @@ class SalteAuth {
       if (this.$config.loginType === 'iframe') {
         logger('Initiating the iframe flow...');
         this.$promises.token = this.loginWithIframe();
+      } else if (this.$config.loginType === 'redirect') {
+        this.$promises.token = this.loginWithRedirect();
       } else if (this.$config.loginType === false) {
         this.$promises.token = null;
         return Promise.reject(new ReferenceError('Automatic login is disabled, please login before making any requests!'));
