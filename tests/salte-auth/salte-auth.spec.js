@@ -47,7 +47,7 @@ describe('salte-auth', () => {
       expect(window.salte.auth).to.be.undefined;
     });
 
-    it('should default storageType and validation', () => {
+    it('should default loginType, storageType, and validation', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
@@ -55,6 +55,7 @@ describe('salte-auth', () => {
       });
 
       expect(auth.$config).to.deep.equal({
+        loginType: 'iframe',
         provider: 'auth0',
         storageType: 'session',
         validation: {
@@ -67,10 +68,11 @@ describe('salte-auth', () => {
       expect(auth.$config).to.deep.equal(auth.profile.$$config);
     });
 
-    it('should support overriding the storageType and validation', () => {
+    it('should support overriding the loginType, storageType, and validation', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
+        loginType: 'redirect',
         provider: 'auth0',
         storageType: 'local',
         validation: {
@@ -79,6 +81,7 @@ describe('salte-auth', () => {
       });
 
       expect(auth.$config).to.deep.equal({
+        loginType: 'redirect',
         provider: 'auth0',
         storageType: 'local',
         validation: {
