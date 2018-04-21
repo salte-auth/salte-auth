@@ -31,6 +31,7 @@ const logger = debug('salte-io:auth');
  * @property {Boolean|Array<String>} routes A list of secured routes. If true is provided then all routes are secured.
  * @property {Array<String|RegExp>} endpoints A list of secured endpoints.
  * @property {('auth0'|'azure'|'cognito'|'wso2')} provider The identity provider you're using.
+ * @property {('iframe')} [loginType='iframe'] The automated login type to use.
  * @property {Function} [redirectLoginCallback] A callback that is invoked when a redirect login fails or succeeds.
  * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
@@ -80,7 +81,9 @@ class SalteAuth {
      * @private
      */
     this.$config = config;
-    this.$config = defaultsDeep(config, this.$provider.defaultConfig);
+    this.$config = defaultsDeep(config, this.$provider.defaultConfig, {
+      loginType: 'iframe'
+    });
     /**
      * Various utility functions for salte auth
      * @type {SalteAuthUtilities}
@@ -645,7 +648,7 @@ class SalteAuth {
     this.$promises.token = Promise.resolve();
     if (this.profile.idTokenExpired) {
       logger('id token has expired, reauthenticating...');
-      if ([undefined, null, 'iframe'].indexOf(this.$config.loginType) !== -1) {
+      if (this.$config.loginType === 'iframe') {
         logger('Initiating the iframe flow...');
         this.$promises.token = this.loginWithIframe();
       } else {
