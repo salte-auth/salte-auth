@@ -78,6 +78,10 @@ const auth = new SalteAuth({
 auth.loginWithIframe();
 ```
 
+## Known Issues
+
+* `loginWithNewTab` and `loginWithPopup` doesn't work on IE 11 ([#166](https://github.com/salte-io/salte-auth/issues/166), [#168](https://github.com/salte-io/salte-auth/issues/168))
+
 ## Debugging
 
 Debug logging can be enabled by setting a `localStorage` variable of `debug` to `salte-io:auth*`.
