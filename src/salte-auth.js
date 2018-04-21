@@ -9,7 +9,7 @@ import { Providers } from './salte-auth.providers.js';
 import { SalteAuthProfile } from './salte-auth.profile.js';
 import { SalteAuthUtilities } from './salte-auth.utilities.js';
 
-const logger = debug('salte-io:auth');
+const logger = debug('@salte-io/salte-auth');
 
 /**
  * Disable certain security validations if your provider doesn't support them.
@@ -353,7 +353,12 @@ class SalteAuth {
       return this.$promises.login;
     }
 
-    this.profile.$clear();
+    if (refresh) {
+      // Only clear errors if we're refreshing the token
+      this.profile.$clearErrors();
+    } else {
+      this.profile.$clear();
+    }
     this.$promises.login = this.$utilities.createIframe(this.$loginUrl(refresh), true).then(() => {
       this.$promises.login = null;
       const error = this.profile.$validate();
@@ -704,22 +709,20 @@ class SalteAuth {
    */
   $$onVisibilityChanged() {
     logger('Visibility change detected, deferring to the next event loop...');
-    setTimeout(() => {
-      logger('Determining if the id token has expired...');
-      if (this.profile.idTokenExpired) return;
+    logger('Determining if the id token has expired...');
+    if (this.profile.idTokenExpired) return;
 
-      if (this.$utilities.$hidden) {
-        logger('Page is hidden, refreshing the token...');
-        this.refreshToken().then(() => {
-          logger('Disabling automatic renewal of the token...');
-          clearTimeout(this.$timeouts.refresh);
-          this.$timeouts.refresh = null;
-        });
-      } else {
-        logger('Page is visible restarting automatic token renewal...');
-        this.$$refreshToken();
-      }
-    });
+    if (this.$utilities.$hidden) {
+      logger('Page is hidden, refreshing the token...');
+      this.refreshToken().then(() => {
+        logger('Disabling automatic renewal of the token...');
+        clearTimeout(this.$timeouts.refresh);
+        this.$timeouts.refresh = null;
+      });
+    } else {
+      logger('Page is visible restarting automatic token renewal...');
+      this.$$refreshToken();
+    }
   }
 }
 
