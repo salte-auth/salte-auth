@@ -659,8 +659,12 @@ class SalteAuth {
       } else if (this.$config.loginType === 'redirect') {
         this.$promises.token = this.loginWithRedirect();
       } else if (this.$config.loginType === false) {
-        this.$promises.token = null;
-        return Promise.reject(new ReferenceError('Automatic login is disabled, please login before making any requests!'));
+        if (this.$promises.login) {
+          this.$promises.token = this.$promises.login;
+        } else {
+          this.$promises.token = null;
+          return Promise.reject(new ReferenceError('Automatic login is disabled, please login before making any requests!'));
+        }
       } else {
         this.$promises.token = null;
         return Promise.reject(new ReferenceError(`Invalid Login Type (${this.$config.loginType})`));
