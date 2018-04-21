@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.4.0
+ * @salte-io/salte-auth JavaScript Library v2.4.1
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7678,7 +7678,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var logger = (0, _debug2.default)('salte-io:auth');
+var logger = (0, _debug2.default)('@salte-io/salte-auth');
 
 /**
  * Disable certain security validations if your provider doesn't support them.
@@ -8006,7 +8006,12 @@ var SalteAuth = function () {
         return this.$promises.login;
       }
 
-      this.profile.$clear();
+      if (refresh) {
+        // Only clear errors if we're refreshing the token
+        this.profile.$clearErrors();
+      } else {
+        this.profile.$clear();
+      }
       this.$promises.login = this.$utilities.createIframe(this.$loginUrl(refresh), true).then(function () {
         _this2.$promises.login = null;
         var error = _this2.profile.$validate();
@@ -8353,8 +8358,12 @@ var SalteAuth = function () {
         } else if (this.$config.loginType === 'redirect') {
           this.$promises.token = this.loginWithRedirect();
         } else if (this.$config.loginType === false) {
-          this.$promises.token = null;
-          return Promise.reject(new ReferenceError('Automatic login is disabled, please login before making any requests!'));
+          if (this.$promises.login) {
+            this.$promises.token = this.$promises.login;
+          } else {
+            this.$promises.token = null;
+            return Promise.reject(new ReferenceError('Automatic login is disabled, please login before making any requests!'));
+          }
         } else {
           this.$promises.token = null;
           return Promise.reject(new ReferenceError('Invalid Login Type (' + this.$config.loginType + ')'));
@@ -8411,22 +8420,20 @@ var SalteAuth = function () {
       var _this11 = this;
 
       logger('Visibility change detected, deferring to the next event loop...');
-      setTimeout(function () {
-        logger('Determining if the id token has expired...');
-        if (_this11.profile.idTokenExpired) return;
+      logger('Determining if the id token has expired...');
+      if (this.profile.idTokenExpired) return;
 
-        if (_this11.$utilities.$hidden) {
-          logger('Page is hidden, refreshing the token...');
-          _this11.refreshToken().then(function () {
-            logger('Disabling automatic renewal of the token...');
-            clearTimeout(_this11.$timeouts.refresh);
-            _this11.$timeouts.refresh = null;
-          });
-        } else {
-          logger('Page is visible restarting automatic token renewal...');
-          _this11.$$refreshToken();
-        }
-      });
+      if (this.$utilities.$hidden) {
+        logger('Page is hidden, refreshing the token...');
+        this.refreshToken().then(function () {
+          logger('Disabling automatic renewal of the token...');
+          clearTimeout(_this11.$timeouts.refresh);
+          _this11.$timeouts.refresh = null;
+        });
+      } else {
+        logger('Page is visible restarting automatic token renewal...');
+        this.$$refreshToken();
+      }
     }
   }, {
     key: '$provider',
@@ -8524,7 +8531,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var logger = (0, _debug2.default)('salte-io:auth.profile');
+var logger = (0, _debug2.default)('@salte-io/salte-auth:profile');
 
 /**
  * All the profile information associated with the current authentication session
@@ -9130,7 +9137,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var logger = (0, _debug2.default)('salte-io:auth.utilities');
+var logger = (0, _debug2.default)('@salte-io/salte-auth:utilities');
 
 /**
  * Basic utilities to support the authentication flow
