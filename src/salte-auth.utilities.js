@@ -1,7 +1,7 @@
 import assign from 'lodash/assign';
 import debug from 'debug';
 
-const logger = debug('salte-io:auth.utilities');
+const logger = debug('@salte-io/salte-auth:utilities');
 
 /**
  * Basic utilities to support the authentication flow

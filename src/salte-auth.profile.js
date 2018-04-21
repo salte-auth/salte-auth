@@ -2,7 +2,7 @@ import defaultsDeep from 'lodash/defaultsDeep';
 import find from 'lodash/find';
 import debug from 'debug';
 
-const logger = debug('salte-io:auth.profile');
+const logger = debug('@salte-io/salte-auth:profile');
 
 /**
  * All the profile information associated with the current authentication session
