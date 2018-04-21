@@ -1615,6 +1615,28 @@ describe('salte-auth', () => {
       });
     });
 
+    it('should use an active login request if automatic login is disabled', () => {
+      auth.$promises.login = Promise.resolve();
+      sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
+      sandbox.stub(auth.profile, 'accessTokenExpired').get(() => true);
+      sandbox.stub(auth.profile, '$clearErrors');
+      sandbox.stub(auth.profile, '$validate');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
+
+      auth.$config.loginType = false;
+
+      const promise = auth.retrieveAccessToken();
+
+      auth.profile.$accessToken = '55555-55555';
+
+      expect(auth.$promises.token).to.equal(promise);
+      return promise.then(accessToken => {
+        expect(auth.profile.$clearErrors.callCount).to.equal(1);
+        expect(accessToken).to.equal('55555-55555');
+        expect(auth.$promises.token).to.equal(null);
+      });
+    });
+
     it('should fail if automatic login is disabled', () => {
       auth.$config.loginType = false;
 
