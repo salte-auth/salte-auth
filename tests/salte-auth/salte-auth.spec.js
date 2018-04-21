@@ -47,7 +47,7 @@ describe('salte-auth', () => {
       expect(window.salte.auth).to.be.undefined;
     });
 
-    it('should default storageType and validation', () => {
+    it('should default loginType, storageType, and validation', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
@@ -55,6 +55,7 @@ describe('salte-auth', () => {
       });
 
       expect(auth.$config).to.deep.equal({
+        loginType: 'iframe',
         provider: 'auth0',
         storageType: 'session',
         validation: {
@@ -67,10 +68,11 @@ describe('salte-auth', () => {
       expect(auth.$config).to.deep.equal(auth.profile.$$config);
     });
 
-    it('should support overriding the storageType and validation', () => {
+    it('should support overriding the loginType, storageType, and validation', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
+        loginType: 'redirect',
         provider: 'auth0',
         storageType: 'local',
         validation: {
@@ -79,6 +81,7 @@ describe('salte-auth', () => {
       });
 
       expect(auth.$config).to.deep.equal({
+        loginType: 'redirect',
         provider: 'auth0',
         storageType: 'local',
         validation: {
@@ -1582,6 +1585,28 @@ describe('salte-auth', () => {
       });
     });
 
+    it('should support logging in via "redirect"', () => {
+      sandbox.stub(auth, 'loginWithRedirect').returns(Promise.resolve());
+      sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
+      sandbox.stub(auth.profile, 'accessTokenExpired').get(() => true);
+      sandbox.stub(auth.profile, '$clearErrors');
+      sandbox.stub(auth.profile, '$validate');
+      sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
+      auth.$config.loginType = 'redirect';
+
+      const promise = auth.retrieveAccessToken();
+
+      auth.profile.$accessToken = '55555-55555';
+
+      expect(auth.$promises.token).to.equal(promise);
+      return promise.then(accessToken => {
+        expect(auth.loginWithRedirect.callCount).to.equal(1);
+        expect(auth.profile.$clearErrors.callCount).to.equal(1);
+        expect(accessToken).to.equal('55555-55555');
+        expect(auth.$promises.token).to.equal(null);
+      });
+    });
+
     it('should bypass fetching the tokens if they have not expired', () => {
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
       sandbox.stub(auth.profile, 'accessTokenExpired').get(() => false);
@@ -1599,22 +1624,34 @@ describe('salte-auth', () => {
       });
     });
 
-    it('should not allow auto logging in via "redirect"', () => {
-      auth.$config.loginType = 'redirect';
-
-      sandbox.stub(auth.profile, 'idTokenExpired').get(() => true);
+    it('should fail if automatic login is disabled', () => {
+      auth.$config.loginType = false;
 
       const promise = auth.retrieveAccessToken();
 
-      expect(auth.$promises.token).to.equal(null);
-      return promise
-        .catch(error => {
-          return error;
-        })
-        .then(error => {
-          expect(error.message).to.equal('Invalid Login Type (redirect)');
-          expect(auth.$promises.token).to.equal(null);
-        });
+      return promise.catch((error) => error).then((error) => {
+        expect(error.message).to.equal('Automatic login is disabled, please login before making any requests!');
+      });
+    });
+
+    it('should fail if the loginType is unknown', () => {
+      auth.$config.loginType = 'bogus';
+
+      const promise = auth.retrieveAccessToken();
+
+      return promise.catch((error) => error).then((error) => {
+        expect(error.message).to.equal('Invalid Login Type (bogus)');
+      });
+    });
+
+    it('should fail if automatic login is disabled', () => {
+      auth.$config.loginType = false;
+
+      const promise = auth.retrieveAccessToken();
+
+      return promise.catch((error) => error).then((error) => {
+        expect(error.message).to.equal('Automatic login is disabled, please login before making any requests!');
+      });
     });
 
     it('should prevent duplicate promises', () => {
