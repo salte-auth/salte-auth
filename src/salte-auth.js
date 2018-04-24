@@ -179,6 +179,8 @@ class SalteAuth {
       document.addEventListener('visibilitychange', this.$$onVisibilityChanged.bind(this), {
         passive: true
       });
+
+      this.$fire('create', null, this);
     }
 
     // TODO(v3.0.0): Revoke singleton status from `salte-auth`.
