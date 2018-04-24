@@ -617,6 +617,22 @@ describe('salte-auth', () => {
       return promise;
     });
 
+    it('should fire an event off on the window', () => {
+      const promise = new Promise((resolve, reject) => {
+        window.addEventListener('salte-auth-logout', (ev) => {
+          if (ev.detail.error) {
+            return reject(ev.detail.error);
+          }
+
+          return resolve();
+        });
+      });
+
+      auth.$fire('logout');
+
+      return promise;
+    });
+
     it('should bail if the listeners are falsy or the list is empty', () => {
       auth.$fire('bogus');
 
