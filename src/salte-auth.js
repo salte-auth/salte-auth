@@ -375,7 +375,7 @@ class SalteAuth {
     } else {
       this.profile.$clear();
     }
-    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(refresh), true).then(() => {
+    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(refresh), !refresh).then(() => {
       this.$promises.login = null;
       const error = this.profile.$validate();
 
