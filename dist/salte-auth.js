@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.6.0
+ * @salte-io/salte-auth JavaScript Library v2.6.1
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -8028,7 +8028,7 @@ var SalteAuth = function () {
       } else {
         this.profile.$clear();
       }
-      this.$promises.login = this.$utilities.createIframe(this.$loginUrl(refresh), true).then(function () {
+      this.$promises.login = this.$utilities.createIframe(this.$loginUrl(refresh), !refresh).then(function () {
         _this2.$promises.login = null;
         var error = _this2.profile.$validate();
 
