@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.5.0
+ * @salte-io/salte-auth JavaScript Library v2.6.0
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7853,6 +7853,8 @@ var SalteAuth = function () {
       document.addEventListener('visibilitychange', this.$$onVisibilityChanged.bind(this), {
         passive: true
       });
+
+      this.$fire('create', null, this);
     }
 
     // TODO(v3.0.0): Revoke singleton status from `salte-auth`.
