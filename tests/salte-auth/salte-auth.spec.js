@@ -47,6 +47,26 @@ describe('salte-auth', () => {
       expect(window.salte.auth).to.be.undefined;
     });
 
+    it('should fire off a create event', () => {
+      const promise = new Promise((resolve, reject) => {
+        window.addEventListener('salte-auth-create', (event) => {
+          if (event.detail.error) return reject(event.detail.error);
+
+          return resolve(event.detail.data);
+        });
+      });
+
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        provider: 'auth0'
+      });
+
+      return promise.then((instance) => {
+        expect(instance).to.equal(auth);
+      });
+    });
+
     it('should default loginType, storageType, and validation', () => {
       delete window.salte.auth;
 
