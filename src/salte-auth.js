@@ -283,6 +283,15 @@ class SalteAuth {
    *
    *   console.log(user); // This is the same as auth.profile.userInfo.
    * });
+   *
+   * @example
+   * window.addEventListener('salte-auth-login', (event) => {
+   *   if (event.detail.error) {
+   *     console.log('something bad happened!');
+   *   }
+   *
+   *   console.log(event.detail.data); // This is the same as auth.profile.userInfo.
+   * });
    */
   on(eventType, callback) {
     if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
@@ -329,6 +338,11 @@ class SalteAuth {
    * @private
    */
   $fire(eventType, error, data) {
+    const event = document.createEvent('Event');
+    event.initEvent(`salte-auth-${eventType}`, false, true);
+    event.detail = { error, data };
+    window.dispatchEvent(event);
+
     const eventListeners = this.$listeners[eventType];
 
     if (!eventListeners || !eventListeners.length) return;
