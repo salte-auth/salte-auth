@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.4.1
+ * @salte-io/salte-auth JavaScript Library v2.5.0
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7923,6 +7923,15 @@ var SalteAuth = function () {
      *
      *   console.log(user); // This is the same as auth.profile.userInfo.
      * });
+     *
+     * @example
+     * window.addEventListener('salte-auth-login', (event) => {
+     *   if (event.detail.error) {
+     *     console.log('something bad happened!');
+     *   }
+     *
+     *   console.log(event.detail.data); // This is the same as auth.profile.userInfo.
+     * });
      */
     value: function on(eventType, callback) {
       if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
@@ -7975,6 +7984,11 @@ var SalteAuth = function () {
   }, {
     key: '$fire',
     value: function $fire(eventType, error, data) {
+      var event = document.createEvent('Event');
+      event.initEvent('salte-auth-' + eventType, false, true);
+      event.detail = { error: error, data: data };
+      window.dispatchEvent(event);
+
       var eventListeners = this.$listeners[eventType];
 
       if (!eventListeners || !eventListeners.length) return;
