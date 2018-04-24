@@ -713,6 +713,7 @@ describe('salte-auth', () => {
       auth.loginWithIframe();
 
       return promise.then((user) => {
+        expect(auth.$utilities.createIframe.calledWith(sinon.match(/.+/), true)).to.equal(true);
         expect(user).to.deep.equal(auth.profile.userInfo);
       });
     });
@@ -731,6 +732,7 @@ describe('salte-auth', () => {
       )}.0`);
 
       return auth.loginWithIframe(true).then((user) => {
+        expect(auth.$utilities.createIframe.calledWith(sinon.match(/.+/), false)).to.equal(true);
         expect(onLogin.callCount).to.equal(0);
         expect(user).to.deep.equal(auth.profile.userInfo);
       });
