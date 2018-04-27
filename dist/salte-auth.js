@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.6.1
+ * @salte-io/salte-auth JavaScript Library v2.6.2
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -8644,7 +8644,7 @@ var SalteAuthProfile = function () {
       if (action) {
         this.$saveItem('salte.auth.action.' + state, action);
       } else {
-        return this.$storage.getItem('salte.auth.action.' + state);
+        return this.$getItem('salte.auth.action.' + state);
       }
     }
 
@@ -8741,17 +8741,34 @@ var SalteAuthProfile = function () {
     /**
      * Saves a value to the Web Storage API
      * @param {String} key The key to save to
+     * @param {String} overrideStorageType the name of the storageType to use
+     * @return {*} the storage value for the given key
+     * @private
+     */
+
+  }, {
+    key: '$getItem',
+    value: function $getItem(key, overrideStorageType) {
+      var storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
+      return storage.getItem(key);
+    }
+
+    /**
+     * Saves a value to the Web Storage API
+     * @param {String} key The key to save to
      * @param {*} value The value to save, if this is undefined or null it will delete the key
+     * @param {String} overrideStorageType the name of the storageType to use
      * @private
      */
 
   }, {
     key: '$saveItem',
-    value: function $saveItem(key, value) {
+    value: function $saveItem(key, value, overrideStorageType) {
+      var storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
       if ([undefined, null].indexOf(value) !== -1) {
-        this.$storage.removeItem(key);
+        storage.removeItem(key);
       } else {
-        this.$storage.setItem(key, value);
+        storage.setItem(key, value);
       }
     }
 
@@ -8795,7 +8812,7 @@ var SalteAuthProfile = function () {
       var destinationStorage = this.$$getStorage(destination);
 
       for (var key in sourceStorage) {
-        if (key.indexOf('salte.auth.') !== 0) continue;
+        if (!key.match(/^salte\.auth\.[^$]/)) continue;
 
         destinationStorage.setItem(key, sourceStorage.getItem(key));
         sourceStorage.removeItem(key);
@@ -8810,9 +8827,15 @@ var SalteAuthProfile = function () {
   }, {
     key: '$clear',
     value: function $clear() {
-      for (var key in this.$storage) {
+      for (var key in localStorage) {
         if (key.match(/^salte\.auth\.[^$]/)) {
           this.$saveItem(key, undefined);
+        }
+      }
+
+      for (var _key in sessionStorage) {
+        if (_key.match(/^salte\.auth\.[^$]/)) {
+          this.$saveItem(_key, undefined);
         }
       }
     }
@@ -8854,10 +8877,10 @@ var SalteAuthProfile = function () {
   }, {
     key: '$tokenType',
     get: function get() {
-      return this.$storage.getItem('salte.auth.token-type');
+      return this.$getItem('salte.auth.$token-type', 'local');
     },
     set: function set(tokenType) {
-      this.$saveItem('salte.auth.token-type', tokenType);
+      this.$saveItem('salte.auth.$token-type', tokenType, 'local');
     }
 
     /**
@@ -8869,7 +8892,7 @@ var SalteAuthProfile = function () {
   }, {
     key: '$expiration',
     get: function get() {
-      return this.$storage.getItem('salte.auth.expiration');
+      return this.$getItem('salte.auth.expiration');
     },
     set: function set(expiration) {
       this.$saveItem('salte.auth.expiration', expiration);
@@ -8884,7 +8907,7 @@ var SalteAuthProfile = function () {
   }, {
     key: '$accessToken',
     get: function get() {
-      return this.$storage.getItem('salte.auth.access-token');
+      return this.$getItem('salte.auth.access-token');
     },
     set: function set(accessToken) {
       this.$saveItem('salte.auth.access-token', accessToken);
@@ -8899,7 +8922,7 @@ var SalteAuthProfile = function () {
   }, {
     key: '$idToken',
     get: function get() {
-      return this.$storage.getItem('salte.auth.id-token');
+      return this.$getItem('salte.auth.id-token');
     },
     set: function set(idToken) {
       this.$saveItem('salte.auth.id-token', idToken);
@@ -8916,10 +8939,10 @@ var SalteAuthProfile = function () {
   }, {
     key: '$state',
     get: function get() {
-      return this.$storage.getItem('salte.auth.state');
+      return this.$getItem('salte.auth.$state', 'local');
     },
     set: function set(state) {
-      this.$saveItem('salte.auth.state', state);
+      this.$saveItem('salte.auth.$state', state, 'local');
     }
 
     /**
@@ -8933,10 +8956,10 @@ var SalteAuthProfile = function () {
   }, {
     key: '$localState',
     get: function get() {
-      return this.$storage.getItem('salte.auth.local-state');
+      return this.$getItem('salte.auth.$local-state', 'local');
     },
     set: function set(localState) {
-      this.$saveItem('salte.auth.local-state', localState);
+      this.$saveItem('salte.auth.$local-state', localState, 'local');
     }
 
     /**
@@ -8948,7 +8971,7 @@ var SalteAuthProfile = function () {
   }, {
     key: '$error',
     get: function get() {
-      return this.$storage.getItem('salte.auth.error');
+      return this.$getItem('salte.auth.error');
     },
     set: function set(error) {
       this.$saveItem('salte.auth.error', error);
@@ -8963,7 +8986,7 @@ var SalteAuthProfile = function () {
   }, {
     key: '$errorDescription',
     get: function get() {
-      return this.$storage.getItem('salte.auth.error-description');
+      return this.$getItem('salte.auth.error-description');
     },
     set: function set(errorDescription) {
       this.$saveItem('salte.auth.error-description', errorDescription);
@@ -8978,10 +9001,10 @@ var SalteAuthProfile = function () {
   }, {
     key: '$redirectUrl',
     get: function get() {
-      return this.$storage.getItem('salte.auth.$redirect-url');
+      return this.$getItem('salte.auth.$redirect-url', 'local');
     },
     set: function set(redirectUrl) {
-      this.$saveItem('salte.auth.$redirect-url', redirectUrl);
+      this.$saveItem('salte.auth.$redirect-url', redirectUrl, 'local');
     }
 
     /**
@@ -8993,10 +9016,10 @@ var SalteAuthProfile = function () {
   }, {
     key: '$nonce',
     get: function get() {
-      return this.$storage.getItem('salte.auth.nonce');
+      return this.$getItem('salte.auth.$nonce', 'local');
     },
     set: function set(nonce) {
-      this.$saveItem('salte.auth.nonce', nonce);
+      this.$saveItem('salte.auth.$nonce', nonce, 'local');
     }
   }, {
     key: 'userInfo',
