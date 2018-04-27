@@ -16,6 +16,7 @@ describe('salte-auth.profile', () => {
 
   describe('function(constructor)', () => {
     beforeEach(() => {
+      localStorage.clear();
       sessionStorage.clear();
     });
 
@@ -150,7 +151,7 @@ describe('salte-auth.profile', () => {
   describe('setter(redirectUrl)', () => {
     it('should set sessionStorage', () => {
       profile.$redirectUrl = location.href;
-      expect(sessionStorage.getItem('salte.auth.$redirect-url')).to.equal(
+      expect(localStorage.getItem('salte.auth.$redirect-url')).to.equal(
         location.href
       );
     });
@@ -407,6 +408,11 @@ describe('salte-auth.profile', () => {
       expect(sessionStorage.getItem('bogus')).to.equal('bogus');
     });
 
+    it('should allow overriding the default storage', () => {
+      profile.$saveItem('bogus', 'bogus', 'local');
+      expect(localStorage.getItem('bogus')).to.equal('bogus');
+    });
+
     it('should allow other falsy values', () => {
       profile.$saveItem('bogus', '');
       expect(sessionStorage.getItem('bogus')).to.equal('');
@@ -420,6 +426,23 @@ describe('salte-auth.profile', () => {
     it('should delete items from sessionStorage when undefined', () => {
       profile.$saveItem('bogus', undefined);
       expect(sessionStorage.getItem('bogus')).to.equal(null);
+    });
+  });
+
+  describe('function($getItem)', () => {
+    it('should save to sessionStorage', () => {
+      profile.$saveItem('bogus', 'bogus');
+      expect(profile.$getItem('bogus')).to.equal('bogus');
+    });
+
+    it('should return null if the value does not exist', () => {
+      profile.$saveItem('bogus', null);
+      expect(profile.$getItem('bogus')).to.equal(null);
+    });
+
+    it('should support overriding the default storage', () => {
+      profile.$saveItem('bogus', '', 'local');
+      expect(profile.$getItem('bogus', 'local')).to.equal(localStorage.getItem('bogus'));
     });
   });
 
@@ -479,6 +502,35 @@ describe('salte-auth.profile', () => {
       expect(sessionStorage.getItem('error_description')).to.equal(
         'Look what you did!'
       );
+    });
+  });
+
+  describe('function($$transfer)', () => {
+    beforeEach(() => {
+      profile.$idToken = '12345-12345-12345';
+      profile.$state = '1234';
+    });
+
+    afterEach(() => {
+      profile.$clear();
+    });
+
+    it('should transfer salte variables between storage', () => {
+      profile.$$transfer('session', 'local');
+
+      expect(sessionStorage.getItem('salte.auth.id-token')).to.equal(null);
+      expect(localStorage.getItem('salte.auth.id-token')).to.equal('12345-12345-12345');
+      expect(sessionStorage.getItem('salte.auth.$state')).to.equal(null);
+      expect(localStorage.getItem('salte.auth.$state')).to.equal('1234');
+    });
+
+    it('should avoid transfering validation variables', () => {
+      profile.$$transfer('local', 'session');
+
+      expect(sessionStorage.getItem('salte.auth.id-token')).to.equal('12345-12345-12345');
+      expect(localStorage.getItem('salte.auth.id-token')).to.equal(null);
+      expect(sessionStorage.getItem('salte.auth.$state')).to.equal(null);
+      expect(localStorage.getItem('salte.auth.$state')).to.equal('1234');
     });
   });
 });
