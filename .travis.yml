@@ -5,10 +5,11 @@ cache:
   yarn: true
   directories:
     - node_modules
-branches:
-  only:
-    - master
-    - /^greenkeeper/.*$/
+# TODO: Remove this before merging!
+# branches:
+#   only:
+#     - master
+#     - /^greenkeeper/.*$/
 script:
   - yarn start lint
   - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then yarn start test.sauce; fi
