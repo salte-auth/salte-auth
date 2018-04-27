@@ -141,7 +141,7 @@
     };
 
     var queryParams = Object.assign({
-      provider: sessionStorage.getItem('salte.demo.provider') || 'auth0',
+      provider: localStorage.getItem('salte.demo.provider') || 'auth0',
       'login-type': 'redirect',
       secured: 'not-secured'
     }, location.search.replace(/^\?/, '').split('&').reduce(function(r, a) {
@@ -220,9 +220,9 @@
       });
     }
 
-    if (queryParams.provider !== sessionStorage.getItem('salte.demo.provider')) {
-      sessionStorage.clear();
-      sessionStorage.setItem('salte.demo.provider', queryParams.provider);
+    if (queryParams.provider !== localStorage.getItem('salte.demo.provider')) {
+      localStorage.clear();
+      localStorage.setItem('salte.demo.provider', queryParams.provider);
     }
 
     var auth = new salte.SalteAuth(config);
