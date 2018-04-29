@@ -3,10 +3,13 @@ import defaultsDeep from 'lodash/defaultsDeep';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import uuid from 'uuid';
+import debug from 'debug';
 
 import { Providers } from './salte-auth.providers.js';
 import { SalteAuthProfile } from './salte-auth.profile.js';
 import { SalteAuthUtilities } from './salte-auth.utilities.js';
+
+const logger = debug('@salte-io/salte-auth');
 
 /**
  * Disable certain security validations if your provider doesn't support them.
@@ -28,6 +31,7 @@ import { SalteAuthUtilities } from './salte-auth.utilities.js';
  * @property {Boolean|Array<String>} routes A list of secured routes. If true is provided then all routes are secured.
  * @property {Array<String|RegExp>} endpoints A list of secured endpoints.
  * @property {('auth0'|'azure'|'cognito'|'wso2')} provider The identity provider you're using.
+ * @property {('iframe'|'redirect'|false)} [loginType='iframe'] The automated login type to use.
  * @property {Function} [redirectLoginCallback] A callback that is invoked when a redirect login fails or succeeds.
  * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
@@ -62,11 +66,24 @@ class SalteAuth {
      */
     this.$promises = {};
     /**
+     * The active authentication timeouts
+     * @private
+     */
+    this.$timeouts = {};
+    /**
+     * The registered listeners
+     * @private
+     */
+    this.$listeners = {};
+    /**
      * The configuration for salte auth
+     * @type {Config}
      * @private
      */
     this.$config = config;
-    this.$config = defaultsDeep(config, this.$provider.defaultConfig);
+    this.$config = defaultsDeep(config, this.$provider.defaultConfig, {
+      loginType: 'iframe'
+    });
     /**
      * Various utility functions for salte auth
      * @type {SalteAuthUtilities}
@@ -81,23 +98,42 @@ class SalteAuth {
     this.profile = new SalteAuthProfile(this.$config);
 
     if (this.$utilities.$iframe) {
+      logger('Detected iframe, removing...');
       parent.document.body.removeChild(this.$utilities.$iframe);
     } else if (this.$utilities.$popup) {
+      logger('Popup detected!');
       // We need to utilize local storage to retain our parsed values
       if (this.$config.storageType === 'session') {
+        logger('Transfering from session to local storage...');
         this.profile.$$transfer('session', 'local');
       }
+      logger('Closing popup...');
       setTimeout(this.$utilities.$popup.close);
     } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
+      logger('Redirect detected!');
       const error = this.profile.$validate();
       if (error) {
         this.profile.$clear();
       } else {
+        logger(`Navigating to Redirect URL... (${this.profile.$redirectUrl})`);
         this.$utilities.$navigate(this.profile.$redirectUrl);
         this.profile.$redirectUrl = undefined;
       }
-      this.$config.redirectLoginCallback(error);
+
+      // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
+      this.$config.redirectLoginCallback && this.$config.redirectLoginCallback(error);
+
+      // Delay for an event loop to give users time to register a listener.
+      setTimeout(() => {
+        const action = this.profile.$actions(this.profile.$state);
+        if (action === 'login') {
+          this.$fire('login', error);
+        } else if (action === 'logout') {
+          this.$fire('logout', error);
+        }
+      });
     } else {
+      logger('Setting up interceptors...');
       this.$utilities.addXHRInterceptor((request, data) => {
         if (this.$utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
           return this.retrieveAccessToken().then((accessToken) => {
@@ -114,11 +150,45 @@ class SalteAuth {
         }
       });
 
-      window.addEventListener('popstate', this.$$onRouteChanged.bind(this));
-      document.addEventListener('click', this.$$onRouteChanged.bind(this));
+      logger('Setting up route change detectors...');
+      window.addEventListener('popstate', this.$$onRouteChanged.bind(this), { passive: true });
+      document.addEventListener('click', this.$$onRouteChanged.bind(this), { passive: true });
       setTimeout(this.$$onRouteChanged.bind(this));
+
+      logger('Setting up automatic renewal of token...');
+      this.on('login', (error, user) => {
+        if (error) return;
+
+        this.$$refreshToken();
+      });
+
+      this.on('refresh', (error, user) => {
+        if (error) return;
+
+        this.$$refreshToken();
+      });
+
+      this.on('logout', (error, user) => {
+        clearTimeout(this.$timeouts.refresh);
+      });
+
+      if (!this.profile.idTokenExpired) {
+        this.$$refreshToken();
+      }
+
+      document.addEventListener('visibilitychange', this.$$onVisibilityChanged.bind(this), {
+        passive: true
+      });
+
+      this.$fire('create', null, this);
     }
+
+    // TODO(v3.0.0): Revoke singleton status from `salte-auth`.
     window.salte.auth = this;
+
+    if (this.$config.redirectLoginCallback) {
+      console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
+    }
   }
 
   /**
@@ -169,10 +239,11 @@ class SalteAuth {
 
   /**
    * The authentication url to retrieve the id token
-   * @type {String}
+   * @param {Boolean} refresh Whether this request is intended to refresh the token.
+   * @return {String} the computed login url
    * @private
    */
-  get $loginUrl() {
+  $loginUrl(refresh) {
     this.profile.$localState = uuid.v4();
     this.profile.$nonce = uuid.v4();
 
@@ -187,7 +258,8 @@ class SalteAuth {
       'response_type': this.$config.responseType,
       'redirect_uri': this.$config.redirectUrl,
       'client_id': this.$config.clientId,
-      'scope': this.$config.scope
+      'scope': this.$config.scope,
+      'prompt': refresh ? 'none' : undefined
     }, this.$config.queryParams));
   }
 
@@ -201,16 +273,109 @@ class SalteAuth {
   }
 
   /**
-   * Authenticates using the iframe-based OAuth flow.
-   * @return {Promise} a promise that resolves when we finish authenticating
+   * Listens for an event to be invoked.
+   * @param {('login'|'logout'|'refresh')} eventType the event to listen for.
+   * @param {Function} callback A callback that fires when the specified event occurs.
+   *
+   * @example
+   * auth.on('login', (error, user) => {
+   *   if (error) {
+   *     console.log('something bad happened!');
+   *   }
+   *
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * });
+   *
+   * @example
+   * window.addEventListener('salte-auth-login', (event) => {
+   *   if (event.detail.error) {
+   *     console.log('something bad happened!');
+   *   }
+   *
+   *   console.log(event.detail.data); // This is the same as auth.profile.userInfo.
+   * });
    */
-  loginWithIframe() {
+  on(eventType, callback) {
+    if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
+      throw new ReferenceError(`Unknown Event Type (${eventType})`);
+    } else if (typeof callback !== 'function') {
+      throw new ReferenceError('Invalid callback provided!');
+    }
+
+    this.$listeners[eventType] = this.$listeners[eventType] || [];
+    this.$listeners[eventType].push(callback);
+  }
+
+  /**
+   * Deregister a callback previously registered.
+   * @param {('login'|'logout'|'refresh')} eventType the event to deregister.
+   * @param {Function} callback A callback that fires when the specified event occurs.
+   *
+   * @example
+   * const someFunction = function() {};
+   *
+   * auth.on('login', someFunction);
+   *
+   * auth.off('login', someFunction);
+   */
+  off(eventType, callback) {
+    if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
+      throw new ReferenceError(`Unknown Event Type (${eventType})`);
+    } else if (typeof callback !== 'function') {
+      throw new ReferenceError('Invalid callback provided!');
+    }
+
+    const eventListeners = this.$listeners[eventType];
+    if (!eventListeners || !eventListeners.length) return;
+
+    const index = eventListeners.indexOf(callback);
+    eventListeners.splice(index, 1);
+  }
+
+  /**
+   * Fires off an event to a given set of listeners
+   * @param {String} eventType The event that occurred.
+   * @param {Error} error The error tied to this event.
+   * @param {*} data The data tied to this event.
+   * @private
+   */
+  $fire(eventType, error, data) {
+    const event = document.createEvent('Event');
+    event.initEvent(`salte-auth-${eventType}`, false, true);
+    event.detail = { error, data };
+    window.dispatchEvent(event);
+
+    const eventListeners = this.$listeners[eventType];
+
+    if (!eventListeners || !eventListeners.length) return;
+
+    eventListeners.forEach((listener) => listener(error, data));
+  }
+
+  /**
+   * Authenticates using the iframe-based OAuth flow.
+   * @param {Boolean} refresh Whether this request is intended to refresh the token.
+   * @return {Promise<Object>} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithIframe().then((user) => {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
+   */
+  loginWithIframe(refresh) {
     if (this.$promises.login) {
       return this.$promises.login;
     }
 
-    this.profile.$clear();
-    this.$promises.login = this.$utilities.createIframe(this.$loginUrl, true).then(() => {
+    if (refresh) {
+      // Only clear errors if we're refreshing the token
+      this.profile.$clearErrors();
+    } else {
+      this.profile.$clear();
+    }
+    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(refresh), !refresh).then(() => {
       this.$promises.login = null;
       const error = this.profile.$validate();
 
@@ -218,8 +383,15 @@ class SalteAuth {
         this.profile.$clear();
         return Promise.reject(error);
       }
+
+      const user = this.profile.userInfo;
+      if (!refresh) {
+        this.$fire('login', null, user);
+      }
+      return user;
     }).catch((error) => {
       this.$promises.login = null;
+      this.$fire('login', error);
       return Promise.reject(error);
     });
 
@@ -228,7 +400,14 @@ class SalteAuth {
 
   /**
    * Authenticates using the popup-based OAuth flow.
-   * @return {Promise} a promise that resolves when we finish authenticating
+   * @return {Promise<Object>} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithPopup().then((user) => {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
    */
   loginWithPopup() {
     if (this.$promises.login) {
@@ -236,7 +415,7 @@ class SalteAuth {
     }
 
     this.profile.$clear();
-    this.$promises.login = this.$utilities.openPopup(this.$loginUrl).then(() => {
+    this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(() => {
       this.$promises.login = null;
       // We need to utilize local storage to retain our parsed values
       if (this.$config.storageType === 'session') {
@@ -248,8 +427,13 @@ class SalteAuth {
         this.profile.$clear();
         return Promise.reject(error);
       }
+
+      const user = this.profile.userInfo;
+      this.$fire('login', null, user);
+      return user;
     }).catch((error) => {
       this.$promises.login = null;
+      this.$fire('login', error);
       return Promise.reject(error);
     });
 
@@ -258,7 +442,14 @@ class SalteAuth {
 
   /**
    * Authenticates using the tab-based OAuth flow.
-   * @return {Promise} a promise that resolves when we finish authenticating
+   * @return {Promise<Object>} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithNewTab().then((user) => {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
    */
   loginWithNewTab() {
     if (this.$promises.login) {
@@ -266,7 +457,7 @@ class SalteAuth {
     }
 
     this.profile.$clear();
-    this.$promises.login = this.$utilities.openNewTab(this.$loginUrl).then(() => {
+    this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(() => {
       this.$promises.login = null;
       // We need to utilize local storage to retain our parsed values
       if (this.$config.storageType === 'session') {
@@ -278,8 +469,13 @@ class SalteAuth {
         this.profile.$clear();
         return Promise.reject(error);
       }
+
+      const user = this.profile.userInfo;
+      this.$fire('login', null, user);
+      return user;
     }).catch((error) => {
       this.$promises.login = null;
+      this.$fire('login', error);
       return Promise.reject(error);
     });
 
@@ -288,11 +484,14 @@ class SalteAuth {
 
   /**
    * Authenticates using the redirect-based OAuth flow.
-   * @return {Promise} a promise that resolves on the next event loop
+   * @return {Promise} a promise intended to block future login attempts.
+   *
+   * @example
+   * auth.loginWithRedirect(); // Don't bother with utilizing the promise here, it never resolves.
    */
   loginWithRedirect() {
-    if (!this.$config.redirectLoginCallback) {
-      throw new ReferenceError('A redirectLoginCallback is required to invoke "loginWithRedirect"!');
+    if (this.$config.redirectLoginCallback) {
+      console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
     }
 
     if (this.$promises.login) {
@@ -306,7 +505,10 @@ class SalteAuth {
 
     this.profile.$clear();
     this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
-    this.$utilities.$navigate(this.$loginUrl);
+    const url = this.$loginUrl();
+
+    this.profile.$actions(this.profile.$localState, 'login');
+    this.$utilities.$navigate(url);
 
     return this.$promises.login;
   }
@@ -314,6 +516,13 @@ class SalteAuth {
   /**
    * Unauthenticates using the iframe-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithIframe().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
    */
   logoutWithIframe() {
     if (this.$promises.logout) {
@@ -323,6 +532,11 @@ class SalteAuth {
     this.profile.$clear();
     this.$promises.logout = this.$utilities.createIframe(this.$deauthorizeUrl).then(() => {
       this.$promises.logout = null;
+      this.$fire('logout');
+    }).catch((error) => {
+      this.$promises.logout = null;
+      this.$fire('logout', error);
+      return Promise.reject(error);
     });
     return this.$promises.logout;
   }
@@ -330,6 +544,13 @@ class SalteAuth {
   /**
    * Unauthenticates using the popup-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithPopup().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
    */
   logoutWithPopup() {
     if (this.$promises.logout) {
@@ -339,6 +560,11 @@ class SalteAuth {
     this.profile.$clear();
     this.$promises.logout = this.$utilities.openPopup(this.$deauthorizeUrl).then(() => {
       this.$promises.logout = null;
+      this.$fire('logout');
+    }).catch((error) => {
+      this.$promises.logout = null;
+      this.$fire('logout', error);
+      return Promise.reject(error);
     });
 
     return this.$promises.logout;
@@ -347,6 +573,13 @@ class SalteAuth {
   /**
    * Unauthenticates using the tab-based OAuth flow.
    * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithNewTab().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
    */
   logoutWithNewTab() {
     if (this.$promises.logout) {
@@ -356,6 +589,11 @@ class SalteAuth {
     this.profile.$clear();
     this.$promises.logout = this.$utilities.openNewTab(this.$deauthorizeUrl).then(() => {
       this.$promises.logout = null;
+      this.$fire('logout');
+    }).catch((error) => {
+      this.$promises.logout = null;
+      this.$fire('logout', error);
+      return Promise.reject(error);
     });
 
     return this.$promises.logout;
@@ -363,10 +601,59 @@ class SalteAuth {
 
   /**
    * Logs the user out of their configured identity provider.
+   *
+   * @example
+   * auth.logoutWithRedirect();
    */
   logoutWithRedirect() {
     this.profile.$clear();
-    this.$utilities.$navigate(this.$deauthorizeUrl);
+    const url = this.$deauthorizeUrl;
+
+    this.profile.$actions(this.profile.$localState, 'logout');
+    this.$utilities.$navigate(url);
+  }
+
+  /**
+   * Refreshes the users tokens and renews their session.
+   * @return {Promise} a promise that resolves when we finish renewing the users tokens.
+   */
+  refreshToken() {
+    if (this.$promises.token) {
+      return this.$promises.token;
+    }
+
+    this.$promises.token = this.loginWithIframe(true).then((user) => {
+      this.$promises.token = null;
+      const error = this.profile.$validate(true);
+
+      if (error) {
+        return Promise.reject(error);
+      }
+      this.$promises.token = null;
+      this.$fire('refresh', null, user);
+      return user;
+    }).catch((error) => {
+      this.$promises.token = null;
+      this.$fire('refresh', error);
+      return Promise.reject(error);
+    });
+
+    return this.$promises.token;
+  }
+
+  /**
+   * Registers a timeout that will automatically refresh the id token
+   */
+  $$refreshToken() {
+    if (this.$timeouts.refresh !== undefined) {
+      clearTimeout(this.$timeouts.refresh);
+    }
+
+    this.$timeouts.refresh = setTimeout(() => {
+      this.refreshToken().catch((error) => {
+        console.error(error);
+      });
+    }, Math.max((this.profile.userInfo.exp * 1000) - Date.now() - 60000, 0));
   }
 
   /**
@@ -375,13 +662,25 @@ class SalteAuth {
    */
   retrieveAccessToken() {
     if (this.$promises.token) {
+      logger('Existing token request detected, resolving...');
       return this.$promises.token;
     }
 
     this.$promises.token = Promise.resolve();
     if (this.profile.idTokenExpired) {
-      if ([undefined, null, 'iframe'].indexOf(this.$config.loginType) !== -1) {
+      logger('id token has expired, reauthenticating...');
+      if (this.$config.loginType === 'iframe') {
+        logger('Initiating the iframe flow...');
         this.$promises.token = this.loginWithIframe();
+      } else if (this.$config.loginType === 'redirect') {
+        this.$promises.token = this.loginWithRedirect();
+      } else if (this.$config.loginType === false) {
+        if (this.$promises.login) {
+          this.$promises.token = this.$promises.login;
+        } else {
+          this.$promises.token = null;
+          return Promise.reject(new ReferenceError('Automatic login is disabled, please login before making any requests!'));
+        }
       } else {
         this.$promises.token = null;
         return Promise.reject(new ReferenceError(`Invalid Login Type (${this.$config.loginType})`));
@@ -391,6 +690,7 @@ class SalteAuth {
     this.$promises.token = this.$promises.token.then(() => {
       this.profile.$clearErrors();
       if (this.profile.accessTokenExpired) {
+        logger('Access token has expired, renewing...');
         return this.$utilities.createIframe(this.$accessTokenUrl).then(() => {
           this.$promises.token = null;
           const error = this.profile.$validate(true);
@@ -416,9 +716,33 @@ class SalteAuth {
    * @ignore
    */
   $$onRouteChanged() {
+    logger('Route change detected, determining if the route is secured...');
     if (!this.$utilities.isRouteSecure(location.href, this.$config.routes)) return;
 
+    logger('Route is secure, verifying tokens...');
     this.retrieveAccessToken();
+  }
+
+  /**
+   * Disables automatic refresh of the token if the page is no longer visible
+   * @ignore
+   */
+  $$onVisibilityChanged() {
+    logger('Visibility change detected, deferring to the next event loop...');
+    logger('Determining if the id token has expired...');
+    if (this.profile.idTokenExpired) return;
+
+    if (this.$utilities.$hidden) {
+      logger('Page is hidden, refreshing the token...');
+      this.refreshToken().then(() => {
+        logger('Disabling automatic renewal of the token...');
+        clearTimeout(this.$timeouts.refresh);
+        this.$timeouts.refresh = null;
+      });
+    } else {
+      logger('Page is visible restarting automatic token renewal...');
+      this.$$refreshToken();
+    }
   }
 }
 

@@ -1,4 +1,7 @@
 import assign from 'lodash/assign';
+import debug from 'debug';
+
+const logger = debug('@salte-io/salte-auth:utilities');
 
 /**
  * Basic utilities to support the authentication flow
@@ -14,6 +17,7 @@ class SalteAuthUtilities {
       xhr: []
     };
 
+    logger('Setting up wrappers for XMLHttpRequest...');
     (function(open) {
       XMLHttpRequest.prototype.open = function(method, url) {
         /** @ignore */
@@ -42,6 +46,7 @@ class SalteAuthUtilities {
     })(XMLHttpRequest.prototype.send);
 
     if (window.fetch) {
+      logger('Fetch detected, setting up wrappers...');
       (function(fetch) {
         window.fetch = function(input, options) {
           const request = input instanceof Request ? input : new Request(input, options);
@@ -171,6 +176,7 @@ class SalteAuthUtilities {
       return Promise.reject(new ReferenceError('We were unable to open the new tab, its likely that the request was blocked.'));
     }
 
+    tabWindow.name = 'salte-auth';
     tabWindow.focus();
     // TODO: Find a better way of tracking when a Window closes.
     return new Promise((resolve) => {
@@ -218,7 +224,7 @@ class SalteAuthUtilities {
     return new Promise((resolve) => {
       iframe.addEventListener('DOMNodeRemoved', () => {
         setTimeout(resolve);
-      });
+      }, { passive: true });
     });
   }
 
@@ -260,6 +266,15 @@ class SalteAuthUtilities {
       return window;
     }
     return null;
+  }
+
+  /**
+   * Determines if the page is currently hidden
+   * @return {Boolean} true if the page is hidden
+   * @private
+   */
+  get $hidden() {
+    return document.hidden;
   }
 
   /**
