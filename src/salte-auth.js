@@ -38,6 +38,14 @@ const logger = debug('@salte-io/salte-auth');
  */
 
 /**
+ * The configuration for salte auth
+ * @typedef {Object} LoginConfig
+ * @property {Boolean} [noPrompt=false] Disables login prompts, this should only be used for token renewal!
+ * @property {(false|'errors'|'all')} [clear='all'] Whether to clear "all" profile information, only "errors", or nothing.
+ * @property {Boolean} [events=true] Whether events should be fired off if the login is successful or not.
+ */
+
+/**
  * Authentication Controller
  */
 class SalteAuth {
@@ -354,7 +362,7 @@ class SalteAuth {
 
   /**
    * Authenticates using the iframe-based OAuth flow.
-   * @param {Boolean} refresh Whether this request is intended to refresh the token.
+   * @param {Boolean|LoginConfig} config Whether this request is intended to refresh the token.
    * @return {Promise<Object>} a promise that resolves when we finish authenticating
    *
    * @example
@@ -364,34 +372,50 @@ class SalteAuth {
    *   console.error('Whoops something went wrong!', error);
    * });
    */
-  loginWithIframe(refresh) {
+  loginWithIframe(config) {
     if (this.$promises.login) {
       return this.$promises.login;
     }
 
-    if (refresh) {
-      // Only clear errors if we're refreshing the token
-      this.profile.$clearErrors();
-    } else {
-      this.profile.$clear();
+    // TODO(v3.0.0): Remove backwards compatibility with refresh boolean.
+    if (typeof config === 'boolean') {
+      config = {
+        noPrompt: config,
+        clear: config ? 'errors' : undefined,
+        events: false
+      };
     }
-    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(refresh), !refresh).then(() => {
+
+    config = defaultsDeep(config, {
+      noPrompt: false,
+      clear: 'all',
+      events: true
+    });
+
+    if (config.clear === 'all') {
+      this.profile.$clear();
+    } else if (config.clear === 'errors') {
+      this.profile.$clearErrors();
+    }
+
+    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt).then(() => {
       this.$promises.login = null;
       const error = this.profile.$validate();
 
       if (error) {
-        this.profile.$clear();
         return Promise.reject(error);
       }
 
       const user = this.profile.userInfo;
-      if (!refresh) {
+      if (config.events) {
         this.$fire('login', null, user);
       }
       return user;
     }).catch((error) => {
       this.$promises.login = null;
-      this.$fire('login', error);
+      if (config.events) {
+        this.$fire('login', error);
+      }
       return Promise.reject(error);
     });
 
