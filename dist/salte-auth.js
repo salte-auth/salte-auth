@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.6.2
+ * @salte-io/salte-auth JavaScript Library v2.7.0
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7707,6 +7707,14 @@ var logger = (0, _debug2.default)('@salte-io/salte-auth');
  */
 
 /**
+ * The configuration for salte auth
+ * @typedef {Object} LoginConfig
+ * @property {Boolean} [noPrompt=false] Disables login prompts, this should only be used for token renewal!
+ * @property {(false|'errors'|'all')} [clear='all'] Whether to clear "all" profile information, only "errors", or nothing.
+ * @property {Boolean} [events=true] Whether events should be fired off if the login is successful or not.
+ */
+
+/**
  * Authentication Controller
  */
 
@@ -8002,7 +8010,7 @@ var SalteAuth = function () {
 
     /**
      * Authenticates using the iframe-based OAuth flow.
-     * @param {Boolean} refresh Whether this request is intended to refresh the token.
+     * @param {Boolean|LoginConfig} config Whether this request is intended to refresh the token.
      * @return {Promise<Object>} a promise that resolves when we finish authenticating
      *
      * @example
@@ -8015,36 +8023,52 @@ var SalteAuth = function () {
 
   }, {
     key: 'loginWithIframe',
-    value: function loginWithIframe(refresh) {
+    value: function loginWithIframe(config) {
       var _this2 = this;
 
       if (this.$promises.login) {
         return this.$promises.login;
       }
 
-      if (refresh) {
-        // Only clear errors if we're refreshing the token
-        this.profile.$clearErrors();
-      } else {
-        this.profile.$clear();
+      // TODO(v3.0.0): Remove backwards compatibility with refresh boolean.
+      if (typeof config === 'boolean') {
+        config = {
+          noPrompt: config,
+          clear: config ? 'errors' : undefined,
+          events: false
+        };
       }
-      this.$promises.login = this.$utilities.createIframe(this.$loginUrl(refresh), !refresh).then(function () {
+
+      config = (0, _defaultsDeep2.default)(config, {
+        noPrompt: false,
+        clear: 'all',
+        events: true
+      });
+
+      if (config.clear === 'all') {
+        this.profile.$clear();
+      } else if (config.clear === 'errors') {
+        this.profile.$clearErrors();
+      }
+
+      this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt).then(function () {
         _this2.$promises.login = null;
         var error = _this2.profile.$validate();
 
         if (error) {
-          _this2.profile.$clear();
           return Promise.reject(error);
         }
 
         var user = _this2.profile.userInfo;
-        if (!refresh) {
+        if (config.events) {
           _this2.$fire('login', null, user);
         }
         return user;
       }).catch(function (error) {
         _this2.$promises.login = null;
-        _this2.$fire('login', error);
+        if (config.events) {
+          _this2.$fire('login', error);
+        }
         return Promise.reject(error);
       });
 

@@ -750,6 +750,100 @@ describe('salte-auth', () => {
       });
     });
 
+    it('should support clearing the entire profile', () => {
+      sandbox.stub(auth.profile, '$validate');
+
+      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`);
+
+      return auth.loginWithIframe({
+        clear: 'all'
+      }).then((user) => {
+        expect(auth.profile.$clear.callCount).to.equal(1);
+      });
+    });
+
+    it('should support clearing only errors', () => {
+      sandbox.stub(auth.profile, '$clearErrors');
+      sandbox.stub(auth.profile, '$validate');
+
+      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`);
+
+      return auth.loginWithIframe({
+        clear: 'errors'
+      }).then((user) => {
+        expect(auth.profile.$clearErrors.callCount).to.equal(1);
+      });
+    });
+
+    it('should support disabling profile clearing', () => {
+      sandbox.stub(auth.profile, '$clearErrors');
+      sandbox.stub(auth.profile, '$validate');
+
+      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`);
+
+      return auth.loginWithIframe({
+        clear: false
+      }).then((user) => {
+        expect(auth.profile.$clear.callCount).to.equal(0);
+        expect(auth.profile.$clearErrors.callCount).to.equal(0);
+      });
+    });
+
+    it('should support disabling prompt-based login', () => {
+      sandbox.stub(auth.profile, '$validate');
+
+      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`);
+
+      return auth.loginWithIframe({
+        noPrompt: true
+      }).then((user) => {
+        expect(auth.$utilities.createIframe.calledWith(sinon.match(/.+/), false)).to.equal(true);
+        expect(user).to.deep.equal(auth.profile.userInfo);
+      });
+    });
+
+    it('should support disabling events', () => {
+      const onLogin = sandbox.stub();
+      auth.on('login', onLogin);
+
+      sandbox.stub(auth.profile, '$validate');
+
+      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe'
+        })
+      )}.0`);
+
+      return auth.loginWithIframe({
+        events: false
+      }).then((user) => {
+        expect(auth.$utilities.createIframe.calledWith(sinon.match(/.+/), true)).to.equal(true);
+        expect(onLogin.callCount).to.equal(0);
+        expect(user).to.deep.equal(auth.profile.userInfo);
+      });
+    });
+
     it('should fire off a "login" event on failures', () => {
       const promise = new Promise((resolve, reject) => {
         auth.on('login', (error, user) => {
