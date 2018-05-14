@@ -5,7 +5,9 @@ import SalteAuthUtilities from '../../../src/salte-auth.utilities.js';
 describe('function(openNewTab)', () => {
   let sandbox, utilities;
   beforeEach(() => {
-    utilities = new SalteAuthUtilities();
+    utilities = new SalteAuthUtilities({
+      redirectUrl: 'https://redirect-url'
+    });
     sandbox = sinon.createSandbox();
   });
 
@@ -14,24 +16,29 @@ describe('function(openNewTab)', () => {
   });
 
   it('should open a new tab', () => {
-    const newTab = {
+    sandbox.stub(window, 'open').returns({
       closed: false,
       focus: sandbox.stub(),
       close: function() {
         this.closed = true;
+      },
+      location: {
+        href: 'https://incorrect-redirect-url'
       }
-    };
-    sandbox.stub(window, 'open').returns(newTab);
-
-    const promise = utilities.openNewTab('https://www.google.com');
-    
-    expect(newTab.name).to.equal('salte-auth');
+    });
 
     setTimeout(() => {
-      window.open.firstCall.returnValue.close();
+      sandbox.stub(window.open.firstCall.returnValue, 'location').get(() => {
+        return {
+          href: 'https://redirect-url'
+        };
+      });
     }, 200);
 
-    return promise;
+    return utilities.openNewTab('https://www.google.com').then(() => {
+      const tab = window.open.firstCall.returnValue;
+      expect(tab.name).to.equal('salte-auth');
+    });
   });
 
   it('should handle blocked tabs', () => {
