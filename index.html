@@ -83,6 +83,10 @@
       <option value="tab">New Tab</option>
       <option value="iframe">Iframe</option>
     </select>
+    <select id="storage-type" name="storage-type">
+      <option value="session">Session Storage</option>
+      <option value="local">Local Storage</option>
+    </select>
     <select id="secured" name="secured">
       <option value="not-secured">Not Secured</option>
       <option value="all-routes">Secure All Routes</option>
@@ -107,6 +111,7 @@
     var elements = {
       provider: document.getElementById('provider'),
       loginType: document.getElementById('login-type'),
+      storageType: document.getElementById('storage-type'),
       secured: document.getElementById('secured'),
       footer: document.getElementById('footer'),
       userInfo: document.getElementById('user-info'),
@@ -143,6 +148,7 @@
     var queryParams = Object.assign({
       provider: localStorage.getItem('salte.demo.provider') || 'auth0',
       'login-type': 'redirect',
+      'storage-type': localStorage.getItem('salte.demo.storage-type') || 'session',
       secured: 'not-secured'
     }, location.search.replace(/^\?/, '').split('&').reduce(function(r, a) {
       var match = a.match(/([^=]+)(?:=([^&]+))?/);
@@ -160,6 +166,7 @@
 
     elements.provider.value = queryParams.provider;
     elements.loginType.value = queryParams['login-type'];
+    elements.storageType.value = queryParams['storage-type'];
     elements.secured.value = queryParams.secured;
 
     function updateParamsOnChange() {
@@ -197,6 +204,7 @@
 
     elements.provider.addEventListener('change', updateParamsOnChange);
     elements.loginType.addEventListener('change', updateParamsOnChange);
+    elements.storageType.addEventListener('change', updateParamsOnChange);
     elements.secured.addEventListener('change', updateParamsOnChange);
 
     var config = Object.assign(configs[queryParams.provider], {
@@ -205,7 +213,9 @@
 
       provider: queryParams.provider,
 
-      loginType: 'redirect'
+      loginType: 'redirect',
+
+      storageType: queryParams['storage-type']
     });
 
     if (['all', 'all-routes'].includes(queryParams.secured)) {
@@ -223,6 +233,10 @@
     if (queryParams.provider !== localStorage.getItem('salte.demo.provider')) {
       localStorage.clear();
       localStorage.setItem('salte.demo.provider', queryParams.provider);
+    }
+
+    if (queryParams['storage-type'] !== localStorage.getItem('salte.demo.storage-type')) {
+      localStorage.setItem('salte.demo.storage-type', queryParams['storage-type']);
     }
 
     var auth = new salte.SalteAuth(config);
