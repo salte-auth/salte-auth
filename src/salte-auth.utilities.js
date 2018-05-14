@@ -9,8 +9,12 @@ const logger = debug('@salte-io/salte-auth:utilities');
 class SalteAuthUtilities {
   /**
    * Wraps all XHR and Fetch (if available) requests to allow promise interceptors
+   * @param {Config} config configuration for salte auth
    */
-  constructor() {
+  constructor(config) {
+    /** @ignore */
+    this.$$config = config;
+
     /** @ignore */
     this.$interceptors = {
       fetch: [],
@@ -158,9 +162,15 @@ class SalteAuthUtilities {
     // TODO: Find a better way of tracking when a Window closes.
     return new Promise((resolve) => {
       const checker = setInterval(() => {
-        if (!popupWindow.closed) return;
-        clearInterval(checker);
-        setTimeout(resolve);
+        try {
+          // This could throw cross-domain errors, so we need to silence them.
+          if (popupWindow.location.href.indexOf(this.$$config.redirectUrl) !== 0) return;
+
+          location.hash = popupWindow.location.hash;
+          popupWindow.close();
+          clearInterval(checker);
+          setTimeout(resolve);
+        } catch (e) {}
       }, 100);
     });
   }
@@ -181,9 +191,15 @@ class SalteAuthUtilities {
     // TODO: Find a better way of tracking when a Window closes.
     return new Promise((resolve) => {
       const checker = setInterval(() => {
-        if (!tabWindow.closed) return;
-        clearInterval(checker);
-        setTimeout(resolve);
+        try {
+          // This could throw cross-domain errors, so we need to silence them.
+          if (tabWindow.location.href.indexOf(this.$$config.redirectUrl) !== 0) return;
+
+          location.hash = tabWindow.location.hash;
+          tabWindow.close();
+          clearInterval(checker);
+          setTimeout(resolve);
+        } catch (e) {}
       }, 100);
     });
   }

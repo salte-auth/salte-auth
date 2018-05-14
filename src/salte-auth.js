@@ -97,7 +97,7 @@ class SalteAuth {
      * @type {SalteAuthUtilities}
      * @private
      */
-    this.$utilities = new SalteAuthUtilities();
+    this.$utilities = new SalteAuthUtilities(this.$config);
 
     /**
      * The user profile for salte auth
@@ -110,13 +110,6 @@ class SalteAuth {
       parent.document.body.removeChild(this.$utilities.$iframe);
     } else if (this.$utilities.$popup) {
       logger('Popup detected!');
-      // We need to utilize local storage to retain our parsed values
-      if (this.$config.storageType === 'session') {
-        logger('Transfering from session to local storage...');
-        this.profile.$$transfer('session', 'local');
-      }
-      logger('Closing popup...');
-      setTimeout(this.$utilities.$popup.close);
     } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
       logger('Redirect detected!');
       const error = this.profile.$validate();
@@ -441,10 +434,7 @@ class SalteAuth {
     this.profile.$clear();
     this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(() => {
       this.$promises.login = null;
-      // We need to utilize local storage to retain our parsed values
-      if (this.$config.storageType === 'session') {
-        this.profile.$$transfer('local', 'session');
-      }
+      this.profile.$hash();
       const error = this.profile.$validate();
 
       if (error) {
@@ -483,10 +473,7 @@ class SalteAuth {
     this.profile.$clear();
     this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(() => {
       this.$promises.login = null;
-      // We need to utilize local storage to retain our parsed values
-      if (this.$config.storageType === 'session') {
-        this.profile.$$transfer('local', 'session');
-      }
+      this.profile.$hash();
       const error = this.profile.$validate();
 
       if (error) {

@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.7.0
+ * @salte-io/salte-auth JavaScript Library v2.7.1
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7771,7 +7771,7 @@ var SalteAuth = function () {
      * @type {SalteAuthUtilities}
      * @private
      */
-    this.$utilities = new _salteAuthUtilities.SalteAuthUtilities();
+    this.$utilities = new _salteAuthUtilities.SalteAuthUtilities(this.$config);
 
     /**
      * The user profile for salte auth
@@ -7784,13 +7784,6 @@ var SalteAuth = function () {
       parent.document.body.removeChild(this.$utilities.$iframe);
     } else if (this.$utilities.$popup) {
       logger('Popup detected!');
-      // We need to utilize local storage to retain our parsed values
-      if (this.$config.storageType === 'session') {
-        logger('Transfering from session to local storage...');
-        this.profile.$$transfer('session', 'local');
-      }
-      logger('Closing popup...');
-      setTimeout(this.$utilities.$popup.close);
     } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
       logger('Redirect detected!');
       var error = this.profile.$validate();
@@ -8099,10 +8092,7 @@ var SalteAuth = function () {
       this.profile.$clear();
       this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(function () {
         _this3.$promises.login = null;
-        // We need to utilize local storage to retain our parsed values
-        if (_this3.$config.storageType === 'session') {
-          _this3.profile.$$transfer('local', 'session');
-        }
+        _this3.profile.$hash();
         var error = _this3.profile.$validate();
 
         if (error) {
@@ -8146,10 +8136,7 @@ var SalteAuth = function () {
       this.profile.$clear();
       this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(function () {
         _this4.$promises.login = null;
-        // We need to utilize local storage to retain our parsed values
-        if (_this4.$config.storageType === 'session') {
-          _this4.profile.$$transfer('local', 'session');
-        }
+        _this4.profile.$hash();
         var error = _this4.profile.$validate();
 
         if (error) {
@@ -8596,31 +8583,43 @@ var SalteAuthProfile = function () {
       },
       storageType: 'session'
     });
-    if (location.hash) {
-      var params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
-      logger('Hash detected, parsing...', params);
-      for (var i = 0; i < params.length; i++) {
-        var param = params[i];
-
-        var _param$split = param.split('='),
-            _param$split2 = _slicedToArray(_param$split, 2),
-            key = _param$split2[0],
-            value = _param$split2[1];
-
-        this.$parse(key, decodeURIComponent(value));
-      }
-    }
+    this.$hash();
   }
 
   /**
-   * Parse a key-value pair
-   * @param {String} key the key to parse
-   * @param {Object} value the matching value to parse
-   * @private
+   * Check for a hash, parses it, and removes it.
    */
 
 
   _createClass(SalteAuthProfile, [{
+    key: '$hash',
+    value: function $hash() {
+      if (location.hash) {
+        var params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
+        logger('Hash detected, parsing...', params);
+        for (var i = 0; i < params.length; i++) {
+          var param = params[i];
+
+          var _param$split = param.split('='),
+              _param$split2 = _slicedToArray(_param$split, 2),
+              key = _param$split2[0],
+              value = _param$split2[1];
+
+          this.$parse(key, decodeURIComponent(value));
+        }
+        logger('Removing hash...');
+        history.pushState('', document.title, location.href.split('#')[0]);
+      }
+    }
+
+    /**
+     * Parse a key-value pair
+     * @param {String} key the key to parse
+     * @param {Object} value the matching value to parse
+     * @private
+     */
+
+  }, {
     key: '$parse',
     value: function $parse(key, value) {
       switch (key) {
@@ -8823,27 +8822,6 @@ var SalteAuthProfile = function () {
     }
 
     /**
-     * Transfers values from one storage type to the other
-     * @param {String} source the name of the storage type to pull from
-     * @param {String} destination the name of the storage type to push to
-     * @ignore
-     */
-
-  }, {
-    key: '$$transfer',
-    value: function $$transfer(source, destination) {
-      var sourceStorage = this.$$getStorage(source);
-      var destinationStorage = this.$$getStorage(destination);
-
-      for (var key in sourceStorage) {
-        if (!key.match(/^salte\.auth\.[^$]/)) continue;
-
-        destinationStorage.setItem(key, sourceStorage.getItem(key));
-        sourceStorage.removeItem(key);
-      }
-    }
-
-    /**
      * Clears all `salte.auth` values from localStorage
      * @private
      */
@@ -8853,13 +8831,13 @@ var SalteAuthProfile = function () {
     value: function $clear() {
       for (var key in localStorage) {
         if (key.match(/^salte\.auth\.[^$]/)) {
-          this.$saveItem(key, undefined);
+          localStorage.removeItem(key);
         }
       }
 
       for (var _key in sessionStorage) {
         if (_key.match(/^salte\.auth\.[^$]/)) {
-          this.$saveItem(_key, undefined);
+          sessionStorage.removeItem(_key);
         }
       }
     }
@@ -8901,10 +8879,10 @@ var SalteAuthProfile = function () {
   }, {
     key: '$tokenType',
     get: function get() {
-      return this.$getItem('salte.auth.$token-type', 'local');
+      return this.$getItem('salte.auth.$token-type', 'session');
     },
     set: function set(tokenType) {
-      this.$saveItem('salte.auth.$token-type', tokenType, 'local');
+      this.$saveItem('salte.auth.$token-type', tokenType, 'session');
     }
 
     /**
@@ -8963,10 +8941,10 @@ var SalteAuthProfile = function () {
   }, {
     key: '$state',
     get: function get() {
-      return this.$getItem('salte.auth.$state', 'local');
+      return this.$getItem('salte.auth.$state', 'session');
     },
     set: function set(state) {
-      this.$saveItem('salte.auth.$state', state, 'local');
+      this.$saveItem('salte.auth.$state', state, 'session');
     }
 
     /**
@@ -8980,10 +8958,10 @@ var SalteAuthProfile = function () {
   }, {
     key: '$localState',
     get: function get() {
-      return this.$getItem('salte.auth.$local-state', 'local');
+      return this.$getItem('salte.auth.$local-state', 'session');
     },
     set: function set(localState) {
-      this.$saveItem('salte.auth.$local-state', localState, 'local');
+      this.$saveItem('salte.auth.$local-state', localState, 'session');
     }
 
     /**
@@ -9025,10 +9003,10 @@ var SalteAuthProfile = function () {
   }, {
     key: '$redirectUrl',
     get: function get() {
-      return this.$getItem('salte.auth.$redirect-url', 'local');
+      return this.$getItem('salte.auth.$redirect-url', 'session');
     },
     set: function set(redirectUrl) {
-      this.$saveItem('salte.auth.$redirect-url', redirectUrl, 'local');
+      this.$saveItem('salte.auth.$redirect-url', redirectUrl, 'session');
     }
 
     /**
@@ -9040,10 +9018,10 @@ var SalteAuthProfile = function () {
   }, {
     key: '$nonce',
     get: function get() {
-      return this.$getItem('salte.auth.$nonce', 'local');
+      return this.$getItem('salte.auth.$nonce', 'session');
     },
     set: function set(nonce) {
-      this.$saveItem('salte.auth.$nonce', nonce, 'local');
+      this.$saveItem('salte.auth.$nonce', nonce, 'session');
     }
   }, {
     key: 'userInfo',
@@ -9209,9 +9187,13 @@ var logger = (0, _debug2.default)('@salte-io/salte-auth:utilities');
 var SalteAuthUtilities = function () {
   /**
    * Wraps all XHR and Fetch (if available) requests to allow promise interceptors
+   * @param {Config} config configuration for salte auth
    */
-  function SalteAuthUtilities() {
+  function SalteAuthUtilities(config) {
     _classCallCheck(this, SalteAuthUtilities);
+
+    /** @ignore */
+    this.$$config = config;
 
     /** @ignore */
     this.$interceptors = {
@@ -9374,6 +9356,9 @@ var SalteAuthUtilities = function () {
     key: 'openPopup',
     value: function openPopup(url) {
       var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'salte-auth';
+
+      var _this3 = this;
+
       var height = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 600;
       var width = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 400;
 
@@ -9388,9 +9373,15 @@ var SalteAuthUtilities = function () {
       // TODO: Find a better way of tracking when a Window closes.
       return new Promise(function (resolve) {
         var checker = setInterval(function () {
-          if (!popupWindow.closed) return;
-          clearInterval(checker);
-          setTimeout(resolve);
+          try {
+            // This could throw cross-domain errors, so we need to silence them.
+            if (popupWindow.location.href.indexOf(_this3.$$config.redirectUrl) !== 0) return;
+
+            location.hash = popupWindow.location.hash;
+            popupWindow.close();
+            clearInterval(checker);
+            setTimeout(resolve);
+          } catch (e) {}
         }, 100);
       });
     }
@@ -9404,6 +9395,8 @@ var SalteAuthUtilities = function () {
   }, {
     key: 'openNewTab',
     value: function openNewTab(url) {
+      var _this4 = this;
+
       var tabWindow = window.open(url, '_blank');
       if (!tabWindow) {
         return Promise.reject(new ReferenceError('We were unable to open the new tab, its likely that the request was blocked.'));
@@ -9414,9 +9407,15 @@ var SalteAuthUtilities = function () {
       // TODO: Find a better way of tracking when a Window closes.
       return new Promise(function (resolve) {
         var checker = setInterval(function () {
-          if (!tabWindow.closed) return;
-          clearInterval(checker);
-          setTimeout(resolve);
+          try {
+            // This could throw cross-domain errors, so we need to silence them.
+            if (tabWindow.location.href.indexOf(_this4.$$config.redirectUrl) !== 0) return;
+
+            location.hash = tabWindow.location.hash;
+            tabWindow.close();
+            clearInterval(checker);
+            setTimeout(resolve);
+          } catch (e) {}
         }, 100);
       });
     }
