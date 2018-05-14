@@ -925,17 +925,17 @@ describe('salte-auth', () => {
       sandbox.stub(auth, '$loginUrl').returns('');
       sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, '$validate');
-      sandbox.stub(auth.profile, '$$transfer');
+      sandbox.stub(auth.profile, '$hash');
 
       const promise = auth.loginWithPopup();
 
       expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
-      expect(auth.profile.$$transfer.callCount).to.equal(0);
+      expect(auth.profile.$hash.callCount).to.equal(0);
 
       return promise.then((user) => {
         expect(user).to.deep.equal(auth.profile.userInfo);
-        expect(auth.profile.$$transfer.callCount).to.equal(1);
+        expect(auth.profile.$hash.callCount).to.equal(1);
         expect(auth.$promises.login).to.equal(null);
       });
     });
@@ -953,7 +953,7 @@ describe('salte-auth', () => {
       sandbox.stub(auth, '$loginUrl').returns('');
       sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
       sandbox.stub(auth.profile, '$validate');
-      sandbox.stub(auth.profile, '$$transfer');
+      sandbox.stub(auth.profile, '$hash');
 
       sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
         JSON.stringify({
@@ -995,25 +995,6 @@ describe('salte-auth', () => {
 
       return promise.then((error) => {
         expect(error).to.equal('Popup blocked!');
-      });
-    });
-
-    it('should bypass transfering storage when using "localStorage"', () => {
-      sandbox.stub(auth.profile, '$clear');
-      sandbox.stub(auth, '$loginUrl').returns('');
-      sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
-      sandbox.stub(auth.profile, '$validate');
-      sandbox.stub(auth.profile, '$$transfer');
-
-      auth.$config.storageType = 'local';
-
-      const promise = auth.loginWithPopup();
-
-      expect(auth.profile.$clear.callCount).to.equal(1);
-      expect(auth.$promises.login).to.equal(promise);
-      return promise.then(() => {
-        expect(auth.profile.$$transfer.callCount).to.equal(0);
-        expect(auth.$promises.login).to.equal(null);
       });
     });
 
@@ -1089,17 +1070,17 @@ describe('salte-auth', () => {
       sandbox.stub(auth, '$loginUrl').returns('');
       sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
       sandbox.stub(auth.profile, '$validate');
-      sandbox.stub(auth.profile, '$$transfer');
+      sandbox.stub(auth.profile, '$hash');
 
       const promise = auth.loginWithNewTab();
 
       expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
-      expect(auth.profile.$$transfer.callCount).to.equal(0);
+      expect(auth.profile.$hash.callCount).to.equal(0);
 
       return promise.then((user) => {
         expect(user).to.deep.equal(auth.profile.userInfo);
-        expect(auth.profile.$$transfer.callCount).to.equal(1);
+        expect(auth.profile.$hash.callCount).to.equal(1);
         expect(auth.$promises.login).to.equal(null);
       });
     });
@@ -1117,7 +1098,7 @@ describe('salte-auth', () => {
       sandbox.stub(auth, '$loginUrl').returns('');
       sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
       sandbox.stub(auth.profile, '$validate');
-      sandbox.stub(auth.profile, '$$transfer');
+      sandbox.stub(auth.profile, '$hash');
 
       sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
         JSON.stringify({
@@ -1159,25 +1140,6 @@ describe('salte-auth', () => {
 
       return promise.then((error) => {
         expect(error).to.equal('New Tab blocked!');
-      });
-    });
-
-    it('should bypass transfering storage when using "localStorage"', () => {
-      sandbox.stub(auth.profile, '$clear');
-      sandbox.stub(auth, '$loginUrl').returns('');
-      sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
-      sandbox.stub(auth.profile, '$validate');
-      sandbox.stub(auth.profile, '$$transfer');
-
-      auth.$config.storageType = 'local';
-
-      const promise = auth.loginWithNewTab();
-
-      expect(auth.profile.$clear.callCount).to.equal(1);
-      expect(auth.$promises.login).to.equal(promise);
-      return promise.then(() => {
-        expect(auth.profile.$$transfer.callCount).to.equal(0);
-        expect(auth.$promises.login).to.equal(null);
       });
     });
 

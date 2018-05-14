@@ -5,7 +5,9 @@ import SalteAuthUtilities from '../../../src/salte-auth.utilities.js';
 describe('function(openPopup)', () => {
   let sandbox, utilities;
   beforeEach(() => {
-    utilities = new SalteAuthUtilities();
+    utilities = new SalteAuthUtilities({
+      redirectUrl: 'https://redirect-url'
+    });
     sandbox = sinon.createSandbox();
   });
 
@@ -19,16 +21,21 @@ describe('function(openPopup)', () => {
       focus: sandbox.stub(),
       close: function() {
         this.closed = true;
+      },
+      location: {
+        href: 'https://incorrect-redirect-url'
       }
     });
 
-    const promise = utilities.openPopup('https://www.google.com');
-
     setTimeout(() => {
-      window.open.firstCall.returnValue.close();
+      sandbox.stub(window.open.firstCall.returnValue, 'location').get(() => {
+        return {
+          href: 'https://redirect-url'
+        };
+      });
     }, 200);
 
-    return promise;
+    return utilities.openPopup('https://www.google.com');
   });
 
   it('should handle blocked popups', () => {

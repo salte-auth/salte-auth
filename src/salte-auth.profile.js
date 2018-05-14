@@ -24,6 +24,13 @@ class SalteAuthProfile {
       },
       storageType: 'session'
     });
+    this.$hash();
+  }
+
+  /**
+   * Check for a hash, parses it, and removes it.
+   */
+  $hash() {
     if (location.hash) {
       const params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
       logger(`Hash detected, parsing...`, params);
@@ -32,6 +39,8 @@ class SalteAuthProfile {
         const [key, value] = param.split('=');
         this.$parse(key, decodeURIComponent(value));
       }
+      logger(`Removing hash...`);
+      history.pushState('', document.title, location.href.split('#')[0]);
     }
   }
 
@@ -89,11 +98,11 @@ class SalteAuthProfile {
    * @private
    */
   get $tokenType() {
-    return this.$getItem('salte.auth.$token-type', 'local');
+    return this.$getItem('salte.auth.$token-type', 'session');
   }
 
   set $tokenType(tokenType) {
-    this.$saveItem('salte.auth.$token-type', tokenType, 'local');
+    this.$saveItem('salte.auth.$token-type', tokenType, 'session');
   }
 
   /**
@@ -143,11 +152,11 @@ class SalteAuthProfile {
    * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
    */
   get $state() {
-    return this.$getItem('salte.auth.$state', 'local');
+    return this.$getItem('salte.auth.$state', 'session');
   }
 
   set $state(state) {
-    this.$saveItem('salte.auth.$state', state, 'local');
+    this.$saveItem('salte.auth.$state', state, 'session');
   }
 
   /**
@@ -158,11 +167,11 @@ class SalteAuthProfile {
    * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
    */
   get $localState() {
-    return this.$getItem('salte.auth.$local-state', 'local');
+    return this.$getItem('salte.auth.$local-state', 'session');
   }
 
   set $localState(localState) {
-    this.$saveItem('salte.auth.$local-state', localState, 'local');
+    this.$saveItem('salte.auth.$local-state', localState, 'session');
   }
 
   /**
@@ -197,11 +206,11 @@ class SalteAuthProfile {
    * @private
    */
   get $redirectUrl() {
-    return this.$getItem('salte.auth.$redirect-url', 'local');
+    return this.$getItem('salte.auth.$redirect-url', 'session');
   }
 
   set $redirectUrl(redirectUrl) {
-    this.$saveItem('salte.auth.$redirect-url', redirectUrl, 'local');
+    this.$saveItem('salte.auth.$redirect-url', redirectUrl, 'session');
   }
 
   /**
@@ -210,11 +219,11 @@ class SalteAuthProfile {
    * @private
    */
   get $nonce() {
-    return this.$getItem('salte.auth.$nonce', 'local');
+    return this.$getItem('salte.auth.$nonce', 'session');
   }
 
   set $nonce(nonce) {
-    this.$saveItem('salte.auth.$nonce', nonce, 'local');
+    this.$saveItem('salte.auth.$nonce', nonce, 'session');
   }
 
   /**
@@ -380,37 +389,19 @@ class SalteAuthProfile {
   }
 
   /**
-   * Transfers values from one storage type to the other
-   * @param {String} source the name of the storage type to pull from
-   * @param {String} destination the name of the storage type to push to
-   * @ignore
-   */
-  $$transfer(source, destination) {
-    const sourceStorage = this.$$getStorage(source);
-    const destinationStorage = this.$$getStorage(destination);
-
-    for (const key in sourceStorage) {
-      if (!key.match(/^salte\.auth\.[^$]/)) continue;
-
-      destinationStorage.setItem(key, sourceStorage.getItem(key));
-      sourceStorage.removeItem(key);
-    }
-  }
-
-  /**
    * Clears all `salte.auth` values from localStorage
    * @private
    */
   $clear() {
     for (const key in localStorage) {
       if (key.match(/^salte\.auth\.[^$]/)) {
-        this.$saveItem(key, undefined);
+        localStorage.removeItem(key);
       }
     }
 
     for (const key in sessionStorage) {
       if (key.match(/^salte\.auth\.[^$]/)) {
-        this.$saveItem(key, undefined);
+        sessionStorage.removeItem(key);
       }
     }
   }
