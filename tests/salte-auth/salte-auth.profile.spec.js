@@ -51,7 +51,7 @@ describe('salte-auth.profile', () => {
     it('should parse the expires_in', () => {
       sandbox.useFakeTimers();
       profile.$parse('expires_in', 5000);
-      expect(profile.$expiration).to.equal('5000');
+      expect(profile.$expiration).to.equal(5000000);
     });
 
     it('should parse the access_token', () => {
@@ -125,6 +125,7 @@ describe('salte-auth.profile', () => {
   describe('getter(accessTokenExpired)', () => {
     beforeEach(() => {
       profile.$accessToken = '55555-555555';
+      profile.$parse('expires_in', '1');
     });
 
     it('should be expired if the "access_token" is empty', () => {
@@ -133,11 +134,15 @@ describe('salte-auth.profile', () => {
     });
 
     it('should be expired if the "expiration" is in the past', () => {
-      expect(profile.accessTokenExpired).to.equal(true);
+      expect(profile.accessTokenExpired).to.equal(false);
+      return new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      }).then(() => {
+        expect(profile.accessTokenExpired).to.equal(true);
+      });
     });
 
     it('should not be expired if the "access_token" is present and the "expiration" is in the future', () => {
-      profile.$expiration = Date.now() + 100;
       expect(profile.accessTokenExpired).to.equal(false);
     });
   });
