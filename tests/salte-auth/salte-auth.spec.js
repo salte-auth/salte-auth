@@ -67,7 +67,7 @@ describe('salte-auth', () => {
       });
     });
 
-    it('should default loginType, storageType, and validation', () => {
+    it('should default loginType, autoRefresh, storageType, and validation', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
@@ -76,6 +76,7 @@ describe('salte-auth', () => {
 
       expect(auth.$config).to.deep.equal({
         loginType: 'iframe',
+        autoRefresh: true,
         provider: 'auth0',
         storageType: 'session',
         validation: {
@@ -88,11 +89,12 @@ describe('salte-auth', () => {
       expect(auth.$config).to.deep.equal(auth.profile.$$config);
     });
 
-    it('should support overriding the loginType, storageType, and validation', () => {
+    it('should support overriding the loginType, autoRefresh, storageType, and validation', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
         loginType: 'redirect',
+        autoRefresh: false,
         provider: 'auth0',
         storageType: 'local',
         validation: {
@@ -102,6 +104,7 @@ describe('salte-auth', () => {
 
       expect(auth.$config).to.deep.equal({
         loginType: 'redirect',
+        autoRefresh: false,
         provider: 'auth0',
         storageType: 'local',
         validation: {
@@ -1655,6 +1658,15 @@ describe('salte-auth', () => {
 
       expect(clearTimeout.callCount).to.equal(1);
     });
+
+    it('should bail if "autoRefresh" is false', () => {
+      window.setTimeout.reset();
+      auth.$config.autoRefresh = false;
+
+      auth.$$refreshToken();
+
+      expect(window.setTimeout.callCount).to.equal(0);
+    });
   });
 
   describe('function(retrieveAccessToken)', () => {
@@ -1835,8 +1847,6 @@ describe('salte-auth', () => {
     it('should refresh the token if we hide the page', () => {
       const promise = Promise.resolve();
 
-      window.setTimeout.restore();
-      sandbox.stub(window, 'setTimeout').callsFake((cb) => cb());
       sandbox.stub(auth, '$$refreshToken');
       sandbox.stub(auth, 'refreshToken').returns(promise);
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
@@ -1857,8 +1867,6 @@ describe('salte-auth', () => {
     it('should reactivate the automatic refresh when the page is shown', () => {
       const promise = Promise.resolve();
 
-      window.setTimeout.restore();
-      sandbox.stub(window, 'setTimeout').callsFake((cb) => cb());
       sandbox.stub(auth, '$$refreshToken');
       sandbox.stub(auth, 'refreshToken').returns(promise);
       sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
@@ -1874,6 +1882,22 @@ describe('salte-auth', () => {
         expect(auth.$$refreshToken.callCount).to.equal(1);
         expect(auth.$timeouts.refresh).to.equal(undefined);
       });
+    });
+
+    it('should bail if "autoRefresh" is false', () => {
+      auth.$config.autoRefresh = false;
+
+      sandbox.stub(auth, '$$refreshToken');
+      sandbox.stub(auth, 'refreshToken');
+      sandbox.stub(auth.profile, 'idTokenExpired').get(() => false);
+
+      expect(auth.refreshToken.callCount).to.equal(0);
+      expect(auth.$$refreshToken.callCount).to.equal(0);
+
+      auth.$$onVisibilityChanged();
+
+      expect(auth.refreshToken.callCount).to.equal(0);
+      expect(auth.$$refreshToken.callCount).to.equal(0);
     });
   });
 });

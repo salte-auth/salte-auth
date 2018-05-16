@@ -50,6 +50,7 @@ describe('salte-auth.profile', () => {
 
     it('should parse the expires_in', () => {
       sandbox.useFakeTimers();
+      expect(profile.$expiration).to.equal(null);
       profile.$parse('expires_in', 5000);
       expect(profile.$expiration).to.equal(5000000);
     });
