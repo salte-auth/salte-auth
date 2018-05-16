@@ -56,7 +56,7 @@ class SalteAuthProfile {
         this.$tokenType = value;
         break;
       case 'expires_in':
-        this.$expiration = Date.now() + value;
+        this.$expiration = Date.now() + (Number(value) * 1000);
         break;
       case 'access_token':
         this.$accessToken = value;
@@ -107,11 +107,12 @@ class SalteAuthProfile {
 
   /**
    * The date and time that the access token will expire
-   * @return {String} the expiration time as unix timestamp
+   * @return {Number} the expiration time as unix timestamp
    * @private
    */
   get $expiration() {
-    return this.$getItem('salte.auth.expiration');
+    const expiration = this.$getItem('salte.auth.expiration');
+    return expiration ? Number(expiration) : null;
   }
 
   set $expiration(expiration) {

@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.7.1
+ * @salte-io/salte-auth JavaScript Library v2.7.2
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -8627,7 +8627,7 @@ var SalteAuthProfile = function () {
           this.$tokenType = value;
           break;
         case 'expires_in':
-          this.$expiration = Date.now() + value;
+          this.$expiration = Date.now() + Number(value) * 1000;
           break;
         case 'access_token':
           this.$accessToken = value;
@@ -8887,14 +8887,15 @@ var SalteAuthProfile = function () {
 
     /**
      * The date and time that the access token will expire
-     * @return {String} the expiration time as unix timestamp
+     * @return {Number} the expiration time as unix timestamp
      * @private
      */
 
   }, {
     key: '$expiration',
     get: function get() {
-      return this.$getItem('salte.auth.expiration');
+      var expiration = this.$getItem('salte.auth.expiration');
+      return expiration ? Number(expiration) : null;
     },
     set: function set(expiration) {
       this.$saveItem('salte.auth.expiration', expiration);
