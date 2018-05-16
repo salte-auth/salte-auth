@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.7.2
+ * @salte-io/salte-auth JavaScript Library v2.8.0
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7704,6 +7704,7 @@ var logger = (0, _debug2.default)('@salte-io/salte-auth');
  * @property {Function} [redirectLoginCallback] A callback that is invoked when a redirect login fails or succeeds.
  * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
+ * @property {Boolean} [autoRefresh=true] Automatically refreshes the users token upon switching tabs or one minute prior to expiration.
  */
 
 /**
@@ -7764,7 +7765,8 @@ var SalteAuth = function () {
      */
     this.$config = config;
     this.$config = (0, _defaultsDeep2.default)(config, this.$provider.defaultConfig, {
-      loginType: 'iframe'
+      loginType: 'iframe',
+      autoRefresh: true
     });
     /**
      * Various utility functions for salte auth
@@ -8354,6 +8356,9 @@ var SalteAuth = function () {
         clearTimeout(this.$timeouts.refresh);
       }
 
+      // Bail if autoRefresh is disabled.
+      if (!this.$config.autoRefresh) return;
+
       this.$timeouts.refresh = setTimeout(function () {
         _this9.refreshToken().catch(function (error) {
           console.error(error);
@@ -8448,7 +8453,7 @@ var SalteAuth = function () {
 
       logger('Visibility change detected, deferring to the next event loop...');
       logger('Determining if the id token has expired...');
-      if (this.profile.idTokenExpired) return;
+      if (this.profile.idTokenExpired || !this.$config.autoRefresh) return;
 
       if (this.$utilities.$hidden) {
         logger('Page is hidden, refreshing the token...');
