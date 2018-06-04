@@ -62,7 +62,7 @@
     "mocha": "^5.0.0",
     "moment": "^2.22.1",
     "nps": "^5.7.1",
-    "promise-polyfill": "^7.0.0",
+    "promise-polyfill": "^8.0.0",
     "publish-latest": "^1.1.2",
     "remove-lockfiles": "^2.0.0",
     "semantic-release": "^12.0.0",
