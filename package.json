@@ -40,7 +40,7 @@
     "esdoc-member-plugin": "^1.0.0",
     "esdoc-plugin-require-coverage": "^0.1.2",
     "esdoc-standard-plugin": "^1.0.0",
-    "eslint": "^4.0.0",
+    "eslint": "^5.0.0",
     "eslint-config-google": "^0.9.1",
     "eslint-plugin-compat": "^2.0.0",
     "eslint-plugin-mocha": "^5.0.0",
