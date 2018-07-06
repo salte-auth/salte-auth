@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.8.0
+ * @salte-io/salte-auth JavaScript Library v2.9.0
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -53,17 +53,32 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -4522,6 +4537,14 @@ var freeProcess = moduleExports && freeGlobal.process;
 /** Used to access faster Node.js helpers. */
 var nodeUtil = (function() {
   try {
+    // Use `util.types` for Node.js 10+.
+    var types = freeModule && freeModule.require && freeModule.require('util').types;
+
+    if (types) {
+      return types;
+    }
+
+    // Legacy `process.binding('util')` for Node.js < 10.
     return freeProcess && freeProcess.binding && freeProcess.binding('util');
   } catch (e) {}
 }());
@@ -7433,7 +7456,7 @@ var SalteAuthAuth0Provider = function () {
      */
     value: function deauthorizeUrl(config) {
       return this.$utilities.createUrl(config.providerUrl + "/v2/logout", {
-        returnTo: config.redirectUrl,
+        returnTo: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
         client_id: config.clientId
       });
     }
@@ -7492,7 +7515,7 @@ var SalteAuthAzureProvider = function () {
     key: "deauthorizeUrl",
     value: function deauthorizeUrl(config) {
       return this.$utilities.createUrl(config.providerUrl + "/oauth2/logout", {
-        post_logout_redirect_uri: config.redirectUrl
+        post_logout_redirect_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl
       });
     }
   }]);
@@ -7550,7 +7573,7 @@ var SalteAuthCognitoProvider = function () {
     key: "deauthorizeUrl",
     value: function deauthorizeUrl(config) {
       return this.$utilities.createUrl(config.providerUrl + "/logout", {
-        logout_uri: config.redirectUrl,
+        logout_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
         client_id: config.clientId
       });
     }
@@ -7614,7 +7637,7 @@ var SalteAuthWSO2Provider = function () {
       return this.$utilities.createUrl(config.providerUrl + '/commonauth', {
         commonAuthLogout: true,
         type: 'oidc',
-        commonAuthCallerPath: config.redirectUrl,
+        commonAuthCallerPath: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
         relyingParty: config.relyingParty
       });
     }
@@ -7678,6 +7701,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+/** @ignore */
 var logger = (0, _debug2.default)('@salte-io/salte-auth');
 
 /**
@@ -7690,11 +7714,18 @@ var logger = (0, _debug2.default)('@salte-io/salte-auth');
  */
 
 /**
+ * Disable certain security validations if your provider doesn't support them.
+ * @typedef {Object} RedirectURLs
+ * @property {String} [loginUrl] The redirect url specified in your identity provider for logging in.
+ * @property {String} [logoutUrl] The redirect url specified in your identity provider for logging out.
+ */
+
+/**
  * The configuration for salte auth
  * @typedef {Object} Config
  * @property {String} providerUrl The base url of your identity provider.
  * @property {('id_token'|'id_token token')} responseType The response type to authenticate with.
- * @property {String} redirectUrl The redirect url specified in your identity provider.
+ * @property {String|RedirectURLs} redirectUrl The redirect url specified in your identity provider.
  * @property {String} clientId The client id of your identity provider
  * @property {String} scope A list of space-delimited claims used to determine what user information is provided and what access is given. Most providers require 'openid'.
  * @property {Boolean|Array<String>} routes A list of secured routes. If true is provided then all routes are secured.
@@ -7898,7 +7929,7 @@ var SalteAuth = function () {
         'state': this.profile.$localState,
         'nonce': this.profile.$nonce,
         'response_type': this.$config.responseType,
-        'redirect_uri': this.$config.redirectUrl,
+        'redirect_uri': this.$config.redirectUrl && this.$config.redirectUrl.loginUrl || this.$config.redirectUrl,
         'client_id': this.$config.clientId,
         'scope': this.$config.scope,
         'prompt': refresh ? 'none' : undefined
@@ -8342,7 +8373,6 @@ var SalteAuth = function () {
 
       return this.$promises.token;
     }
-
     /**
      * Registers a timeout that will automatically refresh the id token
      */
@@ -8506,7 +8536,7 @@ var SalteAuth = function () {
         'state': this.profile.$localState,
         'nonce': this.profile.$nonce,
         'response_type': 'token',
-        'redirect_uri': this.$config.redirectUrl,
+        'redirect_uri': this.$config.redirectUrl && this.$config.redirectUrl.loginUrl || this.$config.redirectUrl,
         'client_id': this.$config.clientId,
         'scope': this.$config.scope,
         'prompt': 'none'
@@ -8563,6 +8593,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+/** @ignore */
 var logger = (0, _debug2.default)('@salte-io/salte-auth:profile');
 
 /**
@@ -9184,6 +9215,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+/** @ignore */
 var logger = (0, _debug2.default)('@salte-io/salte-auth:utilities');
 
 /**
@@ -9381,7 +9413,9 @@ var SalteAuthUtilities = function () {
         var checker = setInterval(function () {
           try {
             // This could throw cross-domain errors, so we need to silence them.
-            if (popupWindow.location.href.indexOf(_this3.$$config.redirectUrl) !== 0) return;
+            var loginUrl = _this3.$$config.redirectUrl && _this3.$$config.redirectUrl.loginUrl || _this3.$$config.redirectUrl;
+            var logoutUrl = _this3.$$config.redirectUrl && _this3.$$config.redirectUrl.logoutUrl || _this3.$$config.redirectUrl;
+            if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
 
             location.hash = popupWindow.location.hash;
             popupWindow.close();
@@ -9415,7 +9449,9 @@ var SalteAuthUtilities = function () {
         var checker = setInterval(function () {
           try {
             // This could throw cross-domain errors, so we need to silence them.
-            if (tabWindow.location.href.indexOf(_this4.$$config.redirectUrl) !== 0) return;
+            var loginUrl = _this4.$$config.redirectUrl && _this4.$$config.redirectUrl.loginUrl || _this4.$$config.redirectUrl;
+            var logoutUrl = _this4.$$config.redirectUrl && _this4.$$config.redirectUrl.logoutUrl || _this4.$$config.redirectUrl;
+            if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
 
             location.hash = tabWindow.location.hash;
             tabWindow.close();
