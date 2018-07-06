@@ -15,10 +15,17 @@ class SalteAuthCognitoProvider {
    * @return {String} the deauthorization url
    */
   static deauthorizeUrl(config) {
-    return this.$utilities.createUrl(`${config.providerUrl}/logout`, {
-      logout_uri: config.redirectUrl,
-      client_id: config.clientId
-    });
+    if ('signoutUrl' in config) {
+      return this.$utilities.createUrl(`${config.providerUrl}/logout`, {
+        logout_uri: config.signoutUrl,
+        client_id: config.clientId
+      });
+    } else {
+      return this.$utilities.createUrl(`${config.providerUrl}/logout`, {
+        logout_uri: config.redirectUrl,
+        client_id: config.clientId
+      });
+    }
   }
 
   /**

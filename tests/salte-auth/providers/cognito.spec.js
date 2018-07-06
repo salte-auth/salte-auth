@@ -25,6 +25,17 @@ describe('cognito', () => {
     });
   });
 
+  describe('function(deauthorizeUrl)', () => {
+    it('should create a signout url', () => {
+      const url = cognito.deauthorizeUrl.call({ $utilities: utilities }, {
+        providerUrl: 'https://mydomain.auth.us-east-1.amazoncognito.com',
+        signoutUrl: `${location.protocol}//${location.host}`,
+        clientId: '33333333-3333-4333-b333-333333333333'
+      });
+      expect(url).to.equal(`https://mydomain.auth.us-east-1.amazoncognito.com/logout?logout_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=33333333-3333-4333-b333-333333333333`);
+    });
+  });
+
   describe('getter(defaultConfig)', () => {
     it('should return a default config', () => {
       expect(cognito.defaultConfig).to.deep.equal({
