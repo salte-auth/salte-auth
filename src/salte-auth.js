@@ -9,6 +9,7 @@ import { Providers } from './salte-auth.providers.js';
 import { SalteAuthProfile } from './salte-auth.profile.js';
 import { SalteAuthUtilities } from './salte-auth.utilities.js';
 
+/** @ignore */
 const logger = debug('@salte-io/salte-auth');
 
 /**
