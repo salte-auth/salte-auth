@@ -2,6 +2,7 @@ import defaultsDeep from 'lodash/defaultsDeep';
 import find from 'lodash/find';
 import debug from 'debug';
 
+/** @ignore */
 const logger = debug('@salte-io/salte-auth:profile');
 
 /**
