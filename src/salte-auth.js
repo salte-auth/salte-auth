@@ -21,11 +21,18 @@ const logger = debug('@salte-io/salte-auth');
  */
 
 /**
+ * Disable certain security validations if your provider doesn't support them.
+ * @typedef {Object} RedirectURLs
+ * @property {String} [loginUrl] The redirect url specified in your identity provider for logging in.
+ * @property {String} [logoutUrl] The redirect url specified in your identity provider for logging out.
+ */
+
+/**
  * The configuration for salte auth
  * @typedef {Object} Config
  * @property {String} providerUrl The base url of your identity provider.
  * @property {('id_token'|'id_token token')} responseType The response type to authenticate with.
- * @property {String} redirectUrl The redirect url specified in your identity provider.
+ * @property {String|RedirectURLs} redirectUrl The redirect url specified in your identity provider.
  * @property {String} clientId The client id of your identity provider
  * @property {String} scope A list of space-delimited claims used to determine what user information is provided and what access is given. Most providers require 'openid'.
  * @property {Boolean|Array<String>} routes A list of secured routes. If true is provided then all routes are secured.
@@ -233,7 +240,7 @@ class SalteAuth {
       'state': this.profile.$localState,
       'nonce': this.profile.$nonce,
       'response_type': 'token',
-      'redirect_uri': this.$config.redirectUrl,
+      'redirect_uri': this.$config.redirectUrl && this.$config.redirectUrl.loginUrl || this.$config.redirectUrl,
       'client_id': this.$config.clientId,
       'scope': this.$config.scope,
       'prompt': 'none'
@@ -259,7 +266,7 @@ class SalteAuth {
       'state': this.profile.$localState,
       'nonce': this.profile.$nonce,
       'response_type': this.$config.responseType,
-      'redirect_uri': this.$config.redirectUrl,
+      'redirect_uri': this.$config.redirectUrl && this.$config.redirectUrl.loginUrl || this.$config.redirectUrl,
       'client_id': this.$config.clientId,
       'scope': this.$config.scope,
       'prompt': refresh ? 'none' : undefined
@@ -653,7 +660,6 @@ class SalteAuth {
 
     return this.$promises.token;
   }
-
   /**
    * Registers a timeout that will automatically refresh the id token
    */

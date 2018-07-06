@@ -164,7 +164,9 @@ class SalteAuthUtilities {
       const checker = setInterval(() => {
         try {
           // This could throw cross-domain errors, so we need to silence them.
-          if (popupWindow.location.href.indexOf(this.$$config.redirectUrl) !== 0) return;
+          const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+          const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+          if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
 
           location.hash = popupWindow.location.hash;
           popupWindow.close();
@@ -193,7 +195,9 @@ class SalteAuthUtilities {
       const checker = setInterval(() => {
         try {
           // This could throw cross-domain errors, so we need to silence them.
-          if (tabWindow.location.href.indexOf(this.$$config.redirectUrl) !== 0) return;
+          const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+          const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+          if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
 
           location.hash = tabWindow.location.hash;
           tabWindow.close();
