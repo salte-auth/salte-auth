@@ -55,4 +55,42 @@ describe('function(openNewTab)', () => {
       );
     });
   });
+
+  it('should support a separate loginUrl', () => {
+    utilities.$$config.redirectUrl = {
+      loginUrl: 'https://redirect-url'
+    };
+
+    sandbox.stub(window, 'open').returns(null);
+
+    const promise = utilities.openNewTab('https://www.google.com');
+
+    return promise.catch(error => {
+      return error;
+    }).then(error => {
+      expect(error).to.be.instanceof(ReferenceError);
+      expect(error.message).to.equal(
+        'We were unable to open the new tab, its likely that the request was blocked.'
+      );
+    });
+  });
+
+  it('should support a separate logoutUrl', () => {
+    utilities.$$config.redirectUrl = {
+      logoutUrl: 'https://redirect-url'
+    };
+
+    sandbox.stub(window, 'open').returns(null);
+
+    const promise = utilities.openNewTab('https://www.google.com');
+
+    return promise.catch(error => {
+      return error;
+    }).then(error => {
+      expect(error).to.be.instanceof(ReferenceError);
+      expect(error.message).to.equal(
+        'We were unable to open the new tab, its likely that the request was blocked.'
+      );
+    });
+  });
 });

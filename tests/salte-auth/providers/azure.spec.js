@@ -22,5 +22,16 @@ describe('azure', () => {
       });
       expect(url).to.equal(`https://login.microsoftonline.com/my-tenant/oauth2/logout?post_logout_redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}`);
     });
+
+    it('should support a separate logoutUrl', () => {
+      const url = azure.deauthorizeUrl.call({ $utilities: utilities }, {
+        providerUrl: 'https://login.microsoftonline.com/my-tenant',
+        redirectUrl: {
+          logoutUrl: `${location.protocol}//${location.host}`
+        },
+        clientId: '33333333-3333-4333-b333-333333333333'
+      });
+      expect(url).to.equal(`https://login.microsoftonline.com/my-tenant/oauth2/logout?post_logout_redirect_uri=${encodeURIComponent(`${location.protocol}//${location.host}`)}`);
+    });
   });
 });
