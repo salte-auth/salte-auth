@@ -83,6 +83,10 @@
       <option value="tab">New Tab</option>
       <option value="iframe">Iframe</option>
     </select>
+    <select id="redirect-url" name="redirect-url">
+      <option value="single">Single</option>
+      <option value="separate">Separate Login and Logout</option>
+    </select>
     <select id="storage-type" name="storage-type">
       <option value="session">Session Storage</option>
       <option value="local">Local Storage</option>
@@ -111,6 +115,7 @@
     var elements = {
       provider: document.getElementById('provider'),
       loginType: document.getElementById('login-type'),
+      redirectUrl: document.getElementById('redirect-url'),
       storageType: document.getElementById('storage-type'),
       secured: document.getElementById('secured'),
       footer: document.getElementById('footer'),
@@ -148,6 +153,7 @@
     var queryParams = Object.assign({
       provider: localStorage.getItem('salte.demo.provider') || 'auth0',
       'login-type': 'redirect',
+      'redirect-url': 'single',
       'storage-type': localStorage.getItem('salte.demo.storage-type') || 'session',
       secured: 'not-secured'
     }, location.search.replace(/^\?/, '').split('&').reduce(function(r, a) {
@@ -166,6 +172,7 @@
 
     elements.provider.value = queryParams.provider;
     elements.loginType.value = queryParams['login-type'];
+    elements.redirectUrl.value = queryParams['redirect-url'];
     elements.storageType.value = queryParams['storage-type'];
     elements.secured.value = queryParams.secured;
 
@@ -204,11 +211,16 @@
 
     elements.provider.addEventListener('change', updateParamsOnChange);
     elements.loginType.addEventListener('change', updateParamsOnChange);
+    elements.redirectUrl.addEventListener('change', updateParamsOnChange);
     elements.storageType.addEventListener('change', updateParamsOnChange);
     elements.secured.addEventListener('change', updateParamsOnChange);
 
     var config = Object.assign(configs[queryParams.provider], {
-      redirectUrl: location.protocol + '//' + location.host,
+      redirectUrl: queryParams['redirect-url'] === 'single' ? location.protocol + '//' + location.host : {
+        loginUrl: location.protocol + '//' + location.host,
+        logoutUrl: location.protocol + '//' + location.host
+      },
+
       scope: 'openid',
 
       provider: queryParams.provider,

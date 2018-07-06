@@ -505,6 +505,26 @@ describe('salte-auth', () => {
         )}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid&prompt=none`
       );
     });
+
+    it('should support a separate loginUrl', () => {
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        providerUrl: 'https://mydomain.auth.us-east-1.amazoncognito.com',
+        redirectUrl: {
+          loginUrl: `${location.protocol}//${location.host}`
+        },
+        clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
+        scope: 'openid',
+        provider: 'cognito'
+      });
+
+      expect(auth.$accessTokenUrl).to.equal(
+        `https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=token&redirect_uri=${encodeURIComponent(
+          `${location.protocol}//${location.host}`
+        )}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid&prompt=none`
+      );
+    });
   });
 
   describe('function($loginUrl)', () => {
@@ -534,6 +554,27 @@ describe('salte-auth', () => {
         providerUrl: 'https://mydomain.auth.us-east-1.amazoncognito.com',
         responseType: 'id_token',
         redirectUrl: `${location.protocol}//${location.host}`,
+        clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
+        scope: 'openid',
+        provider: 'cognito'
+      });
+
+      expect(auth.$loginUrl()).to.equal(
+        `https://mydomain.auth.us-east-1.amazoncognito.com/oauth2/authorize?state=33333333-3333-4333-b333-333333333333&nonce=33333333-3333-4333-b333-333333333333&response_type=id_token&redirect_uri=${encodeURIComponent(
+          `${location.protocol}//${location.host}`
+        )}&client_id=Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC&scope=openid`
+      );
+    });
+
+    it('should support a separate loginUrl', () => {
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        providerUrl: 'https://mydomain.auth.us-east-1.amazoncognito.com',
+        responseType: 'id_token',
+        redirectUrl: {
+          loginUrl: `${location.protocol}//${location.host}`
+        },
         clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
         scope: 'openid',
         provider: 'cognito'
