@@ -36,6 +36,7 @@ const logger = debug('@salte-io/salte-auth');
  * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
  * @property {Boolean} [autoRefresh=true] Automatically refreshes the users token upon switching tabs or one minute prior to expiration.
+ * @property {String} signoutUrl Cognito supports a sign in and sign out redirect url.  If empty the redirect url will be used.
  */
 
 /**
@@ -653,7 +654,6 @@ class SalteAuth {
 
     return this.$promises.token;
   }
-
   /**
    * Registers a timeout that will automatically refresh the id token
    */
