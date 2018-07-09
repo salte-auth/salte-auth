@@ -80,7 +80,9 @@ auth.loginWithIframe();
 
 ## Known Issues
 
-* `loginWithNewTab` and `loginWithPopup` doesn't work on IE 11 ([#166](https://github.com/salte-io/salte-auth/issues/166), [#168](https://github.com/salte-io/salte-auth/issues/168))
+_These are issues that we know about, but don't have a clear fix for!_
+
+**There are currently no known issues, thanks for checking!**
 
 ## Debugging
 
