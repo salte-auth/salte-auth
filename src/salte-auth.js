@@ -167,19 +167,19 @@ class SalteAuth {
       setTimeout(this.$$onRouteChanged.bind(this));
 
       logger('Setting up automatic renewal of token...');
-      this.on('login', (error, user) => {
+      this.on('login', (error) => {
         if (error) return;
 
         this.$$refreshToken();
       });
 
-      this.on('refresh', (error, user) => {
+      this.on('refresh', (error) => {
         if (error) return;
 
         this.$$refreshToken();
       });
 
-      this.on('logout', (error, user) => {
+      this.on('logout', () => {
         clearTimeout(this.$timeouts.refresh);
       });
 
@@ -505,12 +505,13 @@ class SalteAuth {
 
   /**
    * Authenticates using the redirect-based OAuth flow.
+   * @param {String} redirectUrl override for the redirect url, by default this will try to redirect the user back where they started.
    * @return {Promise} a promise intended to block future login attempts.
    *
    * @example
    * auth.loginWithRedirect(); // Don't bother with utilizing the promise here, it never resolves.
    */
-  loginWithRedirect() {
+  loginWithRedirect(redirectUrl) {
     if (this.$config.redirectLoginCallback) {
       console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
     }
@@ -525,7 +526,7 @@ class SalteAuth {
     this.$promises.login = new Promise(() => {});
 
     this.profile.$clear();
-    this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
+    this.profile.$redirectUrl = redirectUrl || this.profile.$redirectUrl || location.href;
     const url = this.$loginUrl();
 
     this.profile.$actions(this.profile.$localState, 'login');
