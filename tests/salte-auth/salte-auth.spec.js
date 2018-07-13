@@ -342,6 +342,26 @@ describe('salte-auth', () => {
         expect(auth.$$onVisibilityChanged.callCount).to.equal(1);
       });
     });
+
+    it('should invoke "$$refreshToken" on "refresh"', () => {
+      sandbox.stub(SalteAuth.prototype, '$$refreshToken');
+
+      expect(auth.$$refreshToken.callCount).to.equal(0);
+
+      auth.$fire('refresh');
+
+      expect(auth.$$refreshToken.callCount).to.equal(1);
+    });
+
+    it('should not invoke "$$refreshToken" when "refresh" errors', () => {
+      sandbox.stub(SalteAuth.prototype, '$$refreshToken');
+
+      expect(auth.$$refreshToken.callCount).to.equal(0);
+
+      auth.$fire('refresh', 'error!');
+
+      expect(auth.$$refreshToken.callCount).to.equal(0);
+    });
   });
 
   describe('interceptor(fetch)', () => {
@@ -1287,6 +1307,12 @@ describe('salte-auth', () => {
       auth.loginWithRedirect();
 
       expect(console.warn.callCount).to.equal(1);
+    });
+
+    it('should support overriding the redirectUrl', () => {
+      auth.loginWithRedirect('https://google.com');
+
+      expect(auth.profile.$redirectUrl).to.equal('https://google.com');
     });
   });
 
