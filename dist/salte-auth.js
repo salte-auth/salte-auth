@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.9.0
+ * @salte-io/salte-auth JavaScript Library v2.10.0
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7864,19 +7864,19 @@ var SalteAuth = function () {
       setTimeout(this.$$onRouteChanged.bind(this));
 
       logger('Setting up automatic renewal of token...');
-      this.on('login', function (error, user) {
+      this.on('login', function (error) {
         if (error) return;
 
         _this.$$refreshToken();
       });
 
-      this.on('refresh', function (error, user) {
+      this.on('refresh', function (error) {
         if (error) return;
 
         _this.$$refreshToken();
       });
 
-      this.on('logout', function (error, user) {
+      this.on('logout', function () {
         clearTimeout(_this.$timeouts.refresh);
       });
 
@@ -8191,6 +8191,7 @@ var SalteAuth = function () {
 
     /**
      * Authenticates using the redirect-based OAuth flow.
+     * @param {String} redirectUrl override for the redirect url, by default this will try to redirect the user back where they started.
      * @return {Promise} a promise intended to block future login attempts.
      *
      * @example
@@ -8199,7 +8200,7 @@ var SalteAuth = function () {
 
   }, {
     key: 'loginWithRedirect',
-    value: function loginWithRedirect() {
+    value: function loginWithRedirect(redirectUrl) {
       if (this.$config.redirectLoginCallback) {
         console.warn('The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.');
       }
@@ -8214,7 +8215,7 @@ var SalteAuth = function () {
       this.$promises.login = new Promise(function () {});
 
       this.profile.$clear();
-      this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
+      this.profile.$redirectUrl = redirectUrl || this.profile.$redirectUrl || location.href;
       var url = this.$loginUrl();
 
       this.profile.$actions(this.profile.$localState, 'login');
