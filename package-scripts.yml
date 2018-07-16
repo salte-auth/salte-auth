@@ -36,7 +36,7 @@ scripts:
     script: coveralls < coverage/lcov.info
     description: Reports code coverage information to Coveralls
   semantic-release:
-    script: semantic-release
+    script: semantic-release --dry-run
     description: Publishes the artifact to NPM and GitHub
   docs:
     script: esdoc

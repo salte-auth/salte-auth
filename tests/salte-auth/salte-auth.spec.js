@@ -317,8 +317,6 @@ describe('salte-auth', () => {
           done();
         }
       });
-
-      expect(location.href).to.equal(url);
     });
 
     it('should disable automatic token renewal when the screen loses visibility', () => {
@@ -388,16 +386,6 @@ describe('salte-auth', () => {
 
       return fetch('/');
     });
-  });
-
-  describe('interceptor(fetch)', () => {
-    it('should request a new access token if we are not authenticated', () => {
-      sandbox.stub(auth, 'retrieveAccessToken').returns(Promise.resolve('55555-55555'));
-      auth.$config = {
-        endpoints: [
-          `${location.protocol}//${location.host}`
-        ]
-      };
 
     it('should not request a new access token if we do not need to be authenticated', () => {
       auth.$utilities.addFetchInterceptor((request) => {
@@ -441,7 +429,6 @@ describe('salte-auth', () => {
       request.open('GET', '/');
       request.send();
     });
-  });
 
     it('should request a new access token if we are not authenticated', done => {
       sandbox.stub(SalteAuth.prototype, 'retrieveAccessToken').returns(Promise.resolve('55555-55555'));
@@ -978,6 +965,7 @@ describe('salte-auth', () => {
         expect(auth.$promises.login).to.deep.equal(null);
       });
     });
+  });
 
   describe('function(loginWithPopup)', () => {
     beforeEach(() => {
@@ -1123,6 +1111,7 @@ describe('salte-auth', () => {
         expect(auth.$promises.login).to.deep.equal(null);
       });
     });
+  });
 
   describe('function(loginWithNewTab)', () => {
     beforeEach(() => {
@@ -1565,6 +1554,7 @@ describe('salte-auth', () => {
       expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.logout).to.be.undefined;
     });
+  });
 
   describe('function(refreshToken)', () => {
     beforeEach(() => {
