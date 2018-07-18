@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.10.0
+ * @salte-io/salte-auth JavaScript Library v2.10.1
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -8387,13 +8387,16 @@ var SalteAuth = function () {
         clearTimeout(this.$timeouts.refresh);
       }
 
-      // Bail if autoRefresh is disabled.
-      if (!this.$config.autoRefresh) return;
-
       this.$timeouts.refresh = setTimeout(function () {
-        _this9.refreshToken().catch(function (error) {
-          console.error(error);
-        });
+        // Allows Auto Refresh to be disabled
+        if (_this9.$config.autoRefresh) {
+          _this9.refreshToken().catch(function (error) {
+            console.error(error);
+          });
+        } else {
+          _this9.$fire('refresh');
+        }
+        // We need to default `autoRefreshBuffer` to 60000 in the constructor.
       }, Math.max(this.profile.userInfo.exp * 1000 - Date.now() - 60000, 0));
     }
 
