@@ -41,6 +41,18 @@ describe('function(openNewTab)', () => {
     });
   });
 
+  it('should handle a user closing the new tab', () => {
+    sandbox.stub(window, 'open').returns({
+      closed: true,
+      focus: sandbox.stub(),
+      location: {
+        href: 'https://incorrect-redirect-url'
+      }
+    });
+
+    return utilities.openNewTab('https://www.google.com');
+  });
+
   it('should handle blocked tabs', () => {
     sandbox.stub(window, 'open').returns(null);
 
