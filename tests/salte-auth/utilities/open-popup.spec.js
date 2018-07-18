@@ -38,6 +38,18 @@ describe('function(openPopup)', () => {
     return utilities.openPopup('https://www.google.com');
   });
 
+  it('should handle a user closing the popup', () => {
+    sandbox.stub(window, 'open').returns({
+      closed: true,
+      focus: sandbox.stub(),
+      location: {
+        href: 'https://incorrect-redirect-url'
+      }
+    });
+
+    return utilities.openPopup('https://www.google.com');
+  });
+
   it('should handle blocked popups', () => {
     sandbox.stub(window, 'open').returns(null);
 

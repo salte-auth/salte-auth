@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.10.2
+ * @salte-io/salte-auth JavaScript Library v2.10.3
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -9417,13 +9417,15 @@ var SalteAuthUtilities = function () {
       return new Promise(function (resolve) {
         var checker = setInterval(function () {
           try {
-            // This could throw cross-domain errors, so we need to silence them.
-            var loginUrl = _this3.$$config.redirectUrl && _this3.$$config.redirectUrl.loginUrl || _this3.$$config.redirectUrl;
-            var logoutUrl = _this3.$$config.redirectUrl && _this3.$$config.redirectUrl.logoutUrl || _this3.$$config.redirectUrl;
-            if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
+            if (!popupWindow.closed) {
+              // This could throw cross-domain errors, so we need to silence them.
+              var loginUrl = _this3.$$config.redirectUrl && _this3.$$config.redirectUrl.loginUrl || _this3.$$config.redirectUrl;
+              var logoutUrl = _this3.$$config.redirectUrl && _this3.$$config.redirectUrl.logoutUrl || _this3.$$config.redirectUrl;
+              if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
 
-            location.hash = popupWindow.location.hash;
-            popupWindow.close();
+              location.hash = popupWindow.location.hash;
+              popupWindow.close();
+            }
             clearInterval(checker);
             setTimeout(resolve);
           } catch (e) {}
@@ -9453,13 +9455,15 @@ var SalteAuthUtilities = function () {
       return new Promise(function (resolve) {
         var checker = setInterval(function () {
           try {
-            // This could throw cross-domain errors, so we need to silence them.
-            var loginUrl = _this4.$$config.redirectUrl && _this4.$$config.redirectUrl.loginUrl || _this4.$$config.redirectUrl;
-            var logoutUrl = _this4.$$config.redirectUrl && _this4.$$config.redirectUrl.logoutUrl || _this4.$$config.redirectUrl;
-            if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
+            if (!tabWindow.closed) {
+              // This could throw cross-domain errors, so we need to silence them.
+              var loginUrl = _this4.$$config.redirectUrl && _this4.$$config.redirectUrl.loginUrl || _this4.$$config.redirectUrl;
+              var logoutUrl = _this4.$$config.redirectUrl && _this4.$$config.redirectUrl.logoutUrl || _this4.$$config.redirectUrl;
+              if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
 
-            location.hash = tabWindow.location.hash;
-            tabWindow.close();
+              location.hash = tabWindow.location.hash;
+              tabWindow.close();
+            }
             clearInterval(checker);
             setTimeout(resolve);
           } catch (e) {}
