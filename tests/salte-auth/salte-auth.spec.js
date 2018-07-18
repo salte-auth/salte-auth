@@ -1727,13 +1727,31 @@ describe('salte-auth', () => {
       expect(clearTimeout.callCount).to.equal(1);
     });
 
-    it('should bail if "autoRefresh" is false', () => {
-      window.setTimeout.reset();
+    it('should not invoke "refreshToken" if autoRefresh is false', () => {
+      window.setTimeout.restore();
       auth.$config.autoRefresh = false;
+
+      const spy = sinon.spy(auth, 'refreshToken');
 
       auth.$$refreshToken();
 
-      expect(window.setTimeout.callCount).to.equal(0);
+      sinon.assert.notCalled(spy);
+    });
+
+    it('should fire off a "refresh" event if autoRefresh is false', () => {
+      window.setTimeout.restore();
+      auth.$config.autoRefresh = false;
+      const promise = new Promise((resolve, reject) => {
+        auth.on('refresh', () => {
+          return resolve('refresh event fired');
+        });
+      });
+
+      auth.$$refreshToken();
+
+      return promise.then((resolution) => {
+        expect(resolution).to.equal('refresh event fired');
+      });
     });
   });
 
