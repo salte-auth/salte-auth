@@ -29,7 +29,7 @@ describe('salte-auth.profile', () => {
       expect(profile.bogus).to.be.undefined;
     });
 
-    it('should support parsing hash parameters', () => {
+    it('should not automatically parse hash parameters', () => {
       history.replaceState(
         null,
         '',
@@ -38,6 +38,27 @@ describe('salte-auth.profile', () => {
         }#state=55555-55555`
       );
       profile = new SalteAuthProfile();
+      expect(profile.$state).to.equal(null);
+    });
+  });
+
+  describe('function($hash)', () => {
+    beforeEach(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
+
+    it('should support parsing hash parameters', () => {
+      history.replaceState(
+        null,
+        '',
+        `${location.protocol}//${location.host}${
+          location.pathname
+        }#state=55555-55555`
+      );
+
+      profile.$hash();
+
       expect(profile.$state).to.equal('55555-55555');
     });
   });
