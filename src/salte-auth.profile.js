@@ -1,7 +1,9 @@
 import defaultsDeep from 'lodash/defaultsDeep';
 import find from 'lodash/find';
-import get from 'lodash/get';
-import set from 'lodash/set';
+import debug from 'debug';
+
+/** @ignore */
+const logger = debug('@salte-io/salte-auth:profile');
 
 /**
  * All the profile information associated with the current authentication session
@@ -12,9 +14,7 @@ class SalteAuthProfile {
    * @param {Config} config configuration for salte auth
    */
   constructor(config) {
-    if (window.salte.SalteAuthProfile.$instance) {
-      return window.salte.SalteAuthProfile.$instance;
-    }
+    logger('Appending defaults to config...');
     /** @ignore */
     this.$$config = defaultsDeep(config, {
       validation: {
@@ -25,15 +25,23 @@ class SalteAuthProfile {
       },
       storageType: 'session'
     });
+  }
+
+  /**
+   * Check for a hash, parses it, and removes it.
+   */
+  $hash() {
     if (location.hash) {
       const params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
+      logger(`Hash detected, parsing...`, params);
       for (let i = 0; i < params.length; i++) {
         const param = params[i];
         const [key, value] = param.split('=');
         this.$parse(key, decodeURIComponent(value));
       }
+      logger(`Removing hash...`);
+      history.pushState('', document.title, location.href.split('#')[0]);
     }
-    window.salte.SalteAuthProfile.$instance = this;
   }
 
   /**
@@ -48,7 +56,7 @@ class SalteAuthProfile {
         this.$tokenType = value;
         break;
       case 'expires_in':
-        this.$expiration = Date.now() + value;
+        this.$expiration = Date.now() + (Number(value) * 1000);
         break;
       case 'access_token':
         this.$accessToken = value;
@@ -90,20 +98,21 @@ class SalteAuthProfile {
    * @private
    */
   get $tokenType() {
-    return this.$storage.getItem('salte.auth.token-type');
+    return this.$getItem('salte.auth.$token-type', 'session');
   }
 
   set $tokenType(tokenType) {
-    this.$saveItem('salte.auth.token-type', tokenType);
+    this.$saveItem('salte.auth.$token-type', tokenType, 'session');
   }
 
   /**
    * The date and time that the access token will expire
-   * @return {String} the expiration time as unix timestamp
+   * @return {Number} the expiration time as unix timestamp
    * @private
    */
   get $expiration() {
-    return this.$storage.getItem('salte.auth.expiration');
+    const expiration = this.$getItem('salte.auth.expiration');
+    return expiration ? Number(expiration) : null;
   }
 
   set $expiration(expiration) {
@@ -116,7 +125,7 @@ class SalteAuthProfile {
    * @private
    */
   get $accessToken() {
-    return this.$storage.getItem('salte.auth.access-token');
+    return this.$getItem('salte.auth.access-token');
   }
 
   set $accessToken(accessToken) {
@@ -129,7 +138,7 @@ class SalteAuthProfile {
    * @private
    */
   get $idToken() {
-    return this.$storage.getItem('salte.auth.id-token');
+    return this.$getItem('salte.auth.id-token');
   }
 
   set $idToken(idToken) {
@@ -144,11 +153,11 @@ class SalteAuthProfile {
    * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
    */
   get $state() {
-    return this.$storage.getItem('salte.auth.state');
+    return this.$getItem('salte.auth.$state', 'session');
   }
 
   set $state(state) {
-    this.$saveItem('salte.auth.state', state);
+    this.$saveItem('salte.auth.$state', state, 'session');
   }
 
   /**
@@ -159,11 +168,11 @@ class SalteAuthProfile {
    * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
    */
   get $localState() {
-    return this.$storage.getItem('salte.auth.local-state');
+    return this.$getItem('salte.auth.$local-state', 'session');
   }
 
   set $localState(localState) {
-    this.$saveItem('salte.auth.local-state', localState);
+    this.$saveItem('salte.auth.$local-state', localState, 'session');
   }
 
   /**
@@ -172,7 +181,7 @@ class SalteAuthProfile {
    * @private
    */
   get $error() {
-    return this.$storage.getItem('salte.auth.error');
+    return this.$getItem('salte.auth.error');
   }
 
   set $error(error) {
@@ -185,7 +194,7 @@ class SalteAuthProfile {
    * @private
    */
   get $errorDescription() {
-    return this.$storage.getItem('salte.auth.error-description');
+    return this.$getItem('salte.auth.error-description');
   }
 
   set $errorDescription(errorDescription) {
@@ -198,11 +207,11 @@ class SalteAuthProfile {
    * @private
    */
   get $redirectUrl() {
-    return this.$storage.getItem('salte.auth.$redirect-url');
+    return this.$getItem('salte.auth.$redirect-url', 'session');
   }
 
   set $redirectUrl(redirectUrl) {
-    this.$saveItem('salte.auth.$redirect-url', redirectUrl);
+    this.$saveItem('salte.auth.$redirect-url', redirectUrl, 'session');
   }
 
   /**
@@ -211,11 +220,26 @@ class SalteAuthProfile {
    * @private
    */
   get $nonce() {
-    return this.$storage.getItem('salte.auth.nonce');
+    return this.$getItem('salte.auth.$nonce', 'session');
   }
 
   set $nonce(nonce) {
-    this.$saveItem('salte.auth.nonce', nonce);
+    this.$saveItem('salte.auth.$nonce', nonce, 'session');
+  }
+
+  /**
+   * Sets or Gets an action based on whether a action was passed.
+   * @param {String} state The state this action is tied to.
+   * @param {String} action The action to store.
+   * @return {String|undefined} Returns a string if an action wasn't provided.
+   * @private
+   */
+  $actions(state, action) {
+    if (action) {
+      this.$saveItem(`salte.auth.action.${state}`, action);
+    } else {
+      return this.$getItem(`salte.auth.action.${state}`);
+    }
   }
 
   /**
@@ -240,6 +264,7 @@ class SalteAuthProfile {
    */
   $validate(accessTokenRequest) {
     if (!this.$$config.validation) {
+      logger('Validation is disabled, skipping...');
       return;
     }
 
@@ -314,14 +339,28 @@ class SalteAuthProfile {
   /**
    * Saves a value to the Web Storage API
    * @param {String} key The key to save to
-   * @param {*} value The value to save, if this is undefined or null it will delete the key
+   * @param {String} overrideStorageType the name of the storageType to use
+   * @return {*} the storage value for the given key
    * @private
    */
-  $saveItem(key, value) {
+  $getItem(key, overrideStorageType) {
+    const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
+    return storage.getItem(key);
+  }
+
+  /**
+   * Saves a value to the Web Storage API
+   * @param {String} key The key to save to
+   * @param {*} value The value to save, if this is undefined or null it will delete the key
+   * @param {String} overrideStorageType the name of the storageType to use
+   * @private
+   */
+  $saveItem(key, value, overrideStorageType) {
+    const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
     if ([undefined, null].indexOf(value) !== -1) {
-      this.$storage.removeItem(key);
+      storage.removeItem(key);
     } else {
-      this.$storage.setItem(key, value);
+      storage.setItem(key, value);
     }
   }
 
@@ -351,31 +390,19 @@ class SalteAuthProfile {
   }
 
   /**
-   * Transfers values from one storage type to the other
-   * @param {String} source the name of the storage type to pull from
-   * @param {String} destination the name of the storage type to push to
-   * @ignore
-   */
-  $$transfer(source, destination) {
-    const sourceStorage = this.$$getStorage(source);
-    const destinationStorage = this.$$getStorage(destination);
-
-    for (const key in sourceStorage) {
-      if (key.indexOf('salte.auth.') !== 0) continue;
-
-      destinationStorage.setItem(key, sourceStorage.getItem(key));
-      sourceStorage.removeItem(key);
-    }
-  }
-
-  /**
    * Clears all `salte.auth` values from localStorage
    * @private
    */
   $clear() {
-    for (const key in this.$storage) {
+    for (const key in localStorage) {
       if (key.match(/^salte\.auth\.[^$]/)) {
-        this.$saveItem(key, undefined);
+        localStorage.removeItem(key);
+      }
+    }
+
+    for (const key in sessionStorage) {
+      if (key.match(/^salte\.auth\.[^$]/)) {
+        sessionStorage.removeItem(key);
       }
     }
   }
@@ -390,5 +417,5 @@ class SalteAuthProfile {
   }
 }
 
-set(window, 'salte.SalteAuthProfile', get(window, 'salte.SalteAuthProfile', SalteAuthProfile));
 export { SalteAuthProfile };
+export default SalteAuthProfile;

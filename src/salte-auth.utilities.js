@@ -1,6 +1,8 @@
 import assign from 'lodash/assign';
-import get from 'lodash/get';
-import set from 'lodash/set';
+import debug from 'debug';
+
+/** @ignore */
+const logger = debug('@salte-io/salte-auth:utilities');
 
 /**
  * Basic utilities to support the authentication flow
@@ -8,11 +10,11 @@ import set from 'lodash/set';
 class SalteAuthUtilities {
   /**
    * Wraps all XHR and Fetch (if available) requests to allow promise interceptors
+   * @param {Config} config configuration for salte auth
    */
-  constructor() {
-    if (window.salte.SalteAuthUtilities.$instance) {
-      return window.salte.SalteAuthUtilities.$instance;
-    }
+  constructor(config) {
+    /** @ignore */
+    this.$$config = config;
 
     /** @ignore */
     this.$interceptors = {
@@ -20,6 +22,7 @@ class SalteAuthUtilities {
       xhr: []
     };
 
+    logger('Setting up wrappers for XMLHttpRequest...');
     (function(open) {
       XMLHttpRequest.prototype.open = function(method, url) {
         /** @ignore */
@@ -48,12 +51,15 @@ class SalteAuthUtilities {
     })(XMLHttpRequest.prototype.send);
 
     if (window.fetch) {
+      logger('Fetch detected, setting up wrappers...');
       (function(fetch) {
-        window.fetch = function(input, options = {}) {
+        window.fetch = function(input, options) {
+          const request = input instanceof Request ? input : new Request(input, options);
+
           const promises = [];
           for (let i = 0; i < self.$interceptors.fetch.length; i++) {
             const interceptor = self.$interceptors.fetch[i];
-            promises.push(interceptor(input, options));
+            promises.push(interceptor(request));
           }
           return Promise.all(promises).then(() => {
             return fetch.call(this, input, options);
@@ -61,7 +67,6 @@ class SalteAuthUtilities {
         };
       })(fetch);
     }
-    window.salte.SalteAuthUtilities.$instance = this;
   }
 
   /**
@@ -158,9 +163,19 @@ class SalteAuthUtilities {
     // TODO: Find a better way of tracking when a Window closes.
     return new Promise((resolve) => {
       const checker = setInterval(() => {
-        if (!popupWindow.closed) return;
-        clearInterval(checker);
-        setTimeout(resolve);
+        try {
+          if (!popupWindow.closed) {
+            // This could throw cross-domain errors, so we need to silence them.
+            const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+            const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+            if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
+
+            location.hash = popupWindow.location.hash;
+            popupWindow.close();
+          }
+          clearInterval(checker);
+          setTimeout(resolve);
+        } catch (e) {}
       }, 100);
     });
   }
@@ -176,13 +191,24 @@ class SalteAuthUtilities {
       return Promise.reject(new ReferenceError('We were unable to open the new tab, its likely that the request was blocked.'));
     }
 
+    tabWindow.name = 'salte-auth';
     tabWindow.focus();
     // TODO: Find a better way of tracking when a Window closes.
     return new Promise((resolve) => {
       const checker = setInterval(() => {
-        if (!tabWindow.closed) return;
-        clearInterval(checker);
-        setTimeout(resolve);
+        try {
+          if (!tabWindow.closed) {
+            // This could throw cross-domain errors, so we need to silence them.
+            const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+            const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+            if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
+
+            location.hash = tabWindow.location.hash;
+            tabWindow.close();
+          }
+          clearInterval(checker);
+          setTimeout(resolve);
+        } catch (e) {}
       }, 100);
     });
   }
@@ -223,7 +249,7 @@ class SalteAuthUtilities {
     return new Promise((resolve) => {
       iframe.addEventListener('DOMNodeRemoved', () => {
         setTimeout(resolve);
-      });
+      }, { passive: true });
     });
   }
 
@@ -266,7 +292,26 @@ class SalteAuthUtilities {
     }
     return null;
   }
+
+  /**
+   * Determines if the page is currently hidden
+   * @return {Boolean} true if the page is hidden
+   * @private
+   */
+  get $hidden() {
+    return document.hidden;
+  }
+
+  /**
+   * Navigates to the url provided.
+   * @param {String} url the url to navigate to
+   * @private
+   */
+  /* istanbul ignore next */
+  $navigate(url) {
+    location.href = url;
+  }
 }
 
-set(window, 'salte.SalteAuthUtilities', get(window, 'salte.SalteAuthUtilities', SalteAuthUtilities));
 export { SalteAuthUtilities };
+export default SalteAuthUtilities;

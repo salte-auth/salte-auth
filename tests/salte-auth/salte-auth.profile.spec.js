@@ -1,46 +1,51 @@
 import { expect } from 'chai';
 
-import { SalteAuthProfile } from '../../src/salte-auth.profile.js';
+import SalteAuthProfile from '../../src/salte-auth.profile.js';
 
 describe('salte-auth.profile', () => {
   let sandbox, profile;
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
+    sandbox = sinon.createSandbox();
     sessionStorage.clear();
     profile = new SalteAuthProfile();
   });
 
   afterEach(() => {
     sandbox.restore();
-    delete window.salte.SalteAuthProfile.$instance;
   });
 
   describe('function(constructor)', () => {
     beforeEach(() => {
-      delete window.salte.SalteAuthProfile.$instance;
+      localStorage.clear();
       sessionStorage.clear();
-    });
-
-    it('should be a singleton', () => {
-      profile = new SalteAuthProfile();
-      profile.bogus = 'test';
-
-      expect(profile.bogus).to.equal('test');
-      expect(new SalteAuthProfile().bogus).to.equal('test');
     });
 
     it('should recreate the path to the instance', () => {
       profile.bogus = 'test';
       expect(profile.bogus).to.equal('test');
 
-      delete window.salte.SalteAuthProfile.$instance;
-
       profile = new SalteAuthProfile();
 
       expect(profile.bogus).to.be.undefined;
-      expect(window.salte.SalteAuthProfile.$instance).to.be.instanceof(
-        SalteAuthProfile
+    });
+
+    it('should not automatically parse hash parameters', () => {
+      history.replaceState(
+        null,
+        '',
+        `${location.protocol}//${location.host}${
+          location.pathname
+        }#state=55555-55555`
       );
+      profile = new SalteAuthProfile();
+      expect(profile.$state).to.equal(null);
+    });
+  });
+
+  describe('function($hash)', () => {
+    beforeEach(() => {
+      localStorage.clear();
+      sessionStorage.clear();
     });
 
     it('should support parsing hash parameters', () => {
@@ -51,7 +56,9 @@ describe('salte-auth.profile', () => {
           location.pathname
         }#state=55555-55555`
       );
-      profile = new SalteAuthProfile();
+
+      profile.$hash();
+
       expect(profile.$state).to.equal('55555-55555');
     });
   });
@@ -64,8 +71,9 @@ describe('salte-auth.profile', () => {
 
     it('should parse the expires_in', () => {
       sandbox.useFakeTimers();
+      expect(profile.$expiration).to.equal(null);
       profile.$parse('expires_in', 5000);
-      expect(profile.$expiration).to.equal('5000');
+      expect(profile.$expiration).to.equal(5000000);
     });
 
     it('should parse the access_token', () => {
@@ -139,6 +147,7 @@ describe('salte-auth.profile', () => {
   describe('getter(accessTokenExpired)', () => {
     beforeEach(() => {
       profile.$accessToken = '55555-555555';
+      profile.$parse('expires_in', '1');
     });
 
     it('should be expired if the "access_token" is empty', () => {
@@ -147,11 +156,15 @@ describe('salte-auth.profile', () => {
     });
 
     it('should be expired if the "expiration" is in the past', () => {
-      expect(profile.accessTokenExpired).to.equal(true);
+      expect(profile.accessTokenExpired).to.equal(false);
+      return new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      }).then(() => {
+        expect(profile.accessTokenExpired).to.equal(true);
+      });
     });
 
     it('should not be expired if the "access_token" is present and the "expiration" is in the future', () => {
-      profile.$expiration = Date.now() + 100;
       expect(profile.accessTokenExpired).to.equal(false);
     });
   });
@@ -254,6 +267,8 @@ describe('salte-auth.profile', () => {
     });
 
     it('should return an error if the "local-state" does not match the "state"', () => {
+      profile.$localState = '54321';
+      profile.$state = '12345';
       profile.$idToken = `0.${btoa(
         JSON.stringify({
           sub: '1234567890',
@@ -422,6 +437,11 @@ describe('salte-auth.profile', () => {
       expect(sessionStorage.getItem('bogus')).to.equal('bogus');
     });
 
+    it('should allow overriding the default storage', () => {
+      profile.$saveItem('bogus', 'bogus', 'local');
+      expect(localStorage.getItem('bogus')).to.equal('bogus');
+    });
+
     it('should allow other falsy values', () => {
       profile.$saveItem('bogus', '');
       expect(sessionStorage.getItem('bogus')).to.equal('');
@@ -438,11 +458,24 @@ describe('salte-auth.profile', () => {
     });
   });
 
-  describe('getter($storage)', () => {
-    afterEach(() => {
-      salte.auth.$config = {};
+  describe('function($getItem)', () => {
+    it('should save to sessionStorage', () => {
+      profile.$saveItem('bogus', 'bogus');
+      expect(profile.$getItem('bogus')).to.equal('bogus');
     });
 
+    it('should return null if the value does not exist', () => {
+      profile.$saveItem('bogus', null);
+      expect(profile.$getItem('bogus')).to.equal(null);
+    });
+
+    it('should support overriding the default storage', () => {
+      profile.$saveItem('bogus', '', 'local');
+      expect(profile.$getItem('bogus', 'local')).to.equal(localStorage.getItem('bogus'));
+    });
+  });
+
+  describe('getter($storage)', () => {
     it('should support using sessionStorage', () => {
       expect(profile.$$getStorage('session')).to.equal(sessionStorage);
     });
@@ -460,14 +493,26 @@ describe('salte-auth.profile', () => {
   });
 
   describe('function($clear)', () => {
-    beforeEach(() => {
+    it('should remove all "salte.auth" items from localStorage', () => {
+      localStorage.setItem('salte.auth.$test', '123');
+      localStorage.setItem('salte.auth.id_token', '12345-12345-12345');
+      localStorage.setItem('salte.auth.bogus', '12345');
+      localStorage.setItem('bogus', '12345');
+
+      profile.$clear();
+
+      expect(localStorage.getItem('salte.auth.$test')).to.equal('123');
+      expect(localStorage.getItem('salte.auth.id_token')).to.equal(null);
+      expect(localStorage.getItem('salte.auth.bogus')).to.equal(null);
+      expect(localStorage.getItem('bogus')).to.equal('12345');
+    });
+
+    it('should remove all "salte.auth" items from sessionStorage', () => {
       sessionStorage.setItem('salte.auth.$test', '123');
       sessionStorage.setItem('salte.auth.id_token', '12345-12345-12345');
       sessionStorage.setItem('salte.auth.bogus', '12345');
       sessionStorage.setItem('bogus', '12345');
-    });
 
-    it('should remove all "salte.auth" items from sessionStorage', () => {
       profile.$clear();
 
       expect(sessionStorage.getItem('salte.auth.$test')).to.equal('123');

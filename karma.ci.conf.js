@@ -44,8 +44,6 @@ module.exports = function(config) {
       browserName: 'safari',
       version: '8'
     },
-    // TODO: For some reason Safari 7 gets fails to load
-    // the test page, every other browser seems to work fine.
     Safari7: {
       base: 'SauceLabs',
       browserName: 'safari',
@@ -65,7 +63,8 @@ module.exports = function(config) {
 
     polyfill: [
       'Promise',
-      'fetch'
+      'fetch',
+      'URL'
     ],
 
     files: [

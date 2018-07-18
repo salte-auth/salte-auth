@@ -9,7 +9,7 @@ class SalteAuthWSO2Provider {
     return this.$utilities.createUrl(`${config.providerUrl}/commonauth`, {
       commonAuthLogout: true,
       type: 'oidc',
-      commonAuthCallerPath: config.redirectUrl,
+      commonAuthCallerPath: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
       relyingParty: config.relyingParty
     });
   }

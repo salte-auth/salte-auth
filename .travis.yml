@@ -1,4 +1,4 @@
-sudo: required
+sudo: false
 language: node_js
 node_js: stable
 cache:
@@ -9,7 +9,6 @@ branches:
   only:
     - master
     - /^greenkeeper/.*$/
-    - is-safari-7-fixed-yet
 script:
   - yarn start lint
   - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then yarn start test.sauce; fi

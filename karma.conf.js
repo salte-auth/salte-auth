@@ -21,7 +21,8 @@ module.exports = function(config) {
 
     polyfills: [
       'fetch',
-      'Promise'
+      'Promise',
+      'URL'
     ],
 
     files: [
@@ -61,7 +62,14 @@ module.exports = function(config) {
 
     autoWatch: true,
 
-    browsers: ['ChromeHeadless'],
+    browsers: ['ChromeHeadlessNoSandbox'],
+
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    },
 
     browserNoActivityTimeout: 120000,
 
