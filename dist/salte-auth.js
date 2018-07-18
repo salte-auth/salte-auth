@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.10.1
+ * @salte-io/salte-auth JavaScript Library v2.10.2
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7814,11 +7814,13 @@ var SalteAuth = function () {
 
     if (this.$utilities.$iframe) {
       logger('Detected iframe, removing...');
+      this.profile.$hash();
       parent.document.body.removeChild(this.$utilities.$iframe);
     } else if (this.$utilities.$popup) {
       logger('Popup detected!');
     } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
       logger('Redirect detected!');
+      this.profile.$hash();
       var error = this.profile.$validate();
       if (error) {
         this.profile.$clear();
@@ -8623,7 +8625,6 @@ var SalteAuthProfile = function () {
       },
       storageType: 'session'
     });
-    this.$hash();
   }
 
   /**

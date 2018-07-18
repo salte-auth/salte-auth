@@ -117,11 +117,13 @@ class SalteAuth {
 
     if (this.$utilities.$iframe) {
       logger('Detected iframe, removing...');
+      this.profile.$hash();
       parent.document.body.removeChild(this.$utilities.$iframe);
     } else if (this.$utilities.$popup) {
       logger('Popup detected!');
     } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
       logger('Redirect detected!');
+      this.profile.$hash();
       const error = this.profile.$validate();
       if (error) {
         this.profile.$clear();
