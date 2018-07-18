@@ -164,13 +164,15 @@ class SalteAuthUtilities {
     return new Promise((resolve) => {
       const checker = setInterval(() => {
         try {
-          // This could throw cross-domain errors, so we need to silence them.
-          const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
-          const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
-          if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
+          if (!popupWindow.closed) {
+            // This could throw cross-domain errors, so we need to silence them.
+            const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+            const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+            if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
 
-          location.hash = popupWindow.location.hash;
-          popupWindow.close();
+            location.hash = popupWindow.location.hash;
+            popupWindow.close();
+          }
           clearInterval(checker);
           setTimeout(resolve);
         } catch (e) {}
@@ -195,13 +197,15 @@ class SalteAuthUtilities {
     return new Promise((resolve) => {
       const checker = setInterval(() => {
         try {
-          // This could throw cross-domain errors, so we need to silence them.
-          const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
-          const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
-          if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
+          if (!tabWindow.closed) {
+            // This could throw cross-domain errors, so we need to silence them.
+            const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+            const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+            if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
 
-          location.hash = tabWindow.location.hash;
-          tabWindow.close();
+            location.hash = tabWindow.location.hash;
+            tabWindow.close();
+          }
           clearInterval(checker);
           setTimeout(resolve);
         } catch (e) {}
