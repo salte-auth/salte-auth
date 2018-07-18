@@ -670,13 +670,16 @@ class SalteAuth {
       clearTimeout(this.$timeouts.refresh);
     }
 
-    // Bail if autoRefresh is disabled.
-    if (!this.$config.autoRefresh) return;
-
     this.$timeouts.refresh = setTimeout(() => {
-      this.refreshToken().catch((error) => {
-        console.error(error);
-      });
+      // Allows Auto Refresh to be disabled
+      if (this.$config.autoRefresh) {
+        this.refreshToken().catch((error) => {
+          console.error(error);
+        });
+      } else {
+        this.$fire('refresh');
+      }
+      // We need to default `autoRefreshBuffer` to 60000 in the constructor.
     }, Math.max((this.profile.userInfo.exp * 1000) - Date.now() - 60000, 0));
   }
 
