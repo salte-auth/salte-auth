@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.10.3
+ * @salte-io/salte-auth JavaScript Library v2.11.0
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7137,14 +7137,15 @@ for (var i = 0; i < 256; ++i) {
 function bytesToUuid(buf, offset) {
   var i = offset || 0;
   var bth = byteToHex;
-  return bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]];
+  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+  return ([bth[buf[i++]], bth[buf[i++]], 
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]]]).join('');
 }
 
 module.exports = bytesToUuid;
@@ -7164,9 +7165,11 @@ module.exports = bytesToUuid;
 // and inconsistent support for the `crypto` API.  We do the best we can via
 // feature-detection
 
-// getRandomValues needs to be invoked in a context where "this" is a Crypto implementation.
-var getRandomValues = (typeof(crypto) != 'undefined' && crypto.getRandomValues.bind(crypto)) ||
-                      (typeof(msCrypto) != 'undefined' && msCrypto.getRandomValues.bind(msCrypto));
+// getRandomValues needs to be invoked in a context where "this" is a Crypto
+// implementation. Also, find the complete implementation of crypto on IE11.
+var getRandomValues = (typeof(crypto) != 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto)) ||
+                      (typeof(msCrypto) != 'undefined' && typeof window.msCrypto.getRandomValues == 'function' && msCrypto.getRandomValues.bind(msCrypto));
+
 if (getRandomValues) {
   // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
   var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
@@ -7736,6 +7739,7 @@ var logger = (0, _debug2.default)('@salte-io/salte-auth');
  * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
  * @property {Boolean} [autoRefresh=true] Automatically refreshes the users token upon switching tabs or one minute prior to expiration.
+ * @property {Number} [autoRefreshBuffer=60000] A number of miliseconds before token expiration to refresh.
  */
 
 /**
@@ -7797,7 +7801,8 @@ var SalteAuth = function () {
     this.$config = config;
     this.$config = (0, _defaultsDeep2.default)(config, this.$provider.defaultConfig, {
       loginType: 'iframe',
-      autoRefresh: true
+      autoRefresh: true,
+      autoRefreshBuffer: 60000
     });
     /**
      * Various utility functions for salte auth
@@ -8399,7 +8404,7 @@ var SalteAuth = function () {
           _this9.$fire('refresh');
         }
         // We need to default `autoRefreshBuffer` to 60000 in the constructor.
-      }, Math.max(this.profile.userInfo.exp * 1000 - Date.now() - 60000, 0));
+      }, Math.max(this.profile.userInfo.exp * 1000 - Date.now() - this.$config.autoRefreshBuffer, 0));
     }
 
     /**
