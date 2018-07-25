@@ -117,11 +117,13 @@ class SalteAuth {
 
     if (this.$utilities.$iframe) {
       logger('Detected iframe, removing...');
+      this.profile.$hash();
       parent.document.body.removeChild(this.$utilities.$iframe);
     } else if (this.$utilities.$popup) {
       logger('Popup detected!');
     } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
       logger('Redirect detected!');
+      this.profile.$hash();
       const error = this.profile.$validate();
       if (error) {
         this.profile.$clear();
@@ -167,19 +169,19 @@ class SalteAuth {
       setTimeout(this.$$onRouteChanged.bind(this));
 
       logger('Setting up automatic renewal of token...');
-      this.on('login', (error, user) => {
+      this.on('login', (error) => {
         if (error) return;
 
         this.$$refreshToken();
       });
 
-      this.on('refresh', (error, user) => {
+      this.on('refresh', (error) => {
         if (error) return;
 
         this.$$refreshToken();
       });
 
-      this.on('logout', (error, user) => {
+      this.on('logout', () => {
         clearTimeout(this.$timeouts.refresh);
       });
 
@@ -505,12 +507,13 @@ class SalteAuth {
 
   /**
    * Authenticates using the redirect-based OAuth flow.
+   * @param {String} redirectUrl override for the redirect url, by default this will try to redirect the user back where they started.
    * @return {Promise} a promise intended to block future login attempts.
    *
    * @example
    * auth.loginWithRedirect(); // Don't bother with utilizing the promise here, it never resolves.
    */
-  loginWithRedirect() {
+  loginWithRedirect(redirectUrl) {
     if (this.$config.redirectLoginCallback) {
       console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
     }
@@ -525,7 +528,7 @@ class SalteAuth {
     this.$promises.login = new Promise(() => {});
 
     this.profile.$clear();
-    this.profile.$redirectUrl = this.profile.$redirectUrl || location.href;
+    this.profile.$redirectUrl = redirectUrl || this.profile.$redirectUrl || location.href;
     const url = this.$loginUrl();
 
     this.profile.$actions(this.profile.$localState, 'login');
@@ -669,13 +672,16 @@ class SalteAuth {
       clearTimeout(this.$timeouts.refresh);
     }
 
-    // Bail if autoRefresh is disabled.
-    if (!this.$config.autoRefresh) return;
-
     this.$timeouts.refresh = setTimeout(() => {
-      this.refreshToken().catch((error) => {
-        console.error(error);
-      });
+      // Allows Auto Refresh to be disabled
+      if (this.$config.autoRefresh) {
+        this.refreshToken().catch((error) => {
+          console.error(error);
+        });
+      } else {
+        this.$fire('refresh');
+      }
+      // We need to default `autoRefreshBuffer` to 60000 in the constructor.
     }, Math.max((this.profile.userInfo.exp * 1000) - Date.now() - 60000, 0));
   }
 

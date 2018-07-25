@@ -12,6 +12,16 @@
 
 OAuth 2.0 for the masses!
 
+## Supported Browsers
+
+_If a version isn't specified that means we test on the latest and greatest, however most versions of that browser should work._
+
+- Chrome
+- Firefox
+- Safari 7+
+- Edge
+- IE 10+
+
 ## Install
 
 You can install this package either with `npm` or with `bower`.

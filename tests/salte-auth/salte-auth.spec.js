@@ -340,6 +340,26 @@ describe('salte-auth', () => {
         expect(auth.$$onVisibilityChanged.callCount).to.equal(1);
       });
     });
+
+    it('should invoke "$$refreshToken" on "refresh"', () => {
+      sandbox.stub(SalteAuth.prototype, '$$refreshToken');
+
+      expect(auth.$$refreshToken.callCount).to.equal(0);
+
+      auth.$fire('refresh');
+
+      expect(auth.$$refreshToken.callCount).to.equal(1);
+    });
+
+    it('should not invoke "$$refreshToken" when "refresh" errors', () => {
+      sandbox.stub(SalteAuth.prototype, '$$refreshToken');
+
+      expect(auth.$$refreshToken.callCount).to.equal(0);
+
+      auth.$fire('refresh', 'error!');
+
+      expect(auth.$$refreshToken.callCount).to.equal(0);
+    });
   });
 
   describe('interceptor(fetch)', () => {
@@ -1277,6 +1297,12 @@ describe('salte-auth', () => {
 
       expect(console.warn.callCount).to.equal(1);
     });
+
+    it('should support overriding the redirectUrl', () => {
+      auth.loginWithRedirect('https://google.com');
+
+      expect(auth.profile.$redirectUrl).to.equal('https://google.com');
+    });
   });
 
   describe('function(logoutWithIframe)', () => {
@@ -1691,13 +1717,31 @@ describe('salte-auth', () => {
       expect(clearTimeout.callCount).to.equal(1);
     });
 
-    it('should bail if "autoRefresh" is false', () => {
-      window.setTimeout.reset();
+    it('should not invoke "refreshToken" if autoRefresh is false', () => {
+      window.setTimeout.restore();
       auth.$config.autoRefresh = false;
+
+      const spy = sinon.spy(auth, 'refreshToken');
 
       auth.$$refreshToken();
 
-      expect(window.setTimeout.callCount).to.equal(0);
+      sinon.assert.notCalled(spy);
+    });
+
+    it('should fire off a "refresh" event if autoRefresh is false', () => {
+      window.setTimeout.restore();
+      auth.$config.autoRefresh = false;
+      const promise = new Promise((resolve, reject) => {
+        auth.on('refresh', () => {
+          return resolve('refresh event fired');
+        });
+      });
+
+      auth.$$refreshToken();
+
+      return promise.then((resolution) => {
+        expect(resolution).to.equal('refresh event fired');
+      });
     });
   });
 
