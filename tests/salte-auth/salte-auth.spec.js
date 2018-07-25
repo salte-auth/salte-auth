@@ -67,7 +67,7 @@ describe('salte-auth', () => {
       });
     });
 
-    it('should default loginType, autoRefresh, storageType, and validation', () => {
+    it('should default loginType, autoRefresh, storageType, validation and autoRefreshBuffer', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
@@ -79,6 +79,7 @@ describe('salte-auth', () => {
         autoRefresh: true,
         provider: 'auth0',
         storageType: 'session',
+        autoRefreshBuffer: 60000,
         validation: {
           aud: true,
           azp: true,
@@ -89,13 +90,14 @@ describe('salte-auth', () => {
       expect(auth.$config).to.deep.equal(auth.profile.$$config);
     });
 
-    it('should support overriding the loginType, autoRefresh, storageType, and validation', () => {
+    it('should support overriding the loginType, autoRefresh, storageType, validation and autoRefreshBuffer', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
         loginType: 'redirect',
         autoRefresh: false,
         provider: 'auth0',
+        autoRefreshBuffer: 500,
         storageType: 'local',
         validation: {
           nonce: false
@@ -107,6 +109,7 @@ describe('salte-auth', () => {
         autoRefresh: false,
         provider: 'auth0',
         storageType: 'local',
+        autoRefreshBuffer: 500,
         validation: {
           aud: true,
           azp: true,

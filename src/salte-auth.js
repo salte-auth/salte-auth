@@ -44,6 +44,7 @@ const logger = debug('@salte-io/salte-auth');
  * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
  * @property {Boolean} [autoRefresh=true] Automatically refreshes the users token upon switching tabs or one minute prior to expiration.
+ * @property {Number} [autoRefreshBuffer=60000] A number of miliseconds before token expiration to refresh.
  */
 
 /**
@@ -100,7 +101,8 @@ class SalteAuth {
     this.$config = config;
     this.$config = defaultsDeep(config, this.$provider.defaultConfig, {
       loginType: 'iframe',
-      autoRefresh: true
+      autoRefresh: true,
+      autoRefreshBuffer: 60000
     });
     /**
      * Various utility functions for salte auth
@@ -682,7 +684,7 @@ class SalteAuth {
         this.$fire('refresh');
       }
       // We need to default `autoRefreshBuffer` to 60000 in the constructor.
-    }, Math.max((this.profile.userInfo.exp * 1000) - Date.now() - 60000, 0));
+    }, Math.max((this.profile.userInfo.exp * 1000) - Date.now() - this.$config.autoRefreshBuffer, 0));
   }
 
   /**
