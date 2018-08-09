@@ -22,11 +22,11 @@
   "scripts": {
     "start": "nps",
     "prepublishOnly": "yarn start build",
-    "postpublish": "publish-latest --user-email bot@salte.io --user-name salte-bot",
     "precommit": "remove-lockfiles"
   },
   "license": "MIT",
   "devDependencies": {
+    "@semantic-release/git": "^6.0.1",
     "babel-core": "^6.0.0",
     "babel-loader": "^7.0.0",
     "babel-preset-env": "^1.0.0",
@@ -63,9 +63,8 @@
     "moment": "^2.22.1",
     "nps": "^5.7.1",
     "promise-polyfill": "^8.0.0",
-    "publish-latest": "^1.1.2",
     "remove-lockfiles": "^2.0.0",
-    "semantic-release": "^12.0.0",
+    "semantic-release": "^15.0.0",
     "sinon": "^6.0.0",
     "unfetch": "^3.0.0",
     "uuid": "^3.0.0",
