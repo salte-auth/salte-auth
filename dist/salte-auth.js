@@ -2050,8 +2050,7 @@ var Stack = __webpack_require__(/*! ./_Stack */ "../node_modules/lodash/_Stack.j
     baseFor = __webpack_require__(/*! ./_baseFor */ "../node_modules/lodash/_baseFor.js"),
     baseMergeDeep = __webpack_require__(/*! ./_baseMergeDeep */ "../node_modules/lodash/_baseMergeDeep.js"),
     isObject = __webpack_require__(/*! ./isObject */ "../node_modules/lodash/isObject.js"),
-    keysIn = __webpack_require__(/*! ./keysIn */ "../node_modules/lodash/keysIn.js"),
-    safeGet = __webpack_require__(/*! ./_safeGet */ "../node_modules/lodash/_safeGet.js");
+    keysIn = __webpack_require__(/*! ./keysIn */ "../node_modules/lodash/keysIn.js");
 
 /**
  * The base implementation of `_.merge` without support for multiple sources.
@@ -2075,7 +2074,7 @@ function baseMerge(object, source, srcIndex, customizer, stack) {
     }
     else {
       var newValue = customizer
-        ? customizer(safeGet(object, key), srcValue, (key + ''), object, source, stack)
+        ? customizer(object[key], srcValue, (key + ''), object, source, stack)
         : undefined;
 
       if (newValue === undefined) {
@@ -2111,7 +2110,6 @@ var assignMergeValue = __webpack_require__(/*! ./_assignMergeValue */ "../node_m
     isObject = __webpack_require__(/*! ./isObject */ "../node_modules/lodash/isObject.js"),
     isPlainObject = __webpack_require__(/*! ./isPlainObject */ "../node_modules/lodash/isPlainObject.js"),
     isTypedArray = __webpack_require__(/*! ./isTypedArray */ "../node_modules/lodash/isTypedArray.js"),
-    safeGet = __webpack_require__(/*! ./_safeGet */ "../node_modules/lodash/_safeGet.js"),
     toPlainObject = __webpack_require__(/*! ./toPlainObject */ "../node_modules/lodash/toPlainObject.js");
 
 /**
@@ -2130,8 +2128,8 @@ var assignMergeValue = __webpack_require__(/*! ./_assignMergeValue */ "../node_m
  *  counterparts.
  */
 function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, stack) {
-  var objValue = safeGet(object, key),
-      srcValue = safeGet(source, key),
+  var objValue = object[key],
+      srcValue = source[key],
       stacked = stack.get(srcValue);
 
   if (stacked) {
@@ -3832,13 +3830,10 @@ var reIsUint = /^(?:0|[1-9]\d*)$/;
  * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
  */
 function isIndex(value, length) {
-  var type = typeof value;
   length = length == null ? MAX_SAFE_INTEGER : length;
-
   return !!length &&
-    (type == 'number' ||
-      (type != 'symbol' && reIsUint.test(value))) &&
-        (value > -1 && value % 1 == 0 && value < length);
+    (typeof value == 'number' || reIsUint.test(value)) &&
+    (value > -1 && value % 1 == 0 && value < length);
 }
 
 module.exports = isIndex;
@@ -4537,14 +4532,6 @@ var freeProcess = moduleExports && freeGlobal.process;
 /** Used to access faster Node.js helpers. */
 var nodeUtil = (function() {
   try {
-    // Use `util.types` for Node.js 10+.
-    var types = freeModule && freeModule.require && freeModule.require('util').types;
-
-    if (types) {
-      return types;
-    }
-
-    // Legacy `process.binding('util')` for Node.js < 10.
     return freeProcess && freeProcess.binding && freeProcess.binding('util');
   } catch (e) {}
 }());
@@ -4677,32 +4664,6 @@ var freeSelf = typeof self == 'object' && self && self.Object === Object && self
 var root = freeGlobal || freeSelf || Function('return this')();
 
 module.exports = root;
-
-
-/***/ }),
-
-/***/ "../node_modules/lodash/_safeGet.js":
-/*!******************************************!*\
-  !*** ../node_modules/lodash/_safeGet.js ***!
-  \******************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-/**
- * Gets the value at `key`, unless `key` is "__proto__".
- *
- * @private
- * @param {Object} object The object to query.
- * @param {string} key The key of the property to get.
- * @returns {*} Returns the property value.
- */
-function safeGet(object, key) {
-  return key == '__proto__'
-    ? undefined
-    : object[key];
-}
-
-module.exports = safeGet;
 
 
 /***/ }),
@@ -5024,7 +4985,8 @@ module.exports = stackSet;
 var memoizeCapped = __webpack_require__(/*! ./_memoizeCapped */ "../node_modules/lodash/_memoizeCapped.js");
 
 /** Used to match property names within property paths. */
-var rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
+var reLeadingDot = /^\./,
+    rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
 
 /** Used to match backslashes in property paths. */
 var reEscapeChar = /\\(\\)?/g;
@@ -5038,11 +5000,11 @@ var reEscapeChar = /\\(\\)?/g;
  */
 var stringToPath = memoizeCapped(function(string) {
   var result = [];
-  if (string.charCodeAt(0) === 46 /* . */) {
+  if (reLeadingDot.test(string)) {
     result.push('');
   }
-  string.replace(rePropName, function(match, number, quote, subString) {
-    result.push(quote ? subString.replace(reEscapeChar, '$1') : (number || match));
+  string.replace(rePropName, function(match, number, quote, string) {
+    result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
   });
   return result;
 });
@@ -7137,15 +7099,14 @@ for (var i = 0; i < 256; ++i) {
 function bytesToUuid(buf, offset) {
   var i = offset || 0;
   var bth = byteToHex;
-  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
-  return ([bth[buf[i++]], bth[buf[i++]], 
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]], '-',
-	bth[buf[i++]], bth[buf[i++]],
-	bth[buf[i++]], bth[buf[i++]],
-	bth[buf[i++]], bth[buf[i++]]]).join('');
+  return bth[buf[i++]] + bth[buf[i++]] +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] + '-' +
+          bth[buf[i++]] + bth[buf[i++]] +
+          bth[buf[i++]] + bth[buf[i++]] +
+          bth[buf[i++]] + bth[buf[i++]];
 }
 
 module.exports = bytesToUuid;
@@ -7158,34 +7119,31 @@ module.exports = bytesToUuid;
   !*** ../node_modules/uuid/lib/rng-browser.js ***!
   \***********************************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-// Unique ID creation requires a high quality random # generator.  In the
+/* WEBPACK VAR INJECTION */(function(global) {// Unique ID creation requires a high quality random # generator.  In the
 // browser this is a little complicated due to unknown quality of Math.random()
 // and inconsistent support for the `crypto` API.  We do the best we can via
 // feature-detection
+var rng;
 
-// getRandomValues needs to be invoked in a context where "this" is a Crypto
-// implementation. Also, find the complete implementation of crypto on IE11.
-var getRandomValues = (typeof(crypto) != 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto)) ||
-                      (typeof(msCrypto) != 'undefined' && typeof window.msCrypto.getRandomValues == 'function' && msCrypto.getRandomValues.bind(msCrypto));
-
-if (getRandomValues) {
+var crypto = global.crypto || global.msCrypto; // for IE 11
+if (crypto && crypto.getRandomValues) {
   // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
   var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
-
-  module.exports = function whatwgRNG() {
-    getRandomValues(rnds8);
+  rng = function whatwgRNG() {
+    crypto.getRandomValues(rnds8);
     return rnds8;
   };
-} else {
+}
+
+if (!rng) {
   // Math.random()-based (RNG)
   //
   // If all else fails, use Math.random().  It's fast, but is of unspecified
   // quality.
   var rnds = new Array(16);
-
-  module.exports = function mathRNG() {
+  rng = function() {
     for (var i = 0, r; i < 16; i++) {
       if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
       rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
@@ -7195,6 +7153,9 @@ if (getRandomValues) {
   };
 }
 
+module.exports = rng;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "../node_modules/webpack/buildin/global.js")))
 
 /***/ }),
 
@@ -7213,12 +7174,20 @@ var bytesToUuid = __webpack_require__(/*! ./lib/bytesToUuid */ "../node_modules/
 // Inspired by https://github.com/LiosK/UUID.js
 // and http://docs.python.org/library/uuid.html
 
-var _nodeId;
-var _clockseq;
+// random #'s we need to init node and clockseq
+var _seedBytes = rng();
+
+// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+var _nodeId = [
+  _seedBytes[0] | 0x01,
+  _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
+];
+
+// Per 4.2.2, randomize (14 bit) clockseq
+var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
 
 // Previous uuid creation time
-var _lastMSecs = 0;
-var _lastNSecs = 0;
+var _lastMSecs = 0, _lastNSecs = 0;
 
 // See https://github.com/broofa/node-uuid for API details
 function v1(options, buf, offset) {
@@ -7226,26 +7195,8 @@ function v1(options, buf, offset) {
   var b = buf || [];
 
   options = options || {};
-  var node = options.node || _nodeId;
-  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
 
-  // node and clockseq need to be initialized to random values if they're not
-  // specified.  We do this lazily to minimize issues related to insufficient
-  // system entropy.  See #189
-  if (node == null || clockseq == null) {
-    var seedBytes = rng();
-    if (node == null) {
-      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-      node = _nodeId = [
-        seedBytes[0] | 0x01,
-        seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]
-      ];
-    }
-    if (clockseq == null) {
-      // Per 4.2.2, randomize (14 bit) clockseq
-      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
-    }
-  }
+  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
 
   // UUID timestamps are 100 nano-second units since the Gregorian epoch,
   // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
@@ -7306,6 +7257,7 @@ function v1(options, buf, offset) {
   b[i++] = clockseq & 0xff;
 
   // `node`
+  var node = options.node || _nodeId;
   for (var n = 0; n < 6; ++n) {
     b[i + n] = node[n];
   }
@@ -7332,7 +7284,7 @@ function v4(options, buf, offset) {
   var i = buf && offset || 0;
 
   if (typeof(options) == 'string') {
-    buf = options === 'binary' ? new Array(16) : null;
+    buf = options == 'binary' ? new Array(16) : null;
     options = null;
   }
   options = options || {};
