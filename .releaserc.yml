@@ -3,9 +3,9 @@ verifyConditions:
   - '@semantic-release/npm'
   - '@semantic-release/git'
 prepare:
+  - '@semantic-release/npm'
   - path: '@semantic-release/exec'
     cmd: yarn start build
-  - '@semantic-release/npm'
   - path: '@semantic-release/git'
     assets:
       - package.json
