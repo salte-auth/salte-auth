@@ -21,11 +21,11 @@
   },
   "scripts": {
     "start": "nps",
-    "prepublishOnly": "yarn start build",
     "precommit": "remove-lockfiles"
   },
   "license": "MIT",
   "devDependencies": {
+    "@semantic-release/exec": "^3.0.2",
     "@semantic-release/git": "^6.0.1",
     "babel-core": "^6.0.0",
     "babel-loader": "^7.0.0",
