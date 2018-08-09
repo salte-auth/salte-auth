@@ -978,6 +978,7 @@ describe('salte-auth', () => {
         expect(auth.$promises.login).to.deep.equal(null);
       });
     });
+  });
 
   describe('function(loginWithPopup)', () => {
     beforeEach(() => {
@@ -1123,6 +1124,7 @@ describe('salte-auth', () => {
         expect(auth.$promises.login).to.deep.equal(null);
       });
     });
+  });
 
   describe('function(loginWithNewTab)', () => {
     beforeEach(() => {
@@ -1565,6 +1567,7 @@ describe('salte-auth', () => {
       expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.logout).to.be.undefined;
     });
+  });
 
   describe('function(refreshToken)', () => {
     beforeEach(() => {
