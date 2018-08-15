@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.11.3
+ * @salte-io/salte-auth JavaScript Library v2.11.4
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -8582,6 +8582,13 @@ var SalteAuthProfile = function () {
       },
       storageType: 'session'
     });
+
+    /**
+     * The parsed user information from the id token
+     * @type {Object}
+     */
+    this.userInfo = null;
+    this.$refreshUserInfo();
   }
 
   /**
@@ -8671,12 +8678,26 @@ var SalteAuthProfile = function () {
 
     /**
      * Parses the User Info from the ID Token
-     * @return {Object} The User Info from the ID Token
+     * @param {String} idToken the id token to update based off
+     * @private
      */
 
   }, {
-    key: '$validate',
+    key: '$refreshUserInfo',
+    value: function $refreshUserInfo() {
+      var idToken = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.$idToken;
 
+      var userInfo = null;
+
+      if (idToken) {
+        var separatedToken = idToken.split('.');
+        if (separatedToken.length === 3) {
+          userInfo = JSON.parse(atob(separatedToken[1]));
+        }
+      }
+
+      this.userInfo = userInfo;
+    }
 
     /**
      * Verifies that we were logged in successfully and that all security checks pass
@@ -8684,8 +8705,13 @@ var SalteAuthProfile = function () {
      * @return {Object} the error message
      * @private
      */
+
+  }, {
+    key: '$validate',
     value: function $validate(accessTokenRequest) {
       var _this = this;
+
+      this.$refreshUserInfo();
 
       if (!this.$$config.validation) {
         logger('Validation is disabled, skipping...');
@@ -8838,6 +8864,8 @@ var SalteAuthProfile = function () {
           sessionStorage.removeItem(_key);
         }
       }
+
+      this.$refreshUserInfo();
     }
 
     /**
@@ -9021,17 +9049,6 @@ var SalteAuthProfile = function () {
     },
     set: function set(nonce) {
       this.$saveItem('salte.auth.$nonce', nonce, 'session');
-    }
-  }, {
-    key: 'userInfo',
-    get: function get() {
-      if (this.$idToken) {
-        var separatedToken = this.$idToken.split('.');
-        if (separatedToken.length === 3) {
-          return JSON.parse(atob(separatedToken[1]));
-        }
-      }
-      return null;
     }
   }, {
     key: '$storage',
