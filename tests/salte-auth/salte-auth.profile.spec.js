@@ -120,11 +120,13 @@ describe('salte-auth.profile', () => {
           exp: 2
         })
       )}.0`;
+      profile.$refreshUserInfo();
       clock = sandbox.useFakeTimers();
     });
 
     it('should be expired if the "id_token" is empty', () => {
       profile.$idToken = null;
+      profile.$refreshUserInfo();
       expect(profile.idTokenExpired).to.equal(true);
     });
 
@@ -184,7 +186,7 @@ describe('salte-auth.profile', () => {
     });
   });
 
-  describe('getter(userInfo)', () => {
+  describe('function($refreshUserInfo)', () => {
     it('should parse the "id_token"', () => {
       profile.$idToken = `0.${btoa(
         JSON.stringify({
@@ -192,7 +194,10 @@ describe('salte-auth.profile', () => {
           name: 'John Doe'
         })
       )}.0`;
+
+      profile.$refreshUserInfo();
       const userInfo = profile.userInfo;
+
       expect(userInfo).to.deep.equal({
         sub: '1234567890',
         name: 'John Doe'
@@ -201,12 +206,17 @@ describe('salte-auth.profile', () => {
 
     it('should return null if the "id_token" does not have three parts', () => {
       profile.$idToken = '0.0';
+
+      profile.$refreshUserInfo();
       const userInfo = profile.userInfo;
+
       expect(userInfo).to.equal(null);
     });
 
     it('should return null if the "id_token" is undefined', () => {
+      profile.$refreshUserInfo();
       const userInfo = profile.userInfo;
+
       expect(userInfo).to.equal(null);
     });
   });

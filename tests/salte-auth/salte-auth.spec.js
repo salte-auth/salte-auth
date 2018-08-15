@@ -22,6 +22,13 @@ describe('salte-auth', () => {
     sandbox.stub(XMLHttpRequest.prototype, 'send').callThrough();
     // NOTE: These are functions we never want to call
     sandbox.stub(SalteAuthUtilities.prototype, '$navigate');
+    sandbox.stub(SalteAuthProfile.prototype, '$idToken').get(() => {
+      return `12345.${btoa(JSON.stringify({
+        sub: '1234567890',
+        name: 'John Doe',
+        exp: 1524168810
+      }))}.12345`;
+    });
     auth = new SalteAuth({
       provider: 'auth0'
     });
@@ -356,6 +363,46 @@ describe('salte-auth', () => {
       expect(auth.$$refreshToken.callCount).to.equal(1);
     });
 
+    it('should initialize "$$refreshToken" if the id token has not expired', () => {
+      sandbox.stub(SalteAuth.prototype, '$$refreshToken');
+
+      sandbox.stub(SalteAuthProfile.prototype, '$idToken').get(() => {
+        return `12345.${btoa(JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          exp: Date.now() + 10000
+        }))}.12345`;
+      });
+
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        provider: 'auth0'
+      });
+
+      expect(auth.$$refreshToken.callCount).to.equal(1);
+    });
+
+    it('should not initialize "$$refreshToken" if the id token has expired', () => {
+      sandbox.stub(SalteAuth.prototype, '$$refreshToken');
+
+      sandbox.stub(SalteAuthProfile.prototype, '$idToken').get(() => {
+        return `12345.${btoa(JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          exp: 0
+        }))}.12345`;
+      });
+
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        provider: 'auth0'
+      });
+
+      expect(auth.$$refreshToken.callCount).to.equal(0);
+    });
+
     it('should not invoke "$$refreshToken" when "refresh" errors', () => {
       sandbox.stub(SalteAuth.prototype, '$$refreshToken');
 
@@ -398,6 +445,7 @@ describe('salte-auth', () => {
           `${location.protocol}//${location.host}`
         ]
       };
+    });
 
     it('should not request a new access token if we do not need to be authenticated', () => {
       auth.$utilities.addFetchInterceptor((request) => {
@@ -441,7 +489,6 @@ describe('salte-auth', () => {
       request.open('GET', '/');
       request.send();
     });
-  });
 
     it('should request a new access token if we are not authenticated', done => {
       sandbox.stub(SalteAuth.prototype, 'retrieveAccessToken').returns(Promise.resolve('55555-55555'));
@@ -747,11 +794,6 @@ describe('salte-auth', () => {
       auth.profile.$clear();
       sandbox.stub(SalteAuthProfile.prototype, '$clear');
       sandbox.stub(SalteAuthUtilities.prototype, 'createIframe').returns(Promise.resolve());
-      sandbox.stub(SalteAuthProfile.prototype, 'userInfo').get(() => {
-        return {
-          'exp': 1524168810
-        };
-      });
       delete window.salte.auth;
       auth = new SalteAuth({
         providerUrl: `${location.protocol}//${location.host}`,
@@ -783,13 +825,6 @@ describe('salte-auth', () => {
 
       sandbox.stub(auth.profile, '$validate');
 
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
-
       auth.loginWithIframe();
 
       return promise.then((user) => {
@@ -804,13 +839,6 @@ describe('salte-auth', () => {
 
       sandbox.stub(auth.profile, '$validate');
 
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
-
       return auth.loginWithIframe(true).then((user) => {
         expect(auth.$utilities.createIframe.calledWith(sinon.match(/.+/), false)).to.equal(true);
         expect(onLogin.callCount).to.equal(0);
@@ -820,13 +848,6 @@ describe('salte-auth', () => {
 
     it('should support clearing the entire profile', () => {
       sandbox.stub(auth.profile, '$validate');
-
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
 
       return auth.loginWithIframe({
         clear: 'all'
@@ -839,13 +860,6 @@ describe('salte-auth', () => {
       sandbox.stub(auth.profile, '$clearErrors');
       sandbox.stub(auth.profile, '$validate');
 
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
-
       return auth.loginWithIframe({
         clear: 'errors'
       }).then((user) => {
@@ -857,13 +871,6 @@ describe('salte-auth', () => {
       sandbox.stub(auth.profile, '$clearErrors');
       sandbox.stub(auth.profile, '$validate');
 
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
-
       return auth.loginWithIframe({
         clear: false
       }).then((user) => {
@@ -874,13 +881,6 @@ describe('salte-auth', () => {
 
     it('should support disabling prompt-based login', () => {
       sandbox.stub(auth.profile, '$validate');
-
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
 
       return auth.loginWithIframe({
         noPrompt: true
@@ -895,13 +895,6 @@ describe('salte-auth', () => {
       auth.on('login', onLogin);
 
       sandbox.stub(auth.profile, '$validate');
-
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
 
       return auth.loginWithIframe({
         events: false
@@ -946,13 +939,6 @@ describe('salte-auth', () => {
     });
 
     it('should throw validation errors', () => {
-      auth.profile.$idToken = `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`;
-
       const promise = auth.loginWithIframe();
 
       return promise.catch(error => {
@@ -981,14 +967,6 @@ describe('salte-auth', () => {
   });
 
   describe('function(loginWithPopup)', () => {
-    beforeEach(() => {
-      sandbox.stub(SalteAuthProfile.prototype, 'userInfo').get(() => {
-        return {
-          'exp': 1524168810
-        };
-      });
-    });
-
     it('should resolve when we have logged in', () => {
       sandbox.stub(auth.profile, '$clear');
       sandbox.stub(auth, '$loginUrl').returns('');
@@ -1024,13 +1002,6 @@ describe('salte-auth', () => {
       sandbox.stub(auth.profile, '$validate');
       sandbox.stub(auth.profile, '$hash');
 
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
-
       auth.loginWithPopup();
 
       return promise.then((user) => {
@@ -1052,13 +1023,6 @@ describe('salte-auth', () => {
       sandbox
         .stub(auth.$utilities, 'openPopup')
         .returns(Promise.reject('Popup blocked!'));
-
-      auth.profile.$idToken = `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`;
 
       auth.loginWithPopup();
 
@@ -1085,13 +1049,6 @@ describe('salte-auth', () => {
       sandbox.stub(auth.profile, '$clear');
       sandbox.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
 
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
-
       const promise = auth.loginWithPopup();
 
       return promise.catch(error => {
@@ -1108,13 +1065,6 @@ describe('salte-auth', () => {
         .stub(auth.$utilities, 'openPopup')
         .returns(Promise.reject('Popup blocked!'));
 
-      auth.profile.$idToken = `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`;
-
       const promise = auth.loginWithPopup();
 
       return promise.catch(error => {
@@ -1127,14 +1077,6 @@ describe('salte-auth', () => {
   });
 
   describe('function(loginWithNewTab)', () => {
-    beforeEach(() => {
-      sandbox.stub(SalteAuthProfile.prototype, 'userInfo').get(() => {
-        return {
-          'exp': 1524168810
-        };
-      });
-    });
-
     it('should resolve when we have logged in', () => {
       sandbox.stub(auth.profile, '$clear');
       sandbox.stub(auth, '$loginUrl').returns('');
@@ -1170,13 +1112,6 @@ describe('salte-auth', () => {
       sandbox.stub(auth.profile, '$validate');
       sandbox.stub(auth.profile, '$hash');
 
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
-
       auth.loginWithNewTab();
 
       return promise.then((user) => {
@@ -1198,13 +1133,6 @@ describe('salte-auth', () => {
       sandbox
         .stub(auth.$utilities, 'openNewTab')
         .returns(Promise.reject('New Tab blocked!'));
-
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
 
       auth.loginWithNewTab();
 
@@ -1231,13 +1159,6 @@ describe('salte-auth', () => {
       sandbox.stub(auth.profile, '$clear');
       sandbox.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
 
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
-
       const promise = auth.loginWithNewTab();
 
       return promise.catch(error => {
@@ -1253,13 +1174,6 @@ describe('salte-auth', () => {
       sandbox
         .stub(auth.$utilities, 'openNewTab')
         .returns(Promise.reject('New Tab blocked!'));
-
-      sandbox.stub(auth.profile, '$idToken').get(() => `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe'
-        })
-      )}.0`);
 
       const promise = auth.loginWithNewTab();
 
@@ -1578,11 +1492,6 @@ describe('salte-auth', () => {
       sandbox.stub(auth.profile, '$clearErrors');
       sandbox.stub(auth.profile, '$validate');
       sandbox.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
-      sandbox.stub(SalteAuthProfile.prototype, 'userInfo').get(() => {
-        return {
-          'exp': 1524168810
-        };
-      });
     });
 
     it('should register a timeout to execute a minute before the token expires', () => {
@@ -1640,7 +1549,7 @@ describe('salte-auth', () => {
       return promise.catch(error => {
         return error;
       }).then(error => {
-        expect(error.code).to.equal('login_canceled');
+        expect(error.code).to.equal('invalid_state');
       });
     });
 
@@ -1673,14 +1582,6 @@ describe('salte-auth', () => {
   });
 
   describe('function($$refreshToken)', () => {
-    beforeEach(() => {
-      sandbox.stub(SalteAuthProfile.prototype, 'userInfo').get(() => {
-        return {
-          'exp': 1524168810
-        };
-      });
-    });
-
     it('should invoke "refreshToken"', () => {
       window.setTimeout.restore();
       const promise = new Promise((resolve) => {
@@ -1904,7 +1805,7 @@ describe('salte-auth', () => {
       return promise.catch(error => {
         return error;
       }).then(error => {
-        expect(error.code).to.equal('login_canceled');
+        expect(error.code).to.equal('invalid_state');
       });
     });
   });

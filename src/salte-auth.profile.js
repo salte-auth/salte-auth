@@ -25,6 +25,13 @@ class SalteAuthProfile {
       },
       storageType: 'session'
     });
+
+    /**
+     * The parsed user information from the id token
+     * @type {Object}
+     */
+    this.userInfo = null;
+    this.$refreshUserInfo();
   }
 
   /**
@@ -244,16 +251,20 @@ class SalteAuthProfile {
 
   /**
    * Parses the User Info from the ID Token
-   * @return {Object} The User Info from the ID Token
+   * @param {String} idToken the id token to update based off
+   * @private
    */
-  get userInfo() {
-    if (this.$idToken) {
-      const separatedToken = this.$idToken.split('.');
+  $refreshUserInfo(idToken = this.$idToken) {
+    let userInfo = null;
+
+    if (idToken) {
+      const separatedToken = idToken.split('.');
       if (separatedToken.length === 3) {
-        return JSON.parse(atob(separatedToken[1]));
+        userInfo = JSON.parse(atob(separatedToken[1]));
       }
     }
-    return null;
+
+    this.userInfo = userInfo;
   }
 
   /**
@@ -263,6 +274,8 @@ class SalteAuthProfile {
    * @private
    */
   $validate(accessTokenRequest) {
+    this.$refreshUserInfo();
+
     if (!this.$$config.validation) {
       logger('Validation is disabled, skipping...');
       return;
@@ -405,6 +418,8 @@ class SalteAuthProfile {
         sessionStorage.removeItem(key);
       }
     }
+
+    this.$refreshUserInfo();
   }
 
   /**
