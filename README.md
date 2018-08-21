@@ -18,9 +18,19 @@ _If a version isn't specified that means we test on the latest and greatest, how
 
 - Chrome
 - Firefox
-- Safari 7+
+- Safari 7+ (7.1 and below require a [Promise polyfill](#promise-polyfill))
 - Edge
-- IE 10+
+- IE 10+ (Requires a [Promise polyfill](#promise-polyfill))
+
+## Promise Polyfill
+
+Here's a list of well known ES6 Promise implementations developed by the community!
+
+* [es6-promise](https://www.npmjs.com/package/es6-promise)
+* [native-promise-only](https://www.npmjs.com/package/native-promise-only)
+* [bluebird](https://www.npmjs.com/package/bluebird)
+
+**Any other ES6 Promise implementation will work as well!**
 
 ## Install
 
