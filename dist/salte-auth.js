@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.11.4
+ * @salte-io/salte-auth JavaScript Library v2.11.5
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -8174,7 +8174,7 @@ var SalteAuth = function () {
       this.$promises.login = new Promise(function () {});
 
       this.profile.$clear();
-      this.profile.$redirectUrl = redirectUrl || this.profile.$redirectUrl || location.href;
+      this.profile.$redirectUrl = redirectUrl && this.$utilities.resolveUrl(redirectUrl) || this.profile.$redirectUrl || location.href;
       var url = this.$loginUrl();
 
       this.profile.$actions(this.profile.$localState, 'login');
@@ -9314,7 +9314,7 @@ var SalteAuthUtilities = function () {
       }
       this.$$urlBase.href = window.location.protocol + '//' + window.location.host;
       this.$$urlAnchor.href = path.replace(/ /g, '%20');
-      return this.$$urlAnchor.href;
+      return this.$$urlAnchor.href.replace(/\/$/, '');
     }
 
     /**
