@@ -1228,10 +1228,16 @@ describe('salte-auth', () => {
       expect(console.warn.callCount).to.equal(1);
     });
 
-    it('should support overriding the redirectUrl', () => {
+    it('should support overriding the redirectUrl with absolute urls', () => {
       auth.loginWithRedirect('https://google.com');
 
       expect(auth.profile.$redirectUrl).to.equal('https://google.com');
+    });
+
+    it('should support overriding the redirectUrl with relative urls', () => {
+      auth.loginWithRedirect('/dashboard');
+
+      expect(auth.profile.$redirectUrl).to.equal(`${window.location.protocol}//${window.location.host}/dashboard`);
     });
   });
 

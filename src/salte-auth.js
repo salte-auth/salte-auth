@@ -530,7 +530,7 @@ class SalteAuth {
     this.$promises.login = new Promise(() => {});
 
     this.profile.$clear();
-    this.profile.$redirectUrl = redirectUrl || this.profile.$redirectUrl || location.href;
+    this.profile.$redirectUrl = redirectUrl && this.$utilities.resolveUrl(redirectUrl) || this.profile.$redirectUrl || location.href;
     const url = this.$loginUrl();
 
     this.profile.$actions(this.profile.$localState, 'login');

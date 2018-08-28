@@ -8,6 +8,10 @@ describe('function(resolveUrl)', () => {
     utilities = new SalteAuthUtilities();
   });
 
+  it('should support site root urls', () => {
+    expect(utilities.resolveUrl('https://google.com')).to.equal('https://google.com');
+  });
+
   it('should support paths', () => {
     expect(utilities.resolveUrl('/api/test')).to.equal(
       `${window.location.protocol}//${window.location.host}/api/test`
