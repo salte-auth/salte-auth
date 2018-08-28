@@ -105,7 +105,7 @@ class SalteAuthUtilities {
     }
     this.$$urlBase.href = window.location.protocol + '//' + window.location.host;
     this.$$urlAnchor.href = path.replace(/ /g, '%20');
-    return this.$$urlAnchor.href;
+    return this.$$urlAnchor.href.replace(/\/$/, '');
   }
 
   /**
