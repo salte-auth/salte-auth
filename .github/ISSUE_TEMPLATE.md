@@ -26,6 +26,7 @@
 <!-- Check all that apply -->
 - [ ] Chrome
 - [ ] Firefox
+- [ ] Safari 11
 - [ ] Safari 10
 - [ ] Safari 9
 - [ ] Safari 8
