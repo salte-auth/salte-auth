@@ -23,7 +23,7 @@
 -->
 
 ### Browsers Affected
-<!-- Check all that apply -->
+<!-- Please only check browsers you've personally verified -->
 - [ ] Chrome
 - [ ] Firefox
 - [ ] Safari 11
