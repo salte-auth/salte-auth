@@ -76,7 +76,7 @@ We also support HTML Imports:
 import { SalteAuth } from '@salte-io/salte-auth';
 
 // Configure SalteAuth with Auth0's url and client id.
-const auth = new SalteAuth({
+const auth = new salte.SalteAuth({
   providerUrl: 'https://salte-alpha.auth0.com',
   responseType: 'id_token',
   redirectUrl: location.origin,
