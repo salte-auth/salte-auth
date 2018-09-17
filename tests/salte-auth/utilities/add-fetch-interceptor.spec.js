@@ -3,10 +3,10 @@ import { expect } from 'chai';
 import SalteAuthUtilities from '../../../src/salte-auth.utilities.js';
 
 describe('function(addFetchInterceptor)', () => {
-  let sandbox, utilities;
+  let sandbox, utilities, windowsFetch;
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    sandbox.stub(window, 'fetch').returns(Promise.resolve());
+    windowsFetch = sandbox.stub(window, 'fetch').returns(Promise.resolve());
     utilities = new SalteAuthUtilities();
   });
 
@@ -28,6 +28,10 @@ describe('function(addFetchInterceptor)', () => {
 
     return fetch(url, {
       method: 'POST'
+    }).then(() => {
+      expect(windowsFetch.calledWith(sinon.match.instanceOf(Request))).to.equal(true);
+      const [request] = windowsFetch.firstCall.args;
+      expect(request.headers.has('Authorization')).to.equal(true);
     });
   });
 
