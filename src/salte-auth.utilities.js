@@ -62,7 +62,7 @@ class SalteAuthUtilities {
             promises.push(interceptor(request));
           }
           return Promise.all(promises).then(() => {
-            return fetch.call(this, input, options);
+            return fetch.call(this, request);
           });
         };
       })(fetch);

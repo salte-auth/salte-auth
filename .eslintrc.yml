@@ -6,6 +6,9 @@ plugins:
 parserOptions:
   sourceType: module
 rules:
+  indent:
+    - error
+    - 2
   compat/compat: 2
   comma-dangle:
     - error

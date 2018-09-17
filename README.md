@@ -70,7 +70,7 @@ We also support HTML Imports:
 <link rel="import" href="/bower_components/salte-auth/salte-auth.html">
 ```
 
-## Usage
+## ES6 Usage
 
 ```js
 import { SalteAuth } from '@salte-io/salte-auth';
@@ -96,6 +96,41 @@ const auth = new SalteAuth({
 
 // Display an iframe to the user that allows them to login
 auth.loginWithIframe();
+```
+
+## ES5 Usage
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/node_modules/@salte-io/salte-auth/dist/salte-auth.js"></script>
+    <script>
+      const auth = new salte.SalteAuth({
+        providerUrl: 'https://salte-alpha.auth0.com',
+        responseType: 'id_token',
+        redirectUrl: location.origin,
+        clientId: 'mM6h2LHJikwdbkvdoiyE8kHhL7gcV8Wb',
+        scope: 'openid',
+        
+        routes: [
+          'http://localhost:8080/account'
+        ],
+
+        endpoints: [
+          'https://jsonplaceholder.typicode.com/posts/1'
+        ],
+
+        provider: 'auth0',
+      });
+
+      auth.loginWithIframe();
+    </script>
+  </head>
+  <body>
+    ...
+  </body>
+</html>
 ```
 
 ## Known Issues
