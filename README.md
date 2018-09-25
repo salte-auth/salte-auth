@@ -18,7 +18,7 @@ _If a version isn't specified that means we test on the latest and greatest, how
 
 - Chrome
 - Firefox
-- Safari 7+ (7.1 and below require a [Promise polyfill](#promise-polyfill))
+- Safari 8+ (7.1 and below require a [Promise polyfill](#promise-polyfill))
 - Edge
 - IE 10+ (Requires a [Promise polyfill](#promise-polyfill))
 
