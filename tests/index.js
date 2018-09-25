@@ -1,8 +1,7 @@
 // Polyfills
-import fetch from 'unfetch';
+import 'unfetch/polyfill/index.js';
 import Promise from 'promise-polyfill';
 
-window.fetch = fetch;
 window.Promise = Promise;
 
 const testsContext = require.context('.', true, /\.spec\.js$/);

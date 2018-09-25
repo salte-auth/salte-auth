@@ -43,12 +43,6 @@ module.exports = function(config) {
       base: 'SauceLabs',
       browserName: 'safari',
       version: '8'
-    },
-    Safari7: {
-      base: 'SauceLabs',
-      browserName: 'safari',
-      platform: 'OS X 10.9',
-      version: '7'
     }
   };
 
