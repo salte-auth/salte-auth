@@ -1,5 +1,5 @@
 // Polyfills
-import 'unfetch/polyfill';
+import 'unfetch/polyfill/index.js';
 import Promise from 'promise-polyfill';
 
 window.Promise = Promise;
