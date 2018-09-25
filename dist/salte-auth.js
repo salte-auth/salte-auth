@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.11.5
+ * @salte-io/salte-auth JavaScript Library v2.11.6
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -103,445 +103,889 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ({
 
-/***/ "../node_modules/debug/src/browser.js":
-/*!********************************************!*\
-  !*** ../node_modules/debug/src/browser.js ***!
-  \********************************************/
+/***/ "../node_modules/debug/dist/debug.js":
+/*!*******************************************!*\
+  !*** ../node_modules/debug/dist/debug.js ***!
+  \*******************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(process) {/**
- * This is the web browser implementation of `debug()`.
- *
- * Expose `debug()` as the module.
- */
+"use strict";
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;
 
-exports = module.exports = __webpack_require__(/*! ./debug */ "../node_modules/debug/src/debug.js");
-exports.log = log;
-exports.formatArgs = formatArgs;
-exports.save = save;
-exports.load = load;
-exports.useColors = useColors;
-exports.storage = 'undefined' != typeof chrome
-               && 'undefined' != typeof chrome.storage
-                  ? chrome.storage.local
-                  : localstorage();
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-/**
- * Colors.
- */
+(function (f) {
+  if (( false ? undefined : _typeof(exports)) === "object" && typeof module !== "undefined") {
+    module.exports = f();
+  } else if (true) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (f),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else { var g; }
+})(function () {
+  var define, module, exports;
+  return function () {
+    function r(e, n, t) {
+      function o(i, f) {
+        if (!n[i]) {
+          if (!e[i]) {
+            var c = "function" == typeof require && require;
+            if (!f && c) return require(i, !0);
+            if (u) return u(i, !0);
+            var a = new Error("Cannot find module '" + i + "'");
+            throw a.code = "MODULE_NOT_FOUND", a;
+          }
 
-exports.colors = [
-  '#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC',
-  '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF',
-  '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC',
-  '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF',
-  '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC',
-  '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033',
-  '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366',
-  '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933',
-  '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC',
-  '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF',
-  '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'
-];
+          var p = n[i] = {
+            exports: {}
+          };
+          e[i][0].call(p.exports, function (r) {
+            var n = e[i][1][r];
+            return o(n || r);
+          }, p, p.exports, r, e, n, t);
+        }
 
-/**
- * Currently only WebKit-based Web Inspectors, Firefox >= v31,
- * and the Firebug extension (any Firefox version) are known
- * to support "%c" CSS customizations.
- *
- * TODO: add a `localStorage` variable to explicitly enable/disable colors
- */
-
-function useColors() {
-  // NB: In an Electron preload script, document will be defined but not fully
-  // initialized. Since we know we're in Chrome, we'll just detect this case
-  // explicitly
-  if (typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
-    return true;
-  }
-
-  // Internet Explorer and Edge do not support colors.
-  if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
-    return false;
-  }
-
-  // is webkit? http://stackoverflow.com/a/16459606/376773
-  // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
-  return (typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance) ||
-    // is firebug? http://stackoverflow.com/a/398120/376773
-    (typeof window !== 'undefined' && window.console && (window.console.firebug || (window.console.exception && window.console.table))) ||
-    // is firefox >= v31?
-    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31) ||
-    // double check webkit in userAgent just in case we are in a worker
-    (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/));
-}
-
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-exports.formatters.j = function(v) {
-  try {
-    return JSON.stringify(v);
-  } catch (err) {
-    return '[UnexpectedJSONParseError]: ' + err.message;
-  }
-};
-
-
-/**
- * Colorize log arguments if enabled.
- *
- * @api public
- */
-
-function formatArgs(args) {
-  var useColors = this.useColors;
-
-  args[0] = (useColors ? '%c' : '')
-    + this.namespace
-    + (useColors ? ' %c' : ' ')
-    + args[0]
-    + (useColors ? '%c ' : ' ')
-    + '+' + exports.humanize(this.diff);
-
-  if (!useColors) return;
-
-  var c = 'color: ' + this.color;
-  args.splice(1, 0, c, 'color: inherit')
-
-  // the final "%c" is somewhat tricky, because there could be other
-  // arguments passed either before or after the %c, so we need to
-  // figure out the correct index to insert the CSS into
-  var index = 0;
-  var lastC = 0;
-  args[0].replace(/%[a-zA-Z%]/g, function(match) {
-    if ('%%' === match) return;
-    index++;
-    if ('%c' === match) {
-      // we only are interested in the *last* %c
-      // (the user may have provided their own)
-      lastC = index;
-    }
-  });
-
-  args.splice(lastC, 0, c);
-}
-
-/**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
- *
- * @api public
- */
-
-function log() {
-  // this hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return 'object' === typeof console
-    && console.log
-    && Function.prototype.apply.call(console.log, console, arguments);
-}
-
-/**
- * Save `namespaces`.
- *
- * @param {String} namespaces
- * @api private
- */
-
-function save(namespaces) {
-  try {
-    if (null == namespaces) {
-      exports.storage.removeItem('debug');
-    } else {
-      exports.storage.debug = namespaces;
-    }
-  } catch(e) {}
-}
-
-/**
- * Load `namespaces`.
- *
- * @return {String} returns the previously persisted debug modes
- * @api private
- */
-
-function load() {
-  var r;
-  try {
-    r = exports.storage.debug;
-  } catch(e) {}
-
-  // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
-  if (!r && typeof process !== 'undefined' && 'env' in process) {
-    r = process.env.DEBUG;
-  }
-
-  return r;
-}
-
-/**
- * Enable namespaces listed in `localStorage.debug` initially.
- */
-
-exports.enable(load());
-
-/**
- * Localstorage attempts to return the localstorage.
- *
- * This is necessary because safari throws
- * when a user disables cookies/localstorage
- * and you attempt to access it.
- *
- * @return {LocalStorage}
- * @api private
- */
-
-function localstorage() {
-  try {
-    return window.localStorage;
-  } catch (e) {}
-}
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../process/browser.js */ "../node_modules/process/browser.js")))
-
-/***/ }),
-
-/***/ "../node_modules/debug/src/debug.js":
-/*!******************************************!*\
-  !*** ../node_modules/debug/src/debug.js ***!
-  \******************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = createDebug.debug = createDebug['default'] = createDebug;
-exports.coerce = coerce;
-exports.disable = disable;
-exports.enable = enable;
-exports.enabled = enabled;
-exports.humanize = __webpack_require__(/*! ms */ "../node_modules/ms/index.js");
-
-/**
- * Active `debug` instances.
- */
-exports.instances = [];
-
-/**
- * The currently active debug mode names, and names to skip.
- */
-
-exports.names = [];
-exports.skips = [];
-
-/**
- * Map of special "%n" handling functions, for the debug "format" argument.
- *
- * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
- */
-
-exports.formatters = {};
-
-/**
- * Select a color.
- * @param {String} namespace
- * @return {Number}
- * @api private
- */
-
-function selectColor(namespace) {
-  var hash = 0, i;
-
-  for (i in namespace) {
-    hash  = ((hash << 5) - hash) + namespace.charCodeAt(i);
-    hash |= 0; // Convert to 32bit integer
-  }
-
-  return exports.colors[Math.abs(hash) % exports.colors.length];
-}
-
-/**
- * Create a debugger with the given `namespace`.
- *
- * @param {String} namespace
- * @return {Function}
- * @api public
- */
-
-function createDebug(namespace) {
-
-  var prevTime;
-
-  function debug() {
-    // disabled?
-    if (!debug.enabled) return;
-
-    var self = debug;
-
-    // set `diff` timestamp
-    var curr = +new Date();
-    var ms = curr - (prevTime || curr);
-    self.diff = ms;
-    self.prev = prevTime;
-    self.curr = curr;
-    prevTime = curr;
-
-    // turn the `arguments` into a proper Array
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-
-    args[0] = exports.coerce(args[0]);
-
-    if ('string' !== typeof args[0]) {
-      // anything else let's inspect with %O
-      args.unshift('%O');
-    }
-
-    // apply any `formatters` transformations
-    var index = 0;
-    args[0] = args[0].replace(/%([a-zA-Z%])/g, function(match, format) {
-      // if we encounter an escaped % then don't increase the array index
-      if (match === '%%') return match;
-      index++;
-      var formatter = exports.formatters[format];
-      if ('function' === typeof formatter) {
-        var val = args[index];
-        match = formatter.call(self, val);
-
-        // now we need to remove `args[index]` since it's inlined in the `format`
-        args.splice(index, 1);
-        index--;
+        return n[i].exports;
       }
-      return match;
-    });
 
-    // apply env-specific formatting (colors, etc.)
-    exports.formatArgs.call(self, args);
+      for (var u = "function" == typeof require && require, i = 0; i < t.length; i++) {
+        o(t[i]);
+      }
 
-    var logFn = debug.log || exports.log || console.log.bind(console);
-    logFn.apply(self, args);
-  }
-
-  debug.namespace = namespace;
-  debug.enabled = exports.enabled(namespace);
-  debug.useColors = exports.useColors();
-  debug.color = selectColor(namespace);
-  debug.destroy = destroy;
-
-  // env-specific initialization logic for debug instances
-  if ('function' === typeof exports.init) {
-    exports.init(debug);
-  }
-
-  exports.instances.push(debug);
-
-  return debug;
-}
-
-function destroy () {
-  var index = exports.instances.indexOf(this);
-  if (index !== -1) {
-    exports.instances.splice(index, 1);
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/**
- * Enables a debug mode by namespaces. This can include modes
- * separated by a colon and wildcards.
- *
- * @param {String} namespaces
- * @api public
- */
-
-function enable(namespaces) {
-  exports.save(namespaces);
-
-  exports.names = [];
-  exports.skips = [];
-
-  var i;
-  var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
-  var len = split.length;
-
-  for (i = 0; i < len; i++) {
-    if (!split[i]) continue; // ignore empty strings
-    namespaces = split[i].replace(/\*/g, '.*?');
-    if (namespaces[0] === '-') {
-      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-    } else {
-      exports.names.push(new RegExp('^' + namespaces + '$'));
+      return o;
     }
-  }
 
-  for (i = 0; i < exports.instances.length; i++) {
-    var instance = exports.instances[i];
-    instance.enabled = exports.enabled(instance.namespace);
-  }
-}
+    return r;
+  }()({
+    1: [function (require, module, exports) {
+      /**
+       * Helpers.
+       */
+      var s = 1000;
+      var m = s * 60;
+      var h = m * 60;
+      var d = h * 24;
+      var w = d * 7;
+      var y = d * 365.25;
+      /**
+       * Parse or format the given `val`.
+       *
+       * Options:
+       *
+       *  - `long` verbose formatting [false]
+       *
+       * @param {String|Number} val
+       * @param {Object} [options]
+       * @throws {Error} throw an error if val is not a non-empty string or a number
+       * @return {String|Number}
+       * @api public
+       */
 
-/**
- * Disable debug output.
- *
- * @api public
- */
+      module.exports = function (val, options) {
+        options = options || {};
 
-function disable() {
-  exports.enable('');
-}
+        var type = _typeof(val);
 
-/**
- * Returns true if the given mode name is enabled, false otherwise.
- *
- * @param {String} name
- * @return {Boolean}
- * @api public
- */
+        if (type === 'string' && val.length > 0) {
+          return parse(val);
+        } else if (type === 'number' && isNaN(val) === false) {
+          return options.long ? fmtLong(val) : fmtShort(val);
+        }
 
-function enabled(name) {
-  if (name[name.length - 1] === '*') {
-    return true;
-  }
-  var i, len;
-  for (i = 0, len = exports.skips.length; i < len; i++) {
-    if (exports.skips[i].test(name)) {
-      return false;
-    }
-  }
-  for (i = 0, len = exports.names.length; i < len; i++) {
-    if (exports.names[i].test(name)) {
-      return true;
-    }
-  }
-  return false;
-}
+        throw new Error('val is not a non-empty string or a valid number. val=' + JSON.stringify(val));
+      };
+      /**
+       * Parse the given `str` and return milliseconds.
+       *
+       * @param {String} str
+       * @return {Number}
+       * @api private
+       */
 
-/**
- * Coerce `val`.
- *
- * @param {Mixed} val
- * @return {Mixed}
- * @api private
- */
 
-function coerce(val) {
-  if (val instanceof Error) return val.stack || val.message;
-  return val;
-}
+      function parse(str) {
+        str = String(str);
+
+        if (str.length > 100) {
+          return;
+        }
+
+        var match = /^((?:\d+)?\-?\d?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(str);
+
+        if (!match) {
+          return;
+        }
+
+        var n = parseFloat(match[1]);
+        var type = (match[2] || 'ms').toLowerCase();
+
+        switch (type) {
+          case 'years':
+          case 'year':
+          case 'yrs':
+          case 'yr':
+          case 'y':
+            return n * y;
+
+          case 'weeks':
+          case 'week':
+          case 'w':
+            return n * w;
+
+          case 'days':
+          case 'day':
+          case 'd':
+            return n * d;
+
+          case 'hours':
+          case 'hour':
+          case 'hrs':
+          case 'hr':
+          case 'h':
+            return n * h;
+
+          case 'minutes':
+          case 'minute':
+          case 'mins':
+          case 'min':
+          case 'm':
+            return n * m;
+
+          case 'seconds':
+          case 'second':
+          case 'secs':
+          case 'sec':
+          case 's':
+            return n * s;
+
+          case 'milliseconds':
+          case 'millisecond':
+          case 'msecs':
+          case 'msec':
+          case 'ms':
+            return n;
+
+          default:
+            return undefined;
+        }
+      }
+      /**
+       * Short format for `ms`.
+       *
+       * @param {Number} ms
+       * @return {String}
+       * @api private
+       */
+
+
+      function fmtShort(ms) {
+        var msAbs = Math.abs(ms);
+
+        if (msAbs >= d) {
+          return Math.round(ms / d) + 'd';
+        }
+
+        if (msAbs >= h) {
+          return Math.round(ms / h) + 'h';
+        }
+
+        if (msAbs >= m) {
+          return Math.round(ms / m) + 'm';
+        }
+
+        if (msAbs >= s) {
+          return Math.round(ms / s) + 's';
+        }
+
+        return ms + 'ms';
+      }
+      /**
+       * Long format for `ms`.
+       *
+       * @param {Number} ms
+       * @return {String}
+       * @api private
+       */
+
+
+      function fmtLong(ms) {
+        var msAbs = Math.abs(ms);
+
+        if (msAbs >= d) {
+          return plural(ms, msAbs, d, 'day');
+        }
+
+        if (msAbs >= h) {
+          return plural(ms, msAbs, h, 'hour');
+        }
+
+        if (msAbs >= m) {
+          return plural(ms, msAbs, m, 'minute');
+        }
+
+        if (msAbs >= s) {
+          return plural(ms, msAbs, s, 'second');
+        }
+
+        return ms + ' ms';
+      }
+      /**
+       * Pluralization helper.
+       */
+
+
+      function plural(ms, msAbs, n, name) {
+        var isPlural = msAbs >= n * 1.5;
+        return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
+      }
+    }, {}],
+    2: [function (require, module, exports) {
+      // shim for using process in browser
+      var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
+      // don't break things.  But we need to wrap it in a try catch in case it is
+      // wrapped in strict mode code which doesn't define any globals.  It's inside a
+      // function because try/catches deoptimize in certain engines.
+
+      var cachedSetTimeout;
+      var cachedClearTimeout;
+
+      function defaultSetTimout() {
+        throw new Error('setTimeout has not been defined');
+      }
+
+      function defaultClearTimeout() {
+        throw new Error('clearTimeout has not been defined');
+      }
+
+      (function () {
+        try {
+          if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+          } else {
+            cachedSetTimeout = defaultSetTimout;
+          }
+        } catch (e) {
+          cachedSetTimeout = defaultSetTimout;
+        }
+
+        try {
+          if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+          } else {
+            cachedClearTimeout = defaultClearTimeout;
+          }
+        } catch (e) {
+          cachedClearTimeout = defaultClearTimeout;
+        }
+      })();
+
+      function runTimeout(fun) {
+        if (cachedSetTimeout === setTimeout) {
+          //normal enviroments in sane situations
+          return setTimeout(fun, 0);
+        } // if setTimeout wasn't available but was latter defined
+
+
+        if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+          cachedSetTimeout = setTimeout;
+          return setTimeout(fun, 0);
+        }
+
+        try {
+          // when when somebody has screwed with setTimeout but no I.E. maddness
+          return cachedSetTimeout(fun, 0);
+        } catch (e) {
+          try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+          } catch (e) {
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+          }
+        }
+      }
+
+      function runClearTimeout(marker) {
+        if (cachedClearTimeout === clearTimeout) {
+          //normal enviroments in sane situations
+          return clearTimeout(marker);
+        } // if clearTimeout wasn't available but was latter defined
+
+
+        if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+          cachedClearTimeout = clearTimeout;
+          return clearTimeout(marker);
+        }
+
+        try {
+          // when when somebody has screwed with setTimeout but no I.E. maddness
+          return cachedClearTimeout(marker);
+        } catch (e) {
+          try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+          } catch (e) {
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+          }
+        }
+      }
+
+      var queue = [];
+      var draining = false;
+      var currentQueue;
+      var queueIndex = -1;
+
+      function cleanUpNextTick() {
+        if (!draining || !currentQueue) {
+          return;
+        }
+
+        draining = false;
+
+        if (currentQueue.length) {
+          queue = currentQueue.concat(queue);
+        } else {
+          queueIndex = -1;
+        }
+
+        if (queue.length) {
+          drainQueue();
+        }
+      }
+
+      function drainQueue() {
+        if (draining) {
+          return;
+        }
+
+        var timeout = runTimeout(cleanUpNextTick);
+        draining = true;
+        var len = queue.length;
+
+        while (len) {
+          currentQueue = queue;
+          queue = [];
+
+          while (++queueIndex < len) {
+            if (currentQueue) {
+              currentQueue[queueIndex].run();
+            }
+          }
+
+          queueIndex = -1;
+          len = queue.length;
+        }
+
+        currentQueue = null;
+        draining = false;
+        runClearTimeout(timeout);
+      }
+
+      process.nextTick = function (fun) {
+        var args = new Array(arguments.length - 1);
+
+        if (arguments.length > 1) {
+          for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+          }
+        }
+
+        queue.push(new Item(fun, args));
+
+        if (queue.length === 1 && !draining) {
+          runTimeout(drainQueue);
+        }
+      }; // v8 likes predictible objects
+
+
+      function Item(fun, array) {
+        this.fun = fun;
+        this.array = array;
+      }
+
+      Item.prototype.run = function () {
+        this.fun.apply(null, this.array);
+      };
+
+      process.title = 'browser';
+      process.browser = true;
+      process.env = {};
+      process.argv = [];
+      process.version = ''; // empty string to avoid regexp issues
+
+      process.versions = {};
+
+      function noop() {}
+
+      process.on = noop;
+      process.addListener = noop;
+      process.once = noop;
+      process.off = noop;
+      process.removeListener = noop;
+      process.removeAllListeners = noop;
+      process.emit = noop;
+      process.prependListener = noop;
+      process.prependOnceListener = noop;
+
+      process.listeners = function (name) {
+        return [];
+      };
+
+      process.binding = function (name) {
+        throw new Error('process.binding is not supported');
+      };
+
+      process.cwd = function () {
+        return '/';
+      };
+
+      process.chdir = function (dir) {
+        throw new Error('process.chdir is not supported');
+      };
+
+      process.umask = function () {
+        return 0;
+      };
+    }, {}],
+    3: [function (require, module, exports) {
+      (function (process) {
+        /* eslint-env browser */
+
+        /**
+         * This is the web browser implementation of `debug()`.
+         */
+        exports.log = log;
+        exports.formatArgs = formatArgs;
+        exports.save = save;
+        exports.load = load;
+        exports.useColors = useColors;
+        exports.storage = localstorage();
+        /**
+         * Colors.
+         */
+
+        exports.colors = ['#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC', '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF', '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC', '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF', '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC', '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033', '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366', '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933', '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC', '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'];
+        /**
+         * Currently only WebKit-based Web Inspectors, Firefox >= v31,
+         * and the Firebug extension (any Firefox version) are known
+         * to support "%c" CSS customizations.
+         *
+         * TODO: add a `localStorage` variable to explicitly enable/disable colors
+         */
+        // eslint-disable-next-line complexity
+
+        function useColors() {
+          // NB: In an Electron preload script, document will be defined but not fully
+          // initialized. Since we know we're in Chrome, we'll just detect this case
+          // explicitly
+          if (typeof window !== 'undefined' && window.process && (window.process.type === 'renderer' || window.process.__nwjs)) {
+            return true;
+          } // Internet Explorer and Edge do not support colors.
+
+
+          if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
+            return false;
+          } // Is webkit? http://stackoverflow.com/a/16459606/376773
+          // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
+
+
+          return typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // Is firebug? http://stackoverflow.com/a/398120/376773
+          typeof window !== 'undefined' && window.console && (window.console.firebug || window.console.exception && window.console.table) || // Is firefox >= v31?
+          // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+          typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31 || // Double check webkit in userAgent just in case we are in a worker
+          typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
+        }
+        /**
+         * Colorize log arguments if enabled.
+         *
+         * @api public
+         */
+
+
+        function formatArgs(args) {
+          args[0] = (this.useColors ? '%c' : '') + this.namespace + (this.useColors ? ' %c' : ' ') + args[0] + (this.useColors ? '%c ' : ' ') + '+' + module.exports.humanize(this.diff);
+
+          if (!this.useColors) {
+            return;
+          }
+
+          var c = 'color: ' + this.color;
+          args.splice(1, 0, c, 'color: inherit'); // The final "%c" is somewhat tricky, because there could be other
+          // arguments passed either before or after the %c, so we need to
+          // figure out the correct index to insert the CSS into
+
+          var index = 0;
+          var lastC = 0;
+          args[0].replace(/%[a-zA-Z%]/g, function (match) {
+            if (match === '%%') {
+              return;
+            }
+
+            index++;
+
+            if (match === '%c') {
+              // We only are interested in the *last* %c
+              // (the user may have provided their own)
+              lastC = index;
+            }
+          });
+          args.splice(lastC, 0, c);
+        }
+        /**
+         * Invokes `console.log()` when available.
+         * No-op when `console.log` is not a "function".
+         *
+         * @api public
+         */
+
+
+        function log() {
+          var _console;
+
+          // This hackery is required for IE8/9, where
+          // the `console.log` function doesn't have 'apply'
+          return (typeof console === "undefined" ? "undefined" : _typeof(console)) === 'object' && console.log && (_console = console).log.apply(_console, arguments);
+        }
+        /**
+         * Save `namespaces`.
+         *
+         * @param {String} namespaces
+         * @api private
+         */
+
+
+        function save(namespaces) {
+          try {
+            if (namespaces) {
+              exports.storage.setItem('debug', namespaces);
+            } else {
+              exports.storage.removeItem('debug');
+            }
+          } catch (error) {// Swallow
+            // XXX (@Qix-) should we be logging these?
+          }
+        }
+        /**
+         * Load `namespaces`.
+         *
+         * @return {String} returns the previously persisted debug modes
+         * @api private
+         */
+
+
+        function load() {
+          var r;
+
+          try {
+            r = exports.storage.getItem('debug');
+          } catch (error) {} // Swallow
+          // XXX (@Qix-) should we be logging these?
+          // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+
+
+          if (!r && typeof process !== 'undefined' && 'env' in process) {
+            r = process.env.DEBUG;
+          }
+
+          return r;
+        }
+        /**
+         * Localstorage attempts to return the localstorage.
+         *
+         * This is necessary because safari throws
+         * when a user disables cookies/localstorage
+         * and you attempt to access it.
+         *
+         * @return {LocalStorage}
+         * @api private
+         */
+
+
+        function localstorage() {
+          try {
+            // TVMLKit (Apple TV JS Runtime) does not have a window object, just localStorage in the global context
+            // The Browser also has localStorage in the global context.
+            return localStorage;
+          } catch (error) {// Swallow
+            // XXX (@Qix-) should we be logging these?
+          }
+        }
+
+        module.exports = require('./common')(exports);
+        var formatters = module.exports.formatters;
+        /**
+         * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
+         */
+
+        formatters.j = function (v) {
+          try {
+            return JSON.stringify(v);
+          } catch (error) {
+            return '[UnexpectedJSONParseError]: ' + error.message;
+          }
+        };
+      }).call(this, require('_process'));
+    }, {
+      "./common": 4,
+      "_process": 2
+    }],
+    4: [function (require, module, exports) {
+      /**
+       * This is the common logic for both the Node.js and web browser
+       * implementations of `debug()`.
+       */
+      function setup(env) {
+        createDebug.debug = createDebug;
+        createDebug.default = createDebug;
+        createDebug.coerce = coerce;
+        createDebug.disable = disable;
+        createDebug.enable = enable;
+        createDebug.enabled = enabled;
+        createDebug.humanize = require('ms');
+        Object.keys(env).forEach(function (key) {
+          createDebug[key] = env[key];
+        });
+        /**
+        * Active `debug` instances.
+        */
+
+        createDebug.instances = [];
+        /**
+        * The currently active debug mode names, and names to skip.
+        */
+
+        createDebug.names = [];
+        createDebug.skips = [];
+        /**
+        * Map of special "%n" handling functions, for the debug "format" argument.
+        *
+        * Valid key names are a single, lower or upper-case letter, i.e. "n" and "N".
+        */
+
+        createDebug.formatters = {};
+        /**
+        * Selects a color for a debug namespace
+        * @param {String} namespace The namespace string for the for the debug instance to be colored
+        * @return {Number|String} An ANSI color code for the given namespace
+        * @api private
+        */
+
+        function selectColor(namespace) {
+          var hash = 0;
+
+          for (var i = 0; i < namespace.length; i++) {
+            hash = (hash << 5) - hash + namespace.charCodeAt(i);
+            hash |= 0; // Convert to 32bit integer
+          }
+
+          return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
+        }
+
+        createDebug.selectColor = selectColor;
+        /**
+        * Create a debugger with the given `namespace`.
+        *
+        * @param {String} namespace
+        * @return {Function}
+        * @api public
+        */
+
+        function createDebug(namespace) {
+          var prevTime;
+
+          function debug() {
+            for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+              args[_key] = arguments[_key];
+            }
+
+            // Disabled?
+            if (!debug.enabled) {
+              return;
+            }
+
+            var self = debug; // Set `diff` timestamp
+
+            var curr = Number(new Date());
+            var ms = curr - (prevTime || curr);
+            self.diff = ms;
+            self.prev = prevTime;
+            self.curr = curr;
+            prevTime = curr;
+            args[0] = createDebug.coerce(args[0]);
+
+            if (typeof args[0] !== 'string') {
+              // Anything else let's inspect with %O
+              args.unshift('%O');
+            } // Apply any `formatters` transformations
+
+
+            var index = 0;
+            args[0] = args[0].replace(/%([a-zA-Z%])/g, function (match, format) {
+              // If we encounter an escaped % then don't increase the array index
+              if (match === '%%') {
+                return match;
+              }
+
+              index++;
+              var formatter = createDebug.formatters[format];
+
+              if (typeof formatter === 'function') {
+                var val = args[index];
+                match = formatter.call(self, val); // Now we need to remove `args[index]` since it's inlined in the `format`
+
+                args.splice(index, 1);
+                index--;
+              }
+
+              return match;
+            }); // Apply env-specific formatting (colors, etc.)
+
+            createDebug.formatArgs.call(self, args);
+            var logFn = self.log || createDebug.log;
+            logFn.apply(self, args);
+          }
+
+          debug.namespace = namespace;
+          debug.enabled = createDebug.enabled(namespace);
+          debug.useColors = createDebug.useColors();
+          debug.color = selectColor(namespace);
+          debug.destroy = destroy;
+          debug.extend = extend; // Debug.formatArgs = formatArgs;
+          // debug.rawLog = rawLog;
+          // env-specific initialization logic for debug instances
+
+          if (typeof createDebug.init === 'function') {
+            createDebug.init(debug);
+          }
+
+          createDebug.instances.push(debug);
+          return debug;
+        }
+
+        function destroy() {
+          var index = createDebug.instances.indexOf(this);
+
+          if (index !== -1) {
+            createDebug.instances.splice(index, 1);
+            return true;
+          }
+
+          return false;
+        }
+
+        function extend(namespace, delimiter) {
+          return createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
+        }
+        /**
+        * Enables a debug mode by namespaces. This can include modes
+        * separated by a colon and wildcards.
+        *
+        * @param {String} namespaces
+        * @api public
+        */
+
+
+        function enable(namespaces) {
+          createDebug.save(namespaces);
+          createDebug.names = [];
+          createDebug.skips = [];
+          var i;
+          var split = (typeof namespaces === 'string' ? namespaces : '').split(/[\s,]+/);
+          var len = split.length;
+
+          for (i = 0; i < len; i++) {
+            if (!split[i]) {
+              // ignore empty strings
+              continue;
+            }
+
+            namespaces = split[i].replace(/\*/g, '.*?');
+
+            if (namespaces[0] === '-') {
+              createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+            } else {
+              createDebug.names.push(new RegExp('^' + namespaces + '$'));
+            }
+          }
+
+          for (i = 0; i < createDebug.instances.length; i++) {
+            var instance = createDebug.instances[i];
+            instance.enabled = createDebug.enabled(instance.namespace);
+          }
+        }
+        /**
+        * Disable debug output.
+        *
+        * @api public
+        */
+
+
+        function disable() {
+          createDebug.enable('');
+        }
+        /**
+        * Returns true if the given mode name is enabled, false otherwise.
+        *
+        * @param {String} name
+        * @return {Boolean}
+        * @api public
+        */
+
+
+        function enabled(name) {
+          if (name[name.length - 1] === '*') {
+            return true;
+          }
+
+          var i;
+          var len;
+
+          for (i = 0, len = createDebug.skips.length; i < len; i++) {
+            if (createDebug.skips[i].test(name)) {
+              return false;
+            }
+          }
+
+          for (i = 0, len = createDebug.names.length; i < len; i++) {
+            if (createDebug.names[i].test(name)) {
+              return true;
+            }
+          }
+
+          return false;
+        }
+        /**
+        * Coerce `val`.
+        *
+        * @param {Mixed} val
+        * @return {Mixed}
+        * @api private
+        */
+
+
+        function coerce(val) {
+          if (val instanceof Error) {
+            return val.stack || val.message;
+          }
+
+          return val;
+        }
+
+        createDebug.enable(createDebug.load());
+        return createDebug;
+      }
+
+      module.exports = setup;
+    }, {
+      "ms": 1
+    }]
+  }, {}, [3])(3);
+});
+
 
 
 /***/ }),
@@ -6703,364 +7147,6 @@ module.exports = toString;
 
 /***/ }),
 
-/***/ "../node_modules/ms/index.js":
-/*!***********************************!*\
-  !*** ../node_modules/ms/index.js ***!
-  \***********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} [options]
- * @throws {Error} throw an error if val is not a non-empty string or a number
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function(val, options) {
-  options = options || {};
-  var type = typeof val;
-  if (type === 'string' && val.length > 0) {
-    return parse(val);
-  } else if (type === 'number' && isNaN(val) === false) {
-    return options.long ? fmtLong(val) : fmtShort(val);
-  }
-  throw new Error(
-    'val is not a non-empty string or a valid number. val=' +
-      JSON.stringify(val)
-  );
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = String(str);
-  if (str.length > 100) {
-    return;
-  }
-  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(
-    str
-  );
-  if (!match) {
-    return;
-  }
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtShort(ms) {
-  if (ms >= d) {
-    return Math.round(ms / d) + 'd';
-  }
-  if (ms >= h) {
-    return Math.round(ms / h) + 'h';
-  }
-  if (ms >= m) {
-    return Math.round(ms / m) + 'm';
-  }
-  if (ms >= s) {
-    return Math.round(ms / s) + 's';
-  }
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtLong(ms) {
-  return plural(ms, d, 'day') ||
-    plural(ms, h, 'hour') ||
-    plural(ms, m, 'minute') ||
-    plural(ms, s, 'second') ||
-    ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, n, name) {
-  if (ms < n) {
-    return;
-  }
-  if (ms < n * 1.5) {
-    return Math.floor(ms / n) + ' ' + name;
-  }
-  return Math.ceil(ms / n) + ' ' + name + 's';
-}
-
-
-/***/ }),
-
-/***/ "../node_modules/process/browser.js":
-/*!******************************************!*\
-  !*** ../node_modules/process/browser.js ***!
-  \******************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-
-/***/ }),
-
 /***/ "../node_modules/uuid/index.js":
 /*!*************************************!*\
   !*** ../node_modules/uuid/index.js ***!
@@ -7378,25 +7464,24 @@ module.exports = function(module) {
 /*!****************************!*\
   !*** ./providers/auth0.js ***!
   \****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
+__webpack_require__.r(__webpack_exports__);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 /**
  * Provider for Auth0
  * @see https://auth0.com
  */
-var SalteAuthAuth0Provider = function () {
+var SalteAuthAuth0Provider =
+/*#__PURE__*/
+function () {
   function SalteAuthAuth0Provider() {
     _classCallCheck(this, SalteAuthAuth0Provider);
   }
@@ -7410,7 +7495,7 @@ var SalteAuthAuth0Provider = function () {
      * @return {String} the deauthorization url
      */
     value: function deauthorizeUrl(config) {
-      return this.$utilities.createUrl(config.providerUrl + "/v2/logout", {
+      return this.$utilities.createUrl("".concat(config.providerUrl, "/v2/logout"), {
         returnTo: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
         client_id: config.clientId
       });
@@ -7420,7 +7505,7 @@ var SalteAuthAuth0Provider = function () {
   return SalteAuthAuth0Provider;
 }();
 
-exports.default = SalteAuthAuth0Provider;
+/* harmony default export */ __webpack_exports__["default"] = (SalteAuthAuth0Provider);
 
 /***/ }),
 
@@ -7428,22 +7513,21 @@ exports.default = SalteAuthAuth0Provider;
 /*!****************************!*\
   !*** ./providers/azure.js ***!
   \****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
+__webpack_require__.r(__webpack_exports__);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 /** Provider for Azure's Active Directory */
-var SalteAuthAzureProvider = function () {
+var SalteAuthAzureProvider =
+/*#__PURE__*/
+function () {
   function SalteAuthAzureProvider() {
     _classCallCheck(this, SalteAuthAzureProvider);
   }
@@ -7457,9 +7541,8 @@ var SalteAuthAzureProvider = function () {
      * @return {String} the authorization endpoint
      */
     value: function authorizeEndpoint(config) {
-      return config.providerUrl + "/oauth2/authorize";
+      return "".concat(config.providerUrl, "/oauth2/authorize");
     }
-
     /**
      * Computes the deauthorization url
      * @param {Config} config configuration for salte auth
@@ -7469,7 +7552,7 @@ var SalteAuthAzureProvider = function () {
   }, {
     key: "deauthorizeUrl",
     value: function deauthorizeUrl(config) {
-      return this.$utilities.createUrl(config.providerUrl + "/oauth2/logout", {
+      return this.$utilities.createUrl("".concat(config.providerUrl, "/oauth2/logout"), {
         post_logout_redirect_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl
       });
     }
@@ -7478,7 +7561,7 @@ var SalteAuthAzureProvider = function () {
   return SalteAuthAzureProvider;
 }();
 
-exports.default = SalteAuthAzureProvider;
+/* harmony default export */ __webpack_exports__["default"] = (SalteAuthAzureProvider);
 
 /***/ }),
 
@@ -7486,22 +7569,21 @@ exports.default = SalteAuthAzureProvider;
 /*!******************************!*\
   !*** ./providers/cognito.js ***!
   \******************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
+__webpack_require__.r(__webpack_exports__);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 /** Provider for Amazon's Cognito */
-var SalteAuthCognitoProvider = function () {
+var SalteAuthCognitoProvider =
+/*#__PURE__*/
+function () {
   function SalteAuthCognitoProvider() {
     _classCallCheck(this, SalteAuthCognitoProvider);
   }
@@ -7515,9 +7597,8 @@ var SalteAuthCognitoProvider = function () {
      * @return {String} the authorization endpoint
      */
     value: function authorizeEndpoint(config) {
-      return config.providerUrl + "/oauth2/authorize";
+      return "".concat(config.providerUrl, "/oauth2/authorize");
     }
-
     /**
      * Computes the deauthorization url
      * @param {Config} config configuration for salte auth
@@ -7527,12 +7608,11 @@ var SalteAuthCognitoProvider = function () {
   }, {
     key: "deauthorizeUrl",
     value: function deauthorizeUrl(config) {
-      return this.$utilities.createUrl(config.providerUrl + "/logout", {
+      return this.$utilities.createUrl("".concat(config.providerUrl, "/logout"), {
         logout_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
         client_id: config.clientId
       });
     }
-
     /**
      * Provides a set of default config options required for cognito
      */
@@ -7552,7 +7632,7 @@ var SalteAuthCognitoProvider = function () {
   return SalteAuthCognitoProvider;
 }();
 
-exports.default = SalteAuthCognitoProvider;
+/* harmony default export */ __webpack_exports__["default"] = (SalteAuthCognitoProvider);
 
 /***/ }),
 
@@ -7560,28 +7640,27 @@ exports.default = SalteAuthCognitoProvider;
 /*!***************************!*\
   !*** ./providers/wso2.js ***!
   \***************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
+__webpack_require__.r(__webpack_exports__);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 /** Provider for WSO2's API Gateway */
-var SalteAuthWSO2Provider = function () {
+var SalteAuthWSO2Provider =
+/*#__PURE__*/
+function () {
   function SalteAuthWSO2Provider() {
     _classCallCheck(this, SalteAuthWSO2Provider);
   }
 
   _createClass(SalteAuthWSO2Provider, null, [{
-    key: 'deauthorizeUrl',
+    key: "deauthorizeUrl",
 
     /**
      * Computes the deauthorization url
@@ -7589,7 +7668,7 @@ var SalteAuthWSO2Provider = function () {
      * @return {String} the deauthorization url
      */
     value: function deauthorizeUrl(config) {
-      return this.$utilities.createUrl(config.providerUrl + '/commonauth', {
+      return this.$utilities.createUrl("".concat(config.providerUrl, "/commonauth"), {
         commonAuthLogout: true,
         type: 'oidc',
         commonAuthCallerPath: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
@@ -7601,7 +7680,7 @@ var SalteAuthWSO2Provider = function () {
   return SalteAuthWSO2Provider;
 }();
 
-exports.default = SalteAuthWSO2Provider;
+/* harmony default export */ __webpack_exports__["default"] = (SalteAuthWSO2Provider);
 
 /***/ }),
 
@@ -7609,56 +7688,45 @@ exports.default = SalteAuthWSO2Provider;
 /*!***********************!*\
   !*** ./salte-auth.js ***!
   \***********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: SalteAuth, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.SalteAuth = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _assign = __webpack_require__(/*! lodash/assign */ "../node_modules/lodash/assign.js");
-
-var _assign2 = _interopRequireDefault(_assign);
-
-var _defaultsDeep = __webpack_require__(/*! lodash/defaultsDeep */ "../node_modules/lodash/defaultsDeep.js");
-
-var _defaultsDeep2 = _interopRequireDefault(_defaultsDeep);
-
-var _get = __webpack_require__(/*! lodash/get */ "../node_modules/lodash/get.js");
-
-var _get2 = _interopRequireDefault(_get);
-
-var _set = __webpack_require__(/*! lodash/set */ "../node_modules/lodash/set.js");
-
-var _set2 = _interopRequireDefault(_set);
-
-var _uuid = __webpack_require__(/*! uuid */ "../node_modules/uuid/index.js");
-
-var _uuid2 = _interopRequireDefault(_uuid);
-
-var _debug = __webpack_require__(/*! debug */ "../node_modules/debug/src/browser.js");
-
-var _debug2 = _interopRequireDefault(_debug);
-
-var _salteAuthProviders = __webpack_require__(/*! ./salte-auth.providers.js */ "./salte-auth.providers.js");
-
-var _salteAuthProfile = __webpack_require__(/*! ./salte-auth.profile.js */ "./salte-auth.profile.js");
-
-var _salteAuthUtilities = __webpack_require__(/*! ./salte-auth.utilities.js */ "./salte-auth.utilities.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SalteAuth", function() { return SalteAuth; });
+/* harmony import */ var lodash_assign__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/assign */ "../node_modules/lodash/assign.js");
+/* harmony import */ var lodash_assign__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_assign__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/defaultsDeep */ "../node_modules/lodash/defaultsDeep.js");
+/* harmony import */ var lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var lodash_get__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/get */ "../node_modules/lodash/get.js");
+/* harmony import */ var lodash_get__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_get__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var lodash_set__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/set */ "../node_modules/lodash/set.js");
+/* harmony import */ var lodash_set__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_set__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! uuid */ "../node_modules/uuid/index.js");
+/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(uuid__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! debug */ "../node_modules/debug/dist/debug.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _salte_auth_providers_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./salte-auth.providers.js */ "./salte-auth.providers.js");
+/* harmony import */ var _salte_auth_profile_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./salte-auth.profile.js */ "./salte-auth.profile.js");
+/* harmony import */ var _salte_auth_utilities_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./salte-auth.utilities.js */ "./salte-auth.utilities.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/** @ignore */
-var logger = (0, _debug2.default)('@salte-io/salte-auth');
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+
+
+
+
+
+
+/** @ignore */
+
+var logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-io/salte-auth');
 /**
  * Disable certain security validations if your provider doesn't support them.
  * @typedef {Object} Validation
@@ -7706,7 +7774,9 @@ var logger = (0, _debug2.default)('@salte-io/salte-auth');
  * Authentication Controller
  */
 
-var SalteAuth = function () {
+var SalteAuth =
+/*#__PURE__*/
+function () {
   /**
    * Sets up Salte Auth
    * @param {Config} config configuration for salte auth
@@ -7723,35 +7793,40 @@ var SalteAuth = function () {
     if (!config) {
       throw new ReferenceError('A config must be provided.');
     }
-
     /**
      * The supported identity providers
      * @type {Providers}
      * @private
      */
-    this.$providers = _salteAuthProviders.Providers;
+
+
+    this.$providers = _salte_auth_providers_js__WEBPACK_IMPORTED_MODULE_6__["Providers"];
     /**
      * The active authentication promises
      * @private
      */
+
     this.$promises = {};
     /**
      * The active authentication timeouts
      * @private
      */
+
     this.$timeouts = {};
     /**
      * The registered listeners
      * @private
      */
+
     this.$listeners = {};
     /**
      * The configuration for salte auth
      * @type {Config}
      * @private
      */
+
     this.$config = config;
-    this.$config = (0, _defaultsDeep2.default)(config, this.$provider.defaultConfig, {
+    this.$config = lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_1___default()(config, this.$provider.defaultConfig, {
       loginType: 'iframe',
       autoRefresh: true,
       autoRefreshBuffer: 60000
@@ -7761,13 +7836,14 @@ var SalteAuth = function () {
      * @type {SalteAuthUtilities}
      * @private
      */
-    this.$utilities = new _salteAuthUtilities.SalteAuthUtilities(this.$config);
 
+    this.$utilities = new _salte_auth_utilities_js__WEBPACK_IMPORTED_MODULE_8__["SalteAuthUtilities"](this.$config);
     /**
      * The user profile for salte auth
      * @type {SalteAuthProfile}
      */
-    this.profile = new _salteAuthProfile.SalteAuthProfile(this.$config);
+
+    this.profile = new _salte_auth_profile_js__WEBPACK_IMPORTED_MODULE_7__["SalteAuthProfile"](this.$config);
 
     if (this.$utilities.$iframe) {
       logger('Detected iframe, removing...');
@@ -7779,20 +7855,21 @@ var SalteAuth = function () {
       logger('Redirect detected!');
       this.profile.$hash();
       var error = this.profile.$validate();
+
       if (error) {
         this.profile.$clear();
       } else {
-        logger('Navigating to Redirect URL... (' + this.profile.$redirectUrl + ')');
+        logger("Navigating to Redirect URL... (".concat(this.profile.$redirectUrl, ")"));
         this.$utilities.$navigate(this.profile.$redirectUrl);
         this.profile.$redirectUrl = undefined;
-      }
+      } // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
 
-      // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
-      this.$config.redirectLoginCallback && this.$config.redirectLoginCallback(error);
 
-      // Delay for an event loop to give users time to register a listener.
+      this.$config.redirectLoginCallback && this.$config.redirectLoginCallback(error); // Delay for an event loop to give users time to register a listener.
+
       setTimeout(function () {
         var action = _this.profile.$actions(_this.profile.$state);
+
         if (action === 'login') {
           _this.$fire('login', error);
         } else if (action === 'logout') {
@@ -7804,37 +7881,36 @@ var SalteAuth = function () {
       this.$utilities.addXHRInterceptor(function (request, data) {
         if (_this.$utilities.checkForMatchingUrl(request.$url, _this.$config.endpoints)) {
           return _this.retrieveAccessToken().then(function (accessToken) {
-            request.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+            request.setRequestHeader('Authorization', "Bearer ".concat(accessToken));
           });
         }
       });
-
       this.$utilities.addFetchInterceptor(function (request) {
         if (_this.$utilities.checkForMatchingUrl(request.url, _this.$config.endpoints)) {
           return _this.retrieveAccessToken().then(function (accessToken) {
-            request.headers.set('Authorization', 'Bearer ' + accessToken);
+            request.headers.set('Authorization', "Bearer ".concat(accessToken));
           });
         }
       });
-
       logger('Setting up route change detectors...');
-      window.addEventListener('popstate', this.$$onRouteChanged.bind(this), { passive: true });
-      document.addEventListener('click', this.$$onRouteChanged.bind(this), { passive: true });
+      window.addEventListener('popstate', this.$$onRouteChanged.bind(this), {
+        passive: true
+      });
+      document.addEventListener('click', this.$$onRouteChanged.bind(this), {
+        passive: true
+      });
       setTimeout(this.$$onRouteChanged.bind(this));
-
       logger('Setting up automatic renewal of token...');
       this.on('login', function (error) {
         if (error) return;
 
         _this.$$refreshToken();
       });
-
       this.on('refresh', function (error) {
         if (error) return;
 
         _this.$$refreshToken();
       });
-
       this.on('logout', function () {
         clearTimeout(_this.$timeouts.refresh);
       });
@@ -7846,18 +7922,16 @@ var SalteAuth = function () {
       document.addEventListener('visibilitychange', this.$$onVisibilityChanged.bind(this), {
         passive: true
       });
-
       this.$fire('create', null, this);
-    }
+    } // TODO(v3.0.0): Revoke singleton status from `salte-auth`.
 
-    // TODO(v3.0.0): Revoke singleton status from `salte-auth`.
+
     window.salte.auth = this;
 
     if (this.$config.redirectLoginCallback) {
-      console.warn('The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.');
+      console.warn("The \"redirectLoginCallback\" api has been deprecated in favor of the \"on\" api, see http://bit.ly/salte-auth-on for more info.");
     }
   }
-
   /**
    * Returns the configured provider
    * @type {Class|Object}
@@ -7866,8 +7940,7 @@ var SalteAuth = function () {
 
 
   _createClass(SalteAuth, [{
-    key: '$loginUrl',
-
+    key: "$loginUrl",
 
     /**
      * The authentication url to retrieve the id token
@@ -7876,15 +7949,15 @@ var SalteAuth = function () {
      * @private
      */
     value: function $loginUrl(refresh) {
-      this.profile.$localState = _uuid2.default.v4();
-      this.profile.$nonce = _uuid2.default.v4();
+      this.profile.$localState = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
+      this.profile.$nonce = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
+      var authorizeEndpoint = "".concat(this.$config.providerUrl, "/authorize");
 
-      var authorizeEndpoint = this.$config.providerUrl + '/authorize';
       if (this.$provider.authorizeEndpoint) {
         authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
       }
 
-      return this.$utilities.createUrl(authorizeEndpoint, (0, _assign2.default)({
+      return this.$utilities.createUrl(authorizeEndpoint, lodash_assign__WEBPACK_IMPORTED_MODULE_0___default()({
         'state': this.profile.$localState,
         'nonce': this.profile.$nonce,
         'response_type': this.$config.responseType,
@@ -7894,7 +7967,6 @@ var SalteAuth = function () {
         'prompt': refresh ? 'none' : undefined
       }, this.$config.queryParams));
     }
-
     /**
      * The url to logout of the configured provider
      * @type {String}
@@ -7902,8 +7974,7 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: 'on',
-
+    key: "on",
 
     /**
      * Listens for an event to be invoked.
@@ -7930,7 +8001,7 @@ var SalteAuth = function () {
      */
     value: function on(eventType, callback) {
       if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
-        throw new ReferenceError('Unknown Event Type (' + eventType + ')');
+        throw new ReferenceError("Unknown Event Type (".concat(eventType, ")"));
       } else if (typeof callback !== 'function') {
         throw new ReferenceError('Invalid callback provided!');
       }
@@ -7938,7 +8009,6 @@ var SalteAuth = function () {
       this.$listeners[eventType] = this.$listeners[eventType] || [];
       this.$listeners[eventType].push(callback);
     }
-
     /**
      * Deregister a callback previously registered.
      * @param {('login'|'logout'|'refresh')} eventType the event to deregister.
@@ -7953,21 +8023,19 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: 'off',
+    key: "off",
     value: function off(eventType, callback) {
       if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
-        throw new ReferenceError('Unknown Event Type (' + eventType + ')');
+        throw new ReferenceError("Unknown Event Type (".concat(eventType, ")"));
       } else if (typeof callback !== 'function') {
         throw new ReferenceError('Invalid callback provided!');
       }
 
       var eventListeners = this.$listeners[eventType];
       if (!eventListeners || !eventListeners.length) return;
-
       var index = eventListeners.indexOf(callback);
       eventListeners.splice(index, 1);
     }
-
     /**
      * Fires off an event to a given set of listeners
      * @param {String} eventType The event that occurred.
@@ -7977,22 +8045,21 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: '$fire',
+    key: "$fire",
     value: function $fire(eventType, error, data) {
       var event = document.createEvent('Event');
-      event.initEvent('salte-auth-' + eventType, false, true);
-      event.detail = { error: error, data: data };
+      event.initEvent("salte-auth-".concat(eventType), false, true);
+      event.detail = {
+        error: error,
+        data: data
+      };
       window.dispatchEvent(event);
-
       var eventListeners = this.$listeners[eventType];
-
       if (!eventListeners || !eventListeners.length) return;
-
       eventListeners.forEach(function (listener) {
         return listener(error, data);
       });
     }
-
     /**
      * Authenticates using the iframe-based OAuth flow.
      * @param {Boolean|LoginConfig} config Whether this request is intended to refresh the token.
@@ -8007,15 +8074,15 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: 'loginWithIframe',
+    key: "loginWithIframe",
     value: function loginWithIframe(config) {
       var _this2 = this;
 
       if (this.$promises.login) {
         return this.$promises.login;
-      }
+      } // TODO(v3.0.0): Remove backwards compatibility with refresh boolean.
 
-      // TODO(v3.0.0): Remove backwards compatibility with refresh boolean.
+
       if (typeof config === 'boolean') {
         config = {
           noPrompt: config,
@@ -8024,7 +8091,7 @@ var SalteAuth = function () {
         };
       }
 
-      config = (0, _defaultsDeep2.default)(config, {
+      config = lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_1___default()(config, {
         noPrompt: false,
         clear: 'all',
         events: true
@@ -8038,6 +8105,7 @@ var SalteAuth = function () {
 
       this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt).then(function () {
         _this2.$promises.login = null;
+
         var error = _this2.profile.$validate();
 
         if (error) {
@@ -8045,21 +8113,23 @@ var SalteAuth = function () {
         }
 
         var user = _this2.profile.userInfo;
+
         if (config.events) {
           _this2.$fire('login', null, user);
         }
+
         return user;
       }).catch(function (error) {
         _this2.$promises.login = null;
+
         if (config.events) {
           _this2.$fire('login', error);
         }
+
         return Promise.reject(error);
       });
-
       return this.$promises.login;
     }
-
     /**
      * Authenticates using the popup-based OAuth flow.
      * @return {Promise<Object>} a promise that resolves when we finish authenticating
@@ -8073,7 +8143,7 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: 'loginWithPopup',
+    key: "loginWithPopup",
     value: function loginWithPopup() {
       var _this3 = this;
 
@@ -8084,26 +8154,31 @@ var SalteAuth = function () {
       this.profile.$clear();
       this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(function () {
         _this3.$promises.login = null;
+
         _this3.profile.$hash();
+
         var error = _this3.profile.$validate();
 
         if (error) {
           _this3.profile.$clear();
+
           return Promise.reject(error);
         }
 
         var user = _this3.profile.userInfo;
+
         _this3.$fire('login', null, user);
+
         return user;
       }).catch(function (error) {
         _this3.$promises.login = null;
+
         _this3.$fire('login', error);
+
         return Promise.reject(error);
       });
-
       return this.$promises.login;
     }
-
     /**
      * Authenticates using the tab-based OAuth flow.
      * @return {Promise<Object>} a promise that resolves when we finish authenticating
@@ -8117,7 +8192,7 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: 'loginWithNewTab',
+    key: "loginWithNewTab",
     value: function loginWithNewTab() {
       var _this4 = this;
 
@@ -8128,26 +8203,31 @@ var SalteAuth = function () {
       this.profile.$clear();
       this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(function () {
         _this4.$promises.login = null;
+
         _this4.profile.$hash();
+
         var error = _this4.profile.$validate();
 
         if (error) {
           _this4.profile.$clear();
+
           return Promise.reject(error);
         }
 
         var user = _this4.profile.userInfo;
+
         _this4.$fire('login', null, user);
+
         return user;
       }).catch(function (error) {
         _this4.$promises.login = null;
+
         _this4.$fire('login', error);
+
         return Promise.reject(error);
       });
-
       return this.$promises.login;
     }
-
     /**
      * Authenticates using the redirect-based OAuth flow.
      * @param {String} redirectUrl override for the redirect url, by default this will try to redirect the user back where they started.
@@ -8158,31 +8238,27 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: 'loginWithRedirect',
+    key: "loginWithRedirect",
     value: function loginWithRedirect(redirectUrl) {
       if (this.$config.redirectLoginCallback) {
-        console.warn('The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.');
+        console.warn("The \"redirectLoginCallback\" api has been deprecated in favor of the \"on\" api, see http://bit.ly/salte-auth-on for more info.");
       }
 
       if (this.$promises.login) {
         return this.$promises.login;
-      }
-
-      // NOTE: This prevents the other login types from racing "loginWithRedirect".
+      } // NOTE: This prevents the other login types from racing "loginWithRedirect".
       // Without this someone could potentially call login somewhere else before
       // the app has a change to redirect. Which could result in an invalid state.
-      this.$promises.login = new Promise(function () {});
 
+
+      this.$promises.login = new Promise(function () {});
       this.profile.$clear();
       this.profile.$redirectUrl = redirectUrl && this.$utilities.resolveUrl(redirectUrl) || this.profile.$redirectUrl || location.href;
       var url = this.$loginUrl();
-
       this.profile.$actions(this.profile.$localState, 'login');
       this.$utilities.$navigate(url);
-
       return this.$promises.login;
     }
-
     /**
      * Unauthenticates using the iframe-based OAuth flow.
      * @return {Promise} a promise that resolves when we finish deauthenticating
@@ -8196,7 +8272,7 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: 'logoutWithIframe',
+    key: "logoutWithIframe",
     value: function logoutWithIframe() {
       var _this5 = this;
 
@@ -8207,15 +8283,17 @@ var SalteAuth = function () {
       this.profile.$clear();
       this.$promises.logout = this.$utilities.createIframe(this.$deauthorizeUrl).then(function () {
         _this5.$promises.logout = null;
+
         _this5.$fire('logout');
       }).catch(function (error) {
         _this5.$promises.logout = null;
+
         _this5.$fire('logout', error);
+
         return Promise.reject(error);
       });
       return this.$promises.logout;
     }
-
     /**
      * Unauthenticates using the popup-based OAuth flow.
      * @return {Promise} a promise that resolves when we finish deauthenticating
@@ -8229,7 +8307,7 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: 'logoutWithPopup',
+    key: "logoutWithPopup",
     value: function logoutWithPopup() {
       var _this6 = this;
 
@@ -8240,16 +8318,17 @@ var SalteAuth = function () {
       this.profile.$clear();
       this.$promises.logout = this.$utilities.openPopup(this.$deauthorizeUrl).then(function () {
         _this6.$promises.logout = null;
+
         _this6.$fire('logout');
       }).catch(function (error) {
         _this6.$promises.logout = null;
+
         _this6.$fire('logout', error);
+
         return Promise.reject(error);
       });
-
       return this.$promises.logout;
     }
-
     /**
      * Unauthenticates using the tab-based OAuth flow.
      * @return {Promise} a promise that resolves when we finish deauthenticating
@@ -8263,7 +8342,7 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: 'logoutWithNewTab',
+    key: "logoutWithNewTab",
     value: function logoutWithNewTab() {
       var _this7 = this;
 
@@ -8274,16 +8353,17 @@ var SalteAuth = function () {
       this.profile.$clear();
       this.$promises.logout = this.$utilities.openNewTab(this.$deauthorizeUrl).then(function () {
         _this7.$promises.logout = null;
+
         _this7.$fire('logout');
       }).catch(function (error) {
         _this7.$promises.logout = null;
+
         _this7.$fire('logout', error);
+
         return Promise.reject(error);
       });
-
       return this.$promises.logout;
     }
-
     /**
      * Logs the user out of their configured identity provider.
      *
@@ -8292,22 +8372,20 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: 'logoutWithRedirect',
+    key: "logoutWithRedirect",
     value: function logoutWithRedirect() {
       this.profile.$clear();
       var url = this.$deauthorizeUrl;
-
       this.profile.$actions(this.profile.$localState, 'logout');
       this.$utilities.$navigate(url);
     }
-
     /**
      * Refreshes the users tokens and renews their session.
      * @return {Promise} a promise that resolves when we finish renewing the users tokens.
      */
 
   }, {
-    key: 'refreshToken',
+    key: "refreshToken",
     value: function refreshToken() {
       var _this8 = this;
 
@@ -8317,20 +8395,25 @@ var SalteAuth = function () {
 
       this.$promises.token = this.loginWithIframe(true).then(function (user) {
         _this8.$promises.token = null;
+
         var error = _this8.profile.$validate(true);
 
         if (error) {
           return Promise.reject(error);
         }
+
         _this8.$promises.token = null;
+
         _this8.$fire('refresh', null, user);
+
         return user;
       }).catch(function (error) {
         _this8.$promises.token = null;
+
         _this8.$fire('refresh', error);
+
         return Promise.reject(error);
       });
-
       return this.$promises.token;
     }
     /**
@@ -8338,7 +8421,7 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: '$$refreshToken',
+    key: "$$refreshToken",
     value: function $$refreshToken() {
       var _this9 = this;
 
@@ -8354,18 +8437,17 @@ var SalteAuth = function () {
           });
         } else {
           _this9.$fire('refresh');
-        }
-        // We need to default `autoRefreshBuffer` to 60000 in the constructor.
+        } // We need to default `autoRefreshBuffer` to 60000 in the constructor.
+
       }, Math.max(this.profile.userInfo.exp * 1000 - Date.now() - this.$config.autoRefreshBuffer, 0));
     }
-
     /**
      * Authenticates, requests the access token, and returns it if necessary.
      * @return {Promise<string>} a promise that resolves when we retrieve the access token
      */
 
   }, {
-    key: 'retrieveAccessToken',
+    key: "retrieveAccessToken",
     value: function retrieveAccessToken() {
       var _this10 = this;
 
@@ -8375,8 +8457,10 @@ var SalteAuth = function () {
       }
 
       this.$promises.token = Promise.resolve();
+
       if (this.profile.idTokenExpired) {
         logger('id token has expired, reauthenticating...');
+
         if (this.$config.loginType === 'iframe') {
           logger('Initiating the iframe flow...');
           this.$promises.token = this.loginWithIframe();
@@ -8391,56 +8475,56 @@ var SalteAuth = function () {
           }
         } else {
           this.$promises.token = null;
-          return Promise.reject(new ReferenceError('Invalid Login Type (' + this.$config.loginType + ')'));
+          return Promise.reject(new ReferenceError("Invalid Login Type (".concat(this.$config.loginType, ")")));
         }
       }
 
       this.$promises.token = this.$promises.token.then(function () {
         _this10.profile.$clearErrors();
+
         if (_this10.profile.accessTokenExpired) {
           logger('Access token has expired, renewing...');
           return _this10.$utilities.createIframe(_this10.$accessTokenUrl).then(function () {
             _this10.$promises.token = null;
+
             var error = _this10.profile.$validate(true);
 
             if (error) {
               return Promise.reject(error);
             }
+
             return _this10.profile.$accessToken;
           });
         }
+
         _this10.$promises.token = null;
         return _this10.profile.$accessToken;
       }).catch(function (error) {
         _this10.$promises.token = null;
         return Promise.reject(error);
       });
-
       return this.$promises.token;
     }
-
     /**
      * Checks if the current route is secured and authenticates the user if necessary
      * @ignore
      */
 
   }, {
-    key: '$$onRouteChanged',
+    key: "$$onRouteChanged",
     value: function $$onRouteChanged() {
       logger('Route change detected, determining if the route is secured...');
       if (!this.$utilities.isRouteSecure(location.href, this.$config.routes)) return;
-
       logger('Route is secure, verifying tokens...');
       this.retrieveAccessToken();
     }
-
     /**
      * Disables automatic refresh of the token if the page is no longer visible
      * @ignore
      */
 
   }, {
-    key: '$$onVisibilityChanged',
+    key: "$$onVisibilityChanged",
     value: function $$onVisibilityChanged() {
       var _this11 = this;
 
@@ -8461,7 +8545,7 @@ var SalteAuth = function () {
       }
     }
   }, {
-    key: '$provider',
+    key: "$provider",
     get: function get() {
       if (!this.$config.provider) {
         throw new ReferenceError('A provider must be specified');
@@ -8469,15 +8553,16 @@ var SalteAuth = function () {
 
       if (typeof this.$config.provider === 'string') {
         var provider = this.$providers[this.$config.provider];
+
         if (!provider) {
-          throw new ReferenceError('Unknown Provider (' + this.$config.provider + ')');
+          throw new ReferenceError("Unknown Provider (".concat(this.$config.provider, ")"));
         }
+
         return provider;
       }
 
       return this.$config.provider;
     }
-
     /**
      * The authentication url to retrieve the access token
      * @type {String}
@@ -8485,17 +8570,17 @@ var SalteAuth = function () {
      */
 
   }, {
-    key: '$accessTokenUrl',
+    key: "$accessTokenUrl",
     get: function get() {
-      this.profile.$localState = _uuid2.default.v4();
-      this.profile.$nonce = _uuid2.default.v4();
+      this.profile.$localState = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
+      this.profile.$nonce = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
+      var authorizeEndpoint = "".concat(this.$config.providerUrl, "/authorize");
 
-      var authorizeEndpoint = this.$config.providerUrl + '/authorize';
       if (this.$provider.authorizeEndpoint) {
         authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
       }
 
-      return this.$utilities.createUrl(authorizeEndpoint, (0, _assign2.default)({
+      return this.$utilities.createUrl(authorizeEndpoint, lodash_assign__WEBPACK_IMPORTED_MODULE_0___default()({
         'state': this.profile.$localState,
         'nonce': this.profile.$nonce,
         'response_type': 'token',
@@ -8506,7 +8591,7 @@ var SalteAuth = function () {
       }, this.$config.queryParams));
     }
   }, {
-    key: '$deauthorizeUrl',
+    key: "$deauthorizeUrl",
     get: function get() {
       return this.$provider.deauthorizeUrl.call(this, this.$config);
     }
@@ -8515,9 +8600,9 @@ var SalteAuth = function () {
   return SalteAuth;
 }();
 
-(0, _set2.default)(window, 'salte.SalteAuth', (0, _get2.default)(window, 'salte.SalteAuth', SalteAuth));
-exports.SalteAuth = SalteAuth;
-exports.default = SalteAuth;
+lodash_set__WEBPACK_IMPORTED_MODULE_3___default()(window, 'salte.SalteAuth', lodash_get__WEBPACK_IMPORTED_MODULE_2___default()(window, 'salte.SalteAuth', SalteAuth));
+
+/* harmony default export */ __webpack_exports__["default"] = (SalteAuth);
 
 /***/ }),
 
@@ -8525,45 +8610,45 @@ exports.default = SalteAuth;
 /*!*******************************!*\
   !*** ./salte-auth.profile.js ***!
   \*******************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: SalteAuthProfile, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SalteAuthProfile", function() { return SalteAuthProfile; });
+/* harmony import */ var lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/defaultsDeep */ "../node_modules/lodash/defaultsDeep.js");
+/* harmony import */ var lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/find */ "../node_modules/lodash/find.js");
+/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! debug */ "../node_modules/debug/dist/debug.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_2__);
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.SalteAuthProfile = undefined;
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _defaultsDeep = __webpack_require__(/*! lodash/defaultsDeep */ "../node_modules/lodash/defaultsDeep.js");
-
-var _defaultsDeep2 = _interopRequireDefault(_defaultsDeep);
-
-var _find = __webpack_require__(/*! lodash/find */ "../node_modules/lodash/find.js");
-
-var _find2 = _interopRequireDefault(_find);
-
-var _debug = __webpack_require__(/*! debug */ "../node_modules/debug/src/browser.js");
-
-var _debug2 = _interopRequireDefault(_debug);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/** @ignore */
-var logger = (0, _debug2.default)('@salte-io/salte-auth:profile');
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+/** @ignore */
+
+var logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('@salte-io/salte-auth:profile');
 /**
  * All the profile information associated with the current authentication session
  */
 
-var SalteAuthProfile = function () {
+var SalteAuthProfile =
+/*#__PURE__*/
+function () {
   /**
    * Parses the current url for the authentication values
    * @param {Config} config configuration for salte auth
@@ -8573,7 +8658,8 @@ var SalteAuthProfile = function () {
 
     logger('Appending defaults to config...');
     /** @ignore */
-    this.$$config = (0, _defaultsDeep2.default)(config, {
+
+    this.$$config = lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_0___default()(config, {
       validation: {
         nonce: true,
         state: true,
@@ -8582,26 +8668,26 @@ var SalteAuthProfile = function () {
       },
       storageType: 'session'
     });
-
     /**
      * The parsed user information from the id token
      * @type {Object}
      */
+
     this.userInfo = null;
     this.$refreshUserInfo();
   }
-
   /**
    * Check for a hash, parses it, and removes it.
    */
 
 
   _createClass(SalteAuthProfile, [{
-    key: '$hash',
+    key: "$hash",
     value: function $hash() {
       if (location.hash) {
         var params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
-        logger('Hash detected, parsing...', params);
+        logger("Hash detected, parsing...", params);
+
         for (var i = 0; i < params.length; i++) {
           var param = params[i];
 
@@ -8612,11 +8698,11 @@ var SalteAuthProfile = function () {
 
           this.$parse(key, decodeURIComponent(value));
         }
-        logger('Removing hash...');
+
+        logger("Removing hash...");
         history.pushState('', document.title, location.href.split('#')[0]);
       }
     }
-
     /**
      * Parse a key-value pair
      * @param {String} key the key to parse
@@ -8625,41 +8711,45 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$parse',
+    key: "$parse",
     value: function $parse(key, value) {
       switch (key) {
         case 'token_type':
           this.$tokenType = value;
           break;
+
         case 'expires_in':
           this.$expiration = Date.now() + Number(value) * 1000;
           break;
+
         case 'access_token':
           this.$accessToken = value;
           break;
+
         case 'id_token':
           this.$idToken = value;
           break;
+
         case 'state':
           this.$state = value;
           break;
+
         case 'error':
           this.$error = value;
           break;
+
         case 'error_description':
           this.$errorDescription = value;
           break;
       }
     }
-
     /**
      * Whether the ID Token has expired
      * @return {Boolean} true if the "id_token" has expired
      */
 
   }, {
-    key: '$actions',
-
+    key: "$actions",
 
     /**
      * Sets or Gets an action based on whether a action was passed.
@@ -8670,12 +8760,11 @@ var SalteAuthProfile = function () {
      */
     value: function $actions(state, action) {
       if (action) {
-        this.$saveItem('salte.auth.action.' + state, action);
+        this.$saveItem("salte.auth.action.".concat(state), action);
       } else {
-        return this.$getItem('salte.auth.action.' + state);
+        return this.$getItem("salte.auth.action.".concat(state));
       }
     }
-
     /**
      * Parses the User Info from the ID Token
      * @param {String} idToken the id token to update based off
@@ -8683,14 +8772,14 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$refreshUserInfo',
+    key: "$refreshUserInfo",
     value: function $refreshUserInfo() {
       var idToken = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.$idToken;
-
       var userInfo = null;
 
       if (idToken) {
         var separatedToken = idToken.split('.');
+
         if (separatedToken.length === 3) {
           userInfo = JSON.parse(atob(separatedToken[1]));
         }
@@ -8698,7 +8787,6 @@ var SalteAuthProfile = function () {
 
       this.userInfo = userInfo;
     }
-
     /**
      * Verifies that we were logged in successfully and that all security checks pass
      * @param {Boolean} accessTokenRequest if the request we're validating was an access token request
@@ -8707,7 +8795,7 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$validate',
+    key: "$validate",
     value: function $validate(accessTokenRequest) {
       var _this = this;
 
@@ -8766,7 +8854,7 @@ var SalteAuthProfile = function () {
         }
 
         if (this.$$config.validation.aud) {
-          var aud = (0, _find2.default)(this.userInfo.aud, function (audience) {
+          var aud = lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(this.userInfo.aud, function (audience) {
             return audience === _this.$$config.clientId;
           });
 
@@ -8784,7 +8872,6 @@ var SalteAuthProfile = function () {
         };
       }
     }
-
     /**
      * Saves a value to the Web Storage API
      * @param {String} key The key to save to
@@ -8794,12 +8881,11 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$getItem',
+    key: "$getItem",
     value: function $getItem(key, overrideStorageType) {
       var storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
       return storage.getItem(key);
     }
-
     /**
      * Saves a value to the Web Storage API
      * @param {String} key The key to save to
@@ -8809,16 +8895,16 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$saveItem',
+    key: "$saveItem",
     value: function $saveItem(key, value, overrideStorageType) {
       var storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
+
       if ([undefined, null].indexOf(value) !== -1) {
         storage.removeItem(key);
       } else {
         storage.setItem(key, value);
       }
     }
-
     /**
      * Return the active Web Storage API
      * @return {Storage} the storage api to save and pull values from
@@ -8826,8 +8912,7 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$$getStorage',
-
+    key: "$$getStorage",
 
     /**
      * Determines which Web Storage API to return using the name provided
@@ -8841,17 +8926,16 @@ var SalteAuthProfile = function () {
       } else if (storageType === 'session') {
         return sessionStorage;
       } else {
-        throw new ReferenceError('Unknown Storage Type (' + storageType + ')');
+        throw new ReferenceError("Unknown Storage Type (".concat(storageType, ")"));
       }
     }
-
     /**
      * Clears all `salte.auth` values from localStorage
      * @private
      */
 
   }, {
-    key: '$clear',
+    key: "$clear",
     value: function $clear() {
       for (var key in localStorage) {
         if (key.match(/^salte\.auth\.[^$]/)) {
@@ -8867,35 +8951,32 @@ var SalteAuthProfile = function () {
 
       this.$refreshUserInfo();
     }
-
     /**
      * Clears all `salte.auth` error values from localStorage
      * @private
      */
 
   }, {
-    key: '$clearErrors',
+    key: "$clearErrors",
     value: function $clearErrors() {
       this.$error = undefined;
       this.$errorDescription = undefined;
     }
   }, {
-    key: 'idTokenExpired',
+    key: "idTokenExpired",
     get: function get() {
       return !this.$idToken || Date.now() >= this.userInfo.exp * 1000;
     }
-
     /**
      * Whether the Access Token has expired
      * @return {Boolean} true if the "access_token" has expired
      */
 
   }, {
-    key: 'accessTokenExpired',
+    key: "accessTokenExpired",
     get: function get() {
       return !this.$accessToken || Date.now() >= this.$expiration;
     }
-
     /**
      * The type of Access Token that was returned by the identity provider
      * @return {String} the type of access token
@@ -8903,14 +8984,13 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$tokenType',
+    key: "$tokenType",
     get: function get() {
       return this.$getItem('salte.auth.$token-type', 'session');
     },
     set: function set(tokenType) {
       this.$saveItem('salte.auth.$token-type', tokenType, 'session');
     }
-
     /**
      * The date and time that the access token will expire
      * @return {Number} the expiration time as unix timestamp
@@ -8918,7 +8998,7 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$expiration',
+    key: "$expiration",
     get: function get() {
       var expiration = this.$getItem('salte.auth.expiration');
       return expiration ? Number(expiration) : null;
@@ -8926,7 +9006,6 @@ var SalteAuthProfile = function () {
     set: function set(expiration) {
       this.$saveItem('salte.auth.expiration', expiration);
     }
-
     /**
      * The Access Token returned by the identity provider
      * @return {String} the access token
@@ -8934,14 +9013,13 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$accessToken',
+    key: "$accessToken",
     get: function get() {
       return this.$getItem('salte.auth.access-token');
     },
     set: function set(accessToken) {
       this.$saveItem('salte.auth.access-token', accessToken);
     }
-
     /**
      * The ID Token returned by the identity provider
      * @return {String} the id token
@@ -8949,14 +9027,13 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$idToken',
+    key: "$idToken",
     get: function get() {
       return this.$getItem('salte.auth.id-token');
     },
     set: function set(idToken) {
       this.$saveItem('salte.auth.id-token', idToken);
     }
-
     /**
      * The authentication state returned by the identity provider
      * @return {String} the state value
@@ -8966,14 +9043,13 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$state',
+    key: "$state",
     get: function get() {
       return this.$getItem('salte.auth.$state', 'session');
     },
     set: function set(state) {
       this.$saveItem('salte.auth.$state', state, 'session');
     }
-
     /**
      * The locally generate authentication state
      * @return {String} the local state value
@@ -8983,14 +9059,13 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$localState',
+    key: "$localState",
     get: function get() {
       return this.$getItem('salte.auth.$local-state', 'session');
     },
     set: function set(localState) {
       this.$saveItem('salte.auth.$local-state', localState, 'session');
     }
-
     /**
      * The error returned by the identity provider
      * @return {String} the state value
@@ -8998,14 +9073,13 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$error',
+    key: "$error",
     get: function get() {
       return this.$getItem('salte.auth.error');
     },
     set: function set(error) {
       this.$saveItem('salte.auth.error', error);
     }
-
     /**
      * The error description returned by the identity provider
      * @return {String} a string that describes the error that occurred
@@ -9013,14 +9087,13 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$errorDescription',
+    key: "$errorDescription",
     get: function get() {
       return this.$getItem('salte.auth.error-description');
     },
     set: function set(errorDescription) {
       this.$saveItem('salte.auth.error-description', errorDescription);
     }
-
     /**
      * The url the user originated from before authentication occurred
      * @return {String} The url the user originated from before authentication occurred
@@ -9028,14 +9101,13 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$redirectUrl',
+    key: "$redirectUrl",
     get: function get() {
       return this.$getItem('salte.auth.$redirect-url', 'session');
     },
     set: function set(redirectUrl) {
       this.$saveItem('salte.auth.$redirect-url', redirectUrl, 'session');
     }
-
     /**
      * Parses the User Info from the ID Token
      * @return {String} The User Info from the ID Token
@@ -9043,7 +9115,7 @@ var SalteAuthProfile = function () {
      */
 
   }, {
-    key: '$nonce',
+    key: "$nonce",
     get: function get() {
       return this.$getItem('salte.auth.$nonce', 'session');
     },
@@ -9051,7 +9123,7 @@ var SalteAuthProfile = function () {
       this.$saveItem('salte.auth.$nonce', nonce, 'session');
     }
   }, {
-    key: '$storage',
+    key: "$storage",
     get: function get() {
       return this.$$getStorage(this.$$config.storageType);
     }
@@ -9060,8 +9132,8 @@ var SalteAuthProfile = function () {
   return SalteAuthProfile;
 }();
 
-exports.SalteAuthProfile = SalteAuthProfile;
-exports.default = SalteAuthProfile;
+
+/* harmony default export */ __webpack_exports__["default"] = (SalteAuthProfile);
 
 /***/ }),
 
@@ -9069,89 +9141,76 @@ exports.default = SalteAuthProfile;
 /*!*********************************!*\
   !*** ./salte-auth.providers.js ***!
   \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: Providers, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Providers = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _auth = __webpack_require__(/*! ./providers/auth0.js */ "./providers/auth0.js");
-
-var _auth2 = _interopRequireDefault(_auth);
-
-var _azure = __webpack_require__(/*! ./providers/azure.js */ "./providers/azure.js");
-
-var _azure2 = _interopRequireDefault(_azure);
-
-var _cognito = __webpack_require__(/*! ./providers/cognito.js */ "./providers/cognito.js");
-
-var _cognito2 = _interopRequireDefault(_cognito);
-
-var _wso = __webpack_require__(/*! ./providers/wso2.js */ "./providers/wso2.js");
-
-var _wso2 = _interopRequireDefault(_wso);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Providers", function() { return Providers; });
+/* harmony import */ var _providers_auth0_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./providers/auth0.js */ "./providers/auth0.js");
+/* harmony import */ var _providers_azure_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./providers/azure.js */ "./providers/azure.js");
+/* harmony import */ var _providers_cognito_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./providers/cognito.js */ "./providers/cognito.js");
+/* harmony import */ var _providers_wso2_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./providers/wso2.js */ "./providers/wso2.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
 
 /**
  * A collection of overrides for specific Identity Providers
  */
-var Providers = function () {
+
+var Providers =
+/*#__PURE__*/
+function () {
   function Providers() {
     _classCallCheck(this, Providers);
   }
 
   _createClass(Providers, null, [{
-    key: 'auth0',
+    key: "auth0",
 
     /**
      * Provider for Auth0
      * @type {SalteAuthAuth0Provider}
      */
     get: function get() {
-      return _auth2.default;
+      return _providers_auth0_js__WEBPACK_IMPORTED_MODULE_0__["default"];
     }
-
     /**
      * Provider for Azure's Active Directory
      * @type {SalteAuthAzureProvider}
      */
 
   }, {
-    key: 'azure',
+    key: "azure",
     get: function get() {
-      return _azure2.default;
+      return _providers_azure_js__WEBPACK_IMPORTED_MODULE_1__["default"];
     }
-
     /**
      * Provider for Amazon's Cognito
      * @type {SalteAuthCognitoProvider}
      */
 
   }, {
-    key: 'cognito',
+    key: "cognito",
     get: function get() {
-      return _cognito2.default;
+      return _providers_cognito_js__WEBPACK_IMPORTED_MODULE_2__["default"];
     }
-
     /**
      * Provider for WSO2's API Gateway
      * @type {SalteAuthWSO2Provider}
      */
 
   }, {
-    key: 'wso2',
+    key: "wso2",
     get: function get() {
-      return _wso2.default;
+      return _providers_wso2_js__WEBPACK_IMPORTED_MODULE_3__["default"];
     }
   }]);
 
@@ -9160,8 +9219,7 @@ var Providers = function () {
 
 ;
 
-exports.Providers = Providers;
-exports.default = Providers;
+/* harmony default export */ __webpack_exports__["default"] = (Providers);
 
 /***/ }),
 
@@ -9169,39 +9227,34 @@ exports.default = Providers;
 /*!*********************************!*\
   !*** ./salte-auth.utilities.js ***!
   \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! exports provided: SalteAuthUtilities, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.SalteAuthUtilities = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _assign = __webpack_require__(/*! lodash/assign */ "../node_modules/lodash/assign.js");
-
-var _assign2 = _interopRequireDefault(_assign);
-
-var _debug = __webpack_require__(/*! debug */ "../node_modules/debug/src/browser.js");
-
-var _debug2 = _interopRequireDefault(_debug);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SalteAuthUtilities", function() { return SalteAuthUtilities; });
+/* harmony import */ var lodash_assign__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/assign */ "../node_modules/lodash/assign.js");
+/* harmony import */ var lodash_assign__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_assign__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "../node_modules/debug/dist/debug.js");
+/* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/** @ignore */
-var logger = (0, _debug2.default)('@salte-io/salte-auth:utilities');
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+/** @ignore */
+
+var logger = debug__WEBPACK_IMPORTED_MODULE_1___default()('@salte-io/salte-auth:utilities');
 /**
  * Basic utilities to support the authentication flow
  */
 
-var SalteAuthUtilities = function () {
+var SalteAuthUtilities =
+/*#__PURE__*/
+function () {
   /**
    * Wraps all XHR and Fetch (if available) requests to allow promise interceptors
    * @param {Config} config configuration for salte auth
@@ -9211,14 +9264,14 @@ var SalteAuthUtilities = function () {
 
     /** @ignore */
     this.$$config = config;
-
     /** @ignore */
+
     this.$interceptors = {
       fetch: [],
       xhr: []
     };
-
     logger('Setting up wrappers for XMLHttpRequest...');
+
     (function (open) {
       XMLHttpRequest.prototype.open = function (method, url) {
         /** @ignore */
@@ -9228,21 +9281,25 @@ var SalteAuthUtilities = function () {
     })(XMLHttpRequest.prototype.open);
 
     var self = this;
+
     (function (send) {
       XMLHttpRequest.prototype.send = function (data) {
         var _this = this;
 
         var promises = [];
+
         for (var i = 0; i < self.$interceptors.xhr.length; i++) {
           var interceptor = self.$interceptors.xhr[i];
           promises.push(interceptor(this, data));
         }
+
         Promise.all(promises).then(function () {
           send.call(_this, data);
         }).catch(function (error) {
           var event = document.createEvent('Event');
           event.initEvent('error', false, true);
           event.detail = error;
+
           _this.dispatchEvent(event);
         });
       };
@@ -9250,25 +9307,26 @@ var SalteAuthUtilities = function () {
 
     if (window.fetch) {
       logger('Fetch detected, setting up wrappers...');
+
       (function (fetch) {
         window.fetch = function (input, options) {
           var _this2 = this;
 
           var request = input instanceof Request ? input : new Request(input, options);
-
           var promises = [];
+
           for (var i = 0; i < self.$interceptors.fetch.length; i++) {
             var interceptor = self.$interceptors.fetch[i];
             promises.push(interceptor(request));
           }
+
           return Promise.all(promises).then(function () {
-            return fetch.call(_this2, input, options);
+            return fetch.call(_this2, request);
           });
         };
       })(fetch);
     }
   }
-
   /**
    * Creates a URL using a base url and a queryParams object
    * @param {String} baseUrl the base url to attach the queryParams to
@@ -9278,22 +9336,19 @@ var SalteAuthUtilities = function () {
 
 
   _createClass(SalteAuthUtilities, [{
-    key: 'createUrl',
+    key: "createUrl",
     value: function createUrl(baseUrl) {
       var queryParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
       var url = baseUrl;
-
       Object.keys(queryParams).forEach(function (key) {
         var value = queryParams[key];
+
         if ([undefined, null, ''].indexOf(value) === -1) {
-          url += '' + (url.indexOf('?') === -1 ? '?' : '&') + key + '=' + encodeURIComponent(value);
+          url += "".concat(url.indexOf('?') === -1 ? '?' : '&').concat(key, "=").concat(encodeURIComponent(value));
         }
       });
-
       return url;
     }
-
     /**
      * Converts a url to an absolute url
      * @param {String} path the url path to resolve to an absolute url
@@ -9301,22 +9356,24 @@ var SalteAuthUtilities = function () {
      */
 
   }, {
-    key: 'resolveUrl',
+    key: "resolveUrl",
     value: function resolveUrl(path) {
       if (!this.$$urlDocument) {
         /** @ignore */
         this.$$urlDocument = document.implementation.createHTMLDocument('url');
         /** @ignore */
+
         this.$$urlBase = this.$$urlDocument.createElement('base');
         /** @ignore */
+
         this.$$urlAnchor = this.$$urlDocument.createElement('a');
         this.$$urlDocument.head.appendChild(this.$$urlBase);
       }
+
       this.$$urlBase.href = window.location.protocol + '//' + window.location.host;
       this.$$urlAnchor.href = path.replace(/ /g, '%20');
       return this.$$urlAnchor.href.replace(/\/$/, '');
     }
-
     /**
      * Checks if the given url matches any of the test urls
      * @param {String} url The url to test
@@ -9325,13 +9382,14 @@ var SalteAuthUtilities = function () {
      */
 
   }, {
-    key: 'checkForMatchingUrl',
+    key: "checkForMatchingUrl",
     value: function checkForMatchingUrl(url) {
       var tests = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
       var resolvedUrl = this.resolveUrl(url);
+
       for (var i = 0; i < tests.length; i++) {
         var test = tests[i];
+
         if (test instanceof RegExp) {
           return !!resolvedUrl.match(test);
         } else {
@@ -9341,7 +9399,6 @@ var SalteAuthUtilities = function () {
 
       return false;
     }
-
     /**
      * Determines if the given route is a secured route
      * @param {String} route the route to verify
@@ -9350,16 +9407,16 @@ var SalteAuthUtilities = function () {
      */
 
   }, {
-    key: 'isRouteSecure',
+    key: "isRouteSecure",
     value: function isRouteSecure(route, securedRoutes) {
       if (securedRoutes === true) {
         return true;
       } else if (securedRoutes instanceof Array) {
         return this.checkForMatchingUrl(route, securedRoutes);
       }
+
       return false;
     }
-
     /**
      * Opens a popup window in the middle of the viewport
      * @param {String} url the url to be loaded
@@ -9370,24 +9427,23 @@ var SalteAuthUtilities = function () {
      */
 
   }, {
-    key: 'openPopup',
+    key: "openPopup",
     value: function openPopup(url) {
-      var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'salte-auth';
-
       var _this3 = this;
 
+      var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'salte-auth';
       var height = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 600;
       var width = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 400;
-
       var top = window.innerHeight / 2 - height / 2 + window.screenTop;
       var left = window.innerWidth / 2 - width / 2 + window.screenLeft;
-      var popupWindow = window.open(url, name, 'height=' + height + ', width=' + width + ', status=yes, toolbar=no, menubar=no, location=no, top=' + top + ', left=' + left);
+      var popupWindow = window.open(url, name, "height=".concat(height, ", width=").concat(width, ", status=yes, toolbar=no, menubar=no, location=no, top=").concat(top, ", left=").concat(left));
+
       if (!popupWindow) {
         return Promise.reject(new ReferenceError('We were unable to open the popup window, its likely that the request was blocked.'));
       }
 
-      popupWindow.focus();
-      // TODO: Find a better way of tracking when a Window closes.
+      popupWindow.focus(); // TODO: Find a better way of tracking when a Window closes.
+
       return new Promise(function (resolve) {
         var checker = setInterval(function () {
           try {
@@ -9396,17 +9452,16 @@ var SalteAuthUtilities = function () {
               var loginUrl = _this3.$$config.redirectUrl && _this3.$$config.redirectUrl.loginUrl || _this3.$$config.redirectUrl;
               var logoutUrl = _this3.$$config.redirectUrl && _this3.$$config.redirectUrl.logoutUrl || _this3.$$config.redirectUrl;
               if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
-
               location.hash = popupWindow.location.hash;
               popupWindow.close();
             }
+
             clearInterval(checker);
             setTimeout(resolve);
           } catch (e) {}
         }, 100);
       });
     }
-
     /**
      * Opens a new tab
      * @param {String} url the url to be loaded
@@ -9414,18 +9469,19 @@ var SalteAuthUtilities = function () {
      */
 
   }, {
-    key: 'openNewTab',
+    key: "openNewTab",
     value: function openNewTab(url) {
       var _this4 = this;
 
       var tabWindow = window.open(url, '_blank');
+
       if (!tabWindow) {
         return Promise.reject(new ReferenceError('We were unable to open the new tab, its likely that the request was blocked.'));
       }
 
       tabWindow.name = 'salte-auth';
-      tabWindow.focus();
-      // TODO: Find a better way of tracking when a Window closes.
+      tabWindow.focus(); // TODO: Find a better way of tracking when a Window closes.
+
       return new Promise(function (resolve) {
         var checker = setInterval(function () {
           try {
@@ -9434,17 +9490,16 @@ var SalteAuthUtilities = function () {
               var loginUrl = _this4.$$config.redirectUrl && _this4.$$config.redirectUrl.loginUrl || _this4.$$config.redirectUrl;
               var logoutUrl = _this4.$$config.redirectUrl && _this4.$$config.redirectUrl.logoutUrl || _this4.$$config.redirectUrl;
               if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
-
               location.hash = tabWindow.location.hash;
               tabWindow.close();
             }
+
             clearInterval(checker);
             setTimeout(resolve);
           } catch (e) {}
         }, 100);
       });
     }
-
     /**
      * Opens an iframe in the background
      * @param {String} url the url to be loaded
@@ -9453,12 +9508,13 @@ var SalteAuthUtilities = function () {
      */
 
   }, {
-    key: 'createIframe',
+    key: "createIframe",
     value: function createIframe(url, show) {
       var iframe = document.createElement('iframe');
       iframe.setAttribute('owner', 'salte-auth');
+
       if (show) {
-        (0, _assign2.default)(iframe.style, {
+        lodash_assign__WEBPACK_IMPORTED_MODULE_0___default()(iframe.style, {
           position: 'fixed',
           top: 0,
           bottom: 0,
@@ -9468,48 +9524,46 @@ var SalteAuthUtilities = function () {
           width: '100%',
           zIndex: 9999,
           border: 'none',
-
           opacity: 0,
           transition: '0.5s opacity'
         });
-
         setTimeout(function () {
           iframe.style.opacity = 1;
         });
       } else {
         iframe.style.display = 'none';
       }
+
       iframe.src = url;
       document.body.appendChild(iframe);
       return new Promise(function (resolve) {
         iframe.addEventListener('DOMNodeRemoved', function () {
           setTimeout(resolve);
-        }, { passive: true });
+        }, {
+          passive: true
+        });
       });
     }
-
     /**
      * Adds a XMLHttpRequest interceptor
      * @param {Function} interceptor the interceptor function
      */
 
   }, {
-    key: 'addXHRInterceptor',
+    key: "addXHRInterceptor",
     value: function addXHRInterceptor(interceptor) {
       this.$interceptors.xhr.push(interceptor);
     }
-
     /**
      * Adds a fetch interceptor
      * @param {Function} interceptor the interceptor function
      */
 
   }, {
-    key: 'addFetchInterceptor',
+    key: "addFetchInterceptor",
     value: function addFetchInterceptor(interceptor) {
       this.$interceptors.fetch.push(interceptor);
     }
-
     /**
      * Checks if the current window is an iframe
      * @return {HTMLIFrameElement} true if the current window is an iframe.
@@ -9517,27 +9571,27 @@ var SalteAuthUtilities = function () {
      */
 
   }, {
-    key: '$navigate',
-
+    key: "$navigate",
 
     /**
      * Navigates to the url provided.
      * @param {String} url the url to navigate to
      * @private
      */
+
     /* istanbul ignore next */
     value: function $navigate(url) {
       location.href = url;
     }
   }, {
-    key: '$iframe',
+    key: "$iframe",
     get: function get() {
       if (window.self === window.top) {
         return null;
       }
+
       return parent.document.querySelector('body > iframe[owner="salte-auth"]');
     }
-
     /**
      * Determines if the current window is a popup window opened by salte auth
      * @return {Window} the window object
@@ -9545,14 +9599,14 @@ var SalteAuthUtilities = function () {
      */
 
   }, {
-    key: '$popup',
+    key: "$popup",
     get: function get() {
       if (window.opener && window.name === 'salte-auth') {
         return window;
       }
+
       return null;
     }
-
     /**
      * Determines if the page is currently hidden
      * @return {Boolean} true if the page is hidden
@@ -9560,7 +9614,7 @@ var SalteAuthUtilities = function () {
      */
 
   }, {
-    key: '$hidden',
+    key: "$hidden",
     get: function get() {
       return document.hidden;
     }
@@ -9569,8 +9623,8 @@ var SalteAuthUtilities = function () {
   return SalteAuthUtilities;
 }();
 
-exports.SalteAuthUtilities = SalteAuthUtilities;
-exports.default = SalteAuthUtilities;
+
+/* harmony default export */ __webpack_exports__["default"] = (SalteAuthUtilities);
 
 /***/ }),
 
