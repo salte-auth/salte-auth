@@ -21,7 +21,7 @@
   },
   "scripts": {
     "start": "nps",
-    "precommit": "remove-lockfiles"
+    "pre-commit": "remove-lockfiles"
   },
   "license": "MIT",
   "devDependencies": {
