@@ -34,6 +34,11 @@ module.exports = {
   optimization: {
     minimize: isProd ? true : false
   },
+  resolve: {
+    alias: {
+      debug: 'debug/dist/debug.js'
+    }
+  },
   plugins: [
     new webpack.BannerPlugin({
       banner: deindent(`
