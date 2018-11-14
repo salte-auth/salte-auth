@@ -17,5 +17,10 @@ module.exports = {
   devtool: 'inline-source-map',
   optimization: {
     minimize: false
+  },
+  resolve: {
+    alias: {
+      debug: 'debug/dist/debug.js'
+    }
   }
 };

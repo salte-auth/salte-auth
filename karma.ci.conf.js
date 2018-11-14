@@ -29,11 +29,12 @@ module.exports = function(config) {
       browserName: 'internet explorer',
       version: '10'
     },
-    Safari10: {
-      base: 'SauceLabs',
-      browserName: 'safari',
-      version: '10'
-    },
+    // TODO: Enable this once https://github.com/karma-runner/karma/issues/3198 is resolved
+    // Safari10: {
+    //   base: 'SauceLabs',
+    //   browserName: 'safari',
+    //   version: '10'
+    // },
     Safari9: {
       base: 'SauceLabs',
       browserName: 'safari',
