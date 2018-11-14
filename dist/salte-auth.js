@@ -552,188 +552,6 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       };
     }, {}],
     3: [function (require, module, exports) {
-      (function (process) {
-        /* eslint-env browser */
-
-        /**
-         * This is the web browser implementation of `debug()`.
-         */
-        exports.log = log;
-        exports.formatArgs = formatArgs;
-        exports.save = save;
-        exports.load = load;
-        exports.useColors = useColors;
-        exports.storage = localstorage();
-        /**
-         * Colors.
-         */
-
-        exports.colors = ['#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC', '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF', '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC', '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF', '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC', '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033', '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366', '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933', '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC', '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'];
-        /**
-         * Currently only WebKit-based Web Inspectors, Firefox >= v31,
-         * and the Firebug extension (any Firefox version) are known
-         * to support "%c" CSS customizations.
-         *
-         * TODO: add a `localStorage` variable to explicitly enable/disable colors
-         */
-        // eslint-disable-next-line complexity
-
-        function useColors() {
-          // NB: In an Electron preload script, document will be defined but not fully
-          // initialized. Since we know we're in Chrome, we'll just detect this case
-          // explicitly
-          if (typeof window !== 'undefined' && window.process && (window.process.type === 'renderer' || window.process.__nwjs)) {
-            return true;
-          } // Internet Explorer and Edge do not support colors.
-
-
-          if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
-            return false;
-          } // Is webkit? http://stackoverflow.com/a/16459606/376773
-          // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
-
-
-          return typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // Is firebug? http://stackoverflow.com/a/398120/376773
-          typeof window !== 'undefined' && window.console && (window.console.firebug || window.console.exception && window.console.table) || // Is firefox >= v31?
-          // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-          typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31 || // Double check webkit in userAgent just in case we are in a worker
-          typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
-        }
-        /**
-         * Colorize log arguments if enabled.
-         *
-         * @api public
-         */
-
-
-        function formatArgs(args) {
-          args[0] = (this.useColors ? '%c' : '') + this.namespace + (this.useColors ? ' %c' : ' ') + args[0] + (this.useColors ? '%c ' : ' ') + '+' + module.exports.humanize(this.diff);
-
-          if (!this.useColors) {
-            return;
-          }
-
-          var c = 'color: ' + this.color;
-          args.splice(1, 0, c, 'color: inherit'); // The final "%c" is somewhat tricky, because there could be other
-          // arguments passed either before or after the %c, so we need to
-          // figure out the correct index to insert the CSS into
-
-          var index = 0;
-          var lastC = 0;
-          args[0].replace(/%[a-zA-Z%]/g, function (match) {
-            if (match === '%%') {
-              return;
-            }
-
-            index++;
-
-            if (match === '%c') {
-              // We only are interested in the *last* %c
-              // (the user may have provided their own)
-              lastC = index;
-            }
-          });
-          args.splice(lastC, 0, c);
-        }
-        /**
-         * Invokes `console.log()` when available.
-         * No-op when `console.log` is not a "function".
-         *
-         * @api public
-         */
-
-
-        function log() {
-          var _console;
-
-          // This hackery is required for IE8/9, where
-          // the `console.log` function doesn't have 'apply'
-          return (typeof console === "undefined" ? "undefined" : _typeof(console)) === 'object' && console.log && (_console = console).log.apply(_console, arguments);
-        }
-        /**
-         * Save `namespaces`.
-         *
-         * @param {String} namespaces
-         * @api private
-         */
-
-
-        function save(namespaces) {
-          try {
-            if (namespaces) {
-              exports.storage.setItem('debug', namespaces);
-            } else {
-              exports.storage.removeItem('debug');
-            }
-          } catch (error) {// Swallow
-            // XXX (@Qix-) should we be logging these?
-          }
-        }
-        /**
-         * Load `namespaces`.
-         *
-         * @return {String} returns the previously persisted debug modes
-         * @api private
-         */
-
-
-        function load() {
-          var r;
-
-          try {
-            r = exports.storage.getItem('debug');
-          } catch (error) {} // Swallow
-          // XXX (@Qix-) should we be logging these?
-          // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
-
-
-          if (!r && typeof process !== 'undefined' && 'env' in process) {
-            r = process.env.DEBUG;
-          }
-
-          return r;
-        }
-        /**
-         * Localstorage attempts to return the localstorage.
-         *
-         * This is necessary because safari throws
-         * when a user disables cookies/localstorage
-         * and you attempt to access it.
-         *
-         * @return {LocalStorage}
-         * @api private
-         */
-
-
-        function localstorage() {
-          try {
-            // TVMLKit (Apple TV JS Runtime) does not have a window object, just localStorage in the global context
-            // The Browser also has localStorage in the global context.
-            return localStorage;
-          } catch (error) {// Swallow
-            // XXX (@Qix-) should we be logging these?
-          }
-        }
-
-        module.exports = require('./common')(exports);
-        var formatters = module.exports.formatters;
-        /**
-         * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
-         */
-
-        formatters.j = function (v) {
-          try {
-            return JSON.stringify(v);
-          } catch (error) {
-            return '[UnexpectedJSONParseError]: ' + error.message;
-          }
-        };
-      }).call(this, require('_process'));
-    }, {
-      "./common": 4,
-      "_process": 2
-    }],
-    4: [function (require, module, exports) {
       /**
        * This is the common logic for both the Node.js and web browser
        * implementations of `debug()`.
@@ -982,8 +800,190 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       module.exports = setup;
     }, {
       "ms": 1
+    }],
+    4: [function (require, module, exports) {
+      (function (process) {
+        /* eslint-env browser */
+
+        /**
+         * This is the web browser implementation of `debug()`.
+         */
+        exports.log = log;
+        exports.formatArgs = formatArgs;
+        exports.save = save;
+        exports.load = load;
+        exports.useColors = useColors;
+        exports.storage = localstorage();
+        /**
+         * Colors.
+         */
+
+        exports.colors = ['#0000CC', '#0000FF', '#0033CC', '#0033FF', '#0066CC', '#0066FF', '#0099CC', '#0099FF', '#00CC00', '#00CC33', '#00CC66', '#00CC99', '#00CCCC', '#00CCFF', '#3300CC', '#3300FF', '#3333CC', '#3333FF', '#3366CC', '#3366FF', '#3399CC', '#3399FF', '#33CC00', '#33CC33', '#33CC66', '#33CC99', '#33CCCC', '#33CCFF', '#6600CC', '#6600FF', '#6633CC', '#6633FF', '#66CC00', '#66CC33', '#9900CC', '#9900FF', '#9933CC', '#9933FF', '#99CC00', '#99CC33', '#CC0000', '#CC0033', '#CC0066', '#CC0099', '#CC00CC', '#CC00FF', '#CC3300', '#CC3333', '#CC3366', '#CC3399', '#CC33CC', '#CC33FF', '#CC6600', '#CC6633', '#CC9900', '#CC9933', '#CCCC00', '#CCCC33', '#FF0000', '#FF0033', '#FF0066', '#FF0099', '#FF00CC', '#FF00FF', '#FF3300', '#FF3333', '#FF3366', '#FF3399', '#FF33CC', '#FF33FF', '#FF6600', '#FF6633', '#FF9900', '#FF9933', '#FFCC00', '#FFCC33'];
+        /**
+         * Currently only WebKit-based Web Inspectors, Firefox >= v31,
+         * and the Firebug extension (any Firefox version) are known
+         * to support "%c" CSS customizations.
+         *
+         * TODO: add a `localStorage` variable to explicitly enable/disable colors
+         */
+        // eslint-disable-next-line complexity
+
+        function useColors() {
+          // NB: In an Electron preload script, document will be defined but not fully
+          // initialized. Since we know we're in Chrome, we'll just detect this case
+          // explicitly
+          if (typeof window !== 'undefined' && window.process && (window.process.type === 'renderer' || window.process.__nwjs)) {
+            return true;
+          } // Internet Explorer and Edge do not support colors.
+
+
+          if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
+            return false;
+          } // Is webkit? http://stackoverflow.com/a/16459606/376773
+          // document is undefined in react-native: https://github.com/facebook/react-native/pull/1632
+
+
+          return typeof document !== 'undefined' && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // Is firebug? http://stackoverflow.com/a/398120/376773
+          typeof window !== 'undefined' && window.console && (window.console.firebug || window.console.exception && window.console.table) || // Is firefox >= v31?
+          // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+          typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31 || // Double check webkit in userAgent just in case we are in a worker
+          typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
+        }
+        /**
+         * Colorize log arguments if enabled.
+         *
+         * @api public
+         */
+
+
+        function formatArgs(args) {
+          args[0] = (this.useColors ? '%c' : '') + this.namespace + (this.useColors ? ' %c' : ' ') + args[0] + (this.useColors ? '%c ' : ' ') + '+' + module.exports.humanize(this.diff);
+
+          if (!this.useColors) {
+            return;
+          }
+
+          var c = 'color: ' + this.color;
+          args.splice(1, 0, c, 'color: inherit'); // The final "%c" is somewhat tricky, because there could be other
+          // arguments passed either before or after the %c, so we need to
+          // figure out the correct index to insert the CSS into
+
+          var index = 0;
+          var lastC = 0;
+          args[0].replace(/%[a-zA-Z%]/g, function (match) {
+            if (match === '%%') {
+              return;
+            }
+
+            index++;
+
+            if (match === '%c') {
+              // We only are interested in the *last* %c
+              // (the user may have provided their own)
+              lastC = index;
+            }
+          });
+          args.splice(lastC, 0, c);
+        }
+        /**
+         * Invokes `console.log()` when available.
+         * No-op when `console.log` is not a "function".
+         *
+         * @api public
+         */
+
+
+        function log() {
+          var _console;
+
+          // This hackery is required for IE8/9, where
+          // the `console.log` function doesn't have 'apply'
+          return (typeof console === "undefined" ? "undefined" : _typeof(console)) === 'object' && console.log && (_console = console).log.apply(_console, arguments);
+        }
+        /**
+         * Save `namespaces`.
+         *
+         * @param {String} namespaces
+         * @api private
+         */
+
+
+        function save(namespaces) {
+          try {
+            if (namespaces) {
+              exports.storage.setItem('debug', namespaces);
+            } else {
+              exports.storage.removeItem('debug');
+            }
+          } catch (error) {// Swallow
+            // XXX (@Qix-) should we be logging these?
+          }
+        }
+        /**
+         * Load `namespaces`.
+         *
+         * @return {String} returns the previously persisted debug modes
+         * @api private
+         */
+
+
+        function load() {
+          var r;
+
+          try {
+            r = exports.storage.getItem('debug');
+          } catch (error) {} // Swallow
+          // XXX (@Qix-) should we be logging these?
+          // If debug isn't set in LS, and we're in Electron, try to load $DEBUG
+
+
+          if (!r && typeof process !== 'undefined' && 'env' in process) {
+            r = process.env.DEBUG;
+          }
+
+          return r;
+        }
+        /**
+         * Localstorage attempts to return the localstorage.
+         *
+         * This is necessary because safari throws
+         * when a user disables cookies/localstorage
+         * and you attempt to access it.
+         *
+         * @return {LocalStorage}
+         * @api private
+         */
+
+
+        function localstorage() {
+          try {
+            // TVMLKit (Apple TV JS Runtime) does not have a window object, just localStorage in the global context
+            // The Browser also has localStorage in the global context.
+            return localStorage;
+          } catch (error) {// Swallow
+            // XXX (@Qix-) should we be logging these?
+          }
+        }
+
+        module.exports = require('./common')(exports);
+        var formatters = module.exports.formatters;
+        /**
+         * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
+         */
+
+        formatters.j = function (v) {
+          try {
+            return JSON.stringify(v);
+          } catch (error) {
+            return '[UnexpectedJSONParseError]: ' + error.message;
+          }
+        };
+      }).call(this, require('_process'));
+    }, {
+      "./common": 3,
+      "_process": 2
     }]
-  }, {}, [3])(3);
+  }, {}, [4])(4);
 });
 
 
@@ -2494,7 +2494,8 @@ var Stack = __webpack_require__(/*! ./_Stack */ "../node_modules/lodash/_Stack.j
     baseFor = __webpack_require__(/*! ./_baseFor */ "../node_modules/lodash/_baseFor.js"),
     baseMergeDeep = __webpack_require__(/*! ./_baseMergeDeep */ "../node_modules/lodash/_baseMergeDeep.js"),
     isObject = __webpack_require__(/*! ./isObject */ "../node_modules/lodash/isObject.js"),
-    keysIn = __webpack_require__(/*! ./keysIn */ "../node_modules/lodash/keysIn.js");
+    keysIn = __webpack_require__(/*! ./keysIn */ "../node_modules/lodash/keysIn.js"),
+    safeGet = __webpack_require__(/*! ./_safeGet */ "../node_modules/lodash/_safeGet.js");
 
 /**
  * The base implementation of `_.merge` without support for multiple sources.
@@ -2518,7 +2519,7 @@ function baseMerge(object, source, srcIndex, customizer, stack) {
     }
     else {
       var newValue = customizer
-        ? customizer(object[key], srcValue, (key + ''), object, source, stack)
+        ? customizer(safeGet(object, key), srcValue, (key + ''), object, source, stack)
         : undefined;
 
       if (newValue === undefined) {
@@ -2554,6 +2555,7 @@ var assignMergeValue = __webpack_require__(/*! ./_assignMergeValue */ "../node_m
     isObject = __webpack_require__(/*! ./isObject */ "../node_modules/lodash/isObject.js"),
     isPlainObject = __webpack_require__(/*! ./isPlainObject */ "../node_modules/lodash/isPlainObject.js"),
     isTypedArray = __webpack_require__(/*! ./isTypedArray */ "../node_modules/lodash/isTypedArray.js"),
+    safeGet = __webpack_require__(/*! ./_safeGet */ "../node_modules/lodash/_safeGet.js"),
     toPlainObject = __webpack_require__(/*! ./toPlainObject */ "../node_modules/lodash/toPlainObject.js");
 
 /**
@@ -2572,8 +2574,8 @@ var assignMergeValue = __webpack_require__(/*! ./_assignMergeValue */ "../node_m
  *  counterparts.
  */
 function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, stack) {
-  var objValue = object[key],
-      srcValue = source[key],
+  var objValue = safeGet(object, key),
+      srcValue = safeGet(source, key),
       stacked = stack.get(srcValue);
 
   if (stacked) {
@@ -2616,7 +2618,7 @@ function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, sta
       if (isArguments(objValue)) {
         newValue = toPlainObject(objValue);
       }
-      else if (!isObject(objValue) || (srcIndex && isFunction(objValue))) {
+      else if (!isObject(objValue) || isFunction(objValue)) {
         newValue = initCloneObject(srcValue);
       }
     }
@@ -3006,7 +3008,7 @@ module.exports = cloneArrayBuffer;
 /* WEBPACK VAR INJECTION */(function(module) {var root = __webpack_require__(/*! ./_root */ "../node_modules/lodash/_root.js");
 
 /** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+var freeExports =  true && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -4274,10 +4276,13 @@ var reIsUint = /^(?:0|[1-9]\d*)$/;
  * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
  */
 function isIndex(value, length) {
+  var type = typeof value;
   length = length == null ? MAX_SAFE_INTEGER : length;
+
   return !!length &&
-    (typeof value == 'number' || reIsUint.test(value)) &&
-    (value > -1 && value % 1 == 0 && value < length);
+    (type == 'number' ||
+      (type != 'symbol' && reIsUint.test(value))) &&
+        (value > -1 && value % 1 == 0 && value < length);
 }
 
 module.exports = isIndex;
@@ -4962,7 +4967,7 @@ module.exports = nativeKeysIn;
 /* WEBPACK VAR INJECTION */(function(module) {var freeGlobal = __webpack_require__(/*! ./_freeGlobal */ "../node_modules/lodash/_freeGlobal.js");
 
 /** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+var freeExports =  true && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -4976,6 +4981,14 @@ var freeProcess = moduleExports && freeGlobal.process;
 /** Used to access faster Node.js helpers. */
 var nodeUtil = (function() {
   try {
+    // Use `util.types` for Node.js 10+.
+    var types = freeModule && freeModule.require && freeModule.require('util').types;
+
+    if (types) {
+      return types;
+    }
+
+    // Legacy `process.binding('util')` for Node.js < 10.
     return freeProcess && freeProcess.binding && freeProcess.binding('util');
   } catch (e) {}
 }());
@@ -5108,6 +5121,34 @@ var freeSelf = typeof self == 'object' && self && self.Object === Object && self
 var root = freeGlobal || freeSelf || Function('return this')();
 
 module.exports = root;
+
+
+/***/ }),
+
+/***/ "../node_modules/lodash/_safeGet.js":
+/*!******************************************!*\
+  !*** ../node_modules/lodash/_safeGet.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Gets the value at `key`, unless `key` is "__proto__".
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {string} key The key of the property to get.
+ * @returns {*} Returns the property value.
+ */
+function safeGet(object, key) {
+  if (key == '__proto__') {
+    return;
+  }
+
+  return object[key];
+}
+
+module.exports = safeGet;
 
 
 /***/ }),
@@ -5429,8 +5470,7 @@ module.exports = stackSet;
 var memoizeCapped = __webpack_require__(/*! ./_memoizeCapped */ "../node_modules/lodash/_memoizeCapped.js");
 
 /** Used to match property names within property paths. */
-var reLeadingDot = /^\./,
-    rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
+var rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
 
 /** Used to match backslashes in property paths. */
 var reEscapeChar = /\\(\\)?/g;
@@ -5444,11 +5484,11 @@ var reEscapeChar = /\\(\\)?/g;
  */
 var stringToPath = memoizeCapped(function(string) {
   var result = [];
-  if (reLeadingDot.test(string)) {
+  if (string.charCodeAt(0) === 46 /* . */) {
     result.push('');
   }
-  string.replace(rePropName, function(match, number, quote, string) {
-    result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
+  string.replace(rePropName, function(match, number, quote, subString) {
+    result.push(quote ? subString.replace(reEscapeChar, '$1') : (number || match));
   });
   return result;
 });
@@ -6145,7 +6185,7 @@ module.exports = isArrayLikeObject;
     stubFalse = __webpack_require__(/*! ./stubFalse */ "../node_modules/lodash/stubFalse.js");
 
 /** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+var freeExports =  true && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -7185,14 +7225,15 @@ for (var i = 0; i < 256; ++i) {
 function bytesToUuid(buf, offset) {
   var i = offset || 0;
   var bth = byteToHex;
-  return bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] + '-' +
-          bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]] +
-          bth[buf[i++]] + bth[buf[i++]];
+  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+  return ([bth[buf[i++]], bth[buf[i++]], 
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]], '-',
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]],
+	bth[buf[i++]], bth[buf[i++]]]).join('');
 }
 
 module.exports = bytesToUuid;
@@ -7205,31 +7246,34 @@ module.exports = bytesToUuid;
   !*** ../node_modules/uuid/lib/rng-browser.js ***!
   \***********************************************/
 /*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-/* WEBPACK VAR INJECTION */(function(global) {// Unique ID creation requires a high quality random # generator.  In the
+// Unique ID creation requires a high quality random # generator.  In the
 // browser this is a little complicated due to unknown quality of Math.random()
 // and inconsistent support for the `crypto` API.  We do the best we can via
 // feature-detection
-var rng;
 
-var crypto = global.crypto || global.msCrypto; // for IE 11
-if (crypto && crypto.getRandomValues) {
+// getRandomValues needs to be invoked in a context where "this" is a Crypto
+// implementation. Also, find the complete implementation of crypto on IE11.
+var getRandomValues = (typeof(crypto) != 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto)) ||
+                      (typeof(msCrypto) != 'undefined' && typeof window.msCrypto.getRandomValues == 'function' && msCrypto.getRandomValues.bind(msCrypto));
+
+if (getRandomValues) {
   // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
   var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
-  rng = function whatwgRNG() {
-    crypto.getRandomValues(rnds8);
+
+  module.exports = function whatwgRNG() {
+    getRandomValues(rnds8);
     return rnds8;
   };
-}
-
-if (!rng) {
+} else {
   // Math.random()-based (RNG)
   //
   // If all else fails, use Math.random().  It's fast, but is of unspecified
   // quality.
   var rnds = new Array(16);
-  rng = function() {
+
+  module.exports = function mathRNG() {
     for (var i = 0, r; i < 16; i++) {
       if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
       rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
@@ -7239,9 +7283,6 @@ if (!rng) {
   };
 }
 
-module.exports = rng;
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "../node_modules/webpack/buildin/global.js")))
 
 /***/ }),
 
@@ -7260,20 +7301,12 @@ var bytesToUuid = __webpack_require__(/*! ./lib/bytesToUuid */ "../node_modules/
 // Inspired by https://github.com/LiosK/UUID.js
 // and http://docs.python.org/library/uuid.html
 
-// random #'s we need to init node and clockseq
-var _seedBytes = rng();
-
-// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
-var _nodeId = [
-  _seedBytes[0] | 0x01,
-  _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
-];
-
-// Per 4.2.2, randomize (14 bit) clockseq
-var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
+var _nodeId;
+var _clockseq;
 
 // Previous uuid creation time
-var _lastMSecs = 0, _lastNSecs = 0;
+var _lastMSecs = 0;
+var _lastNSecs = 0;
 
 // See https://github.com/broofa/node-uuid for API details
 function v1(options, buf, offset) {
@@ -7281,8 +7314,26 @@ function v1(options, buf, offset) {
   var b = buf || [];
 
   options = options || {};
-
+  var node = options.node || _nodeId;
   var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+  // node and clockseq need to be initialized to random values if they're not
+  // specified.  We do this lazily to minimize issues related to insufficient
+  // system entropy.  See #189
+  if (node == null || clockseq == null) {
+    var seedBytes = rng();
+    if (node == null) {
+      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+      node = _nodeId = [
+        seedBytes[0] | 0x01,
+        seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]
+      ];
+    }
+    if (clockseq == null) {
+      // Per 4.2.2, randomize (14 bit) clockseq
+      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
+    }
+  }
 
   // UUID timestamps are 100 nano-second units since the Gregorian epoch,
   // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
@@ -7343,7 +7394,6 @@ function v1(options, buf, offset) {
   b[i++] = clockseq & 0xff;
 
   // `node`
-  var node = options.node || _nodeId;
   for (var n = 0; n < 6; ++n) {
     b[i + n] = node[n];
   }
@@ -7370,7 +7420,7 @@ function v4(options, buf, offset) {
   var i = buf && offset || 0;
 
   if (typeof(options) == 'string') {
-    buf = options == 'binary' ? new Array(16) : null;
+    buf = options === 'binary' ? new Array(16) : null;
     options = null;
   }
   options = options || {};
