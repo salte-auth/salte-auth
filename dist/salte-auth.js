@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.11.6
+ * @salte-io/salte-auth JavaScript Library v2.11.7
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -112,6 +112,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 "use strict";
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -696,7 +704,9 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         }
 
         function extend(namespace, delimiter) {
-          return createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
+          var newDebug = createDebug(this.namespace + (typeof delimiter === 'undefined' ? ':' : delimiter) + namespace);
+          newDebug.log = this.log;
+          return newDebug;
         }
         /**
         * Enables a debug mode by namespaces. This can include modes
@@ -738,12 +748,17 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         /**
         * Disable debug output.
         *
+        * @return {String} namespaces
         * @api public
         */
 
 
         function disable() {
+          var namespaces = [].concat(_toConsumableArray(createDebug.names.map(toNamespace)), _toConsumableArray(createDebug.skips.map(toNamespace).map(function (namespace) {
+            return '-' + namespace;
+          }))).join(',');
           createDebug.enable('');
+          return namespaces;
         }
         /**
         * Returns true if the given mode name is enabled, false otherwise.
@@ -775,6 +790,18 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
           }
 
           return false;
+        }
+        /**
+        * Convert regexp to namespace
+        *
+        * @param {RegExp} regxep
+        * @return {String} namespace
+        * @api private
+        */
+
+
+        function toNamespace(regexp) {
+          return regexp.toString().substring(2, regexp.toString().length - 2).replace(/\.\*\?$/, '*');
         }
         /**
         * Coerce `val`.
@@ -985,7 +1012,6 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     }]
   }, {}, [4])(4);
 });
-
 
 
 /***/ }),
@@ -7462,7 +7488,7 @@ g = (function() {
 
 try {
 	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1, eval)("this");
+	g = g || new Function("return this")();
 } catch (e) {
 	// This works if the window reference is available
 	if (typeof window === "object") g = window;
@@ -8831,7 +8857,11 @@ function () {
         var separatedToken = idToken.split('.');
 
         if (separatedToken.length === 3) {
-          userInfo = JSON.parse(atob(separatedToken[1]));
+          // This fixes an issue where various providers will encode values
+          // incorrectly and cause the browser to fail to decode.
+          // https://stackoverflow.com/questions/43065553/base64-decoded-differently-in-java-jjwt
+          var payload = separatedToken[1].replace(/-/g, '+').replace(/_/g, '/');
+          userInfo = JSON.parse(atob(payload));
         }
       }
 
