@@ -2,7 +2,6 @@ sudo: false
 language: node_js
 node_js: stable
 cache:
-  yarn: true
   directories:
     - node_modules
 branches:
@@ -10,13 +9,13 @@ branches:
     - master
     - /^greenkeeper/.*$/
 script:
-  - yarn start lint
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then yarn start test.sauce; fi
-  - yarn start test
-  - yarn start docs
+  - npm start lint
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm start test.sauce; fi
+  - npm start test
+  - npm start docs
 after_success:
-  - yarn start report-coverage
-  - yarn start semantic-release
+  - npm start report-coverage
+  - npm start semantic-release
 deploy:
   provider: pages
   skip_cleanup: true
