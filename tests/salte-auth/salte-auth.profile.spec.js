@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import base64url from 'base64url';
 
 import SalteAuthProfile from '../../src/salte-auth.profile.js';
 
@@ -201,6 +202,23 @@ describe('salte-auth.profile', () => {
       expect(userInfo).to.deep.equal({
         sub: '1234567890',
         name: 'John Doe'
+      });
+    });
+
+    it('should support decoding base64 url encoded tokens', () => {
+      profile.$idToken = `0.${base64url.encode(
+        JSON.stringify({
+          'name': 'John Doe',
+          'picture': 'https://s.gravatar.com/avatar/f944c2c12cc848203329ee871f6a5d5b?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fni.png'
+        })
+      )}.0`;
+
+      profile.$refreshUserInfo();
+      const userInfo = profile.userInfo;
+
+      expect(userInfo).to.deep.equal({
+        'name': 'John Doe',
+        'picture': 'https://s.gravatar.com/avatar/f944c2c12cc848203329ee871f6a5d5b?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fni.png'
       });
     });
 
