@@ -10,3 +10,4 @@ globals:
 rules:
   no-unused-expressions: 0
   no-invalid-this: 0
+  prefer-promise-reject-errors: 0

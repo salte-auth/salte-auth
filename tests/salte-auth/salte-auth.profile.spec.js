@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import base64url from 'base64url';
 
 import SalteAuthProfile from '../../src/salte-auth.profile.js';
 
@@ -201,6 +202,45 @@ describe('salte-auth.profile', () => {
       expect(userInfo).to.deep.equal({
         sub: '1234567890',
         name: 'John Doe'
+      });
+    });
+
+    it('should support decoding base64 url encoded tokens', () => {
+      profile.$idToken = `0.${base64url.encode(
+        JSON.stringify({
+          'http://salte.io/groups': [],
+          'http://salte.io/encryption_key': 'fdb3364a-329b-41d8-924c-f47616b8fb6e',
+          'nickname': 'nickwoodwrd',
+          'name': 'nickwoodwrd@gmail.com',
+          'picture': 'https://s.gravatar.com/avatar/f944c2c12cc848203329ee871f6a5d5b?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fni.png',
+          'updated_at': '2019-02-03T21:26:58.967Z',
+          'iss': 'https://salte-alpha.auth0.com/',
+          'sub': 'auth0|5c575b2512eadd396fb7054e',
+          'aud': 'ywB5LKCmDI5YnoIaxzyxZ0fIuDn0jimi',
+          'iat': 1549229237,
+          'exp': 1549265237,
+          'at_hash': 'k0kL-W3LjqW9ccSOWTiLyQ',
+          'nonce': '5630cc17-8a62-43cc-bff6-c68b7c62fdf1'
+        })
+      )}.0`;
+
+      profile.$refreshUserInfo();
+      const userInfo = profile.userInfo;
+
+      expect(userInfo).to.deep.equal({
+        'http://salte.io/groups': [],
+        'http://salte.io/encryption_key': 'fdb3364a-329b-41d8-924c-f47616b8fb6e',
+        'nickname': 'nickwoodwrd',
+        'name': 'nickwoodwrd@gmail.com',
+        'picture': 'https://s.gravatar.com/avatar/f944c2c12cc848203329ee871f6a5d5b?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fni.png',
+        'updated_at': '2019-02-03T21:26:58.967Z',
+        'iss': 'https://salte-alpha.auth0.com/',
+        'sub': 'auth0|5c575b2512eadd396fb7054e',
+        'aud': 'ywB5LKCmDI5YnoIaxzyxZ0fIuDn0jimi',
+        'iat': 1549229237,
+        'exp': 1549265237,
+        'at_hash': 'k0kL-W3LjqW9ccSOWTiLyQ',
+        'nonce': '5630cc17-8a62-43cc-bff6-c68b7c62fdf1'
       });
     });
 

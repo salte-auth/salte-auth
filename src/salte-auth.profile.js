@@ -260,7 +260,11 @@ class SalteAuthProfile {
     if (idToken) {
       const separatedToken = idToken.split('.');
       if (separatedToken.length === 3) {
-        userInfo = JSON.parse(atob(separatedToken[1]));
+        // This fixes an issue where various providers will encode values
+        // incorrectly and cause the browser to fail to decode.
+        // https://stackoverflow.com/questions/43065553/base64-decoded-differently-in-java-jjwt
+        const payload = separatedToken[1].replace(/-/g, '+').replace(/_/g, '/');
+        userInfo = JSON.parse(atob(payload));
       }
     }
 
