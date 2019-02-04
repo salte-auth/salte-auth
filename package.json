@@ -67,7 +67,6 @@
     "remove-lockfiles": "^2.0.0",
     "semantic-release": "^15.0.0",
     "sinon": "^7.0.0",
-    "terser": "3.14.1",
     "unfetch": "^4.0.0",
     "uuid": "^3.0.0",
     "watch": "^1.0.2",
