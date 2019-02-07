@@ -156,8 +156,8 @@ Debug logging can be enabled by setting a `localStorage` variable of `debug` to 
 [npm-downloads-image]: https://img.shields.io/npm/dm/@salte-io/salte-auth.svg?style=flat
 [npm-url]: https://npmjs.org/package/@salte-io/salte-auth
 
-[travis-ci-image]: https://img.shields.io/travis/salte-io/salte-auth/master.svg?style=flat
-[travis-ci-url]: https://travis-ci.org/salte-io/salte-auth
+[travis-ci-image]: https://img.shields.io/travis/com/salte-io/salte-auth/master.svg?style=flat
+[travis-ci-url]: https://travis-ci.com/salte-io/salte-auth
 
 [coveralls-image]: https://img.shields.io/coveralls/salte-io/salte-auth/master.svg
 [coveralls-url]: https://coveralls.io/github/salte-io/salte-auth?branch=master

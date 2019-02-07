@@ -20,8 +20,7 @@
     "url": "https://github.com/salte-io/salte-auth.git"
   },
   "scripts": {
-    "start": "nps",
-    "pre-commit": "remove-lockfiles"
+    "start": "nps"
   },
   "license": "MIT",
   "devDependencies": {
@@ -70,8 +69,8 @@
     "unfetch": "^4.0.0",
     "uuid": "^3.0.0",
     "watch": "^1.0.2",
-    "webpack": "^4.0.0",
-    "webpack-cli": "^3.0.0",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.1.7",
     "yargs": "^12.0.2"
   },
@@ -82,5 +81,10 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "remove-lockfiles"
+    }
   }
 }
