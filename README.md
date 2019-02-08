@@ -1,6 +1,5 @@
 # Salte Auth
 
-[![Gitter][gitter-image]][gitter-url]
 [![NPM Version][npm-version-image]][npm-url]
 [![NPM Downloads][npm-downloads-image]][npm-url]
 [![Travis][travis-ci-image]][travis-ci-url]
@@ -148,9 +147,6 @@ Debug logging can be enabled by setting a `localStorage` variable of `debug` to 
 [Click here to view the documentation!](https://salte-io.github.io/salte-auth/)
 
 **Use private or undocumented methods at your own risk, as they will not require a major version bump when breaking changes are made!**
-
-[gitter-image]: https://badges.gitter.im/salte-io/salte-auth.svg
-[gitter-url]: https://gitter.im/salte-io/salte-auth?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
 [npm-version-image]: https://img.shields.io/npm/v/@salte-io/salte-auth.svg?style=flat
 [npm-downloads-image]: https://img.shields.io/npm/dm/@salte-io/salte-auth.svg?style=flat
