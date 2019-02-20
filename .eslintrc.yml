@@ -9,6 +9,7 @@ rules:
   indent:
     - error
     - 2
+    - SwitchCase: 1
   compat/compat: 2
   comma-dangle:
     - error
@@ -33,6 +34,7 @@ rules:
   switch-colon-spacing: 0
 settings:
   polyfills:
+    - url
     - fetch
     - promises
 

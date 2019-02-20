@@ -38,7 +38,7 @@ const logger = debug('@salte-io/salte-auth');
  * @property {String} scope A list of space-delimited claims used to determine what user information is provided and what access is given. Most providers require 'openid'.
  * @property {Boolean|Array<String>} routes A list of secured routes. If true is provided then all routes are secured.
  * @property {Array<String|RegExp>} endpoints A list of secured endpoints.
- * @property {('auth0'|'azure'|'cognito'|'wso2')} provider The identity provider you're using.
+ * @property {('auth0'|'azure'|'cognito'|'wso2'|'okta')} provider The identity provider you're using.
  * @property {('iframe'|'redirect'|false)} [loginType='iframe'] The automated login type to use.
  * @property {Function} [redirectLoginCallback] A callback that is invoked when a redirect login fails or succeeds.
  * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
@@ -284,7 +284,9 @@ class SalteAuth {
    * @private
    */
   get $deauthorizeUrl() {
-    return this.$provider.deauthorizeUrl.call(this, this.$config);
+    return this.$provider.deauthorizeUrl.call(this, defaultsDeep(this.$config, {
+      idToken: this.profile.$idToken
+    }));
   }
 
   /**
@@ -555,8 +557,10 @@ class SalteAuth {
       return this.$promises.logout;
     }
 
+    const deauthorizeUrl = this.$deauthorizeUrl;
     this.profile.$clear();
-    this.$promises.logout = this.$utilities.createIframe(this.$deauthorizeUrl).then(() => {
+
+    this.$promises.logout = this.$utilities.createIframe(deauthorizeUrl).then(() => {
       this.$promises.logout = null;
       this.$fire('logout');
     }).catch((error) => {
@@ -583,8 +587,10 @@ class SalteAuth {
       return this.$promises.logout;
     }
 
+    const deauthorizeUrl = this.$deauthorizeUrl;
     this.profile.$clear();
-    this.$promises.logout = this.$utilities.openPopup(this.$deauthorizeUrl).then(() => {
+
+    this.$promises.logout = this.$utilities.openPopup(deauthorizeUrl).then(() => {
       this.$promises.logout = null;
       this.$fire('logout');
     }).catch((error) => {
@@ -612,8 +618,10 @@ class SalteAuth {
       return this.$promises.logout;
     }
 
+    const deauthorizeUrl = this.$deauthorizeUrl;
     this.profile.$clear();
-    this.$promises.logout = this.$utilities.openNewTab(this.$deauthorizeUrl).then(() => {
+
+    this.$promises.logout = this.$utilities.openNewTab(deauthorizeUrl).then(() => {
       this.$promises.logout = null;
       this.$fire('logout');
     }).catch((error) => {
@@ -632,11 +640,11 @@ class SalteAuth {
    * auth.logoutWithRedirect();
    */
   logoutWithRedirect() {
+    const deauthorizeUrl = this.$deauthorizeUrl;
     this.profile.$clear();
-    const url = this.$deauthorizeUrl;
 
     this.profile.$actions(this.profile.$localState, 'logout');
-    this.$utilities.$navigate(url);
+    this.$utilities.$navigate(deauthorizeUrl);
   }
 
   /**
