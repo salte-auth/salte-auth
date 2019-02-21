@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.11.7
+ * @salte-io/salte-auth JavaScript Library v2.12.0
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -7712,6 +7712,63 @@ function () {
 
 /***/ }),
 
+/***/ "./providers/okta.js":
+/*!***************************!*\
+  !*** ./providers/okta.js ***!
+  \***************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+/** Provider for Okta */
+var SalteAuthOktaProvider =
+/*#__PURE__*/
+function () {
+  function SalteAuthOktaProvider() {
+    _classCallCheck(this, SalteAuthOktaProvider);
+  }
+
+  _createClass(SalteAuthOktaProvider, null, [{
+    key: "authorizeEndpoint",
+
+    /**
+     * Computes the authorization endpoint
+     * @param {Config} config configuration for salte auth
+     * @return {String} the authorization endpoint
+     */
+    value: function authorizeEndpoint(config) {
+      return "".concat(config.providerUrl, "/oauth2/v1/authorize");
+    }
+    /**
+     * Computes the deauthorization url
+     * @param {Config} config configuration for salte auth
+     * @return {String} the deauthorization url
+     */
+
+  }, {
+    key: "deauthorizeUrl",
+    value: function deauthorizeUrl(config) {
+      return this.$utilities.createUrl("".concat(config.providerUrl, "/oauth2/v1/logout"), {
+        id_token_hint: config.idToken,
+        post_logout_redirect_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl
+      });
+    }
+  }]);
+
+  return SalteAuthOktaProvider;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (SalteAuthOktaProvider);
+
+/***/ }),
+
 /***/ "./providers/wso2.js":
 /*!***************************!*\
   !*** ./providers/wso2.js ***!
@@ -7829,7 +7886,7 @@ var logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-io/salte-auth'
  * @property {String} scope A list of space-delimited claims used to determine what user information is provided and what access is given. Most providers require 'openid'.
  * @property {Boolean|Array<String>} routes A list of secured routes. If true is provided then all routes are secured.
  * @property {Array<String|RegExp>} endpoints A list of secured endpoints.
- * @property {('auth0'|'azure'|'cognito'|'wso2')} provider The identity provider you're using.
+ * @property {('auth0'|'azure'|'cognito'|'wso2'|'okta')} provider The identity provider you're using.
  * @property {('iframe'|'redirect'|false)} [loginType='iframe'] The automated login type to use.
  * @property {Function} [redirectLoginCallback] A callback that is invoked when a redirect login fails or succeeds.
  * @property {('session'|'local')} [storageType='session'] The Storage api to keep authenticate information stored in.
@@ -8356,8 +8413,9 @@ function () {
         return this.$promises.logout;
       }
 
+      var deauthorizeUrl = this.$deauthorizeUrl;
       this.profile.$clear();
-      this.$promises.logout = this.$utilities.createIframe(this.$deauthorizeUrl).then(function () {
+      this.$promises.logout = this.$utilities.createIframe(deauthorizeUrl).then(function () {
         _this5.$promises.logout = null;
 
         _this5.$fire('logout');
@@ -8391,8 +8449,9 @@ function () {
         return this.$promises.logout;
       }
 
+      var deauthorizeUrl = this.$deauthorizeUrl;
       this.profile.$clear();
-      this.$promises.logout = this.$utilities.openPopup(this.$deauthorizeUrl).then(function () {
+      this.$promises.logout = this.$utilities.openPopup(deauthorizeUrl).then(function () {
         _this6.$promises.logout = null;
 
         _this6.$fire('logout');
@@ -8426,8 +8485,9 @@ function () {
         return this.$promises.logout;
       }
 
+      var deauthorizeUrl = this.$deauthorizeUrl;
       this.profile.$clear();
-      this.$promises.logout = this.$utilities.openNewTab(this.$deauthorizeUrl).then(function () {
+      this.$promises.logout = this.$utilities.openNewTab(deauthorizeUrl).then(function () {
         _this7.$promises.logout = null;
 
         _this7.$fire('logout');
@@ -8450,10 +8510,10 @@ function () {
   }, {
     key: "logoutWithRedirect",
     value: function logoutWithRedirect() {
+      var deauthorizeUrl = this.$deauthorizeUrl;
       this.profile.$clear();
-      var url = this.$deauthorizeUrl;
       this.profile.$actions(this.profile.$localState, 'logout');
-      this.$utilities.$navigate(url);
+      this.$utilities.$navigate(deauthorizeUrl);
     }
     /**
      * Refreshes the users tokens and renews their session.
@@ -8669,7 +8729,9 @@ function () {
   }, {
     key: "$deauthorizeUrl",
     get: function get() {
-      return this.$provider.deauthorizeUrl.call(this, this.$config);
+      return this.$provider.deauthorizeUrl.call(this, lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_1___default()(this.$config, {
+        idToken: this.profile.$idToken
+      }));
     }
   }]);
 
@@ -9231,11 +9293,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _providers_azure_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./providers/azure.js */ "./providers/azure.js");
 /* harmony import */ var _providers_cognito_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./providers/cognito.js */ "./providers/cognito.js");
 /* harmony import */ var _providers_wso2_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./providers/wso2.js */ "./providers/wso2.js");
+/* harmony import */ var _providers_okta_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./providers/okta.js */ "./providers/okta.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -9291,6 +9355,16 @@ function () {
     key: "wso2",
     get: function get() {
       return _providers_wso2_js__WEBPACK_IMPORTED_MODULE_3__["default"];
+    }
+    /**
+     * Provider for Okta
+     * @type {SalteAuthOktaProvider}
+     */
+
+  }, {
+    key: "okta",
+    get: function get() {
+      return _providers_okta_js__WEBPACK_IMPORTED_MODULE_4__["default"];
     }
   }]);
 
