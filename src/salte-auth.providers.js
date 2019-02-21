@@ -2,6 +2,7 @@ import auth0 from './providers/auth0.js';
 import azure from './providers/azure.js';
 import cognito from './providers/cognito.js';
 import wso2 from './providers/wso2.js';
+import okta from './providers/okta.js';
 
 /**
  * A collection of overrides for specific Identity Providers
@@ -37,6 +38,14 @@ class Providers {
    */
   static get wso2() {
     return wso2;
+  }
+
+  /**
+   * Provider for Okta
+   * @type {SalteAuthOktaProvider}
+   */
+  static get okta() {
+    return okta;
   }
 };
 

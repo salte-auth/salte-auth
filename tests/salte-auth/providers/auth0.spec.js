@@ -8,23 +8,29 @@ describe('auth0', () => {
 
   describe('function(deauthorizeUrl)', () => {
     it('should create a logout url', () => {
-      const url = auth0.deauthorizeUrl.call({ $utilities: utilities }, {
+      const url = new URL(auth0.deauthorizeUrl.call({ $utilities: utilities }, {
         providerUrl: 'https://api.salte.io',
         redirectUrl: `${location.protocol}//${location.host}`,
         clientId: '33333333-3333-4333-b333-333333333333'
-      });
-      expect(url).to.equal(`https://api.salte.io/v2/logout?returnTo=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=33333333-3333-4333-b333-333333333333`);
+      }));
+
+      expect(url.origin + url.pathname).to.equal('https://api.salte.io/v2/logout');
+      expect(url.searchParams.get('client_id')).to.equal('33333333-3333-4333-b333-333333333333');
+      expect(url.searchParams.get('returnTo')).to.equal(`${location.protocol}//${location.host}`);
     });
 
     it('should support a separate logoutUrl', () => {
-      const url = auth0.deauthorizeUrl.call({ $utilities: utilities }, {
+      const url = new URL(auth0.deauthorizeUrl.call({ $utilities: utilities }, {
         providerUrl: 'https://api.salte.io',
         redirectUrl: {
           logoutUrl: `${location.protocol}//${location.host}`
         },
         clientId: '33333333-3333-4333-b333-333333333333'
-      });
-      expect(url).to.equal(`https://api.salte.io/v2/logout?returnTo=${encodeURIComponent(`${location.protocol}//${location.host}`)}&client_id=33333333-3333-4333-b333-333333333333`);
+      }));
+
+      expect(url.origin + url.pathname).to.equal('https://api.salte.io/v2/logout');
+      expect(url.searchParams.get('client_id')).to.equal('33333333-3333-4333-b333-333333333333');
+      expect(url.searchParams.get('returnTo')).to.equal(`${location.protocol}//${location.host}`);
     });
   });
 });

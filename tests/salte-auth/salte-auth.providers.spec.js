@@ -26,4 +26,10 @@ describe('salte-auth.providers', () => {
       expect(Providers.wso2).to.not.be.undefined;
     });
   });
+
+  describe('getter(okta)', () => {
+    it('should return the okta provider', () => {
+      expect(Providers.okta).to.not.be.undefined;
+    });
+  });
 });

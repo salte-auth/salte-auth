@@ -1,4 +1,5 @@
 // Polyfills
+import 'url-polyfill';
 import 'unfetch/polyfill/index.js';
 import Promise from 'promise-polyfill';
 

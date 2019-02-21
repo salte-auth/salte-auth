@@ -76,6 +76,7 @@
       <option value="auth0">Auth0</option>
       <option value="azure">Azure</option>
       <option value="cognito">Cognito</option>
+      <option value="okta">Okta</option>
     </select>
     <select id="login-type" name="login-type">
       <option value="redirect">Redirect</option>
@@ -147,6 +148,12 @@
         providerUrl: 'https://salte-auth-demo.auth.us-east-1.amazoncognito.com',
         responseType: 'token',
         clientId: '51jmkg1t5h3ob58a1birdke2hm'
+      },
+
+      okta: {
+        providerUrl: 'https://dev-960892.oktapreview.com',
+        responseType: 'id_token token',
+        clientId: '0oajg1bj8hxM1z7pa0h7'
       }
     };
 
