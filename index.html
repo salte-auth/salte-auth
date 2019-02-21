@@ -260,7 +260,7 @@
 
     var auth = new salte.SalteAuth(config);
 
-    if (!auth.profile.$idTokenExpired) refreshUserInfo();
+    if (!auth.profile.idTokenExpired) refreshUserInfo();
     auth.on('login', refreshUserInfo);
     auth.on('refresh', refreshUserInfo);
     auth.on('logout', refreshUserInfo);
