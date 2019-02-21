@@ -1,6 +1,6 @@
 // Polyfills
 import 'url-polyfill';
-import 'unfetch/polyfill/index.js';
+import 'whatwg-fetch';
 import Promise from 'promise-polyfill';
 
 window.Promise = Promise;
