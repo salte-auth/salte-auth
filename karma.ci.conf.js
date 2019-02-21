@@ -51,14 +51,7 @@ module.exports = function(config) {
 
     frameworks: [
       'mocha',
-      'sinon',
-      'polyfill'
-    ],
-
-    polyfill: [
-      'Promise',
-      'fetch',
-      'URL'
+      'sinon'
     ],
 
     files: [
