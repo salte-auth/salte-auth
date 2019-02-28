@@ -4,15 +4,14 @@ import base64url from 'base64url';
 import SalteAuthProfile from '../../src/salte-auth.profile.js';
 
 describe('salte-auth.profile', () => {
-  let sandbox, profile;
+  let profile;
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
     sessionStorage.clear();
     profile = new SalteAuthProfile();
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   describe('function(constructor)', () => {
@@ -71,7 +70,7 @@ describe('salte-auth.profile', () => {
     });
 
     it('should parse the expires_in', () => {
-      sandbox.useFakeTimers();
+      sinon.useFakeTimers();
       expect(profile.$expiration).to.equal(null);
       profile.$parse('expires_in', 5000);
       expect(profile.$expiration).to.equal(5000000);
@@ -103,7 +102,7 @@ describe('salte-auth.profile', () => {
     });
 
     it('should ignore scope', () => {
-      const warn = sandbox.stub(console, 'warn');
+      const warn = sinon.stub(console, 'warn');
       expect(warn.callCount).to.equal(0);
       profile.$parse('scope', 'opendid');
       expect(warn.callCount).to.equal(0);
@@ -122,7 +121,7 @@ describe('salte-auth.profile', () => {
         })
       )}.0`;
       profile.$refreshUserInfo();
-      clock = sandbox.useFakeTimers();
+      clock = sinon.useFakeTimers();
     });
 
     it('should be expired if the "id_token" is empty', () => {

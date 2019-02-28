@@ -697,6 +697,9 @@ class SalteAuth {
   $$refreshToken() {
     if (this.$timeouts.refresh !== undefined) {
       clearTimeout(this.$timeouts.refresh);
+    }
+
+    if (this.$timeouts.expired !== undefined) {
       clearTimeout(this.$timeouts.expired);
     }
 

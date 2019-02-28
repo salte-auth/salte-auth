@@ -3,22 +3,21 @@ import { expect } from 'chai';
 import SalteAuthUtilities from '../../../src/salte-auth.utilities.js';
 
 describe('function(openPopup)', () => {
-  let sandbox, utilities;
+  let utilities;
   beforeEach(() => {
     utilities = new SalteAuthUtilities({
       redirectUrl: 'https://redirect-url'
     });
-    sandbox = sinon.createSandbox();
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   it('should open a popup window', () => {
-    sandbox.stub(window, 'open').returns({
+    sinon.stub(window, 'open').returns({
       closed: false,
-      focus: sandbox.stub(),
+      focus: sinon.stub(),
       close: function() {
         this.closed = true;
       },
@@ -28,7 +27,7 @@ describe('function(openPopup)', () => {
     });
 
     setTimeout(() => {
-      sandbox.stub(window.open.firstCall.returnValue, 'location').get(() => {
+      sinon.stub(window.open.firstCall.returnValue, 'location').get(() => {
         return {
           href: 'https://redirect-url'
         };
@@ -39,9 +38,9 @@ describe('function(openPopup)', () => {
   });
 
   it('should handle a user closing the popup', () => {
-    sandbox.stub(window, 'open').returns({
+    sinon.stub(window, 'open').returns({
       closed: true,
-      focus: sandbox.stub(),
+      focus: sinon.stub(),
       location: {
         href: 'https://incorrect-redirect-url'
       }
@@ -51,7 +50,7 @@ describe('function(openPopup)', () => {
   });
 
   it('should handle blocked popups', () => {
-    sandbox.stub(window, 'open').returns(null);
+    sinon.stub(window, 'open').returns(null);
 
     const promise = utilities.openPopup('https://www.google.com');
 
@@ -70,7 +69,7 @@ describe('function(openPopup)', () => {
       loginUrl: 'https://redirect-url'
     };
 
-    sandbox.stub(window, 'open').returns(null);
+    sinon.stub(window, 'open').returns(null);
 
     const promise = utilities.openPopup('https://www.google.com');
 
@@ -89,7 +88,7 @@ describe('function(openPopup)', () => {
       logoutUrl: 'https://redirect-url'
     };
 
-    sandbox.stub(window, 'open').returns(null);
+    sinon.stub(window, 'open').returns(null);
 
     const promise = utilities.openPopup('https://www.google.com');
 

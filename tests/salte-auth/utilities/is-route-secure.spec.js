@@ -3,14 +3,13 @@ import { expect } from 'chai';
 import SalteAuthUtilities from '../../../src/salte-auth.utilities.js';
 
 describe('function(isRouteSecure)', () => {
-  let sandbox, utilities;
+  let utilities;
   beforeEach(() => {
     utilities = new SalteAuthUtilities();
-    sandbox = sinon.createSandbox();
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   it('should support globally requiring authentication', () => {
@@ -20,7 +19,7 @@ describe('function(isRouteSecure)', () => {
   });
 
   it('should support passing an array of secure routes', () => {
-    const spy = sandbox.spy(utilities, 'checkForMatchingUrl');
+    const spy = sinon.spy(utilities, 'checkForMatchingUrl');
 
     const secured = utilities.isRouteSecure(`${location.protocol}//${location.host}`, ['/']);
 

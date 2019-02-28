@@ -1,4 +1,3 @@
-// Polyfills
 import 'url-polyfill';
 import 'whatwg-fetch';
 import Promise from 'promise-polyfill';
