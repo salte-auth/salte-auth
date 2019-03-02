@@ -7545,41 +7545,24 @@ module.exports = function(module) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 /**
  * Provider for Auth0
  * @see https://auth0.com
  */
-var SalteAuthAuth0Provider =
-/*#__PURE__*/
-function () {
-  function SalteAuthAuth0Provider() {
-    _classCallCheck(this, SalteAuthAuth0Provider);
+class SalteAuthAuth0Provider {
+  /**
+   * Computes the deauthorization url
+   * @param {Config} config configuration for salte auth
+   * @return {String} the deauthorization url
+   */
+  static deauthorizeUrl(config) {
+    return this.$utilities.createUrl(`${config.providerUrl}/v2/logout`, {
+      returnTo: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
+      client_id: config.clientId
+    });
   }
 
-  _createClass(SalteAuthAuth0Provider, null, [{
-    key: "deauthorizeUrl",
-
-    /**
-     * Computes the deauthorization url
-     * @param {Config} config configuration for salte auth
-     * @return {String} the deauthorization url
-     */
-    value: function deauthorizeUrl(config) {
-      return this.$utilities.createUrl("".concat(config.providerUrl, "/v2/logout"), {
-        returnTo: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
-        client_id: config.clientId
-      });
-    }
-  }]);
-
-  return SalteAuthAuth0Provider;
-}();
+}
 
 /* harmony default export */ __webpack_exports__["default"] = (SalteAuthAuth0Provider);
 
@@ -7594,48 +7577,30 @@ function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 /** Provider for Azure's Active Directory */
-var SalteAuthAzureProvider =
-/*#__PURE__*/
-function () {
-  function SalteAuthAzureProvider() {
-    _classCallCheck(this, SalteAuthAzureProvider);
+class SalteAuthAzureProvider {
+  /**
+   * Computes the authorization endpoint
+   * @param {Config} config configuration for salte auth
+   * @return {String} the authorization endpoint
+   */
+  static authorizeEndpoint(config) {
+    return `${config.providerUrl}/oauth2/authorize`;
+  }
+  /**
+   * Computes the deauthorization url
+   * @param {Config} config configuration for salte auth
+   * @return {String} the deauthorization url
+   */
+
+
+  static deauthorizeUrl(config) {
+    return this.$utilities.createUrl(`${config.providerUrl}/oauth2/logout`, {
+      post_logout_redirect_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl
+    });
   }
 
-  _createClass(SalteAuthAzureProvider, null, [{
-    key: "authorizeEndpoint",
-
-    /**
-     * Computes the authorization endpoint
-     * @param {Config} config configuration for salte auth
-     * @return {String} the authorization endpoint
-     */
-    value: function authorizeEndpoint(config) {
-      return "".concat(config.providerUrl, "/oauth2/authorize");
-    }
-    /**
-     * Computes the deauthorization url
-     * @param {Config} config configuration for salte auth
-     * @return {String} the deauthorization url
-     */
-
-  }, {
-    key: "deauthorizeUrl",
-    value: function deauthorizeUrl(config) {
-      return this.$utilities.createUrl("".concat(config.providerUrl, "/oauth2/logout"), {
-        post_logout_redirect_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl
-      });
-    }
-  }]);
-
-  return SalteAuthAzureProvider;
-}();
+}
 
 /* harmony default export */ __webpack_exports__["default"] = (SalteAuthAzureProvider);
 
@@ -7650,63 +7615,44 @@ function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 /** Provider for Amazon's Cognito */
-var SalteAuthCognitoProvider =
-/*#__PURE__*/
-function () {
-  function SalteAuthCognitoProvider() {
-    _classCallCheck(this, SalteAuthCognitoProvider);
+class SalteAuthCognitoProvider {
+  /**
+   * Computes the authorization endpoint
+   * @param {Config} config configuration for salte auth
+   * @return {String} the authorization endpoint
+   */
+  static authorizeEndpoint(config) {
+    return `${config.providerUrl}/oauth2/authorize`;
+  }
+  /**
+   * Computes the deauthorization url
+   * @param {Config} config configuration for salte auth
+   * @return {String} the deauthorization url
+   */
+
+
+  static deauthorizeUrl(config) {
+    return this.$utilities.createUrl(`${config.providerUrl}/logout`, {
+      logout_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
+      client_id: config.clientId
+    });
+  }
+  /**
+   * Provides a set of default config options required for cognito
+   */
+
+
+  static get defaultConfig() {
+    return {
+      validation: {
+        // Amazon Cognito doesn't support nonce validation
+        nonce: false
+      }
+    };
   }
 
-  _createClass(SalteAuthCognitoProvider, null, [{
-    key: "authorizeEndpoint",
-
-    /**
-     * Computes the authorization endpoint
-     * @param {Config} config configuration for salte auth
-     * @return {String} the authorization endpoint
-     */
-    value: function authorizeEndpoint(config) {
-      return "".concat(config.providerUrl, "/oauth2/authorize");
-    }
-    /**
-     * Computes the deauthorization url
-     * @param {Config} config configuration for salte auth
-     * @return {String} the deauthorization url
-     */
-
-  }, {
-    key: "deauthorizeUrl",
-    value: function deauthorizeUrl(config) {
-      return this.$utilities.createUrl("".concat(config.providerUrl, "/logout"), {
-        logout_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
-        client_id: config.clientId
-      });
-    }
-    /**
-     * Provides a set of default config options required for cognito
-     */
-
-  }, {
-    key: "defaultConfig",
-    get: function get() {
-      return {
-        validation: {
-          // Amazon Cognito doesn't support nonce validation
-          nonce: false
-        }
-      };
-    }
-  }]);
-
-  return SalteAuthCognitoProvider;
-}();
+}
 
 /* harmony default export */ __webpack_exports__["default"] = (SalteAuthCognitoProvider);
 
@@ -7721,49 +7667,31 @@ function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 /** Provider for Okta */
-var SalteAuthOktaProvider =
-/*#__PURE__*/
-function () {
-  function SalteAuthOktaProvider() {
-    _classCallCheck(this, SalteAuthOktaProvider);
+class SalteAuthOktaProvider {
+  /**
+   * Computes the authorization endpoint
+   * @param {Config} config configuration for salte auth
+   * @return {String} the authorization endpoint
+   */
+  static authorizeEndpoint(config) {
+    return `${config.providerUrl}/oauth2/v1/authorize`;
+  }
+  /**
+   * Computes the deauthorization url
+   * @param {Config} config configuration for salte auth
+   * @return {String} the deauthorization url
+   */
+
+
+  static deauthorizeUrl(config) {
+    return this.$utilities.createUrl(`${config.providerUrl}/oauth2/v1/logout`, {
+      id_token_hint: config.idToken,
+      post_logout_redirect_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl
+    });
   }
 
-  _createClass(SalteAuthOktaProvider, null, [{
-    key: "authorizeEndpoint",
-
-    /**
-     * Computes the authorization endpoint
-     * @param {Config} config configuration for salte auth
-     * @return {String} the authorization endpoint
-     */
-    value: function authorizeEndpoint(config) {
-      return "".concat(config.providerUrl, "/oauth2/v1/authorize");
-    }
-    /**
-     * Computes the deauthorization url
-     * @param {Config} config configuration for salte auth
-     * @return {String} the deauthorization url
-     */
-
-  }, {
-    key: "deauthorizeUrl",
-    value: function deauthorizeUrl(config) {
-      return this.$utilities.createUrl("".concat(config.providerUrl, "/oauth2/v1/logout"), {
-        id_token_hint: config.idToken,
-        post_logout_redirect_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl
-      });
-    }
-  }]);
-
-  return SalteAuthOktaProvider;
-}();
+}
 
 /* harmony default export */ __webpack_exports__["default"] = (SalteAuthOktaProvider);
 
@@ -7778,40 +7706,23 @@ function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 /** Provider for WSO2's API Gateway */
-var SalteAuthWSO2Provider =
-/*#__PURE__*/
-function () {
-  function SalteAuthWSO2Provider() {
-    _classCallCheck(this, SalteAuthWSO2Provider);
+class SalteAuthWSO2Provider {
+  /**
+   * Computes the deauthorization url
+   * @param {Config} config configuration for salte auth
+   * @return {String} the deauthorization url
+   */
+  static deauthorizeUrl(config) {
+    return this.$utilities.createUrl(`${config.providerUrl}/commonauth`, {
+      commonAuthLogout: true,
+      type: 'oidc',
+      commonAuthCallerPath: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
+      relyingParty: config.relyingParty
+    });
   }
 
-  _createClass(SalteAuthWSO2Provider, null, [{
-    key: "deauthorizeUrl",
-
-    /**
-     * Computes the deauthorization url
-     * @param {Config} config configuration for salte auth
-     * @return {String} the deauthorization url
-     */
-    value: function deauthorizeUrl(config) {
-      return this.$utilities.createUrl("".concat(config.providerUrl, "/commonauth"), {
-        commonAuthLogout: true,
-        type: 'oidc',
-        commonAuthCallerPath: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
-        relyingParty: config.relyingParty
-      });
-    }
-  }]);
-
-  return SalteAuthWSO2Provider;
-}();
+}
 
 /* harmony default export */ __webpack_exports__["default"] = (SalteAuthWSO2Provider);
 
@@ -7843,12 +7754,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _salte_auth_profile_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./salte-auth.profile.js */ "./salte-auth.profile.js");
 /* harmony import */ var _salte_auth_utilities_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./salte-auth.utilities.js */ "./salte-auth.utilities.js");
 /* harmony import */ var _salte_auth_mixin_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./salte-auth.mixin.js */ "./salte-auth.mixin.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 
 
 
@@ -7861,7 +7766,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /** @ignore */
 
-var logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-io/salte-auth');
+const logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-io/salte-auth');
 /**
  * Disable certain security validations if your provider doesn't support them.
  * @typedef {Object} Validation
@@ -7909,18 +7814,12 @@ var logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-io/salte-auth'
  * Authentication Controller
  */
 
-var SalteAuth =
-/*#__PURE__*/
-function () {
+class SalteAuth {
   /**
    * Sets up Salte Auth
    * @param {Config} config configuration for salte auth
    */
-  function SalteAuth(config) {
-    var _this = this;
-
-    _classCallCheck(this, SalteAuth);
-
+  constructor(config) {
     if (window.salte.auth) {
       return window.salte.auth;
     }
@@ -8005,12 +7904,12 @@ function () {
     } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
       logger('Redirect detected!');
       this.profile.$hash();
-      var error = this.profile.$validate();
+      const error = this.profile.$validate();
 
       if (error) {
         this.profile.$clear();
       } else {
-        logger("Navigating to Redirect URL... (".concat(this.profile.$redirectUrl, ")"));
+        logger(`Navigating to Redirect URL... (${this.profile.$redirectUrl})`);
         this.$utilities.$navigate(this.profile.$redirectUrl);
         this.profile.$redirectUrl = undefined;
       } // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
@@ -8018,28 +7917,28 @@ function () {
 
       this.$config.redirectLoginCallback && this.$config.redirectLoginCallback(error); // Delay for an event loop to give users time to register a listener.
 
-      setTimeout(function () {
-        var action = _this.profile.$actions(_this.profile.$state);
+      setTimeout(() => {
+        const action = this.profile.$actions(this.profile.$state);
 
         if (action === 'login') {
-          _this.$fire('login', error);
+          this.$fire('login', error);
         } else if (action === 'logout') {
-          _this.$fire('logout', error);
+          this.$fire('logout', error);
         }
       });
     } else {
       logger('Setting up interceptors...');
-      this.$utilities.addXHRInterceptor(function (request, data) {
-        if (_this.$utilities.checkForMatchingUrl(request.$url, _this.$config.endpoints)) {
-          return _this.retrieveAccessToken().then(function (accessToken) {
-            request.setRequestHeader('Authorization', "Bearer ".concat(accessToken));
+      this.$utilities.addXHRInterceptor((request, data) => {
+        if (this.$utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
+          return this.retrieveAccessToken().then(accessToken => {
+            request.setRequestHeader('Authorization', `Bearer ${accessToken}`);
           });
         }
       });
-      this.$utilities.addFetchInterceptor(function (request) {
-        if (_this.$utilities.checkForMatchingUrl(request.url, _this.$config.endpoints)) {
-          return _this.retrieveAccessToken().then(function (accessToken) {
-            request.headers.set('Authorization', "Bearer ".concat(accessToken));
+      this.$utilities.addFetchInterceptor(request => {
+        if (this.$utilities.checkForMatchingUrl(request.url, this.$config.endpoints)) {
+          return this.retrieveAccessToken().then(accessToken => {
+            request.headers.set('Authorization', `Bearer ${accessToken}`);
           });
         }
       });
@@ -8052,18 +7951,16 @@ function () {
       });
       setTimeout(this.$$onRouteChanged.bind(this));
       logger('Setting up automatic renewal of token...');
-      this.on('login', function (error) {
+      this.on('login', error => {
         if (error) return;
-
-        _this.$$refreshToken();
+        this.$$refreshToken();
       });
-      this.on('refresh', function (error) {
+      this.on('refresh', error => {
         if (error) return;
-
-        _this.$$refreshToken();
+        this.$$refreshToken();
       });
-      this.on('logout', function () {
-        clearTimeout(_this.$timeouts.refresh);
+      this.on('logout', () => {
+        clearTimeout(this.$timeouts.refresh);
       });
 
       if (!this.profile.idTokenExpired) {
@@ -8080,7 +7977,7 @@ function () {
     window.salte.auth = this;
 
     if (this.$config.redirectLoginCallback) {
-      console.warn("The \"redirectLoginCallback\" api has been deprecated in favor of the \"on\" api, see http://bit.ly/salte-auth-on for more info.");
+      console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
     }
   }
   /**
@@ -8090,678 +7987,603 @@ function () {
    */
 
 
-  _createClass(SalteAuth, [{
-    key: "$loginUrl",
+  get $provider() {
+    if (!this.$config.provider) {
+      throw new ReferenceError('A provider must be specified');
+    }
 
-    /**
-     * The authentication url to retrieve the id token
-     * @param {Boolean} refresh Whether this request is intended to refresh the token.
-     * @return {String} the computed login url
-     * @private
-     */
-    value: function $loginUrl(refresh) {
-      this.profile.$localState = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
-      this.profile.$nonce = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
-      var authorizeEndpoint = "".concat(this.$config.providerUrl, "/authorize");
+    if (typeof this.$config.provider === 'string') {
+      const provider = this.$providers[this.$config.provider];
 
-      if (this.$provider.authorizeEndpoint) {
-        authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
+      if (!provider) {
+        throw new ReferenceError(`Unknown Provider (${this.$config.provider})`);
       }
 
-      return this.$utilities.createUrl(authorizeEndpoint, lodash_assign__WEBPACK_IMPORTED_MODULE_0___default()({
-        'state': this.profile.$localState,
-        'nonce': this.profile.$nonce,
-        'response_type': this.$config.responseType,
-        'redirect_uri': this.$config.redirectUrl && this.$config.redirectUrl.loginUrl || this.$config.redirectUrl,
-        'client_id': this.$config.clientId,
-        'scope': this.$config.scope,
-        'prompt': refresh ? 'none' : undefined
-      }, this.$config.queryParams));
+      return provider;
     }
-    /**
-     * The url to logout of the configured provider
-     * @type {String}
-     * @private
-     */
 
-  }, {
-    key: "on",
+    return this.$config.provider;
+  }
+  /**
+   * The authentication url to retrieve the access token
+   * @type {String}
+   * @private
+   */
 
-    /**
-     * Listens for an event to be invoked.
-     * @param {('login'|'logout'|'refresh'|'expired')} eventType the event to listen for.
-     * @param {Function} callback A callback that fires when the specified event occurs.
-     *
-     * @example
-     * auth.on('login', (error, user) => {
-     *   if (error) {
-     *     console.log('something bad happened!');
-     *   }
-     *
-     *   console.log(user); // This is the same as auth.profile.userInfo.
-     * });
-     *
-     * @example
-     * window.addEventListener('salte-auth-login', (event) => {
-     *   if (event.detail.error) {
-     *     console.log('something bad happened!');
-     *   }
-     *
-     *   console.log(event.detail.data); // This is the same as auth.profile.userInfo.
-     * });
-     */
-    value: function on(eventType, callback) {
-      if (['login', 'logout', 'refresh', 'expired'].indexOf(eventType) === -1) {
-        throw new ReferenceError("Unknown Event Type (".concat(eventType, ")"));
-      } else if (typeof callback !== 'function') {
-        throw new ReferenceError('Invalid callback provided!');
-      }
 
-      this.$listeners[eventType] = this.$listeners[eventType] || [];
-      this.$listeners[eventType].push(callback);
+  get $accessTokenUrl() {
+    this.profile.$localState = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
+    this.profile.$nonce = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
+    let authorizeEndpoint = `${this.$config.providerUrl}/authorize`;
+
+    if (this.$provider.authorizeEndpoint) {
+      authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
     }
-    /**
-     * Deregister a callback previously registered.
-     * @param {('login'|'logout'|'refresh'|'expired')} eventType the event to deregister.
-     * @param {Function} callback A callback that fires when the specified event occurs.
-     *
-     * @example
-     * const someFunction = function() {};
-     *
-     * auth.on('login', someFunction);
-     *
-     * auth.off('login', someFunction);
-     */
 
-  }, {
-    key: "off",
-    value: function off(eventType, callback) {
-      if (['login', 'logout', 'refresh', 'expired'].indexOf(eventType) === -1) {
-        throw new ReferenceError("Unknown Event Type (".concat(eventType, ")"));
-      } else if (typeof callback !== 'function') {
-        throw new ReferenceError('Invalid callback provided!');
-      }
+    return this.$utilities.createUrl(authorizeEndpoint, lodash_assign__WEBPACK_IMPORTED_MODULE_0___default()({
+      'state': this.profile.$localState,
+      'nonce': this.profile.$nonce,
+      'response_type': 'token',
+      'redirect_uri': this.$config.redirectUrl && this.$config.redirectUrl.loginUrl || this.$config.redirectUrl,
+      'client_id': this.$config.clientId,
+      'scope': this.$config.scope,
+      'prompt': 'none'
+    }, this.$config.queryParams));
+  }
+  /**
+   * The authentication url to retrieve the id token
+   * @param {Boolean} refresh Whether this request is intended to refresh the token.
+   * @return {String} the computed login url
+   * @private
+   */
 
-      var eventListeners = this.$listeners[eventType];
-      if (!eventListeners || !eventListeners.length) return;
-      var index = eventListeners.indexOf(callback);
-      eventListeners.splice(index, 1);
+
+  $loginUrl(refresh) {
+    this.profile.$localState = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
+    this.profile.$nonce = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
+    let authorizeEndpoint = `${this.$config.providerUrl}/authorize`;
+
+    if (this.$provider.authorizeEndpoint) {
+      authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
     }
-    /**
-     * Fires off an event to a given set of listeners
-     * @param {String} eventType The event that occurred.
-     * @param {Error} error The error tied to this event.
-     * @param {*} data The data tied to this event.
-     * @private
-     */
 
-  }, {
-    key: "$fire",
-    value: function $fire(eventType, error, data) {
-      var event = document.createEvent('Event');
-      event.initEvent("salte-auth-".concat(eventType), false, true);
-      event.detail = {
-        error: error,
-        data: data
+    return this.$utilities.createUrl(authorizeEndpoint, lodash_assign__WEBPACK_IMPORTED_MODULE_0___default()({
+      'state': this.profile.$localState,
+      'nonce': this.profile.$nonce,
+      'response_type': this.$config.responseType,
+      'redirect_uri': this.$config.redirectUrl && this.$config.redirectUrl.loginUrl || this.$config.redirectUrl,
+      'client_id': this.$config.clientId,
+      'scope': this.$config.scope,
+      'prompt': refresh ? 'none' : undefined
+    }, this.$config.queryParams));
+  }
+  /**
+   * The url to logout of the configured provider
+   * @type {String}
+   * @private
+   */
+
+
+  get $deauthorizeUrl() {
+    return this.$provider.deauthorizeUrl.call(this, lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_1___default()(this.$config, {
+      idToken: this.profile.$idToken
+    }));
+  }
+  /**
+   * Listens for an event to be invoked.
+   * @param {('login'|'logout'|'refresh'|'expired')} eventType the event to listen for.
+   * @param {Function} callback A callback that fires when the specified event occurs.
+   *
+   * @example
+   * auth.on('login', (error, user) => {
+   *   if (error) {
+   *     console.log('something bad happened!');
+   *   }
+   *
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * });
+   *
+   * @example
+   * window.addEventListener('salte-auth-login', (event) => {
+   *   if (event.detail.error) {
+   *     console.log('something bad happened!');
+   *   }
+   *
+   *   console.log(event.detail.data); // This is the same as auth.profile.userInfo.
+   * });
+   */
+
+
+  on(eventType, callback) {
+    if (['login', 'logout', 'refresh', 'expired'].indexOf(eventType) === -1) {
+      throw new ReferenceError(`Unknown Event Type (${eventType})`);
+    } else if (typeof callback !== 'function') {
+      throw new ReferenceError('Invalid callback provided!');
+    }
+
+    this.$listeners[eventType] = this.$listeners[eventType] || [];
+    this.$listeners[eventType].push(callback);
+  }
+  /**
+   * Deregister a callback previously registered.
+   * @param {('login'|'logout'|'refresh'|'expired')} eventType the event to deregister.
+   * @param {Function} callback A callback that fires when the specified event occurs.
+   *
+   * @example
+   * const someFunction = function() {};
+   *
+   * auth.on('login', someFunction);
+   *
+   * auth.off('login', someFunction);
+   */
+
+
+  off(eventType, callback) {
+    if (['login', 'logout', 'refresh', 'expired'].indexOf(eventType) === -1) {
+      throw new ReferenceError(`Unknown Event Type (${eventType})`);
+    } else if (typeof callback !== 'function') {
+      throw new ReferenceError('Invalid callback provided!');
+    }
+
+    const eventListeners = this.$listeners[eventType];
+    if (!eventListeners || !eventListeners.length) return;
+    const index = eventListeners.indexOf(callback);
+    eventListeners.splice(index, 1);
+  }
+  /**
+   * Fires off an event to a given set of listeners
+   * @param {String} eventType The event that occurred.
+   * @param {Error} error The error tied to this event.
+   * @param {*} data The data tied to this event.
+   * @private
+   */
+
+
+  $fire(eventType, error, data) {
+    const event = document.createEvent('Event');
+    event.initEvent(`salte-auth-${eventType}`, false, true);
+    event.detail = {
+      error,
+      data
+    };
+    window.dispatchEvent(event);
+    const eventListeners = this.$listeners[eventType];
+    if (!eventListeners || !eventListeners.length) return;
+    eventListeners.forEach(listener => listener(error, data));
+  }
+  /**
+   * Authenticates using the iframe-based OAuth flow.
+   * @param {Boolean|LoginConfig} config Whether this request is intended to refresh the token.
+   * @return {Promise<Object>} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithIframe().then((user) => {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
+   */
+
+
+  loginWithIframe(config) {
+    if (this.$promises.login) {
+      return this.$promises.login;
+    } // TODO(v3.0.0): Remove backwards compatibility with refresh boolean.
+
+
+    if (typeof config === 'boolean') {
+      config = {
+        noPrompt: config,
+        clear: config ? 'errors' : undefined,
+        events: false
       };
-      window.dispatchEvent(event);
-      var eventListeners = this.$listeners[eventType];
-      if (!eventListeners || !eventListeners.length) return;
-      eventListeners.forEach(function (listener) {
-        return listener(error, data);
-      });
     }
-    /**
-     * Authenticates using the iframe-based OAuth flow.
-     * @param {Boolean|LoginConfig} config Whether this request is intended to refresh the token.
-     * @return {Promise<Object>} a promise that resolves when we finish authenticating
-     *
-     * @example
-     * auth.loginWithIframe().then((user) => {
-     *   console.log(user); // This is the same as auth.profile.userInfo.
-     * }).catch((error) => {
-     *   console.error('Whoops something went wrong!', error);
-     * });
-     */
 
-  }, {
-    key: "loginWithIframe",
-    value: function loginWithIframe(config) {
-      var _this2 = this;
+    config = lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_1___default()(config, {
+      noPrompt: false,
+      clear: 'all',
+      events: true
+    });
 
-      if (this.$promises.login) {
-        return this.$promises.login;
-      } // TODO(v3.0.0): Remove backwards compatibility with refresh boolean.
+    if (config.clear === 'all') {
+      this.profile.$clear();
+    } else if (config.clear === 'errors') {
+      this.profile.$clearErrors();
+    }
 
+    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt).then(() => {
+      this.$promises.login = null;
+      const error = this.profile.$validate();
 
-      if (typeof config === 'boolean') {
-        config = {
-          noPrompt: config,
-          clear: config ? 'errors' : undefined,
-          events: false
-        };
+      if (error) {
+        return Promise.reject(error);
       }
 
-      config = lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_1___default()(config, {
-        noPrompt: false,
-        clear: 'all',
-        events: true
-      });
+      const user = this.profile.userInfo;
 
-      if (config.clear === 'all') {
+      if (config.events) {
+        this.$fire('login', null, user);
+      }
+
+      return user;
+    }).catch(error => {
+      this.$promises.login = null;
+
+      if (config.events) {
+        this.$fire('login', error);
+      }
+
+      return Promise.reject(error);
+    });
+    return this.$promises.login;
+  }
+  /**
+   * Authenticates using the popup-based OAuth flow.
+   * @return {Promise<Object>} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithPopup().then((user) => {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
+   */
+
+
+  loginWithPopup() {
+    if (this.$promises.login) {
+      return this.$promises.login;
+    }
+
+    this.profile.$clear();
+    this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(() => {
+      this.$promises.login = null;
+      this.profile.$hash();
+      const error = this.profile.$validate();
+
+      if (error) {
         this.profile.$clear();
-      } else if (config.clear === 'errors') {
-        this.profile.$clearErrors();
+        return Promise.reject(error);
       }
 
-      this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt).then(function () {
-        _this2.$promises.login = null;
+      const user = this.profile.userInfo;
+      this.$fire('login', null, user);
+      return user;
+    }).catch(error => {
+      this.$promises.login = null;
+      this.$fire('login', error);
+      return Promise.reject(error);
+    });
+    return this.$promises.login;
+  }
+  /**
+   * Authenticates using the tab-based OAuth flow.
+   * @return {Promise<Object>} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithNewTab().then((user) => {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
+   */
 
-        var error = _this2.profile.$validate();
 
-        if (error) {
-          return Promise.reject(error);
-        }
-
-        var user = _this2.profile.userInfo;
-
-        if (config.events) {
-          _this2.$fire('login', null, user);
-        }
-
-        return user;
-      }).catch(function (error) {
-        _this2.$promises.login = null;
-
-        if (config.events) {
-          _this2.$fire('login', error);
-        }
-
-        return Promise.reject(error);
-      });
+  loginWithNewTab() {
+    if (this.$promises.login) {
       return this.$promises.login;
     }
-    /**
-     * Authenticates using the popup-based OAuth flow.
-     * @return {Promise<Object>} a promise that resolves when we finish authenticating
-     *
-     * @example
-     * auth.loginWithPopup().then((user) => {
-     *   console.log(user); // This is the same as auth.profile.userInfo.
-     * }).catch((error) => {
-     *   console.error('Whoops something went wrong!', error);
-     * });
-     */
 
-  }, {
-    key: "loginWithPopup",
-    value: function loginWithPopup() {
-      var _this3 = this;
+    this.profile.$clear();
+    this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(() => {
+      this.$promises.login = null;
+      this.profile.$hash();
+      const error = this.profile.$validate();
 
-      if (this.$promises.login) {
-        return this.$promises.login;
-      }
-
-      this.profile.$clear();
-      this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(function () {
-        _this3.$promises.login = null;
-
-        _this3.profile.$hash();
-
-        var error = _this3.profile.$validate();
-
-        if (error) {
-          _this3.profile.$clear();
-
-          return Promise.reject(error);
-        }
-
-        var user = _this3.profile.userInfo;
-
-        _this3.$fire('login', null, user);
-
-        return user;
-      }).catch(function (error) {
-        _this3.$promises.login = null;
-
-        _this3.$fire('login', error);
-
+      if (error) {
+        this.profile.$clear();
         return Promise.reject(error);
-      });
-      return this.$promises.login;
-    }
-    /**
-     * Authenticates using the tab-based OAuth flow.
-     * @return {Promise<Object>} a promise that resolves when we finish authenticating
-     *
-     * @example
-     * auth.loginWithNewTab().then((user) => {
-     *   console.log(user); // This is the same as auth.profile.userInfo.
-     * }).catch((error) => {
-     *   console.error('Whoops something went wrong!', error);
-     * });
-     */
-
-  }, {
-    key: "loginWithNewTab",
-    value: function loginWithNewTab() {
-      var _this4 = this;
-
-      if (this.$promises.login) {
-        return this.$promises.login;
       }
 
-      this.profile.$clear();
-      this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(function () {
-        _this4.$promises.login = null;
+      const user = this.profile.userInfo;
+      this.$fire('login', null, user);
+      return user;
+    }).catch(error => {
+      this.$promises.login = null;
+      this.$fire('login', error);
+      return Promise.reject(error);
+    });
+    return this.$promises.login;
+  }
+  /**
+   * Authenticates using the redirect-based OAuth flow.
+   * @param {String} redirectUrl override for the redirect url, by default this will try to redirect the user back where they started.
+   * @return {Promise} a promise intended to block future login attempts.
+   *
+   * @example
+   * auth.loginWithRedirect(); // Don't bother with utilizing the promise here, it never resolves.
+   */
 
-        _this4.profile.$hash();
 
-        var error = _this4.profile.$validate();
-
-        if (error) {
-          _this4.profile.$clear();
-
-          return Promise.reject(error);
-        }
-
-        var user = _this4.profile.userInfo;
-
-        _this4.$fire('login', null, user);
-
-        return user;
-      }).catch(function (error) {
-        _this4.$promises.login = null;
-
-        _this4.$fire('login', error);
-
-        return Promise.reject(error);
-      });
-      return this.$promises.login;
+  loginWithRedirect(redirectUrl) {
+    if (this.$config.redirectLoginCallback) {
+      console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
     }
-    /**
-     * Authenticates using the redirect-based OAuth flow.
-     * @param {String} redirectUrl override for the redirect url, by default this will try to redirect the user back where they started.
-     * @return {Promise} a promise intended to block future login attempts.
-     *
-     * @example
-     * auth.loginWithRedirect(); // Don't bother with utilizing the promise here, it never resolves.
-     */
 
-  }, {
-    key: "loginWithRedirect",
-    value: function loginWithRedirect(redirectUrl) {
-      if (this.$config.redirectLoginCallback) {
-        console.warn("The \"redirectLoginCallback\" api has been deprecated in favor of the \"on\" api, see http://bit.ly/salte-auth-on for more info.");
-      }
-
-      if (this.$promises.login) {
-        return this.$promises.login;
-      } // NOTE: This prevents the other login types from racing "loginWithRedirect".
-      // Without this someone could potentially call login somewhere else before
-      // the app has a change to redirect. Which could result in an invalid state.
-
-
-      this.$promises.login = new Promise(function () {});
-      this.profile.$clear();
-      this.profile.$redirectUrl = redirectUrl && this.$utilities.resolveUrl(redirectUrl) || this.profile.$redirectUrl || location.href;
-      var url = this.$loginUrl();
-      this.profile.$actions(this.profile.$localState, 'login');
-      this.$utilities.$navigate(url);
+    if (this.$promises.login) {
       return this.$promises.login;
-    }
-    /**
-     * Unauthenticates using the iframe-based OAuth flow.
-     * @return {Promise} a promise that resolves when we finish deauthenticating
-     *
-     * @example
-     * auth.logoutWithIframe().then(() => {
-     *   console.log('success!');
-     * }).catch((error) => {
-     *   console.error('Whoops something went wrong!', error);
-     * });
-     */
+    } // NOTE: This prevents the other login types from racing "loginWithRedirect".
+    // Without this someone could potentially call login somewhere else before
+    // the app has a change to redirect. Which could result in an invalid state.
 
-  }, {
-    key: "logoutWithIframe",
-    value: function logoutWithIframe() {
-      var _this5 = this;
 
-      if (this.$promises.logout) {
-        return this.$promises.logout;
-      }
+    this.$promises.login = new Promise(() => {});
+    this.profile.$clear();
+    this.profile.$redirectUrl = redirectUrl && this.$utilities.resolveUrl(redirectUrl) || this.profile.$redirectUrl || location.href;
+    const url = this.$loginUrl();
+    this.profile.$actions(this.profile.$localState, 'login');
+    this.$utilities.$navigate(url);
+    return this.$promises.login;
+  }
+  /**
+   * Unauthenticates using the iframe-based OAuth flow.
+   * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithIframe().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
+   */
 
-      var deauthorizeUrl = this.$deauthorizeUrl;
-      this.profile.$clear();
-      this.$promises.logout = this.$utilities.createIframe(deauthorizeUrl).then(function () {
-        _this5.$promises.logout = null;
 
-        _this5.$fire('logout');
-      }).catch(function (error) {
-        _this5.$promises.logout = null;
-
-        _this5.$fire('logout', error);
-
-        return Promise.reject(error);
-      });
+  logoutWithIframe() {
+    if (this.$promises.logout) {
       return this.$promises.logout;
     }
-    /**
-     * Unauthenticates using the popup-based OAuth flow.
-     * @return {Promise} a promise that resolves when we finish deauthenticating
-     *
-     * @example
-     * auth.logoutWithPopup().then(() => {
-     *   console.log('success!');
-     * }).catch((error) => {
-     *   console.error('Whoops something went wrong!', error);
-     * });
-     */
 
-  }, {
-    key: "logoutWithPopup",
-    value: function logoutWithPopup() {
-      var _this6 = this;
+    const deauthorizeUrl = this.$deauthorizeUrl;
+    this.profile.$clear();
+    this.$promises.logout = this.$utilities.createIframe(deauthorizeUrl).then(() => {
+      this.$promises.logout = null;
+      this.$fire('logout');
+    }).catch(error => {
+      this.$promises.logout = null;
+      this.$fire('logout', error);
+      return Promise.reject(error);
+    });
+    return this.$promises.logout;
+  }
+  /**
+   * Unauthenticates using the popup-based OAuth flow.
+   * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithPopup().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
+   */
 
-      if (this.$promises.logout) {
-        return this.$promises.logout;
-      }
 
-      var deauthorizeUrl = this.$deauthorizeUrl;
-      this.profile.$clear();
-      this.$promises.logout = this.$utilities.openPopup(deauthorizeUrl).then(function () {
-        _this6.$promises.logout = null;
-
-        _this6.$fire('logout');
-      }).catch(function (error) {
-        _this6.$promises.logout = null;
-
-        _this6.$fire('logout', error);
-
-        return Promise.reject(error);
-      });
+  logoutWithPopup() {
+    if (this.$promises.logout) {
       return this.$promises.logout;
     }
-    /**
-     * Unauthenticates using the tab-based OAuth flow.
-     * @return {Promise} a promise that resolves when we finish deauthenticating
-     *
-     * @example
-     * auth.logoutWithNewTab().then(() => {
-     *   console.log('success!');
-     * }).catch((error) => {
-     *   console.error('Whoops something went wrong!', error);
-     * });
-     */
 
-  }, {
-    key: "logoutWithNewTab",
-    value: function logoutWithNewTab() {
-      var _this7 = this;
+    const deauthorizeUrl = this.$deauthorizeUrl;
+    this.profile.$clear();
+    this.$promises.logout = this.$utilities.openPopup(deauthorizeUrl).then(() => {
+      this.$promises.logout = null;
+      this.$fire('logout');
+    }).catch(error => {
+      this.$promises.logout = null;
+      this.$fire('logout', error);
+      return Promise.reject(error);
+    });
+    return this.$promises.logout;
+  }
+  /**
+   * Unauthenticates using the tab-based OAuth flow.
+   * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithNewTab().then(() => {
+   *   console.log('success!');
+   * }).catch((error) => {
+   *   console.error('Whoops something went wrong!', error);
+   * });
+   */
 
-      if (this.$promises.logout) {
-        return this.$promises.logout;
-      }
 
-      var deauthorizeUrl = this.$deauthorizeUrl;
-      this.profile.$clear();
-      this.$promises.logout = this.$utilities.openNewTab(deauthorizeUrl).then(function () {
-        _this7.$promises.logout = null;
-
-        _this7.$fire('logout');
-      }).catch(function (error) {
-        _this7.$promises.logout = null;
-
-        _this7.$fire('logout', error);
-
-        return Promise.reject(error);
-      });
+  logoutWithNewTab() {
+    if (this.$promises.logout) {
       return this.$promises.logout;
     }
-    /**
-     * Logs the user out of their configured identity provider.
-     *
-     * @example
-     * auth.logoutWithRedirect();
-     */
 
-  }, {
-    key: "logoutWithRedirect",
-    value: function logoutWithRedirect() {
-      var deauthorizeUrl = this.$deauthorizeUrl;
-      this.profile.$clear();
-      this.profile.$actions(this.profile.$localState, 'logout');
-      this.$utilities.$navigate(deauthorizeUrl);
-    }
-    /**
-     * Refreshes the users tokens and renews their session.
-     * @return {Promise} a promise that resolves when we finish renewing the users tokens.
-     */
+    const deauthorizeUrl = this.$deauthorizeUrl;
+    this.profile.$clear();
+    this.$promises.logout = this.$utilities.openNewTab(deauthorizeUrl).then(() => {
+      this.$promises.logout = null;
+      this.$fire('logout');
+    }).catch(error => {
+      this.$promises.logout = null;
+      this.$fire('logout', error);
+      return Promise.reject(error);
+    });
+    return this.$promises.logout;
+  }
+  /**
+   * Logs the user out of their configured identity provider.
+   *
+   * @example
+   * auth.logoutWithRedirect();
+   */
 
-  }, {
-    key: "refreshToken",
-    value: function refreshToken() {
-      var _this8 = this;
 
-      if (this.$promises.token) {
-        return this.$promises.token;
-      }
+  logoutWithRedirect() {
+    const deauthorizeUrl = this.$deauthorizeUrl;
+    this.profile.$clear();
+    this.profile.$actions(this.profile.$localState, 'logout');
+    this.$utilities.$navigate(deauthorizeUrl);
+  }
+  /**
+   * Refreshes the users tokens and renews their session.
+   * @return {Promise} a promise that resolves when we finish renewing the users tokens.
+   */
 
-      this.$promises.token = this.loginWithIframe(true).then(function (user) {
-        _this8.$promises.token = null;
 
-        var error = _this8.profile.$validate(true);
-
-        if (error) {
-          return Promise.reject(error);
-        }
-
-        _this8.$promises.token = null;
-
-        _this8.$fire('refresh', null, user);
-
-        return user;
-      }).catch(function (error) {
-        _this8.$promises.token = null;
-
-        _this8.$fire('refresh', error);
-
-        return Promise.reject(error);
-      });
+  refreshToken() {
+    if (this.$promises.token) {
       return this.$promises.token;
     }
-    /**
-     * Registers a timeout that will automatically refresh the id token
-     */
 
-  }, {
-    key: "$$refreshToken",
-    value: function $$refreshToken() {
-      var _this9 = this;
+    this.$promises.token = this.loginWithIframe(true).then(user => {
+      this.$promises.token = null;
+      const error = this.profile.$validate(true);
 
-      if (this.$timeouts.refresh !== undefined) {
-        clearTimeout(this.$timeouts.refresh);
-      }
-
-      if (this.$timeouts.expired !== undefined) {
-        clearTimeout(this.$timeouts.expired);
-      }
-
-      var timeToExpiration = this.profile.userInfo.exp * 1000 - Date.now();
-      this.$timeouts.refresh = setTimeout(function () {
-        // Allows Auto Refresh to be disabled
-        if (_this9.$config.autoRefresh) {
-          _this9.refreshToken().catch(function (error) {
-            console.error(error);
-          });
-        } else {
-          _this9.$fire('refresh');
-        }
-      }, Math.max(timeToExpiration - this.$config.autoRefreshBuffer, 0));
-      this.$timeouts.expired = setTimeout(function () {
-        _this9.$fire('expired');
-      }, Math.max(timeToExpiration, 0));
-    }
-    /**
-     * Authenticates, requests the access token, and returns it if necessary.
-     * @return {Promise<string>} a promise that resolves when we retrieve the access token
-     */
-
-  }, {
-    key: "retrieveAccessToken",
-    value: function retrieveAccessToken() {
-      var _this10 = this;
-
-      if (this.$promises.token) {
-        logger('Existing token request detected, resolving...');
-        return this.$promises.token;
-      }
-
-      this.$promises.token = Promise.resolve();
-
-      if (this.profile.idTokenExpired) {
-        logger('id token has expired, reauthenticating...');
-
-        if (this.$config.loginType === 'iframe') {
-          logger('Initiating the iframe flow...');
-          this.$promises.token = this.loginWithIframe();
-        } else if (this.$config.loginType === 'redirect') {
-          this.$promises.token = this.loginWithRedirect();
-        } else if (this.$config.loginType === false) {
-          if (this.$promises.login) {
-            this.$promises.token = this.$promises.login;
-          } else {
-            this.$promises.token = null;
-            return Promise.reject(new ReferenceError('Automatic login is disabled, please login before making any requests!'));
-          }
-        } else {
-          this.$promises.token = null;
-          return Promise.reject(new ReferenceError("Invalid Login Type (".concat(this.$config.loginType, ")")));
-        }
-      }
-
-      this.$promises.token = this.$promises.token.then(function () {
-        _this10.profile.$clearErrors();
-
-        if (_this10.profile.accessTokenExpired) {
-          logger('Access token has expired, renewing...');
-          return _this10.$utilities.createIframe(_this10.$accessTokenUrl).then(function () {
-            _this10.$promises.token = null;
-
-            var error = _this10.profile.$validate(true);
-
-            if (error) {
-              return Promise.reject(error);
-            }
-
-            return _this10.profile.$accessToken;
-          });
-        }
-
-        _this10.$promises.token = null;
-        return _this10.profile.$accessToken;
-      }).catch(function (error) {
-        _this10.$promises.token = null;
+      if (error) {
         return Promise.reject(error);
-      });
-      return this.$promises.token;
+      }
+
+      this.$promises.token = null;
+      this.$fire('refresh', null, user);
+      return user;
+    }).catch(error => {
+      this.$promises.token = null;
+      this.$fire('refresh', error);
+      return Promise.reject(error);
+    });
+    return this.$promises.token;
+  }
+  /**
+   * Registers a timeout that will automatically refresh the id token
+   */
+
+
+  $$refreshToken() {
+    if (this.$timeouts.refresh !== undefined) {
+      clearTimeout(this.$timeouts.refresh);
     }
-    /**
-     * Checks if the current route is secured and authenticates the user if necessary
-     * @ignore
-     */
 
-  }, {
-    key: "$$onRouteChanged",
-    value: function $$onRouteChanged() {
-      logger('Route change detected, determining if the route is secured...');
-      if (!this.$utilities.isRouteSecure(location.href, this.$config.routes)) return;
-      logger('Route is secure, verifying tokens...');
-      this.retrieveAccessToken();
+    if (this.$timeouts.expired !== undefined) {
+      clearTimeout(this.$timeouts.expired);
     }
-    /**
-     * Disables automatic refresh of the token if the page is no longer visible
-     * @ignore
-     */
 
-  }, {
-    key: "$$onVisibilityChanged",
-    value: function $$onVisibilityChanged() {
-      var _this11 = this;
-
-      logger('Visibility change detected, deferring to the next event loop...');
-      logger('Determining if the id token has expired...');
-      if (this.profile.idTokenExpired || !this.$config.autoRefresh) return;
-
-      if (this.$utilities.$hidden) {
-        logger('Page is hidden, refreshing the token...');
-        this.refreshToken().then(function () {
-          logger('Disabling automatic renewal of the token...');
-          clearTimeout(_this11.$timeouts.refresh);
-          _this11.$timeouts.refresh = null;
+    const timeToExpiration = this.profile.userInfo.exp * 1000 - Date.now();
+    this.$timeouts.refresh = setTimeout(() => {
+      // Allows Auto Refresh to be disabled
+      if (this.$config.autoRefresh) {
+        this.refreshToken().catch(error => {
+          console.error(error);
         });
       } else {
-        logger('Page is visible restarting automatic token renewal...');
-        this.$$refreshToken();
+        this.$fire('refresh');
       }
+    }, Math.max(timeToExpiration - this.$config.autoRefreshBuffer, 0));
+    this.$timeouts.expired = setTimeout(() => {
+      this.$fire('expired');
+    }, Math.max(timeToExpiration, 0));
+  }
+  /**
+   * Authenticates, requests the access token, and returns it if necessary.
+   * @return {Promise<string>} a promise that resolves when we retrieve the access token
+   */
+
+
+  retrieveAccessToken() {
+    if (this.$promises.token) {
+      logger('Existing token request detected, resolving...');
+      return this.$promises.token;
     }
-  }, {
-    key: "$provider",
-    get: function get() {
-      if (!this.$config.provider) {
-        throw new ReferenceError('A provider must be specified');
-      }
 
-      if (typeof this.$config.provider === 'string') {
-        var provider = this.$providers[this.$config.provider];
+    this.$promises.token = Promise.resolve();
 
-        if (!provider) {
-          throw new ReferenceError("Unknown Provider (".concat(this.$config.provider, ")"));
+    if (this.profile.idTokenExpired) {
+      logger('id token has expired, reauthenticating...');
+
+      if (this.$config.loginType === 'iframe') {
+        logger('Initiating the iframe flow...');
+        this.$promises.token = this.loginWithIframe();
+      } else if (this.$config.loginType === 'redirect') {
+        this.$promises.token = this.loginWithRedirect();
+      } else if (this.$config.loginType === false) {
+        if (this.$promises.login) {
+          this.$promises.token = this.$promises.login;
+        } else {
+          this.$promises.token = null;
+          return Promise.reject(new ReferenceError('Automatic login is disabled, please login before making any requests!'));
         }
+      } else {
+        this.$promises.token = null;
+        return Promise.reject(new ReferenceError(`Invalid Login Type (${this.$config.loginType})`));
+      }
+    }
 
-        return provider;
+    this.$promises.token = this.$promises.token.then(() => {
+      this.profile.$clearErrors();
+
+      if (this.profile.accessTokenExpired) {
+        logger('Access token has expired, renewing...');
+        return this.$utilities.createIframe(this.$accessTokenUrl).then(() => {
+          this.$promises.token = null;
+          const error = this.profile.$validate(true);
+
+          if (error) {
+            return Promise.reject(error);
+          }
+
+          return this.profile.$accessToken;
+        });
       }
 
-      return this.$config.provider;
+      this.$promises.token = null;
+      return this.profile.$accessToken;
+    }).catch(error => {
+      this.$promises.token = null;
+      return Promise.reject(error);
+    });
+    return this.$promises.token;
+  }
+  /**
+   * Checks if the current route is secured and authenticates the user if necessary
+   * @ignore
+   */
+
+
+  $$onRouteChanged() {
+    logger('Route change detected, determining if the route is secured...');
+    if (!this.$utilities.isRouteSecure(location.href, this.$config.routes)) return;
+    logger('Route is secure, verifying tokens...');
+    this.retrieveAccessToken();
+  }
+  /**
+   * Disables automatic refresh of the token if the page is no longer visible
+   * @ignore
+   */
+
+
+  $$onVisibilityChanged() {
+    logger('Visibility change detected, deferring to the next event loop...');
+    logger('Determining if the id token has expired...');
+    if (this.profile.idTokenExpired || !this.$config.autoRefresh) return;
+
+    if (this.$utilities.$hidden) {
+      logger('Page is hidden, refreshing the token...');
+      this.refreshToken().then(() => {
+        logger('Disabling automatic renewal of the token...');
+        clearTimeout(this.$timeouts.refresh);
+        this.$timeouts.refresh = null;
+      });
+    } else {
+      logger('Page is visible restarting automatic token renewal...');
+      this.$$refreshToken();
     }
-    /**
-     * The authentication url to retrieve the access token
-     * @type {String}
-     * @private
-     */
+  }
 
-  }, {
-    key: "$accessTokenUrl",
-    get: function get() {
-      this.profile.$localState = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
-      this.profile.$nonce = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
-      var authorizeEndpoint = "".concat(this.$config.providerUrl, "/authorize");
-
-      if (this.$provider.authorizeEndpoint) {
-        authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
-      }
-
-      return this.$utilities.createUrl(authorizeEndpoint, lodash_assign__WEBPACK_IMPORTED_MODULE_0___default()({
-        'state': this.profile.$localState,
-        'nonce': this.profile.$nonce,
-        'response_type': 'token',
-        'redirect_uri': this.$config.redirectUrl && this.$config.redirectUrl.loginUrl || this.$config.redirectUrl,
-        'client_id': this.$config.clientId,
-        'scope': this.$config.scope,
-        'prompt': 'none'
-      }, this.$config.queryParams));
-    }
-  }, {
-    key: "$deauthorizeUrl",
-    get: function get() {
-      return this.$provider.deauthorizeUrl.call(this, lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_1___default()(this.$config, {
-        idToken: this.profile.$idToken
-      }));
-    }
-  }]);
-
-  return SalteAuth;
-}();
+}
 
 lodash_set__WEBPACK_IMPORTED_MODULE_3___default()(window, 'salte.SalteAuth', lodash_get__WEBPACK_IMPORTED_MODULE_2___default()(window, 'salte.SalteAuth', SalteAuth));
 
@@ -8779,107 +8601,75 @@ lodash_set__WEBPACK_IMPORTED_MODULE_3___default()(window, 'salte.SalteAuth', lod
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SalteAuthMixinGenerator", function() { return SalteAuthMixinGenerator; });
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-var SalteAuthMixinGenerator = function SalteAuthMixinGenerator(auth) {
-  var registeredMixedIns = [];
-  auth.on('login', function (error, user) {
+const SalteAuthMixinGenerator = function (auth) {
+  const registeredMixedIns = [];
+  auth.on('login', (error, user) => {
     if (error) {
       console.error(error);
       return;
     }
 
-    for (var i = 0; i < registeredMixedIns.length; i++) {
+    for (let i = 0; i < registeredMixedIns.length; i++) {
       registeredMixedIns[i].user = user;
       registeredMixedIns[i].authenticated = !auth.profile.idTokenExpired;
     }
   });
-  auth.on('logout', function (error) {
+  auth.on('logout', error => {
     if (error) {
       console.error(error);
       return;
     }
 
-    for (var i = 0; i < registeredMixedIns.length; i++) {
+    for (let i = 0; i < registeredMixedIns.length; i++) {
       registeredMixedIns[i].user = null;
       registeredMixedIns[i].authenticated = false;
     }
   });
-  auth.on('expired', function () {
-    for (var i = 0; i < registeredMixedIns.length; i++) {
+  auth.on('expired', () => {
+    for (let i = 0; i < registeredMixedIns.length; i++) {
       registeredMixedIns[i].authenticated = false;
     }
   });
   return function (superClass) {
-    return (
-      /*#__PURE__*/
-      function (_superClass) {
-        _inherits(_class, _superClass);
+    return class extends superClass {
+      constructor() {
+        super();
+        registeredMixedIns.push(this);
+        this.user = auth.profile.userInfo || null;
+        this.authenticated = !auth.profile.idTokenExpired;
+      }
 
-        function _class() {
-          var _this;
+      get auth() {
+        return auth;
+      }
 
-          _classCallCheck(this, _class);
+      get user() {
+        return this.$$user;
+      }
 
-          _this = _possibleConstructorReturn(this, _getPrototypeOf(_class).call(this));
-          registeredMixedIns.push(_assertThisInitialized(_this));
-          _this.user = auth.profile.userInfo || null;
-          _this.authenticated = !auth.profile.idTokenExpired;
-          return _this;
+      set user(user) {
+        const oldUser = this.$$user;
+        this.$$user = user;
+
+        if (this.requestUpdate) {
+          this.requestUpdate('user', oldUser);
         }
+      }
 
-        _createClass(_class, [{
-          key: "auth",
-          get: function get() {
-            return auth;
-          }
-        }, {
-          key: "user",
-          get: function get() {
-            return this.$$user;
-          },
-          set: function set(user) {
-            var oldUser = this.$$user;
-            this.$$user = user;
+      get authenticated() {
+        return this.$$authenticated;
+      }
 
-            if (this.requestUpdate) {
-              this.requestUpdate('user', oldUser);
-            }
-          }
-        }, {
-          key: "authenticated",
-          get: function get() {
-            return this.$$authenticated;
-          },
-          set: function set(authenticated) {
-            var oldAuthenticated = this.$$authenticated;
-            this.$$authenticated = authenticated;
+      set authenticated(authenticated) {
+        const oldAuthenticated = this.$$authenticated;
+        this.$$authenticated = authenticated;
 
-            if (this.requestUpdate) {
-              this.requestUpdate('authenticated', oldAuthenticated);
-            }
-          }
-        }]);
+        if (this.requestUpdate) {
+          this.requestUpdate('authenticated', oldAuthenticated);
+        }
+      }
 
-        return _class;
-      }(superClass)
-    );
+    };
   };
 };
 
@@ -8904,40 +8694,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! debug */ "../node_modules/debug/dist/debug.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_2__);
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
-
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 
 
 
 /** @ignore */
 
-var logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('@salte-io/salte-auth:profile');
+const logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('@salte-io/salte-auth:profile');
 /**
  * All the profile information associated with the current authentication session
  */
 
-var SalteAuthProfile =
-/*#__PURE__*/
-function () {
+class SalteAuthProfile {
   /**
    * Parses the current url for the authentication values
    * @param {Config} config configuration for salte auth
    */
-  function SalteAuthProfile(config) {
-    _classCallCheck(this, SalteAuthProfile);
-
+  constructor(config) {
     logger('Appending defaults to config...');
     /** @ignore */
 
@@ -8963,460 +8735,436 @@ function () {
    */
 
 
-  _createClass(SalteAuthProfile, [{
-    key: "$hash",
-    value: function $hash() {
-      if (location.hash) {
-        var params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
-        logger("Hash detected, parsing...", params);
+  $hash() {
+    if (location.hash) {
+      const params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
+      logger(`Hash detected, parsing...`, params);
 
-        for (var i = 0; i < params.length; i++) {
-          var param = params[i];
+      for (let i = 0; i < params.length; i++) {
+        const param = params[i];
+        const [key, value] = param.split('=');
+        this.$parse(key, decodeURIComponent(value));
+      }
 
-          var _param$split = param.split('='),
-              _param$split2 = _slicedToArray(_param$split, 2),
-              key = _param$split2[0],
-              value = _param$split2[1];
+      logger(`Removing hash...`);
+      history.pushState('', document.title, location.href.split('#')[0]);
+    }
+  }
+  /**
+   * Parse a key-value pair
+   * @param {String} key the key to parse
+   * @param {Object} value the matching value to parse
+   * @private
+   */
 
-          this.$parse(key, decodeURIComponent(value));
+
+  $parse(key, value) {
+    switch (key) {
+      case 'token_type':
+        this.$tokenType = value;
+        break;
+
+      case 'expires_in':
+        this.$expiration = Date.now() + Number(value) * 1000;
+        break;
+
+      case 'access_token':
+        this.$accessToken = value;
+        break;
+
+      case 'id_token':
+        this.$idToken = value;
+        break;
+
+      case 'state':
+        this.$state = value;
+        break;
+
+      case 'error':
+        this.$error = value;
+        break;
+
+      case 'error_description':
+        this.$errorDescription = value;
+        break;
+    }
+  }
+  /**
+   * Whether the ID Token has expired
+   * @return {Boolean} true if the "id_token" has expired
+   */
+
+
+  get idTokenExpired() {
+    return !this.$idToken || Date.now() >= this.userInfo.exp * 1000;
+  }
+  /**
+   * Whether the Access Token has expired
+   * @return {Boolean} true if the "access_token" has expired
+   */
+
+
+  get accessTokenExpired() {
+    return !this.$accessToken || Date.now() >= this.$expiration;
+  }
+  /**
+   * The type of Access Token that was returned by the identity provider
+   * @return {String} the type of access token
+   * @private
+   */
+
+
+  get $tokenType() {
+    return this.$getItem('salte.auth.$token-type', 'session');
+  }
+
+  set $tokenType(tokenType) {
+    this.$saveItem('salte.auth.$token-type', tokenType, 'session');
+  }
+  /**
+   * The date and time that the access token will expire
+   * @return {Number} the expiration time as unix timestamp
+   * @private
+   */
+
+
+  get $expiration() {
+    const expiration = this.$getItem('salte.auth.expiration');
+    return expiration ? Number(expiration) : null;
+  }
+
+  set $expiration(expiration) {
+    this.$saveItem('salte.auth.expiration', expiration);
+  }
+  /**
+   * The Access Token returned by the identity provider
+   * @return {String} the access token
+   * @private
+   */
+
+
+  get $accessToken() {
+    return this.$getItem('salte.auth.access-token');
+  }
+
+  set $accessToken(accessToken) {
+    this.$saveItem('salte.auth.access-token', accessToken);
+  }
+  /**
+   * The ID Token returned by the identity provider
+   * @return {String} the id token
+   * @private
+   */
+
+
+  get $idToken() {
+    return this.$getItem('salte.auth.id-token');
+  }
+
+  set $idToken(idToken) {
+    this.$saveItem('salte.auth.id-token', idToken);
+  }
+  /**
+   * The authentication state returned by the identity provider
+   * @return {String} the state value
+   * @private
+   *
+   * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
+   */
+
+
+  get $state() {
+    return this.$getItem('salte.auth.$state', 'session');
+  }
+
+  set $state(state) {
+    this.$saveItem('salte.auth.$state', state, 'session');
+  }
+  /**
+   * The locally generate authentication state
+   * @return {String} the local state value
+   * @private
+   *
+   * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
+   */
+
+
+  get $localState() {
+    return this.$getItem('salte.auth.$local-state', 'session');
+  }
+
+  set $localState(localState) {
+    this.$saveItem('salte.auth.$local-state', localState, 'session');
+  }
+  /**
+   * The error returned by the identity provider
+   * @return {String} the state value
+   * @private
+   */
+
+
+  get $error() {
+    return this.$getItem('salte.auth.error');
+  }
+
+  set $error(error) {
+    this.$saveItem('salte.auth.error', error);
+  }
+  /**
+   * The error description returned by the identity provider
+   * @return {String} a string that describes the error that occurred
+   * @private
+   */
+
+
+  get $errorDescription() {
+    return this.$getItem('salte.auth.error-description');
+  }
+
+  set $errorDescription(errorDescription) {
+    this.$saveItem('salte.auth.error-description', errorDescription);
+  }
+  /**
+   * The url the user originated from before authentication occurred
+   * @return {String} The url the user originated from before authentication occurred
+   * @private
+   */
+
+
+  get $redirectUrl() {
+    return this.$getItem('salte.auth.$redirect-url', 'session');
+  }
+
+  set $redirectUrl(redirectUrl) {
+    this.$saveItem('salte.auth.$redirect-url', redirectUrl, 'session');
+  }
+  /**
+   * Parses the User Info from the ID Token
+   * @return {String} The User Info from the ID Token
+   * @private
+   */
+
+
+  get $nonce() {
+    return this.$getItem('salte.auth.$nonce', 'session');
+  }
+
+  set $nonce(nonce) {
+    this.$saveItem('salte.auth.$nonce', nonce, 'session');
+  }
+  /**
+   * Sets or Gets an action based on whether a action was passed.
+   * @param {String} state The state this action is tied to.
+   * @param {String} action The action to store.
+   * @return {String|undefined} Returns a string if an action wasn't provided.
+   * @private
+   */
+
+
+  $actions(state, action) {
+    if (action) {
+      this.$saveItem(`salte.auth.action.${state}`, action);
+    } else {
+      return this.$getItem(`salte.auth.action.${state}`);
+    }
+  }
+  /**
+   * Parses the User Info from the ID Token
+   * @param {String} idToken the id token to update based off
+   * @private
+   */
+
+
+  $refreshUserInfo(idToken = this.$idToken) {
+    let userInfo = null;
+
+    if (idToken) {
+      const separatedToken = idToken.split('.');
+
+      if (separatedToken.length === 3) {
+        // This fixes an issue where various providers will encode values
+        // incorrectly and cause the browser to fail to decode.
+        // https://stackoverflow.com/questions/43065553/base64-decoded-differently-in-java-jjwt
+        const payload = separatedToken[1].replace(/-/g, '+').replace(/_/g, '/');
+        userInfo = JSON.parse(atob(payload));
+      }
+    }
+
+    this.userInfo = userInfo;
+  }
+  /**
+   * Verifies that we were logged in successfully and that all security checks pass
+   * @param {Boolean} accessTokenRequest if the request we're validating was an access token request
+   * @return {Object} the error message
+   * @private
+   */
+
+
+  $validate(accessTokenRequest) {
+    this.$refreshUserInfo();
+
+    if (!this.$$config.validation) {
+      logger('Validation is disabled, skipping...');
+      return;
+    }
+
+    if (this.$error) {
+      return {
+        code: this.$error,
+        description: this.$errorDescription
+      };
+    }
+
+    if (!this.$idToken) {
+      return {
+        code: 'login_canceled',
+        description: 'User likely canceled the login or something unexpected occurred.'
+      };
+    }
+
+    if (this.$$config.validation.state && this.$localState !== this.$state) {
+      return {
+        code: 'invalid_state',
+        description: 'State provided by identity provider did not match local state.'
+      };
+    }
+
+    if (accessTokenRequest) return;
+
+    if (this.$$config.validation.nonce && this.$nonce !== this.userInfo.nonce) {
+      return {
+        code: 'invalid_nonce',
+        description: 'Nonce provided by identity provider did not match local nonce.'
+      };
+    }
+
+    if (Array.isArray(this.userInfo.aud)) {
+      if (this.$$config.validation.azp) {
+        if (!this.userInfo.azp) {
+          return {
+            code: 'invalid_azp',
+            description: 'Audience was returned as an array and AZP was not present on the ID Token.'
+          };
         }
 
-        logger("Removing hash...");
-        history.pushState('', document.title, location.href.split('#')[0]);
-      }
-    }
-    /**
-     * Parse a key-value pair
-     * @param {String} key the key to parse
-     * @param {Object} value the matching value to parse
-     * @private
-     */
-
-  }, {
-    key: "$parse",
-    value: function $parse(key, value) {
-      switch (key) {
-        case 'token_type':
-          this.$tokenType = value;
-          break;
-
-        case 'expires_in':
-          this.$expiration = Date.now() + Number(value) * 1000;
-          break;
-
-        case 'access_token':
-          this.$accessToken = value;
-          break;
-
-        case 'id_token':
-          this.$idToken = value;
-          break;
-
-        case 'state':
-          this.$state = value;
-          break;
-
-        case 'error':
-          this.$error = value;
-          break;
-
-        case 'error_description':
-          this.$errorDescription = value;
-          break;
-      }
-    }
-    /**
-     * Whether the ID Token has expired
-     * @return {Boolean} true if the "id_token" has expired
-     */
-
-  }, {
-    key: "$actions",
-
-    /**
-     * Sets or Gets an action based on whether a action was passed.
-     * @param {String} state The state this action is tied to.
-     * @param {String} action The action to store.
-     * @return {String|undefined} Returns a string if an action wasn't provided.
-     * @private
-     */
-    value: function $actions(state, action) {
-      if (action) {
-        this.$saveItem("salte.auth.action.".concat(state), action);
-      } else {
-        return this.$getItem("salte.auth.action.".concat(state));
-      }
-    }
-    /**
-     * Parses the User Info from the ID Token
-     * @param {String} idToken the id token to update based off
-     * @private
-     */
-
-  }, {
-    key: "$refreshUserInfo",
-    value: function $refreshUserInfo() {
-      var idToken = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.$idToken;
-      var userInfo = null;
-
-      if (idToken) {
-        var separatedToken = idToken.split('.');
-
-        if (separatedToken.length === 3) {
-          // This fixes an issue where various providers will encode values
-          // incorrectly and cause the browser to fail to decode.
-          // https://stackoverflow.com/questions/43065553/base64-decoded-differently-in-java-jjwt
-          var payload = separatedToken[1].replace(/-/g, '+').replace(/_/g, '/');
-          userInfo = JSON.parse(atob(payload));
+        if (this.userInfo.azp !== this.$$config.clientId) {
+          return {
+            code: 'invalid_azp',
+            description: 'AZP does not match the Client ID.'
+          };
         }
       }
 
-      this.userInfo = userInfo;
-    }
-    /**
-     * Verifies that we were logged in successfully and that all security checks pass
-     * @param {Boolean} accessTokenRequest if the request we're validating was an access token request
-     * @return {Object} the error message
-     * @private
-     */
+      if (this.$$config.validation.aud) {
+        const aud = lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(this.userInfo.aud, audience => {
+          return audience === this.$$config.clientId;
+        });
 
-  }, {
-    key: "$validate",
-    value: function $validate(accessTokenRequest) {
-      var _this = this;
-
-      this.$refreshUserInfo();
-
-      if (!this.$$config.validation) {
-        logger('Validation is disabled, skipping...');
-        return;
-      }
-
-      if (this.$error) {
-        return {
-          code: this.$error,
-          description: this.$errorDescription
-        };
-      }
-
-      if (!this.$idToken) {
-        return {
-          code: 'login_canceled',
-          description: 'User likely canceled the login or something unexpected occurred.'
-        };
-      }
-
-      if (this.$$config.validation.state && this.$localState !== this.$state) {
-        return {
-          code: 'invalid_state',
-          description: 'State provided by identity provider did not match local state.'
-        };
-      }
-
-      if (accessTokenRequest) return;
-
-      if (this.$$config.validation.nonce && this.$nonce !== this.userInfo.nonce) {
-        return {
-          code: 'invalid_nonce',
-          description: 'Nonce provided by identity provider did not match local nonce.'
-        };
-      }
-
-      if (Array.isArray(this.userInfo.aud)) {
-        if (this.$$config.validation.azp) {
-          if (!this.userInfo.azp) {
-            return {
-              code: 'invalid_azp',
-              description: 'Audience was returned as an array and AZP was not present on the ID Token.'
-            };
-          }
-
-          if (this.userInfo.azp !== this.$$config.clientId) {
-            return {
-              code: 'invalid_azp',
-              description: 'AZP does not match the Client ID.'
-            };
-          }
-        }
-
-        if (this.$$config.validation.aud) {
-          var aud = lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(this.userInfo.aud, function (audience) {
-            return audience === _this.$$config.clientId;
-          });
-
-          if (!aud) {
-            return {
-              code: 'invalid_aud',
-              description: 'None of the audience values matched the Client ID.'
-            };
-          }
-        }
-      } else if (this.$$config.validation.aud && this.userInfo.aud !== this.$$config.clientId) {
-        return {
-          code: 'invalid_aud',
-          description: 'The audience did not match the Client ID.'
-        };
-      }
-    }
-    /**
-     * Saves a value to the Web Storage API
-     * @param {String} key The key to save to
-     * @param {String} overrideStorageType the name of the storageType to use
-     * @return {*} the storage value for the given key
-     * @private
-     */
-
-  }, {
-    key: "$getItem",
-    value: function $getItem(key, overrideStorageType) {
-      var storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
-      return storage.getItem(key);
-    }
-    /**
-     * Saves a value to the Web Storage API
-     * @param {String} key The key to save to
-     * @param {*} value The value to save, if this is undefined or null it will delete the key
-     * @param {String} overrideStorageType the name of the storageType to use
-     * @private
-     */
-
-  }, {
-    key: "$saveItem",
-    value: function $saveItem(key, value, overrideStorageType) {
-      var storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
-
-      if ([undefined, null].indexOf(value) !== -1) {
-        storage.removeItem(key);
-      } else {
-        storage.setItem(key, value);
-      }
-    }
-    /**
-     * Return the active Web Storage API
-     * @return {Storage} the storage api to save and pull values from
-     * @private
-     */
-
-  }, {
-    key: "$$getStorage",
-
-    /**
-     * Determines which Web Storage API to return using the name provided
-     * @param {String} storageType the name of the storageType to use
-     * @return {Storage} the web storage api that matches the given string
-     * @ignore
-     */
-    value: function $$getStorage(storageType) {
-      if (storageType === 'local') {
-        return localStorage;
-      } else if (storageType === 'session') {
-        return sessionStorage;
-      } else {
-        throw new ReferenceError("Unknown Storage Type (".concat(storageType, ")"));
-      }
-    }
-    /**
-     * Clears all `salte.auth` values from localStorage
-     * @private
-     */
-
-  }, {
-    key: "$clear",
-    value: function $clear() {
-      for (var key in localStorage) {
-        if (key.match(/^salte\.auth\.[^$]/)) {
-          localStorage.removeItem(key);
+        if (!aud) {
+          return {
+            code: 'invalid_aud',
+            description: 'None of the audience values matched the Client ID.'
+          };
         }
       }
+    } else if (this.$$config.validation.aud && this.userInfo.aud !== this.$$config.clientId) {
+      return {
+        code: 'invalid_aud',
+        description: 'The audience did not match the Client ID.'
+      };
+    }
+  }
+  /**
+   * Saves a value to the Web Storage API
+   * @param {String} key The key to save to
+   * @param {String} overrideStorageType the name of the storageType to use
+   * @return {*} the storage value for the given key
+   * @private
+   */
 
-      for (var _key in sessionStorage) {
-        if (_key.match(/^salte\.auth\.[^$]/)) {
-          sessionStorage.removeItem(_key);
-        }
+
+  $getItem(key, overrideStorageType) {
+    const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
+    return storage.getItem(key);
+  }
+  /**
+   * Saves a value to the Web Storage API
+   * @param {String} key The key to save to
+   * @param {*} value The value to save, if this is undefined or null it will delete the key
+   * @param {String} overrideStorageType the name of the storageType to use
+   * @private
+   */
+
+
+  $saveItem(key, value, overrideStorageType) {
+    const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
+
+    if ([undefined, null].indexOf(value) !== -1) {
+      storage.removeItem(key);
+    } else {
+      storage.setItem(key, value);
+    }
+  }
+  /**
+   * Return the active Web Storage API
+   * @return {Storage} the storage api to save and pull values from
+   * @private
+   */
+
+
+  get $storage() {
+    return this.$$getStorage(this.$$config.storageType);
+  }
+  /**
+   * Determines which Web Storage API to return using the name provided
+   * @param {String} storageType the name of the storageType to use
+   * @return {Storage} the web storage api that matches the given string
+   * @ignore
+   */
+
+
+  $$getStorage(storageType) {
+    if (storageType === 'local') {
+      return localStorage;
+    } else if (storageType === 'session') {
+      return sessionStorage;
+    } else {
+      throw new ReferenceError(`Unknown Storage Type (${storageType})`);
+    }
+  }
+  /**
+   * Clears all `salte.auth` values from localStorage
+   * @private
+   */
+
+
+  $clear() {
+    for (const key in localStorage) {
+      if (key.match(/^salte\.auth\.[^$]/)) {
+        localStorage.removeItem(key);
       }
+    }
 
-      this.$refreshUserInfo();
+    for (const key in sessionStorage) {
+      if (key.match(/^salte\.auth\.[^$]/)) {
+        sessionStorage.removeItem(key);
+      }
     }
-    /**
-     * Clears all `salte.auth` error values from localStorage
-     * @private
-     */
 
-  }, {
-    key: "$clearErrors",
-    value: function $clearErrors() {
-      this.$error = undefined;
-      this.$errorDescription = undefined;
-    }
-  }, {
-    key: "idTokenExpired",
-    get: function get() {
-      return !this.$idToken || Date.now() >= this.userInfo.exp * 1000;
-    }
-    /**
-     * Whether the Access Token has expired
-     * @return {Boolean} true if the "access_token" has expired
-     */
+    this.$refreshUserInfo();
+  }
+  /**
+   * Clears all `salte.auth` error values from localStorage
+   * @private
+   */
 
-  }, {
-    key: "accessTokenExpired",
-    get: function get() {
-      return !this.$accessToken || Date.now() >= this.$expiration;
-    }
-    /**
-     * The type of Access Token that was returned by the identity provider
-     * @return {String} the type of access token
-     * @private
-     */
 
-  }, {
-    key: "$tokenType",
-    get: function get() {
-      return this.$getItem('salte.auth.$token-type', 'session');
-    },
-    set: function set(tokenType) {
-      this.$saveItem('salte.auth.$token-type', tokenType, 'session');
-    }
-    /**
-     * The date and time that the access token will expire
-     * @return {Number} the expiration time as unix timestamp
-     * @private
-     */
+  $clearErrors() {
+    this.$error = undefined;
+    this.$errorDescription = undefined;
+  }
 
-  }, {
-    key: "$expiration",
-    get: function get() {
-      var expiration = this.$getItem('salte.auth.expiration');
-      return expiration ? Number(expiration) : null;
-    },
-    set: function set(expiration) {
-      this.$saveItem('salte.auth.expiration', expiration);
-    }
-    /**
-     * The Access Token returned by the identity provider
-     * @return {String} the access token
-     * @private
-     */
-
-  }, {
-    key: "$accessToken",
-    get: function get() {
-      return this.$getItem('salte.auth.access-token');
-    },
-    set: function set(accessToken) {
-      this.$saveItem('salte.auth.access-token', accessToken);
-    }
-    /**
-     * The ID Token returned by the identity provider
-     * @return {String} the id token
-     * @private
-     */
-
-  }, {
-    key: "$idToken",
-    get: function get() {
-      return this.$getItem('salte.auth.id-token');
-    },
-    set: function set(idToken) {
-      this.$saveItem('salte.auth.id-token', idToken);
-    }
-    /**
-     * The authentication state returned by the identity provider
-     * @return {String} the state value
-     * @private
-     *
-     * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
-     */
-
-  }, {
-    key: "$state",
-    get: function get() {
-      return this.$getItem('salte.auth.$state', 'session');
-    },
-    set: function set(state) {
-      this.$saveItem('salte.auth.$state', state, 'session');
-    }
-    /**
-     * The locally generate authentication state
-     * @return {String} the local state value
-     * @private
-     *
-     * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
-     */
-
-  }, {
-    key: "$localState",
-    get: function get() {
-      return this.$getItem('salte.auth.$local-state', 'session');
-    },
-    set: function set(localState) {
-      this.$saveItem('salte.auth.$local-state', localState, 'session');
-    }
-    /**
-     * The error returned by the identity provider
-     * @return {String} the state value
-     * @private
-     */
-
-  }, {
-    key: "$error",
-    get: function get() {
-      return this.$getItem('salte.auth.error');
-    },
-    set: function set(error) {
-      this.$saveItem('salte.auth.error', error);
-    }
-    /**
-     * The error description returned by the identity provider
-     * @return {String} a string that describes the error that occurred
-     * @private
-     */
-
-  }, {
-    key: "$errorDescription",
-    get: function get() {
-      return this.$getItem('salte.auth.error-description');
-    },
-    set: function set(errorDescription) {
-      this.$saveItem('salte.auth.error-description', errorDescription);
-    }
-    /**
-     * The url the user originated from before authentication occurred
-     * @return {String} The url the user originated from before authentication occurred
-     * @private
-     */
-
-  }, {
-    key: "$redirectUrl",
-    get: function get() {
-      return this.$getItem('salte.auth.$redirect-url', 'session');
-    },
-    set: function set(redirectUrl) {
-      this.$saveItem('salte.auth.$redirect-url', redirectUrl, 'session');
-    }
-    /**
-     * Parses the User Info from the ID Token
-     * @return {String} The User Info from the ID Token
-     * @private
-     */
-
-  }, {
-    key: "$nonce",
-    get: function get() {
-      return this.$getItem('salte.auth.$nonce', 'session');
-    },
-    set: function set(nonce) {
-      this.$saveItem('salte.auth.$nonce', nonce, 'session');
-    }
-  }, {
-    key: "$storage",
-    get: function get() {
-      return this.$$getStorage(this.$$config.storageType);
-    }
-  }]);
-
-  return SalteAuthProfile;
-}();
+}
 
 
 /* harmony default export */ __webpack_exports__["default"] = (SalteAuthProfile);
@@ -9438,12 +9186,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _providers_cognito_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./providers/cognito.js */ "./providers/cognito.js");
 /* harmony import */ var _providers_wso2_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./providers/wso2.js */ "./providers/wso2.js");
 /* harmony import */ var _providers_okta_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./providers/okta.js */ "./providers/okta.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 
 
 
@@ -9453,67 +9195,52 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * A collection of overrides for specific Identity Providers
  */
 
-var Providers =
-/*#__PURE__*/
-function () {
-  function Providers() {
-    _classCallCheck(this, Providers);
+class Providers {
+  /**
+   * Provider for Auth0
+   * @type {SalteAuthAuth0Provider}
+   */
+  static get auth0() {
+    return _providers_auth0_js__WEBPACK_IMPORTED_MODULE_0__["default"];
+  }
+  /**
+   * Provider for Azure's Active Directory
+   * @type {SalteAuthAzureProvider}
+   */
+
+
+  static get azure() {
+    return _providers_azure_js__WEBPACK_IMPORTED_MODULE_1__["default"];
+  }
+  /**
+   * Provider for Amazon's Cognito
+   * @type {SalteAuthCognitoProvider}
+   */
+
+
+  static get cognito() {
+    return _providers_cognito_js__WEBPACK_IMPORTED_MODULE_2__["default"];
+  }
+  /**
+   * Provider for WSO2's API Gateway
+   * @type {SalteAuthWSO2Provider}
+   */
+
+
+  static get wso2() {
+    return _providers_wso2_js__WEBPACK_IMPORTED_MODULE_3__["default"];
+  }
+  /**
+   * Provider for Okta
+   * @type {SalteAuthOktaProvider}
+   */
+
+
+  static get okta() {
+    return _providers_okta_js__WEBPACK_IMPORTED_MODULE_4__["default"];
   }
 
-  _createClass(Providers, null, [{
-    key: "auth0",
-
-    /**
-     * Provider for Auth0
-     * @type {SalteAuthAuth0Provider}
-     */
-    get: function get() {
-      return _providers_auth0_js__WEBPACK_IMPORTED_MODULE_0__["default"];
-    }
-    /**
-     * Provider for Azure's Active Directory
-     * @type {SalteAuthAzureProvider}
-     */
-
-  }, {
-    key: "azure",
-    get: function get() {
-      return _providers_azure_js__WEBPACK_IMPORTED_MODULE_1__["default"];
-    }
-    /**
-     * Provider for Amazon's Cognito
-     * @type {SalteAuthCognitoProvider}
-     */
-
-  }, {
-    key: "cognito",
-    get: function get() {
-      return _providers_cognito_js__WEBPACK_IMPORTED_MODULE_2__["default"];
-    }
-    /**
-     * Provider for WSO2's API Gateway
-     * @type {SalteAuthWSO2Provider}
-     */
-
-  }, {
-    key: "wso2",
-    get: function get() {
-      return _providers_wso2_js__WEBPACK_IMPORTED_MODULE_3__["default"];
-    }
-    /**
-     * Provider for Okta
-     * @type {SalteAuthOktaProvider}
-     */
-
-  }, {
-    key: "okta",
-    get: function get() {
-      return _providers_okta_js__WEBPACK_IMPORTED_MODULE_4__["default"];
-    }
-  }]);
-
-  return Providers;
-}();
+}
 
 ;
 
@@ -9535,31 +9262,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_assign__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_assign__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! debug */ "../node_modules/debug/dist/debug.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_1__);
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 
 
 /** @ignore */
 
-var logger = debug__WEBPACK_IMPORTED_MODULE_1___default()('@salte-io/salte-auth:utilities');
+const logger = debug__WEBPACK_IMPORTED_MODULE_1___default()('@salte-io/salte-auth:utilities');
 /**
  * Basic utilities to support the authentication flow
  */
 
-var SalteAuthUtilities =
-/*#__PURE__*/
-function () {
+class SalteAuthUtilities {
   /**
    * Wraps all XHR and Fetch (if available) requests to allow promise interceptors
    * @param {Config} config configuration for salte auth
    */
-  function SalteAuthUtilities(config) {
-    _classCallCheck(this, SalteAuthUtilities);
-
+  constructor(config) {
     /** @ignore */
     this.$$config = config;
     /** @ignore */
@@ -9578,27 +9295,24 @@ function () {
       };
     })(XMLHttpRequest.prototype.open);
 
-    var self = this;
+    const self = this;
 
     (function (send) {
       XMLHttpRequest.prototype.send = function (data) {
-        var _this = this;
+        const promises = [];
 
-        var promises = [];
-
-        for (var i = 0; i < self.$interceptors.xhr.length; i++) {
-          var interceptor = self.$interceptors.xhr[i];
+        for (let i = 0; i < self.$interceptors.xhr.length; i++) {
+          const interceptor = self.$interceptors.xhr[i];
           promises.push(interceptor(this, data));
         }
 
-        Promise.all(promises).then(function () {
-          send.call(_this, data);
-        }).catch(function (error) {
-          var event = document.createEvent('Event');
+        Promise.all(promises).then(() => {
+          send.call(this, data);
+        }).catch(error => {
+          const event = document.createEvent('Event');
           event.initEvent('error', false, true);
           event.detail = error;
-
-          _this.dispatchEvent(event);
+          this.dispatchEvent(event);
         });
       };
     })(XMLHttpRequest.prototype.send);
@@ -9608,18 +9322,16 @@ function () {
 
       (function (fetch) {
         window.fetch = function (input, options) {
-          var _this2 = this;
+          const request = input instanceof Request ? input : new Request(input, options);
+          const promises = [];
 
-          var request = input instanceof Request ? input : new Request(input, options);
-          var promises = [];
-
-          for (var i = 0; i < self.$interceptors.fetch.length; i++) {
-            var interceptor = self.$interceptors.fetch[i];
+          for (let i = 0; i < self.$interceptors.fetch.length; i++) {
+            const interceptor = self.$interceptors.fetch[i];
             promises.push(interceptor(request));
           }
 
-          return Promise.all(promises).then(function () {
-            return fetch.call(_this2, request);
+          return Promise.all(promises).then(() => {
+            return fetch.call(this, request);
           });
         };
       })(fetch);
@@ -9633,293 +9345,268 @@ function () {
    */
 
 
-  _createClass(SalteAuthUtilities, [{
-    key: "createUrl",
-    value: function createUrl(baseUrl) {
-      var queryParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var url = baseUrl;
-      Object.keys(queryParams).forEach(function (key) {
-        var value = queryParams[key];
+  createUrl(baseUrl, queryParams = {}) {
+    let url = baseUrl;
+    Object.keys(queryParams).forEach(key => {
+      const value = queryParams[key];
 
-        if ([undefined, null, ''].indexOf(value) === -1) {
-          url += "".concat(url.indexOf('?') === -1 ? '?' : '&').concat(key, "=").concat(encodeURIComponent(value));
-        }
-      });
-      return url;
-    }
-    /**
-     * Converts a url to an absolute url
-     * @param {String} path the url path to resolve to an absolute url
-     * @return {String} the absolutely resolved url
-     */
-
-  }, {
-    key: "resolveUrl",
-    value: function resolveUrl(path) {
-      if (!this.$$urlDocument) {
-        /** @ignore */
-        this.$$urlDocument = document.implementation.createHTMLDocument('url');
-        /** @ignore */
-
-        this.$$urlBase = this.$$urlDocument.createElement('base');
-        /** @ignore */
-
-        this.$$urlAnchor = this.$$urlDocument.createElement('a');
-        this.$$urlDocument.head.appendChild(this.$$urlBase);
+      if ([undefined, null, ''].indexOf(value) === -1) {
+        url += `${url.indexOf('?') === -1 ? '?' : '&'}${key}=${encodeURIComponent(value)}`;
       }
+    });
+    return url;
+  }
+  /**
+   * Converts a url to an absolute url
+   * @param {String} path the url path to resolve to an absolute url
+   * @return {String} the absolutely resolved url
+   */
 
-      this.$$urlBase.href = window.location.protocol + '//' + window.location.host;
-      this.$$urlAnchor.href = path.replace(/ /g, '%20');
-      return this.$$urlAnchor.href.replace(/\/$/, '');
+
+  resolveUrl(path) {
+    if (!this.$$urlDocument) {
+      /** @ignore */
+      this.$$urlDocument = document.implementation.createHTMLDocument('url');
+      /** @ignore */
+
+      this.$$urlBase = this.$$urlDocument.createElement('base');
+      /** @ignore */
+
+      this.$$urlAnchor = this.$$urlDocument.createElement('a');
+      this.$$urlDocument.head.appendChild(this.$$urlBase);
     }
-    /**
-     * Checks if the given url matches any of the test urls
-     * @param {String} url The url to test
-     * @param {Array<String|RegExp>} tests The urls to match the test url against
-     * @return {Boolean} true if the url matches one of the tests
-     */
 
-  }, {
-    key: "checkForMatchingUrl",
-    value: function checkForMatchingUrl(url) {
-      var tests = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      var resolvedUrl = this.resolveUrl(url);
+    this.$$urlBase.href = window.location.protocol + '//' + window.location.host;
+    this.$$urlAnchor.href = path.replace(/ /g, '%20');
+    return this.$$urlAnchor.href.replace(/\/$/, '');
+  }
+  /**
+   * Checks if the given url matches any of the test urls
+   * @param {String} url The url to test
+   * @param {Array<String|RegExp>} tests The urls to match the test url against
+   * @return {Boolean} true if the url matches one of the tests
+   */
 
-      for (var i = 0; i < tests.length; i++) {
-        var test = tests[i];
 
-        if (test instanceof RegExp) {
-          return !!resolvedUrl.match(test);
-        } else {
-          return resolvedUrl.indexOf(this.resolveUrl(test)) === 0;
-        }
-      }
+  checkForMatchingUrl(url, tests = []) {
+    const resolvedUrl = this.resolveUrl(url);
 
-      return false;
-    }
-    /**
-     * Determines if the given route is a secured route
-     * @param {String} route the route to verify
-     * @param {Boolean|Array<String>} securedRoutes a list of routes that require authentication
-     * @return {Boolean} true if the route provided is a secured route
-     */
+    for (let i = 0; i < tests.length; i++) {
+      const test = tests[i];
 
-  }, {
-    key: "isRouteSecure",
-    value: function isRouteSecure(route, securedRoutes) {
-      if (securedRoutes === true) {
-        return true;
-      } else if (securedRoutes instanceof Array) {
-        return this.checkForMatchingUrl(route, securedRoutes);
-      }
-
-      return false;
-    }
-    /**
-     * Opens a popup window in the middle of the viewport
-     * @param {String} url the url to be loaded
-     * @param {String} name the name of the window
-     * @param {Number} height the height of the window
-     * @param {Number} width the width of the window
-     * @return {Promise} resolves when the popup is closed
-     */
-
-  }, {
-    key: "openPopup",
-    value: function openPopup(url) {
-      var _this3 = this;
-
-      var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'salte-auth';
-      var height = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 600;
-      var width = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 400;
-      var top = window.innerHeight / 2 - height / 2 + window.screenTop;
-      var left = window.innerWidth / 2 - width / 2 + window.screenLeft;
-      var popupWindow = window.open(url, name, "height=".concat(height, ", width=").concat(width, ", status=yes, toolbar=no, menubar=no, location=no, top=").concat(top, ", left=").concat(left));
-
-      if (!popupWindow) {
-        return Promise.reject(new ReferenceError('We were unable to open the popup window, its likely that the request was blocked.'));
-      }
-
-      popupWindow.focus(); // TODO: Find a better way of tracking when a Window closes.
-
-      return new Promise(function (resolve) {
-        var checker = setInterval(function () {
-          try {
-            if (!popupWindow.closed) {
-              // This could throw cross-domain errors, so we need to silence them.
-              var loginUrl = _this3.$$config.redirectUrl && _this3.$$config.redirectUrl.loginUrl || _this3.$$config.redirectUrl;
-              var logoutUrl = _this3.$$config.redirectUrl && _this3.$$config.redirectUrl.logoutUrl || _this3.$$config.redirectUrl;
-              if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
-              location.hash = popupWindow.location.hash;
-              popupWindow.close();
-            }
-
-            clearInterval(checker);
-            setTimeout(resolve);
-          } catch (e) {}
-        }, 100);
-      });
-    }
-    /**
-     * Opens a new tab
-     * @param {String} url the url to be loaded
-     * @return {Promise} resolves when the tab is closed
-     */
-
-  }, {
-    key: "openNewTab",
-    value: function openNewTab(url) {
-      var _this4 = this;
-
-      var tabWindow = window.open(url, '_blank');
-
-      if (!tabWindow) {
-        return Promise.reject(new ReferenceError('We were unable to open the new tab, its likely that the request was blocked.'));
-      }
-
-      tabWindow.name = 'salte-auth';
-      tabWindow.focus(); // TODO: Find a better way of tracking when a Window closes.
-
-      return new Promise(function (resolve) {
-        var checker = setInterval(function () {
-          try {
-            if (!tabWindow.closed) {
-              // This could throw cross-domain errors, so we need to silence them.
-              var loginUrl = _this4.$$config.redirectUrl && _this4.$$config.redirectUrl.loginUrl || _this4.$$config.redirectUrl;
-              var logoutUrl = _this4.$$config.redirectUrl && _this4.$$config.redirectUrl.logoutUrl || _this4.$$config.redirectUrl;
-              if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
-              location.hash = tabWindow.location.hash;
-              tabWindow.close();
-            }
-
-            clearInterval(checker);
-            setTimeout(resolve);
-          } catch (e) {}
-        }, 100);
-      });
-    }
-    /**
-     * Opens an iframe in the background
-     * @param {String} url the url to be loaded
-     * @param {Boolean} show whether the iframe should be visible
-     * @return {Promise} resolves when the iframe is closed
-     */
-
-  }, {
-    key: "createIframe",
-    value: function createIframe(url, show) {
-      var iframe = document.createElement('iframe');
-      iframe.setAttribute('owner', 'salte-auth');
-
-      if (show) {
-        lodash_assign__WEBPACK_IMPORTED_MODULE_0___default()(iframe.style, {
-          position: 'fixed',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '100%',
-          width: '100%',
-          zIndex: 9999,
-          border: 'none',
-          opacity: 0,
-          transition: '0.5s opacity'
-        });
-        setTimeout(function () {
-          iframe.style.opacity = 1;
-        });
+      if (test instanceof RegExp) {
+        return !!resolvedUrl.match(test);
       } else {
-        iframe.style.display = 'none';
+        return resolvedUrl.indexOf(this.resolveUrl(test)) === 0;
       }
+    }
 
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      return new Promise(function (resolve) {
-        iframe.addEventListener('DOMNodeRemoved', function () {
+    return false;
+  }
+  /**
+   * Determines if the given route is a secured route
+   * @param {String} route the route to verify
+   * @param {Boolean|Array<String>} securedRoutes a list of routes that require authentication
+   * @return {Boolean} true if the route provided is a secured route
+   */
+
+
+  isRouteSecure(route, securedRoutes) {
+    if (securedRoutes === true) {
+      return true;
+    } else if (securedRoutes instanceof Array) {
+      return this.checkForMatchingUrl(route, securedRoutes);
+    }
+
+    return false;
+  }
+  /**
+   * Opens a popup window in the middle of the viewport
+   * @param {String} url the url to be loaded
+   * @param {String} name the name of the window
+   * @param {Number} height the height of the window
+   * @param {Number} width the width of the window
+   * @return {Promise} resolves when the popup is closed
+   */
+
+
+  openPopup(url, name = 'salte-auth', height = 600, width = 400) {
+    const top = window.innerHeight / 2 - height / 2 + window.screenTop;
+    const left = window.innerWidth / 2 - width / 2 + window.screenLeft;
+    const popupWindow = window.open(url, name, `height=${height}, width=${width}, status=yes, toolbar=no, menubar=no, location=no, top=${top}, left=${left}`);
+
+    if (!popupWindow) {
+      return Promise.reject(new ReferenceError('We were unable to open the popup window, its likely that the request was blocked.'));
+    }
+
+    popupWindow.focus(); // TODO: Find a better way of tracking when a Window closes.
+
+    return new Promise(resolve => {
+      const checker = setInterval(() => {
+        try {
+          if (!popupWindow.closed) {
+            // This could throw cross-domain errors, so we need to silence them.
+            const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+            const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+            if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
+            location.hash = popupWindow.location.hash;
+            popupWindow.close();
+          }
+
+          clearInterval(checker);
           setTimeout(resolve);
-        }, {
-          passive: true
-        });
+        } catch (e) {}
+      }, 100);
+    });
+  }
+  /**
+   * Opens a new tab
+   * @param {String} url the url to be loaded
+   * @return {Promise} resolves when the tab is closed
+   */
+
+
+  openNewTab(url) {
+    const tabWindow = window.open(url, '_blank');
+
+    if (!tabWindow) {
+      return Promise.reject(new ReferenceError('We were unable to open the new tab, its likely that the request was blocked.'));
+    }
+
+    tabWindow.name = 'salte-auth';
+    tabWindow.focus(); // TODO: Find a better way of tracking when a Window closes.
+
+    return new Promise(resolve => {
+      const checker = setInterval(() => {
+        try {
+          if (!tabWindow.closed) {
+            // This could throw cross-domain errors, so we need to silence them.
+            const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+            const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+            if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
+            location.hash = tabWindow.location.hash;
+            tabWindow.close();
+          }
+
+          clearInterval(checker);
+          setTimeout(resolve);
+        } catch (e) {}
+      }, 100);
+    });
+  }
+  /**
+   * Opens an iframe in the background
+   * @param {String} url the url to be loaded
+   * @param {Boolean} show whether the iframe should be visible
+   * @return {Promise} resolves when the iframe is closed
+   */
+
+
+  createIframe(url, show) {
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('owner', 'salte-auth');
+
+    if (show) {
+      lodash_assign__WEBPACK_IMPORTED_MODULE_0___default()(iframe.style, {
+        position: 'fixed',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '100%',
+        width: '100%',
+        zIndex: 9999,
+        border: 'none',
+        opacity: 0,
+        transition: '0.5s opacity'
       });
+      setTimeout(() => {
+        iframe.style.opacity = 1;
+      });
+    } else {
+      iframe.style.display = 'none';
     }
-    /**
-     * Adds a XMLHttpRequest interceptor
-     * @param {Function} interceptor the interceptor function
-     */
 
-  }, {
-    key: "addXHRInterceptor",
-    value: function addXHRInterceptor(interceptor) {
-      this.$interceptors.xhr.push(interceptor);
-    }
-    /**
-     * Adds a fetch interceptor
-     * @param {Function} interceptor the interceptor function
-     */
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    return new Promise(resolve => {
+      iframe.addEventListener('DOMNodeRemoved', () => {
+        setTimeout(resolve);
+      }, {
+        passive: true
+      });
+    });
+  }
+  /**
+   * Adds a XMLHttpRequest interceptor
+   * @param {Function} interceptor the interceptor function
+   */
 
-  }, {
-    key: "addFetchInterceptor",
-    value: function addFetchInterceptor(interceptor) {
-      this.$interceptors.fetch.push(interceptor);
-    }
-    /**
-     * Checks if the current window is an iframe
-     * @return {HTMLIFrameElement} true if the current window is an iframe.
-     * @private
-     */
 
-  }, {
-    key: "$navigate",
+  addXHRInterceptor(interceptor) {
+    this.$interceptors.xhr.push(interceptor);
+  }
+  /**
+   * Adds a fetch interceptor
+   * @param {Function} interceptor the interceptor function
+   */
 
-    /**
-     * Navigates to the url provided.
-     * @param {String} url the url to navigate to
-     * @private
-     */
 
-    /* istanbul ignore next */
-    value: function $navigate(url) {
-      location.href = url;
-    }
-  }, {
-    key: "$iframe",
-    get: function get() {
-      if (window.self === window.top) {
-        return null;
-      }
+  addFetchInterceptor(interceptor) {
+    this.$interceptors.fetch.push(interceptor);
+  }
+  /**
+   * Checks if the current window is an iframe
+   * @return {HTMLIFrameElement} true if the current window is an iframe.
+   * @private
+   */
 
-      return parent.document.querySelector('body > iframe[owner="salte-auth"]');
-    }
-    /**
-     * Determines if the current window is a popup window opened by salte auth
-     * @return {Window} the window object
-     * @private
-     */
 
-  }, {
-    key: "$popup",
-    get: function get() {
-      if (window.opener && window.name === 'salte-auth') {
-        return window;
-      }
-
+  get $iframe() {
+    if (window.self === window.top) {
       return null;
     }
-    /**
-     * Determines if the page is currently hidden
-     * @return {Boolean} true if the page is hidden
-     * @private
-     */
 
-  }, {
-    key: "$hidden",
-    get: function get() {
-      return document.hidden;
+    return parent.document.querySelector('body > iframe[owner="salte-auth"]');
+  }
+  /**
+   * Determines if the current window is a popup window opened by salte auth
+   * @return {Window} the window object
+   * @private
+   */
+
+
+  get $popup() {
+    if (window.opener && window.name === 'salte-auth') {
+      return window;
     }
-  }]);
 
-  return SalteAuthUtilities;
-}();
+    return null;
+  }
+  /**
+   * Determines if the page is currently hidden
+   * @return {Boolean} true if the page is hidden
+   * @private
+   */
+
+
+  get $hidden() {
+    return document.hidden;
+  }
+  /**
+   * Navigates to the url provided.
+   * @param {String} url the url to navigate to
+   * @private
+   */
+
+  /* istanbul ignore next */
+
+
+  $navigate(url) {
+    location.href = url;
+  }
+
+}
 
 
 /* harmony default export */ __webpack_exports__["default"] = (SalteAuthUtilities);
@@ -9940,4 +9627,4 @@ module.exports = __webpack_require__(/*! ./salte-auth.js */"./salte-auth.js");
 
 /******/ });
 });
-//# sourceMappingURL=salte-auth.js.map
+//# sourceMappingURL=salte-auth.es6.js.map
