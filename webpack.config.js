@@ -23,13 +23,11 @@ module.exports = {
   module: {
     rules: [{
       test: /\.js$/,
-      exclude: /node_modules/,
-      include: /node_modules(?:\/|\\)lit-element|lit-html/,
-      loader: 'babel-loader'
-    }, {
-      test: /\.html$/,
-      exclude: /node_modules/,
-      loader: 'html-loader'
+      loader: 'babel-loader',
+      exclude: /node_modules\/(?!(@webcomponents\/shadycss|lit-html|lit-element|@polymer)\/).*/,
+      options: {
+        cacheDirectory: true
+      }
     }]
   },
   optimization: {

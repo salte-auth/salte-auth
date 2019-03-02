@@ -1,5 +1,10 @@
 const config = require('./webpack.config.js');
 
+config.module.rules.push({
+  test: /\.html$/,
+  exclude: /node_modules/,
+  loader: 'html-loader'
+});
 config.externals = [];
 config.entry['salte-auth'] = ['../index.html', '../index.js'];
 config.devtool = 'inline-source-map';
