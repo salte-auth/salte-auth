@@ -3,15 +3,14 @@ import { expect } from 'chai';
 import SalteAuthUtilities from '../../../src/salte-auth.utilities.js';
 
 describe('function(addFetchInterceptor)', () => {
-  let sandbox, utilities, windowsFetch;
+  let utilities, windowsFetch;
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
-    windowsFetch = sandbox.stub(window, 'fetch').returns(Promise.resolve());
+    windowsFetch = sinon.stub(window, 'fetch').returns(Promise.resolve());
     utilities = new SalteAuthUtilities();
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   it('should intercept Fetch requests', () => {

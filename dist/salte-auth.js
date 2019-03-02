@@ -7842,11 +7842,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _salte_auth_providers_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./salte-auth.providers.js */ "./salte-auth.providers.js");
 /* harmony import */ var _salte_auth_profile_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./salte-auth.profile.js */ "./salte-auth.profile.js");
 /* harmony import */ var _salte_auth_utilities_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./salte-auth.utilities.js */ "./salte-auth.utilities.js");
+/* harmony import */ var _salte_auth_mixin_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./salte-auth.mixin.js */ "./salte-auth.mixin.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -7977,6 +7979,22 @@ function () {
      */
 
     this.profile = new _salte_auth_profile_js__WEBPACK_IMPORTED_MODULE_7__["SalteAuthProfile"](this.$config);
+    /**
+     * A mixin built for Web Components
+     *
+     * @example
+     * class MyElement extends auth.mixin(HTMLElement) {
+     *   constructor() {
+     *     super();
+     *
+     *     console.log(this.auth); // This is the same as auth
+     *     console.log(this.user); // This is the same as auth.profile.userInfo.
+     *     console.log(this.authenticated); // This is the same as auth.profile.idTokenExpired.
+     *   }
+     * }
+     */
+
+    this.mixin = Object(_salte_auth_mixin_js__WEBPACK_IMPORTED_MODULE_9__["SalteAuthMixinGenerator"])(this);
 
     if (this.$utilities.$iframe) {
       logger('Detected iframe, removing...');
@@ -8111,7 +8129,7 @@ function () {
 
     /**
      * Listens for an event to be invoked.
-     * @param {('login'|'logout'|'refresh')} eventType the event to listen for.
+     * @param {('login'|'logout'|'refresh'|'expired')} eventType the event to listen for.
      * @param {Function} callback A callback that fires when the specified event occurs.
      *
      * @example
@@ -8133,7 +8151,7 @@ function () {
      * });
      */
     value: function on(eventType, callback) {
-      if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
+      if (['login', 'logout', 'refresh', 'expired'].indexOf(eventType) === -1) {
         throw new ReferenceError("Unknown Event Type (".concat(eventType, ")"));
       } else if (typeof callback !== 'function') {
         throw new ReferenceError('Invalid callback provided!');
@@ -8144,7 +8162,7 @@ function () {
     }
     /**
      * Deregister a callback previously registered.
-     * @param {('login'|'logout'|'refresh')} eventType the event to deregister.
+     * @param {('login'|'logout'|'refresh'|'expired')} eventType the event to deregister.
      * @param {Function} callback A callback that fires when the specified event occurs.
      *
      * @example
@@ -8158,7 +8176,7 @@ function () {
   }, {
     key: "off",
     value: function off(eventType, callback) {
-      if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
+      if (['login', 'logout', 'refresh', 'expired'].indexOf(eventType) === -1) {
         throw new ReferenceError("Unknown Event Type (".concat(eventType, ")"));
       } else if (typeof callback !== 'function') {
         throw new ReferenceError('Invalid callback provided!');
@@ -8565,6 +8583,11 @@ function () {
         clearTimeout(this.$timeouts.refresh);
       }
 
+      if (this.$timeouts.expired !== undefined) {
+        clearTimeout(this.$timeouts.expired);
+      }
+
+      var timeToExpiration = this.profile.userInfo.exp * 1000 - Date.now();
       this.$timeouts.refresh = setTimeout(function () {
         // Allows Auto Refresh to be disabled
         if (_this9.$config.autoRefresh) {
@@ -8573,9 +8596,11 @@ function () {
           });
         } else {
           _this9.$fire('refresh');
-        } // We need to default `autoRefreshBuffer` to 60000 in the constructor.
-
-      }, Math.max(this.profile.userInfo.exp * 1000 - Date.now() - this.$config.autoRefreshBuffer, 0));
+        }
+      }, Math.max(timeToExpiration - this.$config.autoRefreshBuffer, 0));
+      this.$timeouts.expired = setTimeout(function () {
+        _this9.$fire('expired');
+      }, Math.max(timeToExpiration, 0));
     }
     /**
      * Authenticates, requests the access token, and returns it if necessary.
@@ -8741,6 +8766,114 @@ function () {
 lodash_set__WEBPACK_IMPORTED_MODULE_3___default()(window, 'salte.SalteAuth', lodash_get__WEBPACK_IMPORTED_MODULE_2___default()(window, 'salte.SalteAuth', SalteAuth));
 
 /* harmony default export */ __webpack_exports__["default"] = (SalteAuth);
+
+/***/ }),
+
+/***/ "./salte-auth.mixin.js":
+/*!*****************************!*\
+  !*** ./salte-auth.mixin.js ***!
+  \*****************************/
+/*! exports provided: SalteAuthMixinGenerator, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SalteAuthMixinGenerator", function() { return SalteAuthMixinGenerator; });
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var SalteAuthMixinGenerator = function SalteAuthMixinGenerator(auth) {
+  var registeredMixedIns = [];
+  auth.on('login', function (error, user) {
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    for (var i = 0; i < registeredMixedIns.length; i++) {
+      registeredMixedIns[i].user = user;
+      registeredMixedIns[i].authenticated = !auth.profile.idTokenExpired;
+    }
+  });
+  auth.on('logout', function (error) {
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    for (var i = 0; i < registeredMixedIns.length; i++) {
+      registeredMixedIns[i].user = null;
+      registeredMixedIns[i].authenticated = false;
+    }
+  });
+  auth.on('expired', function () {
+    for (var i = 0; i < registeredMixedIns.length; i++) {
+      registeredMixedIns[i].authenticated = false;
+    }
+  });
+  return function (superClass) {
+    return (
+      /*#__PURE__*/
+      function (_superClass) {
+        _inherits(_class, _superClass);
+
+        function _class() {
+          var _this;
+
+          _classCallCheck(this, _class);
+
+          _this = _possibleConstructorReturn(this, _getPrototypeOf(_class).call(this));
+          registeredMixedIns.push(_assertThisInitialized(_this));
+          _this.user = auth.profile.userInfo;
+          return _this;
+        }
+
+        _createClass(_class, [{
+          key: "auth",
+          get: function get() {
+            return auth;
+          }
+        }, {
+          key: "user",
+          get: function get() {
+            return this.$$user;
+          },
+          set: function set(user) {
+            this.$$user = user;
+          }
+        }, {
+          key: "authenticated",
+          get: function get() {
+            return this._authenticated;
+          },
+          set: function set(authenticated) {
+            this._authenticated = authenticated;
+          }
+        }]);
+
+        return _class;
+      }(superClass)
+    );
+  };
+};
+
+
+/* harmony default export */ __webpack_exports__["default"] = (SalteAuthMixinGenerator);
 
 /***/ }),
 

@@ -32,6 +32,7 @@ rules:
   no-confusing-arrow: 2
   prefer-arrow-callback: 2
   switch-colon-spacing: 0
+  no-invalid-this: 0
 settings:
   polyfills:
     - url
