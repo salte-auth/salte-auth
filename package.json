@@ -35,6 +35,7 @@
     "base64url": "^3.0.1",
     "chai": "^4.0.0",
     "coveralls": "^3.0.3",
+    "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^2.0.0",
     "debug": "^4.0.0",
     "deindent": "^0.1.0",

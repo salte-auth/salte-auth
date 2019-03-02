@@ -4,7 +4,8 @@ const deindent = require('deindent');
 const packageJson = require('./package.json');
 const { argv: args } = require('yargs');
 
-const isProd = args.mode === 'production';
+const isProduction = args.mode === 'production';
+const isES6 = process.env.ES6 === 'true';
 
 module.exports = {
   context: path.join(__dirname, 'src'),
@@ -13,7 +14,7 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: isProd ? '[name].min.js' : '[name].js',
+    filename: `[name]${isES6 ? '.es6' : ''}${isProduction ? '.min' : ''}.js`,
     sourceMapFilename: '[file].map',
     library: 'salte.auth',
     libraryTarget: 'umd',
@@ -27,13 +28,26 @@ module.exports = {
       exclude: /node_modules\/(?!(whatwg-url|@webcomponents|lit-html|lit-element|@polymer)\/).*/,
       options: {
         presets: [['@babel/preset-env', {
-          modules: false
+          modules: false,
+          targets: isES6 ? {
+            browsers: [
+              'last 1 chrome versions'
+            ]
+          } : {
+            browsers: [
+              'last 2 chrome versions',
+              'last 2 firefox versions',
+              'last 2 edge versions',
+              'IE >= 10',
+              'Safari >= 7'
+            ]
+          }
         }]]
       }
     }]
   },
   optimization: {
-    minimize: isProd ? true : false
+    minimize: isProduction ? true : false
   },
   resolve: {
     alias: {
