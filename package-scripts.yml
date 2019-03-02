@@ -24,14 +24,28 @@ scripts:
       description: Starts a server for previewing the documentation
   build:
     default:
-      script: nps build.dev && nps build.prod
-      description: Builds both a minified and unminified artifact
-    dev:
-      script: webpack --progress --colors --mode development
-      description: Builds an unminified artifact
-    prod:
-      script: webpack --progress --colors --mode production
-      description: Builds a minified artifact
+      script: nps build.es5 && nps build.es6
+      description: Builds both a minified and unminified ES5 and ES6 artifacts
+    es5:
+      default:
+        script: nps build.es5.dev && nps build.es5.prod
+        description: Builds both a minified and unminified ES5 artifact
+      dev:
+        script: webpack --progress --colors --mode development
+        description: Builds an unminified artifact
+      prod:
+        script: webpack --progress --colors --mode production
+        description: Builds a minified artifact
+    es6:
+      default:
+        script: nps build.es6.dev && nps build.es6.prod
+        description: Builds both a minified and unminified ES6 artifact
+      dev:
+        script: cross-env ES6=true webpack --progress --colors --mode development
+        description: Builds an unminified artifact
+      prod:
+        script: cross-env ES6=true webpack --progress --colors --mode production
+        description: Builds a minified artifact
   report-coverage:
     script: coveralls < coverage/lcov.info
     description: Reports code coverage information to Coveralls

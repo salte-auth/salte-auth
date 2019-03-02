@@ -8,6 +8,7 @@ import debug from 'debug';
 import { Providers } from './salte-auth.providers.js';
 import { SalteAuthProfile } from './salte-auth.profile.js';
 import { SalteAuthUtilities } from './salte-auth.utilities.js';
+import { SalteAuthMixinGenerator } from './salte-auth.mixin.js';
 
 /** @ignore */
 const logger = debug('@salte-io/salte-auth');
@@ -116,6 +117,22 @@ class SalteAuth {
      * @type {SalteAuthProfile}
      */
     this.profile = new SalteAuthProfile(this.$config);
+
+    /**
+     * A mixin built for Web Components
+     *
+     * @example
+     * class MyElement extends auth.mixin(HTMLElement) {
+     *   constructor() {
+     *     super();
+     *
+     *     console.log(this.auth); // This is the same as auth
+     *     console.log(this.user); // This is the same as auth.profile.userInfo.
+     *     console.log(this.authenticated); // This is the same as auth.profile.idTokenExpired.
+     *   }
+     * }
+     */
+    this.mixin = SalteAuthMixinGenerator(this);
 
     if (this.$utilities.$iframe) {
       logger('Detected iframe, removing...');
@@ -291,7 +308,7 @@ class SalteAuth {
 
   /**
    * Listens for an event to be invoked.
-   * @param {('login'|'logout'|'refresh')} eventType the event to listen for.
+   * @param {('login'|'logout'|'refresh'|'expired')} eventType the event to listen for.
    * @param {Function} callback A callback that fires when the specified event occurs.
    *
    * @example
@@ -313,7 +330,7 @@ class SalteAuth {
    * });
    */
   on(eventType, callback) {
-    if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
+    if (['login', 'logout', 'refresh', 'expired'].indexOf(eventType) === -1) {
       throw new ReferenceError(`Unknown Event Type (${eventType})`);
     } else if (typeof callback !== 'function') {
       throw new ReferenceError('Invalid callback provided!');
@@ -325,7 +342,7 @@ class SalteAuth {
 
   /**
    * Deregister a callback previously registered.
-   * @param {('login'|'logout'|'refresh')} eventType the event to deregister.
+   * @param {('login'|'logout'|'refresh'|'expired')} eventType the event to deregister.
    * @param {Function} callback A callback that fires when the specified event occurs.
    *
    * @example
@@ -336,7 +353,7 @@ class SalteAuth {
    * auth.off('login', someFunction);
    */
   off(eventType, callback) {
-    if (['login', 'logout', 'refresh'].indexOf(eventType) === -1) {
+    if (['login', 'logout', 'refresh', 'expired'].indexOf(eventType) === -1) {
       throw new ReferenceError(`Unknown Event Type (${eventType})`);
     } else if (typeof callback !== 'function') {
       throw new ReferenceError('Invalid callback provided!');
@@ -682,6 +699,12 @@ class SalteAuth {
       clearTimeout(this.$timeouts.refresh);
     }
 
+    if (this.$timeouts.expired !== undefined) {
+      clearTimeout(this.$timeouts.expired);
+    }
+
+    const timeToExpiration = (this.profile.userInfo.exp * 1000) - Date.now();
+
     this.$timeouts.refresh = setTimeout(() => {
       // Allows Auto Refresh to be disabled
       if (this.$config.autoRefresh) {
@@ -691,8 +714,11 @@ class SalteAuth {
       } else {
         this.$fire('refresh');
       }
-      // We need to default `autoRefreshBuffer` to 60000 in the constructor.
-    }, Math.max((this.profile.userInfo.exp * 1000) - Date.now() - this.$config.autoRefreshBuffer, 0));
+    }, Math.max(timeToExpiration - this.$config.autoRefreshBuffer, 0));
+
+    this.$timeouts.expired = setTimeout(() => {
+      this.$fire('expired');
+    }, Math.max(timeToExpiration, 0));
   }
 
   /**
