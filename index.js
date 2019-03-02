@@ -1,8 +1,9 @@
-import moment from 'moment';
-import '@webcomponents/custom-elements/src/native-shim.js';
-import '@webcomponents/custom-elements';
-import { LitElement } from 'lit-element';
-import SalteAuth from './src/salte-auth.js';
+require('@webcomponents/custom-elements/src/native-shim.js');
+require('@webcomponents/custom-elements');
+const moment = require('moment');
+const { LitElement, html: litHtml } = require('lit-element');
+const { PolymerElement, html: polymerHtml } = require('@polymer/polymer');
+const { SalteAuth } = require('./src/salte-auth.js');
 
 const elements = {
   provider: document.getElementById('provider'),
@@ -210,6 +211,25 @@ request.addEventListener('load', function(event) {
 request.open('GET', 'https://jsonplaceholder.typicode.com/posts/2');
 request.send();
 
+class NativeElement extends auth.mixin(HTMLElement) {
+  connectedCallback() {
+    this.attachShadow({ mode: 'open' });
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
+      <h1>Native</h1>
+      <div>User: ${this.user && this.user.sub}</div>
+      <div>Authenticated: ${this.authenticated}</div>
+    `;
+  }
+}
+
+customElements.define('native-element', NativeElement);
+
 class MyLitElement extends auth.mixin(LitElement) {
   render() {
     return litHtml`
@@ -226,3 +246,20 @@ class MyLitElement extends auth.mixin(LitElement) {
 }
 
 customElements.define('my-lit-element', MyLitElement);
+
+class MyPolymerElement extends auth.mixin(PolymerElement) {
+  static get template() {
+    return polymerHtml`
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
+      <h1>Polymer</h1>
+      <div>User: [[user.sub]]</div>
+      <div>Authenticated: [[authenticated]]</div>
+    `;
+  }
+}
+
+customElements.define('my-polymer-element', MyPolymerElement);

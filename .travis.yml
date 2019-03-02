@@ -6,6 +6,7 @@ branches:
   only:
     - master
     - /^greenkeeper/.*$/
+    - mixins
 script:
   - npm start lint
   - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm start test.sauce; fi

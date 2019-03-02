@@ -37,7 +37,8 @@ const SalteAuthMixinGenerator = function(auth) {
         super();
 
         registeredMixedIns.push(this);
-        this.user = auth.profile.userInfo;
+        this.user = auth.profile.userInfo || null;
+        this.authenticated = !auth.profile.idTokenExpired;
       }
 
       get auth() {
@@ -49,15 +50,25 @@ const SalteAuthMixinGenerator = function(auth) {
       }
 
       set user(user) {
+        const oldUser = this.$$user;
+
         this.$$user = user;
+        if (this.requestUpdate) {
+          this.requestUpdate('user', oldUser);
+        }
       }
 
       get authenticated() {
-        return this._authenticated;
+        return this.$$authenticated;
       }
 
       set authenticated(authenticated) {
-        this._authenticated = authenticated;
+        const oldAuthenticated = this.$$authenticated;
+
+        this.$$authenticated = authenticated;
+        if (this.requestUpdate) {
+          this.requestUpdate('authenticated', oldAuthenticated);
+        }
       }
     };
   };

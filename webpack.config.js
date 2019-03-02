@@ -24,6 +24,7 @@ module.exports = {
     rules: [{
       test: /\.js$/,
       exclude: /node_modules/,
+      include: /node_modules(?:\/|\\)lit-element|lit-html/,
       loader: 'babel-loader'
     }, {
       test: /\.html$/,

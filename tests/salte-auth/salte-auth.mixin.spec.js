@@ -1,24 +1,31 @@
 import { expect } from 'chai';
 
-const { LitElement, html: litHtml } = require('lit-element');
-// const { PolymerElement, html: polymerHtml } = require('@polymer/polymer');
-
 import { SalteAuthMixinGenerator } from '../../src/salte-auth.mixin.js';
 
 describe('salte-auth.mixin', () => {
-  let auth, mixin;
+  let auth, mixin, MyElement;
   beforeEach(() => {
     auth = {
-      on: sinon.stub().returns(),
+      listeners: {},
+      on: sinon.stub().callsFake((event, cb) => {
+        auth.listeners[event] = auth.listeners[event] || [];
+        auth.listeners[event].push(cb);
+      }),
       profile: {
-        userInfo: {}
+        userInfo: {},
+        idTokenExpired: {}
       }
     };
 
     sinon.stub(auth.profile, 'userInfo').get(() => {
-      return {};
+      return { sub: '12345' };
     });
+
+    sinon.stub(auth.profile, 'idTokenExpired').get(() => false);
     mixin = SalteAuthMixinGenerator(auth);
+
+    class Test {}
+    MyElement = class extends mixin(Test) {};
   });
 
   describe('function(generator)', () => {
@@ -28,62 +35,55 @@ describe('salte-auth.mixin', () => {
     });
 
     it('should support being mixed with a class', () => {
-      class Test {}
-      class MyElement extends mixin(Test) {}
-
       const element = new MyElement();
       expect(element.auth).to.equal(auth);
+      expect(element.user).to.deep.equal({ sub: '12345' });
+    });
+
+    it('should default the user to null if not present', () => {
+      delete auth.profile.userInfo;
+      const element = new MyElement();
+      expect(element.user).to.equal(null);
     });
   });
 
-  describe('mixin(lit-element)', () => {
-    let element;
+  describe('on(login)', () => {
     beforeEach(() => {
-      class MyLitElement extends mixin(LitElement) {
-        render() {
-          return litHtml`
-            <style>
-              :host {
-                display: block;
-              }
-            </style>
-            <h1>Lit</h1>
-            <div>User: ${this.user && this.user.sub}</div>
-            <div>Authenticated: ${this.authenticated}</div>
-          `;
-        }
-      }
-
-      customElements.define('my-lit-element', MyLitElement);
-      element = document.createElement('my-lit-element');
-      document.body.appendChild(element);
+      sinon.stub(auth.profile, 'userInfo').get(() => null);
+      sinon.stub(auth.profile, 'idTokenExpired').get(() => true);
     });
 
-    afterEach(() => {
-      document.body.removeChild(element);
-    });
+    it('should support being authenticated', () => {
+      const element = new MyElement();
+      expect(element.authenticated).to.equal(false);
+      expect(element.user).to.deep.equal(null);
 
-    it('should support updating bindings with lit-element', () => {
-      expect(element.auth).to.equal(auth);
+      auth.listeners.login.forEach((cb) => cb(null, { sub: '54321' }));
+
+      expect(element.authenticated).to.equal(false); // This is determined by whether the id token is expired, so it should still be false
+      expect(element.user).to.deep.equal({ sub: '54321' });
+    });
+  });
+
+  describe('on(logout)', () => {
+    it('should support being deauthenticated', () => {
+      const element = new MyElement();
+      expect(element.authenticated).to.equal(true);
+      expect(element.user).to.deep.equal({ sub: '12345' });
+
+      auth.listeners.logout.forEach((cb) => cb());
+
+      expect(element.authenticated).to.equal(false); // This is determined by whether the id token is expired, so it should still be false
+      expect(element.user).to.deep.equal(null);
+    });
+  });
+
+  describe('on(expired)', () => {
+    it('should no longer be authenticated', () => {
+      const element = new MyElement();
+      expect(element.authenticated).to.equal(true);
+      auth.listeners.expired.forEach((cb) => cb());
+      expect(element.authenticated).to.equal(false);
     });
   });
 });
-
-
-// class MyPolymerElement extends auth.mixin(PolymerElement) {
-//   static get template() {
-//     return polymerHtml`
-//       <style>
-//         :host {
-//           display: block;
-//         }
-//       </style>
-//       <h1>Polymer</h1>
-//       <div>User: [[user]]</div>
-//       <div>Authenticated: [[authenticated]]</div>
-//     `;
-//   }
-// }
-
-// customElements.define('my-lit-element', MyLitElement);
-// customElements.define('my-polymer-element', MyPolymerElement);
