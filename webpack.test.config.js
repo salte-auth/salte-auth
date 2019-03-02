@@ -1,25 +1,17 @@
-module.exports = {
-  output: {
-    pathinfo: true
-  },
-  module: {
-    rules: [{
-      test: /\.js$/,
-      loader: 'babel-loader',
-      exclude: /node_modules\/(?!(@webcomponents\/shadycss|lit-html|lit-element|@polymer)\/).*/,
-      options: {
-        cacheDirectory: true
-      }
-    }]
-  },
-  mode: 'development',
-  devtool: 'inline-source-map',
-  optimization: {
-    minimize: false
-  },
-  resolve: {
-    alias: {
-      debug: 'debug/dist/debug.js'
-    }
+const config = require('./webpack.config.js');
+
+config.output = { pathinfo: true };
+config.mode = 'development';
+config.devtool = 'inline-source-map';
+config.optimization = { minimize: false };
+config.module.rules.push({
+  enforce: 'pre',
+  test: /\.js$/,
+  exclude: /tests|node_modules/,
+  use: {
+    loader: 'istanbul-instrumenter-loader',
+    options: { esModules: true }
   }
-};
+});
+
+module.exports = config;

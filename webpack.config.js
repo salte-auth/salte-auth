@@ -24,9 +24,11 @@ module.exports = {
     rules: [{
       test: /\.js$/,
       loader: 'babel-loader',
-      exclude: /node_modules\/(?!(@webcomponents\/shadycss|lit-html|lit-element|@polymer)\/).*/,
+      exclude: /node_modules\/(?!(whatwg-url|@webcomponents|lit-html|lit-element|@polymer)\/).*/,
       options: {
-        cacheDirectory: true
+        presets: [['@babel/preset-env', {
+          modules: false
+        }]]
       }
     }]
   },

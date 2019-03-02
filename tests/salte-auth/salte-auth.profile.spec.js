@@ -147,7 +147,9 @@ describe('salte-auth.profile', () => {
   });
 
   describe('getter(accessTokenExpired)', () => {
+    let clock;
     beforeEach(() => {
+      clock = sinon.useFakeTimers();
       profile.$accessToken = '55555-555555';
       profile.$parse('expires_in', '1');
     });
@@ -159,11 +161,8 @@ describe('salte-auth.profile', () => {
 
     it('should be expired if the "expiration" is in the past', () => {
       expect(profile.accessTokenExpired).to.equal(false);
-      return new Promise((resolve) => {
-        setTimeout(resolve, 1000);
-      }).then(() => {
-        expect(profile.accessTokenExpired).to.equal(true);
-      });
+      clock.tick(1000);
+      expect(profile.accessTokenExpired).to.equal(true);
     });
 
     it('should not be expired if the "access_token" is present and the "expiration" is in the future', () => {

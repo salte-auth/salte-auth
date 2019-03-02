@@ -47,7 +47,7 @@ describe('mixin(lit-element)', () => {
 
     element.user = null;
     return element.updateComplete.then(() => {
-      expect(user.innerText).to.equal('User:');
+      expect(user.innerText).to.match(/^User:/);
       expect(authenticated.innerText).to.equal('Authenticated: true');
     });
   });
@@ -61,7 +61,7 @@ describe('mixin(lit-element)', () => {
 
     element.user = null;
     return element.updateComplete.then(() => {
-      expect(user.innerText).to.equal('User:');
+      expect(user.innerText).to.match(/^User:/);
       expect(authenticated.innerText).to.equal('Authenticated: true');
     });
   });

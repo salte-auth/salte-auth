@@ -32,7 +32,7 @@ describe('mixin(polymer-element)', () => {
     element = document.createElement('my-polymer-element');
     document.body.appendChild(element);
 
-    return element.updateComplete;
+    return customElements.whenDefined('my-polymer-element');
   });
 
   afterEach(() => {
@@ -47,7 +47,7 @@ describe('mixin(polymer-element)', () => {
 
     element.user = null;
 
-    expect(user.innerText).to.equal('User:');
+    expect(user.innerText).to.match(/^User:/);
     expect(authenticated.innerText).to.equal('Authenticated: true');
   });
 });

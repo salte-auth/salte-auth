@@ -1,13 +1,4 @@
 const webpackConfig = require('./webpack.test.config.js');
-webpackConfig.module.rules.push({
-  enforce: 'pre',
-  test: /\.js$/,
-  exclude: /tests|node_modules/,
-  use: {
-    loader: 'istanbul-instrumenter-loader',
-    options: { esModules: true }
-  }
-});
 
 module.exports = function(config) {
   config.set({

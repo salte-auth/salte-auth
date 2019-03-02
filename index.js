@@ -1,5 +1,5 @@
-require('@webcomponents/custom-elements/src/native-shim.js');
-require('@webcomponents/custom-elements');
+require('@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js');
+require('@webcomponents/webcomponentsjs');
 const moment = require('moment');
 const { LitElement, html: litHtml } = require('lit-element');
 const { PolymerElement, html: polymerHtml } = require('@polymer/polymer');
