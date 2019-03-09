@@ -1,8 +1,10 @@
-<h1 align="center">
-  <a href="https://github.com/salte-io/salte-auth">
-    <img height="250px" src="./images/banner.svg">
-  </a>
-</h1>
+<h2 align="center">
+  <div>
+    <a href="https://github.com/salte-io/salte-auth">
+      <img height="250px" src="https://github.com/salte-io/salte-auth/raw/master/images/banner.svg?sanitize=true">
+    </a>
+  </div>
+</h2>
 
 <h3 align="center">
 	OAuth 2.0 for the masses!
