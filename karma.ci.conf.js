@@ -1,4 +1,4 @@
-const webpackConfig = require('./webpack.test.config.js');
+const common = require('./webpack.common.config.js');
 
 module.exports = function(config) {
   const customLaunchers = {
@@ -57,7 +57,12 @@ module.exports = function(config) {
       'tests/index.js': ['webpack', 'sourcemap']
     },
 
-    webpack: webpackConfig,
+    webpack: common({
+      minified: false,
+      es6: false,
+      coverage: false,
+      test: true
+    }),
 
     webpackMiddleware: {
       noInfo: true,
