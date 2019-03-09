@@ -1,15 +1,35 @@
-# Salte Auth
+<h1 align="center">
+  <a href="https://github.com/salte-io/salte-auth">
+    <img height="250px" src="./images/banner.svg">
+  </a>
+</h1>
 
-[![NPM Version][npm-version-image]][npm-url]
-[![NPM Downloads][npm-downloads-image]][npm-url]
-[![Travis][travis-ci-image]][travis-ci-url]
-[![Coveralls][coveralls-image]][coveralls-url]
+<h3 align="center">
+	OAuth 2.0 for the masses!
+</h3>
 
-[![Commitizen friendly][commitizen-image]][commitizen-url]
-[![semantic-release][semantic-release-image]][semantic-release-url]
-[![Greenkeeper badge][greenkeeper-image]][greenkeeper-url]
+<p align="center">
+	<strong>
+		<!-- <a href="https://salte.io">Website</a> -->
+		<!-- • -->
+		<a href="https://salte-io.github.io/salte-auth">Docs</a>
+		•
+		<a href="https://salte-auth-demo.glitch.me">Demo</a>
+	</strong>
+</p>
 
-OAuth 2.0 for the masses!
+<div align="center">
+
+  [![NPM Version][npm-version-image]][npm-url]
+  [![NPM Downloads][npm-downloads-image]][npm-url]
+  [![Travis][travis-ci-image]][travis-ci-url]
+  [![Coveralls][coveralls-image]][coveralls-url]
+
+  [![Commitizen friendly][commitizen-image]][commitizen-url]
+  [![semantic-release][semantic-release-image]][semantic-release-url]
+  [![Greenkeeper badge][greenkeeper-image]][greenkeeper-url]
+
+</div>
 
 ## Supported Browsers
 
