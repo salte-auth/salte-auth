@@ -36,7 +36,6 @@
     "chai": "^4.0.0",
     "coveralls": "^3.0.3",
     "cross-env": "^5.2.0",
-    "cz-conventional-changelog": "^2.0.0",
     "debug": "^4.0.0",
     "deindent": "^0.1.0",
     "esdoc": "^1.0.3",
@@ -78,11 +77,6 @@
     "webpack-dev-server": "^3.2.1",
     "whatwg-fetch": "^3.0.0",
     "yargs": "^13.1.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   },
   "publishConfig": {
     "access": "public"
