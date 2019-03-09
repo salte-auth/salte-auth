@@ -1,4 +1,4 @@
-const webpackConfig = require('./webpack.test.config.js');
+const common = require('./webpack.common.config.js');
 
 module.exports = function(config) {
   config.set({
@@ -17,7 +17,12 @@ module.exports = function(config) {
       'tests/index.js': ['webpack', 'sourcemap']
     },
 
-    webpack: webpackConfig,
+    webpack: common({
+      minified: false,
+      es6: false,
+      coverage: true,
+      test: true
+    }),
 
     webpackMiddleware: {
       noInfo: true,
