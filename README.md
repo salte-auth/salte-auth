@@ -25,7 +25,6 @@
   [![Travis][travis-ci-image]][travis-ci-url]
   [![Coveralls][coveralls-image]][coveralls-url]
 
-  [![Commitizen friendly][commitizen-image]][commitizen-url]
   [![semantic-release][semantic-release-image]][semantic-release-url]
   [![Greenkeeper badge][greenkeeper-image]][greenkeeper-url]
 
