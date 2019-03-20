@@ -35,11 +35,13 @@ class SalteAuthProfile {
   }
 
   /**
-   * Check for a hash, parses it, and removes it.
+   * Checks for a hash / query params, parses it, and removes it.
    */
-  $hash() {
-    if (location.hash) {
-      const params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
+  $parseParams() {
+    if (location.search || location.hash) {
+      const params = location.search.replace(/^\?/, '').split('&')
+        .concat(location.hash.replace(/(#!?[^#]+)?#/, '').split('&'));
+
       logger(`Hash detected, parsing...`, params);
       for (let i = 0; i < params.length; i++) {
         const param = params[i];
@@ -47,7 +49,7 @@ class SalteAuthProfile {
         this.$parse(key, decodeURIComponent(value));
       }
       logger(`Removing hash...`);
-      history.pushState('', document.title, location.href.split('#')[0]);
+      history.pushState('', document.title, location.href.replace(location.search, '').replace(location.hash, ''));
     }
   }
 
