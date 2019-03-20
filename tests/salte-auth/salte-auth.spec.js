@@ -194,6 +194,9 @@ describe('salte-auth', () => {
     });
 
     it('should redirect to the "redirectUrl"', done => {
+      SalteAuthUtilities.prototype.$navigate.restore();
+      window.setTimeout.restore();
+
       const url = `${location.protocol}//${location.host}${
         location.pathname
       }#test=test`;
@@ -211,11 +214,10 @@ describe('salte-auth', () => {
         provider: 'auth0',
         redirectLoginCallback: error => {
           expect(error).to.deep.equal(undefined);
+          expect(location.href).to.equal(url);
           done();
         }
       });
-
-      expect(location.href).to.equal(url);
     });
 
     it('should fire off a "login" event if we failed to login via a redirect', () => {
@@ -305,6 +307,8 @@ describe('salte-auth', () => {
     });
 
     it('should validate for errors when redirecting', done => {
+      window.setTimeout.restore();
+
       sinon.stub(SalteAuthProfile.prototype, '$validate').returns({
         code: 'stuff_broke',
         description: 'what did you break!'
@@ -323,8 +327,6 @@ describe('salte-auth', () => {
           done();
         }
       });
-
-      expect(location.href).to.equal(url);
     });
 
     it('should disable automatic token renewal when the screen loses visibility', () => {
@@ -971,17 +973,17 @@ describe('salte-auth', () => {
       sinon.stub(auth, '$loginUrl').returns('');
       sinon.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
       sinon.stub(auth.profile, '$validate');
-      sinon.stub(auth.profile, '$hash');
+      sinon.stub(auth.profile, '$parseParams');
 
       const promise = auth.loginWithPopup();
 
       expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
-      expect(auth.profile.$hash.callCount).to.equal(0);
+      expect(auth.profile.$parseParams.callCount).to.equal(0);
 
       return promise.then((user) => {
         expect(user).to.deep.equal(auth.profile.userInfo);
-        expect(auth.profile.$hash.callCount).to.equal(1);
+        expect(auth.profile.$parseParams.callCount).to.equal(1);
         expect(auth.$promises.login).to.equal(null);
       });
     });
@@ -999,7 +1001,7 @@ describe('salte-auth', () => {
       sinon.stub(auth, '$loginUrl').returns('');
       sinon.stub(auth.$utilities, 'openPopup').returns(Promise.resolve());
       sinon.stub(auth.profile, '$validate');
-      sinon.stub(auth.profile, '$hash');
+      sinon.stub(auth.profile, '$parseParams');
 
       auth.loginWithPopup();
 
@@ -1081,17 +1083,17 @@ describe('salte-auth', () => {
       sinon.stub(auth, '$loginUrl').returns('');
       sinon.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
       sinon.stub(auth.profile, '$validate');
-      sinon.stub(auth.profile, '$hash');
+      sinon.stub(auth.profile, '$parseParams');
 
       const promise = auth.loginWithNewTab();
 
       expect(auth.profile.$clear.callCount).to.equal(1);
       expect(auth.$promises.login).to.equal(promise);
-      expect(auth.profile.$hash.callCount).to.equal(0);
+      expect(auth.profile.$parseParams.callCount).to.equal(0);
 
       return promise.then((user) => {
         expect(user).to.deep.equal(auth.profile.userInfo);
-        expect(auth.profile.$hash.callCount).to.equal(1);
+        expect(auth.profile.$parseParams.callCount).to.equal(1);
         expect(auth.$promises.login).to.equal(null);
       });
     });
@@ -1109,7 +1111,7 @@ describe('salte-auth', () => {
       sinon.stub(auth, '$loginUrl').returns('');
       sinon.stub(auth.$utilities, 'openNewTab').returns(Promise.resolve());
       sinon.stub(auth.profile, '$validate');
-      sinon.stub(auth.profile, '$hash');
+      sinon.stub(auth.profile, '$parseParams');
 
       auth.loginWithNewTab();
 

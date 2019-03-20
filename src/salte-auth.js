@@ -136,33 +136,35 @@ class SalteAuth {
 
     if (this.$utilities.$iframe) {
       logger('Detected iframe, removing...');
-      this.profile.$hash();
+      this.profile.$parseParams();
       parent.document.body.removeChild(this.$utilities.$iframe);
     } else if (this.$utilities.$popup) {
       logger('Popup detected!');
     } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
       logger('Redirect detected!');
-      this.profile.$hash();
+      this.profile.$parseParams();
       const error = this.profile.$validate();
-      if (error) {
-        this.profile.$clear();
-      } else {
-        logger(`Navigating to Redirect URL... (${this.profile.$redirectUrl})`);
-        this.$utilities.$navigate(this.profile.$redirectUrl);
-        this.profile.$redirectUrl = undefined;
-      }
-
-      // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
-      this.$config.redirectLoginCallback && this.$config.redirectLoginCallback(error);
 
       // Delay for an event loop to give users time to register a listener.
       setTimeout(() => {
         const action = this.profile.$actions(this.profile.$state);
+
+        if (error) {
+          this.profile.$clear();
+        } else {
+          logger(`Navigating to Redirect URL... (${this.profile.$redirectUrl})`);
+          this.$utilities.$navigate(this.profile.$redirectUrl);
+          this.profile.$redirectUrl = undefined;
+        }
+
         if (action === 'login') {
-          this.$fire('login', error);
+          this.$fire('login', error || null, this.profile.userInfo);
         } else if (action === 'logout') {
           this.$fire('logout', error);
         }
+
+        // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
+        this.$config.redirectLoginCallback && this.$config.redirectLoginCallback(error);
       });
     } else {
       logger('Setting up interceptors...');
@@ -467,7 +469,7 @@ class SalteAuth {
     this.profile.$clear();
     this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(() => {
       this.$promises.login = null;
-      this.profile.$hash();
+      this.profile.$parseParams();
       const error = this.profile.$validate();
 
       if (error) {
@@ -506,7 +508,7 @@ class SalteAuth {
     this.profile.$clear();
     this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(() => {
       this.$promises.login = null;
-      this.profile.$hash();
+      this.profile.$parseParams();
       const error = this.profile.$validate();
 
       if (error) {

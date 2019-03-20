@@ -1,3 +1,4 @@
+require('@babel/polyfill');
 require('@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js');
 require('@webcomponents/webcomponentsjs');
 const moment = require('moment');
@@ -21,9 +22,9 @@ const elements = {
 
 const configs = {
   auth0: {
-    providerUrl: 'https://salte-alpha.auth0.com',
+    providerUrl: 'https://salte.auth0.com',
     responseType: 'id_token token',
-    clientId: 'mM6h2LHJikwdbkvdoiyE8kHhL7gcV8Wb'
+    clientId: '6HXbmGnu4145AE0jLZO1Q01WX53cLI48'
   },
 
   azure: {
@@ -54,7 +55,7 @@ const queryParams = Object.assign({
   'login-type': 'redirect',
   'redirect-url': 'single',
   'storage-type': localStorage.getItem('salte.demo.storage-type') || 'session',
-  'secured': 'not-secured'
+  'secured': localStorage.getItem('salte.demo.secured') || 'not-secured'
 }, location.search.replace(/^\?/, '').split('&').reduce((r, a) => {
   const match = a.match(/([^=]+)(?:=([^&]+))?/);
   const key = match && match[1] || null;
@@ -114,7 +115,7 @@ elements.redirectUrl.addEventListener('change', updateParamsOnChange);
 elements.storageType.addEventListener('change', updateParamsOnChange);
 elements.secured.addEventListener('change', updateParamsOnChange);
 
-const config = Object.assign(configs[queryParams.provider], {
+let config = Object.assign(configs[queryParams.provider], {
   redirectUrl: queryParams['redirect-url'] === 'single' ? location.protocol + '//' + location.host : {
     loginUrl: location.protocol + '//' + location.host,
     logoutUrl: location.protocol + '//' + location.host
@@ -148,6 +149,10 @@ if (queryParams.provider !== localStorage.getItem('salte.demo.provider')) {
 
 if (queryParams['storage-type'] !== localStorage.getItem('salte.demo.storage-type')) {
   localStorage.setItem('salte.demo.storage-type', queryParams['storage-type']);
+}
+
+if (queryParams['secured'] !== localStorage.getItem('salte.demo.secured')) {
+  localStorage.setItem('salte.demo.secured', queryParams['secured']);
 }
 
 const auth = new SalteAuth(config);
