@@ -42,7 +42,7 @@ describe('salte-auth.profile', () => {
     });
   });
 
-  describe('function($hash)', () => {
+  describe('function($parseParams)', () => {
     beforeEach(() => {
       localStorage.clear();
       sessionStorage.clear();
@@ -57,7 +57,7 @@ describe('salte-auth.profile', () => {
         }#state=55555-55555`
       );
 
-      profile.$hash();
+      profile.$parseParams();
 
       expect(profile.$state).to.equal('55555-55555');
     });

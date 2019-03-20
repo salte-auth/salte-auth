@@ -1,4 +1,9 @@
-const config = require('./webpack.config.js');
+const common = require('./webpack.common.config.js');
+
+const config = common({
+  es6: false,
+  minified: false
+});
 
 config.module.rules.push({
   test: /\.html$/,
