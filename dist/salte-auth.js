@@ -1,5 +1,5 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.13.3
+ * @salte-io/salte-auth JavaScript Library v2.13.4
  *
  * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
  *
@@ -286,34 +286,36 @@ function () {
 
     if (this.$utilities.$iframe) {
       logger('Detected iframe, removing...');
-      this.profile.$hash();
+      this.profile.$parseParams();
       parent.document.body.removeChild(this.$utilities.$iframe);
     } else if (this.$utilities.$popup) {
       logger('Popup detected!');
     } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
       logger('Redirect detected!');
-      this.profile.$hash();
-      var error = this.profile.$validate();
-
-      if (error) {
-        this.profile.$clear();
-      } else {
-        logger("Navigating to Redirect URL... (".concat(this.profile.$redirectUrl, ")"));
-        this.$utilities.$navigate(this.profile.$redirectUrl);
-        this.profile.$redirectUrl = undefined;
-      } // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
-
-
-      this.$config.redirectLoginCallback && this.$config.redirectLoginCallback(error); // Delay for an event loop to give users time to register a listener.
+      this.profile.$parseParams();
+      var error = this.profile.$validate(); // Delay for an event loop to give users time to register a listener.
 
       setTimeout(function () {
         var action = _this.profile.$actions(_this.profile.$state);
 
+        if (error) {
+          _this.profile.$clear();
+        } else {
+          logger("Navigating to Redirect URL... (".concat(_this.profile.$redirectUrl, ")"));
+
+          _this.$utilities.$navigate(_this.profile.$redirectUrl);
+
+          _this.profile.$redirectUrl = undefined;
+        }
+
         if (action === 'login') {
-          _this.$fire('login', error);
+          _this.$fire('login', error || null, _this.profile.userInfo);
         } else if (action === 'logout') {
           _this.$fire('logout', error);
-        }
+        } // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
+
+
+        _this.$config.redirectLoginCallback && _this.$config.redirectLoginCallback(error);
       });
     } else {
       logger('Setting up interceptors...');
@@ -594,7 +596,7 @@ function () {
       this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(function () {
         _this3.$promises.login = null;
 
-        _this3.profile.$hash();
+        _this3.profile.$parseParams();
 
         var error = _this3.profile.$validate();
 
@@ -643,7 +645,7 @@ function () {
       this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(function () {
         _this4.$promises.login = null;
 
-        _this4.profile.$hash();
+        _this4.profile.$parseParams();
 
         var error = _this4.profile.$validate();
 
@@ -6420,15 +6422,15 @@ function () {
     this.$refreshUserInfo();
   }
   /**
-   * Check for a hash, parses it, and removes it.
+   * Checks for a hash / query params, parses it, and removes it.
    */
 
 
   _createClass(SalteAuthProfile, [{
-    key: "$hash",
-    value: function $hash() {
-      if (location.hash) {
-        var params = location.hash.replace(/(#!?[^#]+)?#/, '').split('&');
+    key: "$parseParams",
+    value: function $parseParams() {
+      if (location.search || location.hash) {
+        var params = location.search.replace(/^\?/, '').split('&').concat(location.hash.replace(/(#!?[^#]+)?#/, '').split('&'));
         logger("Hash detected, parsing...", params);
 
         for (var i = 0; i < params.length; i++) {
@@ -6443,7 +6445,7 @@ function () {
         }
 
         logger("Removing hash...");
-        history.pushState('', document.title, location.href.split('#')[0]);
+        history.pushState('', document.title, location.href.replace(location.search, '').replace(location.hash, ''));
       }
     }
     /**
