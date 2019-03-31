@@ -1,36 +1,33 @@
 scripts:
   lint:
-    script: eslint src/**/*.js tests/**/*.js
+    script: eslint src/**/*.ts test/**/*.js
     description: Checks for any formatting errors
+  check-types:
+    script: tsc --noEmit
+    description: Validates that types are being used properly.
   test:
     default:
-      script: karma start --single-run
+      script: karma start karma.conf.js --single-run
       description: Executes the Test Suite
     tdd:
-      script: karma start
+      script: karma start karma.conf.js
       description: Watches for changes and executes the Test Suite accordingly
     sauce:
       script: karma start karma.ci.conf.js
       description: Executes the Test Suite on Sauce Labs
   serve:
-    default:
-      script: webpack-dev-server --mode development --config webpack.server.config.js
-      description: Starts a server at http://localhost:8080
-    https:
-      script: webpack-dev-server --mode development --https --port 443 --config webpack.server.config.js
-      description: Starts a server at https://localhost
-    docs:
-      script: watch 'nps docs' 'src' & http-server docs
-      description: Starts a server for previewing the documentation
+    script: rollup -c rollup.serve.config.js --watch
+    description: Starts a server at http://localhost:8080
   build:
-    script: webpack --progress --colors
-    description: Builds both a minified and unminified ES5 and ES6 artifacts
+    default:
+      script: rm -rf dist && rollup -c && npm start build.types
+      description: Builds both a minified and unminified artifacts
+    types:
+      script: tsc --emitDeclarationOnly
+      description: Builds both a minified and unminified artifacts
   report-coverage:
     script: coveralls < coverage/lcov.info
     description: Reports code coverage information to Coveralls
   semantic-release:
     script: semantic-release
     description: Publishes the artifact to NPM and GitHub
-  docs:
-    script: esdoc
-    description: Creates documentation based upon JSDoc and ESDoc comments

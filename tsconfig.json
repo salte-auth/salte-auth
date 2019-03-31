@@ -1,0 +1,23 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "target": "es6",
+    "outDir": "dist",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitThis": true,
+    "declaration": true,
+		// Enable strictest settings like strictNullChecks & noImplicitAny.
+    "strict": true,
+    "strictNullChecks": false
+  },
+  "include": [
+    "src"
+  ]
+}

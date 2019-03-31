@@ -1,70 +1,59 @@
-const common = require('./webpack.common.config.js');
+const common = require('./rollup.common.config.js');
 
-module.exports = function(config) {
-  const customLaunchers = {
-    Chrome: {
+module.exports = (config) => {
+  const lastTwoVersions = ['Chrome', 'Firefox', 'MicrosoftEdge', 'Safari'].reduce((output, browser) => {
+    // TODO: For some reason Safari 12 throws a 500 error...
+    output[`${browser}Latest`] = {
       base: 'SauceLabs',
-      browserName: 'chrome'
-    },
-    Firefox: {
+      browserName: browser.toLowerCase(),
+      version: browser === 'Safari' ? 'latest-1' : 'latest'
+    };
+
+    output[`${browser}Prior`] = {
       base: 'SauceLabs',
-      browserName: 'firefox'
-    },
-    Edge: {
-      base: 'SauceLabs',
-      browserName: 'microsoftedge'
-    },
+      browserName: browser.toLowerCase(),
+      version: browser === 'Safari' ? 'latest-2' : 'latest-1'
+    };
+    return output;
+  }, {});
+
+  const customLaunchers = Object.assign(lastTwoVersions, {
     InternetExplorer11: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
       version: '11'
-    },
-    // Safari12: {
-    //   base: 'SauceLabs',
-    //   browserName: 'safari',
-    //   version: '12'
-    // },
-    Safari11: {
-      base: 'SauceLabs',
-      browserName: 'safari',
-      version: '11'
-    },
-    Safari10: {
-      base: 'SauceLabs',
-      browserName: 'safari',
-      version: '10'
     }
-  };
+  });
 
-  const karmaConfig = {
+  config.set({
     basePath: '',
 
     frameworks: [
-      'mocha',
-      'sinon'
+      'mocha'
     ],
 
     files: [
-      'tests/index.js'
+      'test/index.js'
     ],
 
-    preprocessors: {
-      'tests/index.js': ['webpack', 'sourcemap']
+    client: {
+      mocha: {
+        timeout: 10000
+      }
     },
 
-    webpack: common({
+    preprocessors: {
+      'test/index.js': ['rollup', 'sourcemap']
+    },
+
+    rollupPreprocessor: common({
       minified: false,
       es6: false,
-      coverage: false,
-      test: true
+      tests: true,
+      coverage: false
     }),
 
-    webpackMiddleware: {
-      noInfo: true,
-      stats: 'errors-only'
-    },
-
-    reporters: ['mocha', 'saucelabs'],
+    reporters: ['mocha', 'coverage'],
 
     mochaReporter: {
       output: 'minimal',
@@ -85,11 +74,9 @@ module.exports = function(config) {
 
     customLaunchers: customLaunchers,
     browsers: Object.keys(customLaunchers),
-    captureTimeout: 0,
+    captureTimeout: 120000,
     browserNoActivityTimeout: 120000,
 
     singleRun: true
-  };
-
-  config.set(karmaConfig);
-};
+  });
+}

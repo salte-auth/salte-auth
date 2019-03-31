@@ -1,33 +1,27 @@
-const common = require('./webpack.common.config.js');
+const common = require('./rollup.common.config.js');
 
-module.exports = function(config) {
+module.exports = (config) => {
   config.set({
     basePath: '',
 
     frameworks: [
-      'mocha',
-      'sinon'
+      'mocha'
     ],
 
     files: [
-      'tests/index.js'
+      'test/index.js'
     ],
 
     preprocessors: {
-      'tests/index.js': ['webpack', 'sourcemap']
+      'test/index.js': ['rollup', 'sourcemap'],
     },
 
-    webpack: common({
+    rollupPreprocessor: common({
       minified: false,
       es6: false,
-      coverage: true,
-      test: true
+      tests: true,
+      coverage: true
     }),
-
-    webpackMiddleware: {
-      noInfo: true,
-      stats: 'errors-only'
-    },
 
     reporters: ['mocha', 'coverage'],
 
@@ -51,17 +45,10 @@ module.exports = function(config) {
 
     autoWatch: true,
 
-    browsers: ['ChromeHeadlessNoSandbox'],
-
-    customLaunchers: {
-      ChromeHeadlessNoSandbox: {
-        base: 'ChromeHeadless',
-        flags: ['--no-sandbox']
-      }
-    },
+    browsers: ['ChromeHeadless'],
 
     browserNoActivityTimeout: 120000,
 
     singleRun: false
   });
-};
+}
