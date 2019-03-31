@@ -1,42 +1,32 @@
-extends: google
-env:
-  browser: true
-plugins:
-  - compat
+parser: '@typescript-eslint/parser'
+extends:
+  - plugin:@typescript-eslint/recommended
+  - plugin:compat/recommended
 parserOptions:
+  ecmaVersion: 2018
   sourceType: module
 rules:
-  indent:
+  '@typescript-eslint/explicit-function-return-type': off
+  '@typescript-eslint/indent': [error, 2]
+  '@typescript-eslint/interface-name-prefix': off
+  '@typescript-eslint/no-namespace':
     - error
-    - 2
-    - SwitchCase: 1
-  compat/compat: 2
-  comma-dangle:
-    - error
-    - arrays: never
-      objects: never
-      imports: never
-      exports: never
-      functions: never
-  max-nested-callbacks: 0
-  no-warning-comments: 0
-  require-jsdoc: 0
-  max-len: 0
-  object-curly-spacing: 0
-  one-var: 0
-  arrow-parens: 0
-  new-cap: 0
-  camelcase: 0
-  no-var: 2
-  prefer-const: 2
-  no-confusing-arrow: 2
-  prefer-arrow-callback: 2
-  switch-colon-spacing: 0
-  no-invalid-this: 0
+    - allowDeclarations: true
+  '@typescript-eslint/camelcase':
+    - always
+    - ignoreDestructuring: true
+  '@typescript-eslint/no-var-requires': off
+  '@typescript-eslint/no-explicit-any': off
+overrides:
+  - files:
+    - karma.*
+    - rollup.*
+    rules:
+      'compat/compat': off
 settings:
   polyfills:
-    - url
+    - Promise
     - fetch
-    - promises
-
+    - URL
+    - Request
 

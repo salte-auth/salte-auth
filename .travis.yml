@@ -4,27 +4,17 @@ node_js: stable
 cache: npm
 branches:
   only:
-    - master
+    - next
     - /^greenkeeper/.*$/
 script:
   - npm start lint
+  - npm start check-types
   - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm start test.sauce; fi
   - npm start test
-  - if [ "${TRAVIS_PULL_REQUEST}" = "true" ]; then npm start build; fi
-  - npm start docs
 after_success:
   - npm start report-coverage
-  - npm start semantic-release
+  # - npm start semantic-release
 addons:
   sauce_connect: true
-deploy:
-  provider: pages
-  skip_cleanup: true
-  email: bot@salte.io
-  name: Salte Bot
-  github_token: $GH_TOKEN
-  local_dir: docs
-  on:
-    branch: master
 notifications:
   email: change
