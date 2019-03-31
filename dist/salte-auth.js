@@ -1,7 +1,7 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.13.4
+ * @salte-auth/salte-auth JavaScript Library v2.13.5
  *
- * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
+ * @license MIT (https://github.com/salte-auth/salte-auth/blob/master/LICENSE)
  *
  * Made with ♥ by Ceci <admin@cecilias.me>, Dave Woodward <dave@salte.io>
  */
@@ -149,7 +149,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /** @ignore */
 
-var logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-io/salte-auth');
+var logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-auth/salte-auth');
 /**
  * Disable certain security validations if your provider doesn't support them.
  * @typedef {Object} Validation
@@ -6386,7 +6386,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /** @ignore */
 
-var logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('@salte-io/salte-auth:profile');
+var logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('@salte-auth/salte-auth:profile');
 /**
  * All the profile information associated with the current authentication session
  */
@@ -8555,7 +8555,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /** @ignore */
 
-var logger = debug__WEBPACK_IMPORTED_MODULE_1___default()('@salte-io/salte-auth:utilities');
+var logger = debug__WEBPACK_IMPORTED_MODULE_1___default()('@salte-auth/salte-auth:utilities');
 /**
  * Basic utilities to support the authentication flow
  */

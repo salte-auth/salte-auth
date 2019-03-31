@@ -1,7 +1,7 @@
 /**
- * @salte-io/salte-auth JavaScript Library v2.13.4
+ * @salte-auth/salte-auth JavaScript Library v2.13.5
  *
- * @license MIT (https://github.com/salte-io/salte-auth/blob/master/LICENSE)
+ * @license MIT (https://github.com/salte-auth/salte-auth/blob/master/LICENSE)
  *
  * Made with ♥ by Ceci <admin@cecilias.me>, Dave Woodward <dave@salte.io>
  */
@@ -143,7 +143,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /** @ignore */
 
-const logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-io/salte-auth');
+const logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-auth/salte-auth');
 /**
  * Disable certain security validations if your provider doesn't support them.
  * @typedef {Object} Validation
@@ -289,7 +289,7 @@ class SalteAuth {
         if (error) {
           this.profile.$clear();
         } else {
-          logger(`Navigating to Redirect URL... (${this.profile.$redirectUrl})`);
+          logger("Navigating to Redirect URL... (".concat(this.profile.$redirectUrl, ")"));
           this.$utilities.$navigate(this.profile.$redirectUrl);
           this.profile.$redirectUrl = undefined;
         }
@@ -308,14 +308,14 @@ class SalteAuth {
       this.$utilities.addXHRInterceptor((request, data) => {
         if (this.$utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
           return this.retrieveAccessToken().then(accessToken => {
-            request.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+            request.setRequestHeader('Authorization', "Bearer ".concat(accessToken));
           });
         }
       });
       this.$utilities.addFetchInterceptor(request => {
         if (this.$utilities.checkForMatchingUrl(request.url, this.$config.endpoints)) {
           return this.retrieveAccessToken().then(accessToken => {
-            request.headers.set('Authorization', `Bearer ${accessToken}`);
+            request.headers.set('Authorization', "Bearer ".concat(accessToken));
           });
         }
       });
@@ -354,7 +354,7 @@ class SalteAuth {
     window.salte.auth = this;
 
     if (this.$config.redirectLoginCallback) {
-      console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
+      console.warn("The \"redirectLoginCallback\" api has been deprecated in favor of the \"on\" api, see http://bit.ly/salte-auth-on for more info.");
     }
   }
   /**
@@ -373,7 +373,7 @@ class SalteAuth {
       const provider = this.$providers[this.$config.provider];
 
       if (!provider) {
-        throw new ReferenceError(`Unknown Provider (${this.$config.provider})`);
+        throw new ReferenceError("Unknown Provider (".concat(this.$config.provider, ")"));
       }
 
       return provider;
@@ -391,7 +391,7 @@ class SalteAuth {
   get $accessTokenUrl() {
     this.profile.$localState = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
     this.profile.$nonce = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
-    let authorizeEndpoint = `${this.$config.providerUrl}/authorize`;
+    let authorizeEndpoint = "".concat(this.$config.providerUrl, "/authorize");
 
     if (this.$provider.authorizeEndpoint) {
       authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
@@ -418,7 +418,7 @@ class SalteAuth {
   $loginUrl(refresh) {
     this.profile.$localState = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
     this.profile.$nonce = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
-    let authorizeEndpoint = `${this.$config.providerUrl}/authorize`;
+    let authorizeEndpoint = "".concat(this.$config.providerUrl, "/authorize");
 
     if (this.$provider.authorizeEndpoint) {
       authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
@@ -473,7 +473,7 @@ class SalteAuth {
 
   on(eventType, callback) {
     if (['login', 'logout', 'refresh', 'expired'].indexOf(eventType) === -1) {
-      throw new ReferenceError(`Unknown Event Type (${eventType})`);
+      throw new ReferenceError("Unknown Event Type (".concat(eventType, ")"));
     } else if (typeof callback !== 'function') {
       throw new ReferenceError('Invalid callback provided!');
     }
@@ -497,7 +497,7 @@ class SalteAuth {
 
   off(eventType, callback) {
     if (['login', 'logout', 'refresh', 'expired'].indexOf(eventType) === -1) {
-      throw new ReferenceError(`Unknown Event Type (${eventType})`);
+      throw new ReferenceError("Unknown Event Type (".concat(eventType, ")"));
     } else if (typeof callback !== 'function') {
       throw new ReferenceError('Invalid callback provided!');
     }
@@ -518,7 +518,7 @@ class SalteAuth {
 
   $fire(eventType, error, data) {
     const event = document.createEvent('Event');
-    event.initEvent(`salte-auth-${eventType}`, false, true);
+    event.initEvent("salte-auth-".concat(eventType), false, true);
     event.detail = {
       error,
       data
@@ -684,7 +684,7 @@ class SalteAuth {
 
   loginWithRedirect(redirectUrl) {
     if (this.$config.redirectLoginCallback) {
-      console.warn(`The "redirectLoginCallback" api has been deprecated in favor of the "on" api, see http://bit.ly/salte-auth-on for more info.`);
+      console.warn("The \"redirectLoginCallback\" api has been deprecated in favor of the \"on\" api, see http://bit.ly/salte-auth-on for more info.");
     }
 
     if (this.$promises.login) {
@@ -895,7 +895,7 @@ class SalteAuth {
         }
       } else {
         this.$promises.token = null;
-        return Promise.reject(new ReferenceError(`Invalid Login Type (${this.$config.loginType})`));
+        return Promise.reject(new ReferenceError("Invalid Login Type (".concat(this.$config.loginType, ")")));
       }
     }
 
@@ -6003,7 +6003,7 @@ class SalteAuthAuth0Provider {
    * @return {String} the deauthorization url
    */
   static deauthorizeUrl(config) {
-    return this.$utilities.createUrl(`${config.providerUrl}/v2/logout`, {
+    return this.$utilities.createUrl("".concat(config.providerUrl, "/v2/logout"), {
       returnTo: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
       client_id: config.clientId
     });
@@ -6027,7 +6027,7 @@ class SalteAuthAzureProvider {
    * @return {String} the authorization endpoint
    */
   static authorizeEndpoint(config) {
-    return `${config.providerUrl}/oauth2/authorize`;
+    return "".concat(config.providerUrl, "/oauth2/authorize");
   }
   /**
    * Computes the deauthorization url
@@ -6037,7 +6037,7 @@ class SalteAuthAzureProvider {
 
 
   static deauthorizeUrl(config) {
-    return this.$utilities.createUrl(`${config.providerUrl}/oauth2/logout`, {
+    return this.$utilities.createUrl("".concat(config.providerUrl, "/oauth2/logout"), {
       post_logout_redirect_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl
     });
   }
@@ -6060,7 +6060,7 @@ class SalteAuthCognitoProvider {
    * @return {String} the authorization endpoint
    */
   static authorizeEndpoint(config) {
-    return `${config.providerUrl}/oauth2/authorize`;
+    return "".concat(config.providerUrl, "/oauth2/authorize");
   }
   /**
    * Computes the deauthorization url
@@ -6070,7 +6070,7 @@ class SalteAuthCognitoProvider {
 
 
   static deauthorizeUrl(config) {
-    return this.$utilities.createUrl(`${config.providerUrl}/logout`, {
+    return this.$utilities.createUrl("".concat(config.providerUrl, "/logout"), {
       logout_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
       client_id: config.clientId
     });
@@ -6107,7 +6107,7 @@ class SalteAuthWSO2Provider {
    * @return {String} the deauthorization url
    */
   static deauthorizeUrl(config) {
-    return this.$utilities.createUrl(`${config.providerUrl}/commonauth`, {
+    return this.$utilities.createUrl("".concat(config.providerUrl, "/commonauth"), {
       commonAuthLogout: true,
       type: 'oidc',
       commonAuthCallerPath: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
@@ -6133,7 +6133,7 @@ class SalteAuthOktaProvider {
    * @return {String} the authorization endpoint
    */
   static authorizeEndpoint(config) {
-    return `${config.providerUrl}/oauth2/v1/authorize`;
+    return "".concat(config.providerUrl, "/oauth2/v1/authorize");
   }
   /**
    * Computes the deauthorization url
@@ -6143,7 +6143,7 @@ class SalteAuthOktaProvider {
 
 
   static deauthorizeUrl(config) {
-    return this.$utilities.createUrl(`${config.providerUrl}/oauth2/v1/logout`, {
+    return this.$utilities.createUrl("".concat(config.providerUrl, "/oauth2/v1/logout"), {
       id_token_hint: config.idToken,
       post_logout_redirect_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl
     });
@@ -6179,7 +6179,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 /** @ignore */
 
-const logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('@salte-io/salte-auth:profile');
+const logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('@salte-auth/salte-auth:profile');
 /**
  * All the profile information associated with the current authentication session
  */
@@ -6218,7 +6218,7 @@ class SalteAuthProfile {
   $parseParams() {
     if (location.search || location.hash) {
       const params = location.search.replace(/^\?/, '').split('&').concat(location.hash.replace(/(#!?[^#]+)?#/, '').split('&'));
-      logger(`Hash detected, parsing...`, params);
+      logger("Hash detected, parsing...", params);
 
       for (let i = 0; i < params.length; i++) {
         const param = params[i];
@@ -6231,7 +6231,7 @@ class SalteAuthProfile {
         this.$parse(key, decodeURIComponent(value));
       }
 
-      logger(`Removing hash...`);
+      logger("Removing hash...");
       history.pushState('', document.title, location.href.replace(location.search, '').replace(location.hash, ''));
     }
   }
@@ -6448,9 +6448,9 @@ class SalteAuthProfile {
 
   $actions(state, action) {
     if (action) {
-      this.$saveItem(`salte.auth.action.${state}`, action);
+      this.$saveItem("salte.auth.action.".concat(state), action);
     } else {
-      return this.$getItem(`salte.auth.action.${state}`);
+      return this.$getItem("salte.auth.action.".concat(state));
     }
   }
   /**
@@ -6615,7 +6615,7 @@ class SalteAuthProfile {
     } else if (storageType === 'session') {
       return sessionStorage;
     } else {
-      throw new ReferenceError(`Unknown Storage Type (${storageType})`);
+      throw new ReferenceError("Unknown Storage Type (".concat(storageType, ")"));
     }
   }
   /**
@@ -8320,7 +8320,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /** @ignore */
 
-const logger = debug__WEBPACK_IMPORTED_MODULE_1___default()('@salte-io/salte-auth:utilities');
+const logger = debug__WEBPACK_IMPORTED_MODULE_1___default()('@salte-auth/salte-auth:utilities');
 /**
  * Basic utilities to support the authentication flow
  */
@@ -8406,7 +8406,7 @@ class SalteAuthUtilities {
       const value = queryParams[key];
 
       if ([undefined, null, ''].indexOf(value) === -1) {
-        url += `${url.indexOf('?') === -1 ? '?' : '&'}${key}=${encodeURIComponent(value)}`;
+        url += "".concat(url.indexOf('?') === -1 ? '?' : '&').concat(key, "=").concat(encodeURIComponent(value));
       }
     });
     return url;
@@ -8492,7 +8492,7 @@ class SalteAuthUtilities {
     let width = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 400;
     const top = window.innerHeight / 2 - height / 2 + window.screenTop;
     const left = window.innerWidth / 2 - width / 2 + window.screenLeft;
-    const popupWindow = window.open(url, name, `height=${height}, width=${width}, status=yes, toolbar=no, menubar=no, location=no, top=${top}, left=${left}`);
+    const popupWindow = window.open(url, name, "height=".concat(height, ", width=").concat(width, ", status=yes, toolbar=no, menubar=no, location=no, top=").concat(top, ", left=").concat(left));
 
     if (!popupWindow) {
       return Promise.reject(new ReferenceError('We were unable to open the popup window, its likely that the request was blocked.'));
