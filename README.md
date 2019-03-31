@@ -17,7 +17,7 @@
 	<strong>
 		<!-- <a href="https://salte.io">Website</a> -->
 		<!-- • -->
-		<a href="https://salte-io.github.io/salte-auth">Docs</a>
+		<a href="https://salte-auth.github.io/salte-auth">Docs</a>
 		•
 		<a href="https://salte-auth-demo.glitch.me">Demo</a>
 	</strong>
@@ -62,21 +62,21 @@ You can install this package either with `npm` or with `bower`.
 ## npm
 
 ```sh
-$ npm install @salte-io/salte-auth
+$ npm install @salte-auth/salte-auth
 ```
 
 Then add a `<script>` to your index.html:
 
 ```html
-<script src="/node_modules/@salte-io/dist/salte-auth.js"></script>
+<script src="/node_modules/@salte-auth/dist/salte-auth.js"></script>
 ```
 
-Or `require('@salte-io/salte-auth')` from your code.
+Or `require('@salte-auth/salte-auth')` from your code.
 
 ## bower
 
 ```sh
-$ bower install salte-io/salte-auth
+$ bower install salte-auth/salte-auth
 ```
 
 Then add a `<script>` to your index.html:
@@ -96,7 +96,7 @@ We also support HTML Imports:
 ## ES6 Usage
 
 ```js
-import { SalteAuth } from '@salte-io/salte-auth';
+import { SalteAuth } from '@salte-auth/salte-auth';
 
 // Configure SalteAuth with Auth0's url and client id.
 const auth = new SalteAuth({
@@ -127,7 +127,7 @@ auth.loginWithIframe();
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="/node_modules/@salte-io/salte-auth/dist/salte-auth.js"></script>
+    <script src="/node_modules/@salte-auth/salte-auth/dist/salte-auth.js"></script>
     <script>
       const auth = new salte.SalteAuth({
         providerUrl: 'https://salte-alpha.auth0.com',
@@ -164,23 +164,23 @@ _These are issues that we know about, but don't have a clear fix for!_
 
 ## Debugging
 
-Debug logging can be enabled by setting a `localStorage` variable of `debug` to `@salte-io/salte-auth*`.
+Debug logging can be enabled by setting a `localStorage` variable of `debug` to `@salte-auth/salte-auth*`.
 
 ## Documentation
 
-[Click here to view the documentation!](https://salte-io.github.io/salte-auth/)
+[Click here to view the documentation!](https://salte-auth.github.io/salte-auth/)
 
 **Use private or undocumented methods at your own risk, as they will not require a major version bump when breaking changes are made!**
 
-[npm-version-image]: https://img.shields.io/npm/v/@salte-io/salte-auth.svg?style=flat
-[npm-downloads-image]: https://img.shields.io/npm/dm/@salte-io/salte-auth.svg?style=flat
-[npm-url]: https://npmjs.org/package/@salte-io/salte-auth
+[npm-version-image]: https://img.shields.io/npm/v/@salte-auth/salte-auth.svg?style=flat
+[npm-downloads-image]: https://img.shields.io/npm/dm/@salte-auth/salte-auth.svg?style=flat
+[npm-url]: https://npmjs.org/package/@salte-auth/salte-auth
 
-[travis-ci-image]: https://img.shields.io/travis/com/salte-io/salte-auth/master.svg?style=flat
-[travis-ci-url]: https://travis-ci.com/salte-io/salte-auth
+[travis-ci-image]: https://img.shields.io/travis/com/salte-auth/salte-auth/master.svg?style=flat
+[travis-ci-url]: https://travis-ci.com/salte-auth/salte-auth
 
-[coveralls-image]: https://img.shields.io/coveralls/salte-io/salte-auth/master.svg
-[coveralls-url]: https://coveralls.io/github/salte-io/salte-auth?branch=master
+[coveralls-image]: https://img.shields.io/coveralls/salte-auth/salte-auth/master.svg
+[coveralls-url]: https://coveralls.io/github/salte-auth/salte-auth?branch=master
 
 [commitizen-image]: https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
 [commitizen-url]: https://commitizen.github.io/cz-cli/
@@ -188,5 +188,5 @@ Debug logging can be enabled by setting a `localStorage` variable of `debug` to 
 [semantic-release-url]: https://github.com/semantic-release/semantic-release
 [semantic-release-image]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 
-[greenkeeper-image]: https://badges.greenkeeper.io/salte-io/salte-auth.svg
+[greenkeeper-image]: https://badges.greenkeeper.io/salte-auth/salte-auth.svg
 [greenkeeper-url]: https://greenkeeper.io

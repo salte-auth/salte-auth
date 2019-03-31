@@ -8,7 +8,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/salte-io/salte-auth.git"
+    "url": "https://github.com/salte-auth/salte-auth.git"
   },
   "keywords": [
     "salte-auth",
@@ -21,7 +21,7 @@
     "Dave Woodward <dave@salte.io>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/salte-io/salte-auth",
+  "homepage": "https://github.com/salte-auth/salte-auth",
   "ignore": [
     "**/.*",
     "node_modules",
