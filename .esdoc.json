@@ -13,7 +13,7 @@
     "option": {
       "stripPackageName": true,
       "replaces": [{
-        "from": "^src/", "to": "@salte-io/salte-auth/dist/"
+        "from": "^src/", "to": "@salte-auth/salte-auth/dist/"
       }, {
         "from": "/dist/salte-auth.js$", "to": ""
       }]

@@ -3,7 +3,7 @@ import find from 'lodash/find';
 import debug from 'debug';
 
 /** @ignore */
-const logger = debug('@salte-io/salte-auth:profile');
+const logger = debug('@salte-auth/salte-auth:profile');
 
 /**
  * All the profile information associated with the current authentication session

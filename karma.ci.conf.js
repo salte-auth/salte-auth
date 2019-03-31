@@ -2,11 +2,6 @@ const common = require('./webpack.common.config.js');
 
 module.exports = function(config) {
   const customLaunchers = {
-    ChromeBeta: {
-      base: 'SauceLabs',
-      browserName: 'chrome',
-      version: 'beta'
-    },
     Chrome: {
       base: 'SauceLabs',
       browserName: 'chrome'
@@ -83,7 +78,7 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
 
     sauceLabs: {
-      testName: 'salte-io/salte-auth',
+      testName: 'salte-auth/salte-auth',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
       startConnect: false
     },

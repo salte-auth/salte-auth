@@ -1,10 +1,10 @@
 {
-  "name": "@salte-io/salte-auth",
+  "name": "@salte-auth/salte-auth",
   "version": "2.13.4",
   "main": "dist/salte-auth.min.js",
   "description": "OAuth 2.0 for the masses!",
-  "homepage": "https://github.com/salte-io/salte-auth",
-  "bugs": "https://github.com/salte-io/salte-auth/issues",
+  "homepage": "https://github.com/salte-auth/salte-auth",
+  "bugs": "https://github.com/salte-auth/salte-auth/issues",
   "contributors": [
     "Nick Woodward <nick@salte.io>",
     "Dave Woodward <dave@salte.io>"
@@ -17,7 +17,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/salte-io/salte-auth.git"
+    "url": "https://github.com/salte-auth/salte-auth.git"
   },
   "scripts": {
     "start": "nps"
@@ -44,7 +44,7 @@
     "esdoc-member-plugin": "^1.0.0",
     "esdoc-plugin-require-coverage": "^0.1.2",
     "esdoc-standard-plugin": "^1.0.0",
-    "eslint": "^5.14.1",
+    "eslint": "^5.16.0",
     "eslint-config-google": "^0.12.0",
     "eslint-plugin-compat": "^2.7.0",
     "eslint-plugin-mocha": "^5.3.0",
@@ -61,15 +61,15 @@
     "karma-sinon": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.0",
-    "lit-element": "^2.0.1",
+    "lit-element": "^2.1.0",
     "lodash": "^4.0.0",
     "mocha": "^6.0.2",
     "moment": "^2.22.1",
-    "nps": "^5.9.4",
+    "nps": "^5.9.5",
     "promise-polyfill": "^8.1.0",
     "remove-lockfiles": "^2.0.0",
     "semantic-release": "^15.0.0",
-    "sinon": "^7.2.5",
+    "sinon": "^7.3.1",
     "url-polyfill": "^1.1.3",
     "uuid": "^3.0.0",
     "watch": "^1.0.2",

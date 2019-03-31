@@ -11,7 +11,7 @@ import { SalteAuthUtilities } from './salte-auth.utilities.js';
 import { SalteAuthMixinGenerator } from './salte-auth.mixin.js';
 
 /** @ignore */
-const logger = debug('@salte-io/salte-auth');
+const logger = debug('@salte-auth/salte-auth');
 
 /**
  * Disable certain security validations if your provider doesn't support them.
