@@ -119,9 +119,9 @@ class SalteAuthUtilities {
     for (let i = 0; i < tests.length; i++) {
       const test = tests[i];
       if (test instanceof RegExp) {
-        return !!resolvedUrl.match(test);
+        if (resolvedUrl.match(test)) return true;
       } else {
-        return resolvedUrl.indexOf(this.resolveUrl(test)) === 0;
+        if (resolvedUrl.indexOf(this.resolveUrl(test)) === 0) return true;
       }
     }
 
