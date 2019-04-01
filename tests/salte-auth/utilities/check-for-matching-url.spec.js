@@ -16,6 +16,15 @@ describe('function(checkForMatchingUrl)', () => {
     expect(match).to.equal(true);
   });
 
+  it('should support multiple values', () => {
+    const match = utilities.checkForMatchingUrl('https://api.salte.io', [
+      'https://google.com/api',
+      'https://api.salte.io'
+    ]);
+
+    expect(match).to.equal(true);
+  });
+
   it('should support relative strings', () => {
     const match = utilities.checkForMatchingUrl(
       `${location.protocol}//${location.host}/api`,
