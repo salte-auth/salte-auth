@@ -36,9 +36,7 @@
   <a href="https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss" target="_blank" alt="Single Sign On & Token Based Authentication - Auth0">
     <img width="150" height="50" alt="JWT Auth for open source projects" src="https://cdn.auth0.com/oss/badges/a0-badge-dark.png"/>
   </a>
-
-  [![Auth0](https://cdn.auth0.com/oss/badges/a0-badge-dark.png)](https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss)
-
+  
 </div>
 
 ## Supported Browsers
