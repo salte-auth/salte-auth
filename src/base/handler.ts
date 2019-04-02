@@ -6,7 +6,7 @@ import { Common, Logger } from '../utils';
 export abstract class Handler extends Storage {
   protected logger: Logger;
 
-  public constructor(config: Handler.Config) {
+  public constructor(config?: Handler.Config) {
     super(config);
 
     this.config = Common.defaults(this.config, {

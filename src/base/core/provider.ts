@@ -5,7 +5,7 @@ import { Common, Interceptors, Logger } from '../../utils';
 export abstract class Provider extends Shared {
   protected logger: Logger;
 
-  constructor(config?: Provider.Config) {
+  constructor(config: Provider.Config) {
     super(config);
 
     this.config = Common.defaults(this.config, {
