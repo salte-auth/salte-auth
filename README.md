@@ -32,10 +32,6 @@
 
   [![semantic-release][semantic-release-image]][semantic-release-url]
   [![Greenkeeper badge][greenkeeper-image]][greenkeeper-url]
-
-  <a href="https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss" target="_blank" alt="Single Sign On & Token Based Authentication - Auth0">
-    <img width="150" height="50" alt="JWT Auth for open source projects" src="https://cdn.auth0.com/oss/badges/a0-badge-dark.png"/>
-  </a>
   
 </div>
 
@@ -175,6 +171,14 @@ Debug logging can be enabled by setting a `localStorage` variable of `debug` to 
 [Click here to view the documentation!](https://salte-auth.github.io/salte-auth/)
 
 **Use private or undocumented methods at your own risk, as they will not require a major version bump when breaking changes are made!**
+
+## Shoutouts
+
+Huge shoutout to [Auth0](https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss) for providing us with an open source tenant!
+
+<a href="https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss" target="_blank" alt="Single Sign On & Token Based Authentication - Auth0">
+  <img width="150" height="50" alt="JWT Auth for open source projects" src="https://cdn.auth0.com/oss/badges/a0-badge-dark.png"/>
+</a>
 
 [npm-version-image]: https://img.shields.io/npm/v/@salte-auth/salte-auth.svg?style=flat
 [npm-downloads-image]: https://img.shields.io/npm/dm/@salte-auth/salte-auth.svg?style=flat
