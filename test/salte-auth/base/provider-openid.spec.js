@@ -32,6 +32,7 @@ describe('OpenIDProvider', () => {
           super(config);
 
           expect(this.config).to.deep.equal({
+            level: 'warn',
             redirectUrl: location.origin,
             responseType: 'id_token',
             scope: 'openid',

@@ -1,27 +1,27 @@
-import debug from 'debug';
 
 import { Shared } from './base/core/shared';
 import * as Generic from './generic';
 import * as Utils from './utils';
-import { Common, Events, Interceptors, URL, IDToken } from './utils';
+import { Common, Events, Interceptors, URL, IDToken, Logger } from './utils';
 
 import { Provider } from './base/core/provider';
 import { SalteAuthError } from './base/core/salte-auth-error';
 import { Handler } from './base/handler';
 
 export class SalteAuth extends Shared {
-  public logger: debug.Debugger;
+  public logger: Logger;
 
   constructor(config: SalteAuth.Config) {
     super(config);
-
-    this.logger = debug(`@salte-auth/salte-auth/core`);
 
     this.required('providers', 'handlers');
 
     this.config = Common.defaults(this.config, {
       validation: true,
+      level: 'warn'
     });
+
+    this.logger = new Logger(`@salte-auth/salte-auth:core`, this.config.level);
 
     Common.forEach(this.config.providers, (provider) => {
       provider.config = Common.defaults(provider.config, this.config);
@@ -246,6 +246,11 @@ export declare namespace SalteAuth {
     providers: Provider[];
 
     handlers: Handler[];
+
+    /**
+     * Determines the level of verbosity of the logs.
+     */
+    level: ('error'|'warn'|'info'|'trace');
   }
 
   interface EventWrapper {

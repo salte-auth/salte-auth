@@ -7,7 +7,8 @@ export abstract class Shared extends Events {
     super(config);
 
     this.config = Common.defaults(this.config, {
-      redirectUrl: location.origin
+      redirectUrl: location.origin,
+      level: 'warn'
     });
   }
 

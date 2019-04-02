@@ -1,19 +1,18 @@
-import debug from 'debug';
-
 import { Shared } from './shared';
 
-import { Common, Interceptors } from '../../utils';
+import { Common, Interceptors, Logger } from '../../utils';
 
 export abstract class Provider extends Shared {
-  protected logger: debug.Debugger;
+  protected logger: Logger;
 
   constructor(config?: Provider.Config) {
     super(config);
 
     this.config = Common.defaults(this.config, {
-      validation: true
+      validation: true,
+      level: 'warn'
     });
-    this.logger = debug(`@salte-auth/salte-auth/providers/${this.$name}`);
+    this.logger = new Logger(`@salte-auth/salte-auth:providers/${this.$name}`, this.config.level);
   }
 
   /**
@@ -141,6 +140,11 @@ export declare namespace Provider {
      * The endpoints to secure for this provider.
      */
     endpoints?: Array<string | RegExp>;
+
+    /**
+     * Determines the level of verbosity of the logs.
+     */
+    level: ('error'|'warn'|'info'|'trace');
   }
 
   export interface OverrideOptions {}

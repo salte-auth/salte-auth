@@ -4,7 +4,6 @@ const glob = require('rollup-plugin-glob-import');
 const babel = require('rollup-plugin-babel');
 const deindent = require('deindent');
 const { terser } = require('rollup-plugin-terser');
-const alias = require('rollup-plugin-alias');
 const replace = require('rollup-plugin-replace');
 const serve = require('rollup-plugin-serve');
 const copy = require('rollup-plugin-copy-assets-to');
@@ -33,11 +32,6 @@ module.exports = function({ minified, es6, coverage, tests, server }) {
     },
 
     plugins: [
-      alias({
-        resolve: ['.jsx', '.js'],
-        debug: 'node_modules/debug/dist/debug.js'  // Will check for ./bar.jsx and ./bar.js
-      }),
-
       replace({
         'process.env.NODE_ENV': JSON.stringify('production')
       }),
