@@ -89,6 +89,5 @@ export declare namespace Handler {
   export interface OpenOptions {
     url: string;
     redirectUrl: string | Shared.RedirectUrl;
-    auto?: boolean;
   }
 }
