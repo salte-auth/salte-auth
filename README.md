@@ -1,11 +1,13 @@
-<div align="center">
-  <a href="https://github.com/salte-auth/salte-auth">
-    <img height="180px" src="https://raw.githubusercontent.com/salte-auth/logos/master/images/logo.svg?sanitize=true">
-    <br>
-    <br>
-    <img height="50px" src="https://raw.githubusercontent.com/salte-auth/logos/master/images/%40salte-auth/salte-auth.svg?sanitize=true">
-  </a>
-</div>
+<h2 align="center">
+  <div>
+    <a href="https://github.com/salte-auth/logos">
+      <img height="180px" src="https://raw.githubusercontent.com/salte-auth/logos/master/images/logo.svg?sanitize=true">
+      <br>
+      <br>
+      <img height="50px" src="https://raw.githubusercontent.com/salte-auth/logos/master/images/%40salte-auth/salte-auth.svg?sanitize=true">
+    </a>
+  </div>
+</h2>
 
 <h3 align="center">
   Authentication for the modern web!
@@ -22,7 +24,7 @@
 </p>
 
 <div align="center">
-  
+
   [![NPM Version][npm-version-image]][npm-url]
   [![NPM Downloads][npm-downloads-image]][npm-url]
   [![Travis][travis-ci-image]][travis-ci-url]
