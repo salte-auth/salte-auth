@@ -1,5 +1,5 @@
 /**
- * @salte-auth/salte-auth JavaScript Library v2.13.5
+ * @salte-auth/salte-auth JavaScript Library v2.13.6
  *
  * @license MIT (https://github.com/salte-auth/salte-auth/blob/master/LICENSE)
  *
@@ -8451,9 +8451,9 @@ class SalteAuthUtilities {
       const test = tests[i];
 
       if (test instanceof RegExp) {
-        return !!resolvedUrl.match(test);
+        if (resolvedUrl.match(test)) return true;
       } else {
-        return resolvedUrl.indexOf(this.resolveUrl(test)) === 0;
+        if (resolvedUrl.indexOf(this.resolveUrl(test)) === 0) return true;
       }
     }
 

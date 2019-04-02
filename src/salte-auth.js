@@ -46,6 +46,7 @@ const logger = debug('@salte-auth/salte-auth');
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
  * @property {Boolean} [autoRefresh=true] Automatically refreshes the users token upon switching tabs or one minute prior to expiration.
  * @property {Number} [autoRefreshBuffer=60000] A number of miliseconds before token expiration to refresh.
+ * @property {Object} [queryParams] A key-value set of additional query params to attached to the login request.
  */
 
 /**
