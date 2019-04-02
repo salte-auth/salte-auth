@@ -1,16 +1,18 @@
-import debug from 'debug';
-
 import { Storage } from './core/storage';
 import { Provider } from './core/provider';
 import { Shared } from './core/shared';
+import { Common, Logger } from '../utils';
 
 export abstract class Handler extends Storage {
-  protected logger: debug.Debugger;
+  protected logger: Logger;
 
-  public constructor(config: Handler.Config = {}) {
+  public constructor(config: Handler.Config) {
     super(config);
 
-    this.logger = debug(`@salte-auth/salte-auth/handlers/${this.$name}`);
+    this.config = Common.defaults(this.config, {
+      level: 'warn'
+    });
+    this.logger = new Logger(`@salte-auth/salte-auth:handlers/${this.$name}`, this.config.level);
   }
 
   public abstract open(options: Handler.OpenOptions): Promise<any>;
@@ -53,22 +55,36 @@ export abstract class Handler extends Storage {
 }
 
 export interface Handler {
+  config: Handler.Config;
+
   connected?(options: Handler.ConnectedOptions): void;
 }
 
 export declare namespace Handler {
-  interface Config extends Storage.Config {
+  export interface Config extends Storage.Config {
+    /**
+     * Overrides the default name of the handler.
+     */
     name?: string;
+
+    /**
+     * Dictates that this is the default handler.
+     */
     default?: boolean;
+
+    /**
+     * Determines the level of verbosity of the logs.
+     */
+    level: ('error'|'warn'|'info'|'trace');
   }
 
-  interface ConnectedOptions {
+  export interface ConnectedOptions {
     action?: string;
     handler?: string;
     provider?: Provider;
   }
 
-  interface OpenOptions {
+  export interface OpenOptions {
     url: string;
     redirectUrl: string | Shared.RedirectUrl;
     auto?: boolean;

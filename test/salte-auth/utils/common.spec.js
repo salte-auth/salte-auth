@@ -11,13 +11,77 @@ describe('Common', () => {
     sinon.restore();
   });
 
+  describe('function(includes)', () => {
+    it('should support arrays', () => {
+      expect(Common.includes([1,2,3], 2)).to.equal(true);
+    });
+
+    it('should support strings', () => {
+      expect(Common.includes('hello', 'ell')).to.equal(true);
+    });
+  });
+
   describe('function(forEach)', () => {
-    it('should loop over an array', () => {
+    it('should support arrays', () => {
       let count = 0;
 
       Common.forEach(Array(3), () => count++);
 
       expect(count).to.equal(3);
+    });
+
+    it('should support objects', () => {
+      let count = 0;
+
+      Common.forEach({
+        hello: 'world',
+        hallo: 'welt'
+      }, (value, key) => {
+        if (count === 0) {
+          expect(key).to.equal('hello');
+          expect(value).to.equal('world');
+        } else if (count === 1) {
+          expect(key).to.equal('hallo');
+          expect(value).to.equal('welt');
+        }
+
+        count++
+      });
+
+      expect(count).to.equal(2);
+    });
+  });
+
+  describe('function(find)', () => {
+    it('should support arrays', () => {
+      const match = Common.find([0,1,2], (value, index) => index === 1);
+
+      expect(match).to.equal(1);
+    });
+
+    it('should support objects', () => {
+      const match = Common.find({
+        hello: 'world',
+        hallo: 'welt'
+      }, (value, key) => key === 'hello' && value === 'world');
+
+      expect(match).to.equal('world');
+    });
+  });
+
+  describe('function(defaults)', () => {
+    it('should override previous values', () => {
+      const output = Common.assign({
+        hello: 'world'
+      }, {
+        hello: 'welt',
+        hallo: 'welt'
+      });
+
+      expect(output).to.deep.equal({
+        hello: 'welt',
+        hallo: 'welt'
+      });
     });
   });
 

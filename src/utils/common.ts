@@ -23,11 +23,22 @@ export class Common {
     }
   }
 
-  public static find<T>(array: T[], cb: (item: T, index: number) => boolean): T | null {
-    for (let i = 0; i < array.length; i++) {
-      const item = array[i];
-      if (cb(item, i)) {
-        return item;
+  public static find<T>(source: T[], cb: (value: T, key: number | string) => boolean): T;
+  public static find<T extends object>(source: T, cb: (item: any, key: number | string) => boolean): any;
+  public static find<T>(source: T[] | T, cb: (item: T | any, key: number | string) => boolean): T | any {
+    if (Array.isArray(source)) {
+      for (let i = 0; i < source.length; i++) {
+        const item = source[i];
+        if (cb(item, i)) {
+          return item;
+        }
+      }
+    } else {
+      for (let key in source) {
+        const item = source[key];
+        if (cb(item, key)) {
+          return item;
+        }
       }
     }
 
