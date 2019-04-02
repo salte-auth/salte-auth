@@ -78,7 +78,7 @@ _These are issues that we know about, but don't have a clear fix for!_
 
 Debug logging can be enabled by setting a `localStorage` variable of `debug` to `@salte-auth/salte-auth*`.
 
-[npm-version-image]: https://img.shields.io/npm/v/@salte-auth/salte-auth.svg?style=flat
+[npm-version-image]: https://img.shields.io/npm/v/@salte-auth/salte-auth/next.svg?style=flat
 [npm-downloads-image]: https://img.shields.io/npm/dm/@salte-auth/salte-auth.svg?style=flat
 [npm-url]: https://npmjs.org/package/@salte-auth/salte-auth
 
