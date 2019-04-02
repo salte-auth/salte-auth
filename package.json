@@ -1,6 +1,6 @@
 {
   "name": "@salte-auth/salte-auth",
-  "version": "0.0.0-semantically-released.0",
+  "version": "3.0.0-rc.1",
   "main": "dist/salte-auth.min.js",
   "module": "dist/salte-auth.min.mjs",
   "types": "dist/salte-auth.d.ts",
@@ -78,7 +78,8 @@
     "whatwg-fetch": "^3.0.0"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "next"
   },
   "husky": {
     "hooks": {
