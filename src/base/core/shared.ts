@@ -3,7 +3,7 @@ import { Events } from './events';
 import { Common } from '../../utils';
 
 export abstract class Shared extends Events {
-  constructor(config: Shared.Config) {
+  constructor(config?: Shared.Config) {
     super(config);
 
     this.config = Common.defaults(this.config, {

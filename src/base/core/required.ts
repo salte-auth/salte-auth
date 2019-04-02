@@ -1,7 +1,7 @@
 import { SalteAuthError } from './salte-auth-error';
 
 export abstract class Required {
-  constructor(config: Required.Config) {
+  constructor(config?: Required.Config) {
     this.config = config || {};
   }
 
