@@ -249,8 +249,10 @@ export declare namespace SalteAuth {
 
     /**
      * Determines the level of verbosity of the logs.
+     *
+     * @default 'warn'
      */
-    level: ('error'|'warn'|'info'|'trace');
+    level?: ('error'|'warn'|'info'|'trace');
   }
 
   interface EventWrapper {

@@ -74,8 +74,10 @@ export declare namespace Handler {
 
     /**
      * Determines the level of verbosity of the logs.
+     *
+     * @default 'warn'
      */
-    level: ('error'|'warn'|'info'|'trace');
+    level?: ('error'|'warn'|'info'|'trace');
   }
 
   export interface ConnectedOptions {
