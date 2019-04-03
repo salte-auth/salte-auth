@@ -33,7 +33,7 @@ const logger = debug('@salte-auth/salte-auth');
  * The configuration for salte auth
  * @typedef {Object} Config
  * @property {String} providerUrl The base url of your identity provider.
- * @property {('id_token'|'id_token token')} responseType The response type to authenticate with.
+ * @property {('id_token'|'id_token token'|'code')} responseType The response type to authenticate with.
  * @property {String|RedirectURLs} redirectUrl The redirect url specified in your identity provider.
  * @property {String} clientId The client id of your identity provider
  * @property {String} scope A list of space-delimited claims used to determine what user information is provided and what access is given. Most providers require 'openid'.
