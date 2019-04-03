@@ -174,9 +174,8 @@ Debug logging can be enabled by setting a `localStorage` variable of `debug` to 
 
 ## Shoutouts
 
-Huge shoutout to [Auth0](https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss) for providing us with an open source tenant!
-
-Shoutout to the folks over at [BrowserStack](https://browserstack.com) for enabling us to test across various browsers!
+- [Auth0](https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss) - For providing us with an open source tenant!
+- [BrowserStack](https://browserstack.com) - For providing us with cross-browser testing!
 
 <a href="https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss" target="_blank" alt="Single Sign On & Token Based Authentication - Auth0">
   <img width="150" alt="JWT Auth for open source projects" src="https://cdn.auth0.com/oss/badges/a0-badge-dark.png"/>
