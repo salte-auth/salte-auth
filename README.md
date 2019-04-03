@@ -176,8 +176,14 @@ Debug logging can be enabled by setting a `localStorage` variable of `debug` to 
 
 Huge shoutout to [Auth0](https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss) for providing us with an open source tenant!
 
+Shoutout to the folks over at [BrowserStack](https://browserstack.com) for enabling us to test across various browsers!
+
 <a href="https://auth0.com/?utm_source=oss&utm_medium=gp&utm_campaign=oss" target="_blank" alt="Single Sign On & Token Based Authentication - Auth0">
-  <img width="150" height="50" alt="JWT Auth for open source projects" src="https://cdn.auth0.com/oss/badges/a0-badge-dark.png"/>
+  <img width="150" alt="JWT Auth for open source projects" src="https://cdn.auth0.com/oss/badges/a0-badge-dark.png"/>
+</a>
+
+<a href="https://www.browserstack.com">
+  <img width="150" alt="App and Browser Testing Made Easy" src="https://camo.githubusercontent.com/8a50997157aa6fe37f4d3526e8c40a4805522902/687474703a2f2f666f756e646174696f6e2e7a7572622e636f6d2f73697465732f646f63732f6173736574732f696d672f6c6f676f732f62726f777365722d737461636b2e737667">
 </a>
 
 [npm-version-image]: https://img.shields.io/npm/v/@salte-auth/salte-auth.svg?style=flat
