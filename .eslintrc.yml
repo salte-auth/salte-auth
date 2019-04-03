@@ -35,8 +35,9 @@ rules:
   no-invalid-this: 0
 settings:
   polyfills:
-    - url
+    - URL
     - fetch
-    - promises
+    - Promise
+    - Request
 
 
