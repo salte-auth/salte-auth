@@ -69,6 +69,11 @@ describe('salte-auth.profile', () => {
       expect(profile.$tokenType).to.equal('access');
     });
 
+    it('should parse the code', () => {
+      profile.$parse('code', '12345');
+      expect(profile.code).to.equal('12345');
+    });
+
     it('should parse the expires_in', () => {
       sinon.useFakeTimers();
       expect(profile.$expiration).to.equal(null);
@@ -182,6 +187,20 @@ describe('salte-auth.profile', () => {
       expect(sessionStorage.getItem('salte.auth.$redirect-url')).to.equal(
         location.href
       );
+    });
+  });
+
+  describe('getter(code)', () => {
+    it('should pull from session storage', () => {
+      sessionStorage.setItem('salte.auth.code', '54321');
+      expect(profile.code).to.equal('54321');
+    });
+  });
+
+  describe('setter(code)', () => {
+    it('should set sessionStorage', () => {
+      profile.code = '12345';
+      expect(sessionStorage.getItem('salte.auth.code')).to.equal('12345');
     });
   });
 
@@ -422,6 +441,15 @@ describe('salte-auth.profile', () => {
       profile.$localState = null;
       profile.$state = null;
       const response = profile.$validate(true);
+      expect(response).to.deep.equal(undefined);
+    });
+
+    it('should skip "nonce" validation if we are validating a code', () => {
+      profile.code = '12345';
+      profile.$localState = null;
+      profile.$state = null;
+      profile.$$config.responseType = 'code';
+      const response = profile.$validate();
       expect(response).to.deep.equal(undefined);
     });
 

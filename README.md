@@ -100,10 +100,10 @@ import { SalteAuth } from '@salte-auth/salte-auth';
 
 // Configure SalteAuth with Auth0's url and client id.
 const auth = new SalteAuth({
-  providerUrl: 'https://salte-alpha.auth0.com',
+  providerUrl: 'https://salte-os.auth0.com',
   responseType: 'id_token',
   redirectUrl: location.origin,
-  clientId: 'mM6h2LHJikwdbkvdoiyE8kHhL7gcV8Wb',
+  clientId: '9JTBXBREtckkFHTxTNBceewrnn7NeDd0',
   scope: 'openid',
 
   routes: [
