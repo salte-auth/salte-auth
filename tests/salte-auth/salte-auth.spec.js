@@ -29,7 +29,8 @@ describe('salte-auth', () => {
       }))}.12345`;
     });
     auth = new SalteAuth({
-      provider: 'auth0'
+      provider: 'auth0',
+      responseType: 'id_token'
     });
   });
 
@@ -65,7 +66,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       return promise.then((instance) => {
@@ -77,11 +79,13 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       expect(auth.$config).to.deep.equal({
         loginType: 'iframe',
+        responseType: 'id_token',
         autoRefresh: true,
         provider: 'auth0',
         storageType: 'session',
@@ -101,6 +105,7 @@ describe('salte-auth', () => {
 
       auth = new SalteAuth({
         loginType: 'redirect',
+        responseType: 'id_token',
         autoRefresh: false,
         provider: 'auth0',
         autoRefreshBuffer: 500,
@@ -112,6 +117,7 @@ describe('salte-auth', () => {
 
       expect(auth.$config).to.deep.equal({
         loginType: 'redirect',
+        responseType: 'id_token',
         autoRefresh: false,
         provider: 'auth0',
         storageType: 'local',
@@ -133,7 +139,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       expect(auth.bogus).to.be.undefined;
@@ -148,7 +155,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       expect(parent.document.querySelector('[owner="salte-auth"]')).to.equal(
@@ -166,7 +174,8 @@ describe('salte-auth', () => {
 
       auth = new SalteAuth({
         storageType: 'local',
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       expect(popup.close.callCount).to.equal(0);
@@ -184,7 +193,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       expect(popup.close.callCount).to.equal(0);
@@ -193,7 +203,35 @@ describe('salte-auth', () => {
       });
     });
 
-    it('should redirect to the "redirectUrl"', done => {
+    it('should redirect to the "redirectUrl" for implicit flow', done => {
+      SalteAuthUtilities.prototype.$navigate.restore();
+      window.setTimeout.restore();
+
+      const url = `${location.protocol}//${location.host}${
+        location.pathname
+      }#hello=world`;
+      sinon.stub(SalteAuthProfile.prototype, '$validate').returns(undefined);
+      sinon
+        .stub(SalteAuthProfile.prototype, '$redirectUrl')
+        .get(() => url)
+        .set(redirectUrl => {
+          expect(redirectUrl).to.equal(undefined);
+        });
+
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        provider: 'auth0',
+        responseType: 'id_token',
+        redirectLoginCallback: error => {
+          expect(error).to.deep.equal(undefined);
+          expect(location.href).to.equal(url);
+          done();
+        }
+      });
+    });
+
+    it('should redirect to the "redirectUrl" for code flow', done => {
       SalteAuthUtilities.prototype.$navigate.restore();
       window.setTimeout.restore();
 
@@ -212,6 +250,7 @@ describe('salte-auth', () => {
 
       auth = new SalteAuth({
         provider: 'auth0',
+        responseType: 'code',
         redirectLoginCallback: error => {
           expect(error).to.deep.equal(undefined);
           expect(location.href).to.equal(url);
@@ -233,7 +272,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       auth.profile.$actions('bogus', 'login');
@@ -265,7 +305,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       auth.profile.$actions('bogus', 'logout');
@@ -298,7 +339,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       auth.profile.$actions('bogus', 'bogus');
@@ -319,6 +361,7 @@ describe('salte-auth', () => {
 
       auth = new SalteAuth({
         provider: 'auth0',
+        responseType: 'id_token',
         redirectLoginCallback: error => {
           expect(error).to.deep.equal({
             code: 'stuff_broke',
@@ -338,7 +381,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       const promise = new Promise((resolve) => {
@@ -378,7 +422,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       expect(auth.$$refreshToken.callCount).to.equal(1);
@@ -398,7 +443,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       expect(auth.$$refreshToken.callCount).to.equal(0);
@@ -421,6 +467,7 @@ describe('salte-auth', () => {
 
       auth = new SalteAuth({
         provider: 'auth0',
+        responseType: 'id_token',
         endpoints: [`${location.protocol}//${location.host}`]
       });
 
@@ -436,19 +483,20 @@ describe('salte-auth', () => {
 
       return fetch('/');
     });
-  });
 
-  describe('interceptor(fetch)', () => {
-    it('should request a new access token if we are not authenticated', () => {
-      sinon.stub(auth, 'retrieveAccessToken').returns(Promise.resolve('55555-55555'));
-      auth.$config = {
-        endpoints: [
-          `${location.protocol}//${location.host}`
-        ]
-      };
-    });
+    it('should skip if the responseType is code', () => {
+      delete window.salte.auth;
 
-    it('should not request a new access token if we do not need to be authenticated', () => {
+      auth = new SalteAuth({
+        provider: 'auth0',
+        responseType: 'code',
+        endpoints: [`${location.protocol}//${location.host}`]
+      });
+
+      sinon
+        .stub(auth, 'retrieveAccessToken')
+        .returns(Promise.resolve('55555-55555'));
+
       auth.$utilities.addFetchInterceptor((request) => {
         return Promise.resolve().then(() => {
           expect(request.headers.get('Authorization')).to.equal(null);
@@ -467,6 +515,7 @@ describe('salte-auth', () => {
 
       auth = new SalteAuth({
         provider: 'auth0',
+        responseType: 'id_token',
         endpoints: [`${location.protocol}//${location.host}`]
       });
 
@@ -491,13 +540,42 @@ describe('salte-auth', () => {
       request.send();
     });
 
-    it('should request a new access token if we are not authenticated', done => {
+    it('should not request a new access token if we are authenticated', done => {
       sinon.stub(SalteAuth.prototype, 'retrieveAccessToken').returns(Promise.resolve('55555-55555'));
 
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
+      });
+
+      const setRequestHeaderSpy = sinon.spy(
+        XMLHttpRequest.prototype,
+        'setRequestHeader'
+      );
+
+      expect(setRequestHeaderSpy.callCount).to.equal(0);
+
+      const request = new XMLHttpRequest();
+      request.addEventListener('load', () => {
+        expect(setRequestHeaderSpy.callCount).to.equal(0);
+        done();
+      }, { passive: true });
+
+      request.open('GET', '/');
+      request.send();
+    });
+
+    it('should skip if the responseType is code', done => {
+      sinon.stub(SalteAuth.prototype, 'retrieveAccessToken').returns(Promise.resolve('55555-55555'));
+
+      delete window.salte.auth;
+
+      auth = new SalteAuth({
+        provider: 'auth0',
+        responseType: 'code',
+        endpoints: [`${location.protocol}//${location.host}`]
       });
 
       const setRequestHeaderSpy = sinon.spy(
@@ -523,7 +601,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: 'auth0'
+        provider: 'auth0',
+        responseType: 'id_token'
       });
 
       expect(auth.$provider).to.not.be.undefined;
@@ -533,7 +612,8 @@ describe('salte-auth', () => {
       delete window.salte.auth;
 
       auth = new SalteAuth({
-        provider: class {}
+        provider: class {},
+        responseType: 'id_token'
       });
 
       expect(auth.$provider).to.equal(auth.$config.provider);
@@ -559,6 +639,7 @@ describe('salte-auth', () => {
 
       auth = new SalteAuth({
         providerUrl: 'https://api.salte.io',
+        responseType: 'id_token',
         redirectUrl: `${location.protocol}//${location.host}`,
         clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
         scope: 'openid',
@@ -577,6 +658,7 @@ describe('salte-auth', () => {
 
       auth = new SalteAuth({
         providerUrl: 'https://mydomain.auth.us-east-1.amazoncognito.com',
+        responseType: 'id_token',
         redirectUrl: `${location.protocol}//${location.host}`,
         clientId: 'Hzl9Rvu_Ws_s1QKIhI2TXi8NZRn672FC',
         scope: 'openid',
@@ -595,6 +677,7 @@ describe('salte-auth', () => {
 
       auth = new SalteAuth({
         providerUrl: 'https://mydomain.auth.us-east-1.amazoncognito.com',
+        responseType: 'id_token',
         redirectUrl: {
           loginUrl: `${location.protocol}//${location.host}`
         },
@@ -798,6 +881,7 @@ describe('salte-auth', () => {
       delete window.salte.auth;
       auth = new SalteAuth({
         providerUrl: `${location.protocol}//${location.host}`,
+        responseType: 'id_token',
         provider: 'auth0'
       });
     });
@@ -1813,6 +1897,27 @@ describe('salte-auth', () => {
         return error;
       }).then(error => {
         expect(error.code).to.equal('invalid_state');
+      });
+    });
+
+    it('should support code flow', () => {
+      sinon.stub(auth, 'loginWithRedirect').returns(Promise.resolve());
+      sinon.stub(auth.profile, 'idTokenExpired').get(() => true);
+      sinon.stub(auth.profile, 'accessTokenExpired').get(() => true);
+      sinon.stub(auth.profile, '$clearErrors');
+      sinon.stub(auth.profile, '$validate');
+      sinon.stub(auth.$utilities, 'createIframe').returns(Promise.resolve());
+      auth.$config.loginType = 'redirect';
+      auth.$config.responseType = 'code';
+
+      const promise = auth.retrieveAccessToken();
+
+      expect(auth.$promises.token).to.equal(promise);
+      return promise.then(accessToken => {
+        expect(auth.loginWithRedirect.callCount).to.equal(1);
+        expect(auth.profile.$clearErrors.callCount).to.equal(0);
+        expect(accessToken).to.equal(undefined);
+        expect(auth.$promises.token).to.equal(null);
       });
     });
   });

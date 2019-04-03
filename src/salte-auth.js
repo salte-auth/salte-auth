@@ -159,7 +159,7 @@ class SalteAuth {
         }
 
         if (action === 'login') {
-          this.$fire('login', error || null, this.profile.userInfo);
+          this.$fire('login', error || null, this.profile.code || this.profile.userInfo);
         } else if (action === 'logout') {
           this.$fire('logout', error);
         }
@@ -170,7 +170,7 @@ class SalteAuth {
     } else {
       logger('Setting up interceptors...');
       this.$utilities.addXHRInterceptor((request, data) => {
-        if (this.$utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
+        if (this.$config.responseType !== 'code' && this.$utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
           return this.retrieveAccessToken().then((accessToken) => {
             request.setRequestHeader('Authorization', `Bearer ${accessToken}`);
           });
@@ -178,7 +178,7 @@ class SalteAuth {
       });
 
       this.$utilities.addFetchInterceptor((request) => {
-        if (this.$utilities.checkForMatchingUrl(request.url, this.$config.endpoints)) {
+        if (this.$config.responseType !== 'code' && this.$utilities.checkForMatchingUrl(request.url, this.$config.endpoints)) {
           return this.retrieveAccessToken().then((accessToken) => {
             request.headers.set('Authorization', `Bearer ${accessToken}`);
           });
@@ -435,11 +435,11 @@ class SalteAuth {
         return Promise.reject(error);
       }
 
-      const user = this.profile.userInfo;
+      const response = this.profile.code || this.profile.userInfo;
       if (config.events) {
-        this.$fire('login', null, user);
+        this.$fire('login', null, response);
       }
-      return user;
+      return response;
     }).catch((error) => {
       this.$promises.login = null;
       if (config.events) {
@@ -478,9 +478,9 @@ class SalteAuth {
         return Promise.reject(error);
       }
 
-      const user = this.profile.userInfo;
-      this.$fire('login', null, user);
-      return user;
+      const response = this.profile.code || this.profile.userInfo;
+      this.$fire('login', null, response);
+      return response;
     }).catch((error) => {
       this.$promises.login = null;
       this.$fire('login', error);
@@ -517,9 +517,9 @@ class SalteAuth {
         return Promise.reject(error);
       }
 
-      const user = this.profile.userInfo;
-      this.$fire('login', null, user);
-      return user;
+      const response = this.profile.code || this.profile.userInfo;
+      this.$fire('login', null, response);
+      return response;
     }).catch((error) => {
       this.$promises.login = null;
       this.$fire('login', error);
@@ -735,7 +735,7 @@ class SalteAuth {
     }
 
     this.$promises.token = Promise.resolve();
-    if (this.profile.idTokenExpired) {
+    if ((this.$config.responseType === 'code' && !this.profile.code) || (this.$config.responseType !== 'code' && this.profile.idTokenExpired)) {
       logger('id token has expired, reauthenticating...');
       if (this.$config.loginType === 'iframe') {
         logger('Initiating the iframe flow...');
@@ -755,26 +755,33 @@ class SalteAuth {
       }
     }
 
-    this.$promises.token = this.$promises.token.then(() => {
-      this.profile.$clearErrors();
-      if (this.profile.accessTokenExpired) {
-        logger('Access token has expired, renewing...');
-        return this.$utilities.createIframe(this.$accessTokenUrl).then(() => {
-          this.$promises.token = null;
-          const error = this.profile.$validate(true);
+    if (this.$config.responseType !== 'code') {
+      this.$promises.token = this.$promises.token.then(() => {
+        this.profile.$clearErrors();
+        if (this.profile.accessTokenExpired) {
+          logger('Access token has expired, renewing...');
+          return this.$utilities.createIframe(this.$accessTokenUrl).then(() => {
+            const error = this.profile.$validate(true);
 
-          if (error) {
-            return Promise.reject(error);
-          }
-          return this.profile.$accessToken;
-        });
-      }
-      this.$promises.token = null;
-      return this.profile.$accessToken;
-    }).catch((error) => {
-      this.$promises.token = null;
-      return Promise.reject(error);
-    });
+            if (error) {
+              return Promise.reject(error);
+            }
+            return this.profile.$accessToken;
+          });
+        }
+        return this.profile.$accessToken;
+      });
+    }
+
+    if (this.$promises.token) {
+      this.$promises.token = this.$promises.token.then((response) => {
+        this.$promises.token = null;
+        return response;
+      }).catch((error) => {
+        this.$promises.token = null;
+        return Promise.reject(error);
+      });
+    }
 
     return this.$promises.token;
   }
