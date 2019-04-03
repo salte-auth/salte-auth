@@ -73,6 +73,9 @@ class SalteAuthProfile {
       case 'id_token':
         this.$idToken = value;
         break;
+      case 'code':
+        this.code = value;
+        break;
       case 'state':
         this.$state = value;
         break;
@@ -152,6 +155,19 @@ class SalteAuthProfile {
 
   set $idToken(idToken) {
     this.$saveItem('salte.auth.id-token', idToken);
+  }
+
+  /**
+   * The Authorization Code returned by the identity provider
+   * @return {String} the authorization code
+   * @private
+   */
+  get code() {
+    return this.$getItem('salte.auth.code');
+  }
+
+  set code(code) {
+    this.$saveItem('salte.auth.code', code);
   }
 
   /**
@@ -294,7 +310,7 @@ class SalteAuthProfile {
       };
     }
 
-    if (!this.$idToken) {
+    if ((this.$$config.responseType === 'code' && !this.code) || (this.$$config.responseType !== 'code' && !this.$idToken)) {
       return {
         code: 'login_canceled',
         description: 'User likely canceled the login or something unexpected occurred.'
@@ -308,7 +324,7 @@ class SalteAuthProfile {
       };
     }
 
-    if (accessTokenRequest) return;
+    if (this.$$config.responseType === 'code' || accessTokenRequest) return;
 
     if (this.$$config.validation.nonce && this.$nonce !== this.userInfo.nonce) {
       return {

@@ -9,6 +9,7 @@ const { SalteAuth } = require('./src/salte-auth.js');
 const elements = {
   provider: document.getElementById('provider'),
   loginType: document.getElementById('login-type'),
+  responseType: document.getElementById('response-type'),
   redirectUrl: document.getElementById('redirect-url'),
   storageType: document.getElementById('storage-type'),
   secured: document.getElementById('secured'),
@@ -22,14 +23,12 @@ const elements = {
 
 const configs = {
   auth0: {
-    providerUrl: 'https://salte.auth0.com',
-    responseType: 'id_token token',
-    clientId: '6HXbmGnu4145AE0jLZO1Q01WX53cLI48'
+    providerUrl: 'https://salte-os.auth0.com',
+    clientId: '9JTBXBREtckkFHTxTNBceewrnn7NeDd0'
   },
 
   azure: {
     providerUrl: 'https://login.microsoftonline.com/3f6df7ce-5830-4280-ae97-8e4016d1c6d0',
-    responseType: 'id_token',
     clientId: 'c679f65f-8070-4719-8798-31c6fc256736',
 
     queryParams: {
@@ -39,13 +38,11 @@ const configs = {
 
   cognito: {
     providerUrl: 'https://salte-auth-demo.auth.us-east-1.amazoncognito.com',
-    responseType: 'token',
     clientId: '51jmkg1t5h3ob58a1birdke2hm'
   },
 
   okta: {
     providerUrl: 'https://dev-960892.oktapreview.com',
-    responseType: 'id_token token',
     clientId: '0oajg1bj8hxM1z7pa0h7'
   }
 };
@@ -53,6 +50,7 @@ const configs = {
 const queryParams = Object.assign({
   'provider': localStorage.getItem('salte.demo.provider') || 'auth0',
   'login-type': 'redirect',
+  'response-type': localStorage.getItem('salte.demo.response-type') || 'id_token',
   'redirect-url': 'single',
   'storage-type': localStorage.getItem('salte.demo.storage-type') || 'session',
   'secured': localStorage.getItem('salte.demo.secured') || 'not-secured'
@@ -72,6 +70,7 @@ const queryParams = Object.assign({
 
 elements.provider.value = queryParams.provider;
 elements.loginType.value = queryParams['login-type'];
+elements.responseType.value = queryParams['response-type'];
 elements.redirectUrl.value = queryParams['redirect-url'];
 elements.storageType.value = queryParams['storage-type'];
 elements.secured.value = queryParams.secured;
@@ -111,6 +110,7 @@ function refreshUserInfo(error) {
 
 elements.provider.addEventListener('change', updateParamsOnChange);
 elements.loginType.addEventListener('change', updateParamsOnChange);
+elements.responseType.addEventListener('change', updateParamsOnChange);
 elements.redirectUrl.addEventListener('change', updateParamsOnChange);
 elements.storageType.addEventListener('change', updateParamsOnChange);
 elements.secured.addEventListener('change', updateParamsOnChange);
@@ -124,6 +124,8 @@ let config = Object.assign(configs[queryParams.provider], {
   scope: 'openid',
 
   provider: queryParams.provider,
+
+  responseType: queryParams['response-type'],
 
   loginType: 'redirect',
 
@@ -145,6 +147,10 @@ if (['all', 'all-endpoints'].includes(queryParams.secured)) {
 if (queryParams.provider !== localStorage.getItem('salte.demo.provider')) {
   localStorage.clear();
   localStorage.setItem('salte.demo.provider', queryParams.provider);
+}
+
+if (queryParams['response-type'] !== localStorage.getItem('salte.demo.response-type')) {
+  localStorage.setItem('salte.demo.response-type', queryParams['response-type']);
 }
 
 if (queryParams['storage-type'] !== localStorage.getItem('salte.demo.storage-type')) {
