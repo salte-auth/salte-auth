@@ -1,5 +1,5 @@
 /**
- * @salte-auth/salte-auth JavaScript Library v2.13.6
+ * @salte-auth/salte-auth JavaScript Library v2.14.0
  *
  * @license MIT (https://github.com/salte-auth/salte-auth/blob/master/LICENSE)
  *
@@ -183,6 +183,7 @@ var logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-auth/salte-aut
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
  * @property {Boolean} [autoRefresh=true] Automatically refreshes the users token upon switching tabs or one minute prior to expiration.
  * @property {Number} [autoRefreshBuffer=60000] A number of miliseconds before token expiration to refresh.
+ * @property {Object} [queryParams] A key-value set of additional query params to attached to the login request.
  */
 
 /**
@@ -309,7 +310,7 @@ function () {
         }
 
         if (action === 'login') {
-          _this.$fire('login', error || null, _this.profile.userInfo);
+          _this.$fire('login', error || null, _this.profile.code || _this.profile.userInfo);
         } else if (action === 'logout') {
           _this.$fire('logout', error);
         } // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
@@ -320,14 +321,14 @@ function () {
     } else {
       logger('Setting up interceptors...');
       this.$utilities.addXHRInterceptor(function (request, data) {
-        if (_this.$utilities.checkForMatchingUrl(request.$url, _this.$config.endpoints)) {
+        if (_this.$config.responseType !== 'code' && _this.$utilities.checkForMatchingUrl(request.$url, _this.$config.endpoints)) {
           return _this.retrieveAccessToken().then(function (accessToken) {
             request.setRequestHeader('Authorization', "Bearer ".concat(accessToken));
           });
         }
       });
       this.$utilities.addFetchInterceptor(function (request) {
-        if (_this.$utilities.checkForMatchingUrl(request.url, _this.$config.endpoints)) {
+        if (_this.$config.responseType !== 'code' && _this.$utilities.checkForMatchingUrl(request.url, _this.$config.endpoints)) {
           return _this.retrieveAccessToken().then(function (accessToken) {
             request.headers.set('Authorization', "Bearer ".concat(accessToken));
           });
@@ -553,13 +554,13 @@ function () {
           return Promise.reject(error);
         }
 
-        var user = _this2.profile.userInfo;
+        var response = _this2.profile.code || _this2.profile.userInfo;
 
         if (config.events) {
-          _this2.$fire('login', null, user);
+          _this2.$fire('login', null, response);
         }
 
-        return user;
+        return response;
       }).catch(function (error) {
         _this2.$promises.login = null;
 
@@ -606,11 +607,11 @@ function () {
           return Promise.reject(error);
         }
 
-        var user = _this3.profile.userInfo;
+        var response = _this3.profile.code || _this3.profile.userInfo;
 
-        _this3.$fire('login', null, user);
+        _this3.$fire('login', null, response);
 
-        return user;
+        return response;
       }).catch(function (error) {
         _this3.$promises.login = null;
 
@@ -655,11 +656,11 @@ function () {
           return Promise.reject(error);
         }
 
-        var user = _this4.profile.userInfo;
+        var response = _this4.profile.code || _this4.profile.userInfo;
 
-        _this4.$fire('login', null, user);
+        _this4.$fire('login', null, response);
 
-        return user;
+        return response;
       }).catch(function (error) {
         _this4.$promises.login = null;
 
@@ -909,7 +910,7 @@ function () {
 
       this.$promises.token = Promise.resolve();
 
-      if (this.profile.idTokenExpired) {
+      if (this.$config.responseType === 'code' && !this.profile.code || this.$config.responseType !== 'code' && this.profile.idTokenExpired) {
         logger('id token has expired, reauthenticating...');
 
         if (this.$config.loginType === 'iframe') {
@@ -930,30 +931,37 @@ function () {
         }
       }
 
-      this.$promises.token = this.$promises.token.then(function () {
-        _this10.profile.$clearErrors();
+      if (this.$config.responseType !== 'code') {
+        this.$promises.token = this.$promises.token.then(function () {
+          _this10.profile.$clearErrors();
 
-        if (_this10.profile.accessTokenExpired) {
-          logger('Access token has expired, renewing...');
-          return _this10.$utilities.createIframe(_this10.$accessTokenUrl).then(function () {
-            _this10.$promises.token = null;
+          if (_this10.profile.accessTokenExpired) {
+            logger('Access token has expired, renewing...');
+            return _this10.$utilities.createIframe(_this10.$accessTokenUrl).then(function () {
+              var error = _this10.profile.$validate(true);
 
-            var error = _this10.profile.$validate(true);
+              if (error) {
+                return Promise.reject(error);
+              }
 
-            if (error) {
-              return Promise.reject(error);
-            }
+              return _this10.profile.$accessToken;
+            });
+          }
 
-            return _this10.profile.$accessToken;
-          });
-        }
+          return _this10.profile.$accessToken;
+        });
+      }
 
-        _this10.$promises.token = null;
-        return _this10.profile.$accessToken;
-      }).catch(function (error) {
-        _this10.$promises.token = null;
-        return Promise.reject(error);
-      });
+      if (this.$promises.token) {
+        this.$promises.token = this.$promises.token.then(function (response) {
+          _this10.$promises.token = null;
+          return response;
+        }).catch(function (error) {
+          _this10.$promises.token = null;
+          return Promise.reject(error);
+        });
+      }
+
       return this.$promises.token;
     }
     /**
@@ -6475,6 +6483,10 @@ function () {
           this.$idToken = value;
           break;
 
+        case 'code':
+          this.code = value;
+          break;
+
         case 'state':
           this.$state = value;
           break;
@@ -6562,7 +6574,7 @@ function () {
         };
       }
 
-      if (!this.$idToken) {
+      if (this.$$config.responseType === 'code' && !this.code || this.$$config.responseType !== 'code' && !this.$idToken) {
         return {
           code: 'login_canceled',
           description: 'User likely canceled the login or something unexpected occurred.'
@@ -6576,7 +6588,7 @@ function () {
         };
       }
 
-      if (accessTokenRequest) return;
+      if (this.$$config.responseType === 'code' || accessTokenRequest) return;
 
       if (this.$$config.validation.nonce && this.$nonce !== this.userInfo.nonce) {
         return {
@@ -6782,6 +6794,20 @@ function () {
     },
     set: function set(idToken) {
       this.$saveItem('salte.auth.id-token', idToken);
+    }
+    /**
+     * The Authorization Code returned by the identity provider
+     * @return {String} the authorization code
+     * @private
+     */
+
+  }, {
+    key: "code",
+    get: function get() {
+      return this.$getItem('salte.auth.code');
+    },
+    set: function set(code) {
+      this.$saveItem('salte.auth.code', code);
     }
     /**
      * The authentication state returned by the identity provider
