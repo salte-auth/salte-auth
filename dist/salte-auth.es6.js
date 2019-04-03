@@ -1,5 +1,5 @@
 /**
- * @salte-auth/salte-auth JavaScript Library v2.13.6
+ * @salte-auth/salte-auth JavaScript Library v2.14.0
  *
  * @license MIT (https://github.com/salte-auth/salte-auth/blob/master/LICENSE)
  *
@@ -177,6 +177,7 @@ const logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-auth/salte-a
  * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn't support them.
  * @property {Boolean} [autoRefresh=true] Automatically refreshes the users token upon switching tabs or one minute prior to expiration.
  * @property {Number} [autoRefreshBuffer=60000] A number of miliseconds before token expiration to refresh.
+ * @property {Object} [queryParams] A key-value set of additional query params to attached to the login request.
  */
 
 /**
@@ -295,7 +296,7 @@ class SalteAuth {
         }
 
         if (action === 'login') {
-          this.$fire('login', error || null, this.profile.userInfo);
+          this.$fire('login', error || null, this.profile.code || this.profile.userInfo);
         } else if (action === 'logout') {
           this.$fire('logout', error);
         } // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
@@ -306,14 +307,14 @@ class SalteAuth {
     } else {
       logger('Setting up interceptors...');
       this.$utilities.addXHRInterceptor((request, data) => {
-        if (this.$utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
+        if (this.$config.responseType !== 'code' && this.$utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
           return this.retrieveAccessToken().then(accessToken => {
             request.setRequestHeader('Authorization', "Bearer ".concat(accessToken));
           });
         }
       });
       this.$utilities.addFetchInterceptor(request => {
-        if (this.$utilities.checkForMatchingUrl(request.url, this.$config.endpoints)) {
+        if (this.$config.responseType !== 'code' && this.$utilities.checkForMatchingUrl(request.url, this.$config.endpoints)) {
           return this.retrieveAccessToken().then(accessToken => {
             request.headers.set('Authorization', "Bearer ".concat(accessToken));
           });
@@ -576,13 +577,13 @@ class SalteAuth {
         return Promise.reject(error);
       }
 
-      const user = this.profile.userInfo;
+      const response = this.profile.code || this.profile.userInfo;
 
       if (config.events) {
-        this.$fire('login', null, user);
+        this.$fire('login', null, response);
       }
 
-      return user;
+      return response;
     }).catch(error => {
       this.$promises.login = null;
 
@@ -623,9 +624,9 @@ class SalteAuth {
         return Promise.reject(error);
       }
 
-      const user = this.profile.userInfo;
-      this.$fire('login', null, user);
-      return user;
+      const response = this.profile.code || this.profile.userInfo;
+      this.$fire('login', null, response);
+      return response;
     }).catch(error => {
       this.$promises.login = null;
       this.$fire('login', error);
@@ -662,9 +663,9 @@ class SalteAuth {
         return Promise.reject(error);
       }
 
-      const user = this.profile.userInfo;
-      this.$fire('login', null, user);
-      return user;
+      const response = this.profile.code || this.profile.userInfo;
+      this.$fire('login', null, response);
+      return response;
     }).catch(error => {
       this.$promises.login = null;
       this.$fire('login', error);
@@ -878,7 +879,7 @@ class SalteAuth {
 
     this.$promises.token = Promise.resolve();
 
-    if (this.profile.idTokenExpired) {
+    if (this.$config.responseType === 'code' && !this.profile.code || this.$config.responseType !== 'code' && this.profile.idTokenExpired) {
       logger('id token has expired, reauthenticating...');
 
       if (this.$config.loginType === 'iframe') {
@@ -899,29 +900,37 @@ class SalteAuth {
       }
     }
 
-    this.$promises.token = this.$promises.token.then(() => {
-      this.profile.$clearErrors();
+    if (this.$config.responseType !== 'code') {
+      this.$promises.token = this.$promises.token.then(() => {
+        this.profile.$clearErrors();
 
-      if (this.profile.accessTokenExpired) {
-        logger('Access token has expired, renewing...');
-        return this.$utilities.createIframe(this.$accessTokenUrl).then(() => {
-          this.$promises.token = null;
-          const error = this.profile.$validate(true);
+        if (this.profile.accessTokenExpired) {
+          logger('Access token has expired, renewing...');
+          return this.$utilities.createIframe(this.$accessTokenUrl).then(() => {
+            const error = this.profile.$validate(true);
 
-          if (error) {
-            return Promise.reject(error);
-          }
+            if (error) {
+              return Promise.reject(error);
+            }
 
-          return this.profile.$accessToken;
-        });
-      }
+            return this.profile.$accessToken;
+          });
+        }
 
-      this.$promises.token = null;
-      return this.profile.$accessToken;
-    }).catch(error => {
-      this.$promises.token = null;
-      return Promise.reject(error);
-    });
+        return this.profile.$accessToken;
+      });
+    }
+
+    if (this.$promises.token) {
+      this.$promises.token = this.$promises.token.then(response => {
+        this.$promises.token = null;
+        return response;
+      }).catch(error => {
+        this.$promises.token = null;
+        return Promise.reject(error);
+      });
+    }
+
     return this.$promises.token;
   }
   /**
@@ -6261,6 +6270,10 @@ class SalteAuthProfile {
         this.$idToken = value;
         break;
 
+      case 'code':
+        this.code = value;
+        break;
+
       case 'state':
         this.$state = value;
         break;
@@ -6348,6 +6361,20 @@ class SalteAuthProfile {
 
   set $idToken(idToken) {
     this.$saveItem('salte.auth.id-token', idToken);
+  }
+  /**
+   * The Authorization Code returned by the identity provider
+   * @return {String} the authorization code
+   * @private
+   */
+
+
+  get code() {
+    return this.$getItem('salte.auth.code');
+  }
+
+  set code(code) {
+    this.$saveItem('salte.auth.code', code);
   }
   /**
    * The authentication state returned by the identity provider
@@ -6501,7 +6528,7 @@ class SalteAuthProfile {
       };
     }
 
-    if (!this.$idToken) {
+    if (this.$$config.responseType === 'code' && !this.code || this.$$config.responseType !== 'code' && !this.$idToken) {
       return {
         code: 'login_canceled',
         description: 'User likely canceled the login or something unexpected occurred.'
@@ -6515,7 +6542,7 @@ class SalteAuthProfile {
       };
     }
 
-    if (accessTokenRequest) return;
+    if (this.$$config.responseType === 'code' || accessTokenRequest) return;
 
     if (this.$$config.validation.nonce && this.$nonce !== this.userInfo.nonce) {
       return {
