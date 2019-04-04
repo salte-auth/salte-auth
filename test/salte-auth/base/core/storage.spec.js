@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+const { describe, it, beforeEach } = intern.getPlugin('interface.bdd');
+const { expect } = intern.getPlugin('chai');
 
 import { SalteAuthError } from '../../../../src/base/core/salte-auth-error';
 import { Storage } from '../../../../src/base/core/storage';

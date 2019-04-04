@@ -1,8 +1,10 @@
+const { describe, it, before, after } = intern.getPlugin('interface.bdd');
+
 import sinon from 'sinon';
 
 import { Events } from '../../../src/utils/events';
 
-describe('Events', () => {
+describe('Utils.Events', () => {
   let events = {};
   before(() => {
     sinon.stub(window, 'addEventListener').callsFake((name, listener) => {
