@@ -1,11 +1,9 @@
-const { describe, it, beforeEach, afterEach } = intern.getPlugin('interface.bdd');
-const { expect } = intern.getPlugin('chai');
-
+import { expect } from 'chai';
 import sinon from 'sinon';
 
 import { Logger } from '../../../src/utils/logger';
 
-describe('Utils.Logger', () => {
+describe('Logger', () => {
   beforeEach(() => {
     sinon.spy(console, 'log');
   });
