@@ -1,11 +1,9 @@
-const { describe, it } = intern.getPlugin('interface.bdd');
-const { expect } = intern.getPlugin('chai');
-
+import { expect } from 'chai';
 import { encode } from 'universal-base64url';
 
 import { IDToken } from '../../../src/utils/id-token';
 
-describe('Utils.IDToken', () => {
+describe('IDToken', () => {
   describe('function(parse)', () => {
     it('should parse the "id_token"', () => {
       const user = IDToken.parse(`0.${btoa(

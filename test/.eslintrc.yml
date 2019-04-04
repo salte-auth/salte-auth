@@ -1,0 +1,5 @@
+extends: ../.eslintrc.yml
+plugins:
+  - mocha
+env:
+  mocha: true

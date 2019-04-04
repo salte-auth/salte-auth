@@ -7,14 +7,14 @@ scripts:
     description: Validates that types are being used properly.
   test:
     default:
-      script: rollup -c rollup.test.config.js && intern config=@coverage
+      script: karma start karma.conf.js --single-run
       description: Executes the Test Suite
     tdd:
-      script: watch "rollup -c rollup.test.config.js && intern config=@coverage" src/ test/
+      script: karma start karma.conf.js
       description: Watches for changes and executes the Test Suite accordingly
-    ci:
-      script: rollup -c rollup.test.config.js && intern config=@ci
-      description: Executes the Test Suite on BrowserStack
+    sauce:
+      script: karma start karma.ci.conf.js
+      description: Executes the Test Suite on Sauce Labs
   serve:
     script: rollup -c rollup.serve.config.js --watch
     description: Starts a server at http://localhost:8080

@@ -1,11 +1,9 @@
-const { describe, it, beforeEach, afterEach } = intern.getPlugin('interface.bdd');
-const { expect } = intern.getPlugin('chai');
-
+import { expect } from 'chai';
 import sinon from 'sinon';
 
 import { XHR } from '../../../../src/utils/interceptors/xhr';
 
-describe('Utils.Interceptors@XHR', () => {
+describe('XHR', () => {
   beforeEach(() => {
     XHR.setup(true);
     sinon.spy(XHR, 'realOpen');
@@ -28,7 +26,7 @@ describe('Utils.Interceptors@XHR', () => {
         const request = new XMLHttpRequest();
 
         request.addEventListener('load', function() {
-          expect(this.responseText).to.be.ok;
+          expect(this.responseText).to.contain('This is the execution context.');
           expect(XHR.realOpen.callCount).to.equal(1);
           expect(XHR.realSend.callCount).to.equal(1);
           resolve();

@@ -1,6 +1,4 @@
-const { describe, it, beforeEach, afterEach } = intern.getPlugin('interface.bdd');
-const chai = intern.getPlugin('chai');
-
+import chai from 'chai';
 import chaiSinon from 'chai-sinon';
 import sinon from 'sinon';
 
@@ -9,7 +7,7 @@ import { Fetch } from '../../../../src/utils/interceptors/fetch';
 const { expect } = chai;
 chai.use(chaiSinon);
 
-describe('Utils.Interceptors.Fetch', () => {
+describe('Fetch', () => {
   beforeEach(() => {
     Fetch.setup(true);
     sinon.stub(Fetch, 'real').returns(Promise.resolve());

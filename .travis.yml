@@ -9,12 +9,12 @@ branches:
 script:
   - npm start lint
   - npm start check-types
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm start test.ci; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm start test.sauce; fi
   - npm start test
 after_success:
   - npm start report-coverage
   # - npm start semantic-release
 addons:
-  chrome: stable # have Travis install Chrome stable.
+  sauce_connect: true
 notifications:
   email: change
