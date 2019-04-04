@@ -1,14 +1,8 @@
 # Getting Started
 
-👋 Hey there, thanks for taking the time to check us out!
+🎉 Huzzah! So you've decided to take the plunge into the wonderful world of Authentication!
 
-#### Table Of Contents
-
-- [Picking a Provider](#picking-a-provider)
-- [Picking a Handler](#picking-a-handler)
-- [Setting up Salte Auth](#setting-up-salte-auth)
-  - [Install](#install)
-  - [Usage](#usage)
+This guide will attempt to quickly walk you through how you can utilize Salte Auth for authentication.
 
 ## Picking a Provider
 
@@ -17,6 +11,18 @@
 A `Provider` (Identity Provider) tells Salte Auth _who_ you're going to be authenticating with.
 
 For a list of examples you should check out the [providers](usage/providers.md) page!.
+
+### 😱 Which Provider should I use?!?
+
+That primarily depends on where your priorities are.
+
+#### I need all the features!
+
+If you're worried about SSO (Single Sign-On) then an OpenID Connect Provider like [Auth0](https://github.com/salte-auth/auth0), [Azure](https://github.com/salte-auth/azure), etc. are probaby your best bet.
+
+#### I'm not made of money!
+
+If cost is more of a concern I'd recommend using one of the OAuth2 Providers like [GitHub](https://github.com/salte-auth/github), [Google](https://github.com/salte-auth/google), [Facebook](https://github.com/salte-auth/facebook), etc.
 
 ## Picking a Handler
 
@@ -31,7 +37,12 @@ For a list of examples you should check out the [handlers](usage/handlers.md) pa
 ### Install
 
 ```sh
+# Install the Core
 $ npm install @salte-auth/salte-auth
+# Install a Provider
+$ npm install @salte-auth/auth0
+# Install a Handler
+$ npm install @salte-auth/redirect
 ```
 
 ### Usage
@@ -57,6 +68,8 @@ const auth = new SalteAuth({
   ]
 });
 
-// Redirects the user to your Auth0 login page!
-auth.login('auth0');
+if (auth.provider('auth0').idToken().expired) {
+  // Redirects the user to your Auth0 login page!
+  auth.login('auth0');
+}
 ```

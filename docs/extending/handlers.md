@@ -11,68 +11,48 @@ We highly recommend you write your Handler in TypeScript to take advantage of ou
 {% code-tabs %}
 {% code-tabs-item title="TypeScript" %}
 ```typescript
+// my-custom-handler.ts
 import { Handler } from '@salte-auth/salte-auth';
 
-export class IFrame extends Handler {
-  get name(): string {
+export class CustomHandler extends Handler {
+  /**
+   * This is the default name of the handler.
+   */
+  get name() {
     return 'iframe';
   }
 
-  // This determines whether the handler supports being automatically triggered
-  // Handlers that require user input such as '@salte-auth/tab' 
-  // and '@salte-auth/popup' don't support this.
-  get auto(): boolean {
+  /**
+   * This determines whether the handler supports being automatically triggered
+   * Handlers that require user input such as '@salte-auth/tab' 
+   * and '@salte-auth/popup' don't support this.
+   */
+  get auto() {
     return true;
   }
 
-  connected({ handler }: Handler.ConnectedOptions) {
-    if (handler !== this.$name || window.self === window.top) return;
-
-    const iframe = parent.document.querySelector('body > iframe[owner="salte-auth"]');
-
-    parent.document.body.removeChild(iframe);
+  /**
+   * This is invoked when `salte-auth` starts up.
+   */
+  connected({ action, handler, provider }: Handler.ConnectedOptions) {
+    // Generally this won't be needed, however in certain cases such 
+    // as `@salte-auth/redirect` it's used to wrap up authentication.
   }
 
-  open({ url, visible = true }: IFrame.OpenOptions): Promise<any> {
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('owner', 'salte-auth');
-
-    if (visible) {
-      Object.assign(iframe.style, {
-        position: 'fixed',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: '100%',
-        width: '100%',
-        zIndex: 9999,
-        border: 'none',
-
-        opacity: 0,
-        transition: '0.5s opacity'
-      });
-
-      setTimeout(() => iframe.style.opacity = '1');
-    } else {
-      iframe.style.display = 'none';
-    }
-    
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    return new Promise((resolve) => {
-      iframe.addEventListener('DOMNodeRemoved', () => {
-        const parsed = this.parse(iframe.contentWindow.location);
-
-        setTimeout(() => resolve(parsed));
-      }, { passive: true });
+  /**
+   * This is invoked when the developer invokes `login` or `logout`
+   * The expected response is a promise with the parsed url parameters.
+   * 
+   * For fully implemented examples check out our official handlers.
+   * https://salte-auth.gitbook.io/salte-auth/usage/handlers
+   */
+  open({ url, redirectUrl }: Handler.OpenOptions): Promise<any> {
+    // For the given example: https://google.com?token=12345&state=54321
+    // This would be the expected response.
+    Promise.resolve({
+      token: '12345',
+      state: '54321'
     });
-  }
-}
-
-export declare namespace IFrame {
-  export interface OpenOptions extends Handler.OpenOptions {
-    visible?: boolean
   }
 }
 ```
@@ -80,64 +60,77 @@ export declare namespace IFrame {
 
 {% code-tabs-item title="JavaScript" %}
 ```javascript
+// my-custom-handler.js
 import { Handler } from '@salte-auth/salte-auth';
 
-export class IFrame extends Handler {
+export class CustomHandler extends Handler {
+  /**
+   * This is the default name of the handler.
+   */
   get name() {
     return 'iframe';
   }
 
-  // This determines whether the handler supports being automatically triggered
-  // Handlers that require user input such as '@salte-auth/tab' 
-  // and '@salte-auth/popup' don't support this.
-  get auto(): boolean {
+  /**
+   * This determines whether the handler supports being automatically triggered
+   * Handlers that require user input such as '@salte-auth/tab' 
+   * and '@salte-auth/popup' don't support this.
+   */
+  get auto() {
     return true;
   }
 
-  connected({ handler }) {
-    if (handler !== this.$name || window.self === window.top) return;
-
-    const iframe = parent.document.querySelector('body > iframe[owner="salte-auth"]');
-
-    parent.document.body.removeChild(iframe);
+  /**
+   * This is invoked when `salte-auth` starts up.
+   */
+  connected({ action, handler, provider }) {
+    // Generally this won't be needed, however in certain cases such 
+    // as `@salte-auth/redirect` it's used to wrap up authentication.
   }
 
-  open({ url, visible = true }) {
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('owner', 'salte-auth');
-
-    if (visible) {
-      Object.assign(iframe.style, {
-        position: 'fixed',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: '100%',
-        width: '100%',
-        zIndex: 9999,
-        border: 'none',
-
-        opacity: 0,
-        transition: '0.5s opacity'
-      });
-
-      setTimeout(() => iframe.style.opacity = '1');
-    } else {
-      iframe.style.display = 'none';
-    }
-    
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    return new Promise((resolve) => {
-      iframe.addEventListener('DOMNodeRemoved', () => {
-        const parsed = this.parse(iframe.contentWindow.location);
-
-        setTimeout(() => resolve(parsed));
-      }, { passive: true });
+  /**
+   * This is invoked when the developer invokes `login` or `logout`
+   * The expected response is a promise with the parsed url parameters.
+   * 
+   * For fully implemented examples check out our official handlers.
+   * https://salte-auth.gitbook.io/salte-auth/usage/handlers
+   */
+  open({ url, redirectUrl }) {
+    // For the given example: https://google.com?token=12345&state=54321
+    // This would be the expected response.
+    Promise.resolve({
+      token: '12345',
+      state: '54321'
     });
   }
 }
 ```
 {% endcode-tabs-item %}
 {% endcode-tabs %}
+
+## Using your Custom Handler
+
+It's equally as easy to use a custom handler.
+
+```js
+import { SalteAuth } from '@salte-auth/salte-auth';
+import { Auth0 } from '@salte-auth/auth0';
+import { CustomHandler } from './my-custom-handler.js';
+
+const auth = new SalteAuth({
+  // ...
+
+  providers: [
+    new Auth0({
+      url: 'https://salte-os.auth0.com',
+      clientID: '9JTBXBREtckkFHTxTNBceewrnn7NeDd0'
+    })
+  ],
+
+  handlers: [
+    new CustomHandler()
+  ]
+});
+
+auth0.login('auth0');
+```

@@ -11,4 +11,4 @@
 
 ## Support
 - [Supported Browsers](support/supported-browsers.md)
-- [Migration from 2.0](support/migration-from-2.0.md)
+- [Migration Guide](support/migration-guide.md)
