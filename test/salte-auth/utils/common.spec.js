@@ -1,12 +1,12 @@
-import chai from 'chai';
+const { describe, it, beforeEach, afterEach } = intern.getPlugin('interface.bdd');
+const { expect } = intern.getPlugin('chai');
+
 import sinon from 'sinon';
 
 import { Common } from '../../../src/utils/common';
 import { getError } from '../../utils/get-error';
 
-const { expect } = chai;
-
-describe('Common', () => {
+describe('Utils.Common', () => {
   afterEach(() => {
     sinon.restore();
   });
@@ -83,9 +83,7 @@ describe('Common', () => {
         hallo: 'welt'
       });
     });
-  });
 
-  describe('function(defaults)', () => {
     it('should support merging defaults into an existing object', () => {
       const output = Common.defaults({
         hallo: 'welt'

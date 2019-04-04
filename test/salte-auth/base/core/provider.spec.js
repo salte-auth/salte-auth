@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+const { describe, it } = intern.getPlugin('interface.bdd');
+const { expect } = intern.getPlugin('chai');
 
 import { Provider } from '../../../../src/base/core/provider';
 

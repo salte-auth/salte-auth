@@ -1,8 +1,9 @@
-import { expect } from 'chai';
+const { describe, it } = intern.getPlugin('interface.bdd');
+const { expect } = intern.getPlugin('chai');
 
 import { URL } from '../../../src/utils/url';
 
-describe('URL', () => {
+describe('Utils.URL', () => {
   describe('function(resolve)', () => {
     it('should support site root urls', () => {
       expect(URL.resolve('https://google.com')).to.equal('https://google.com');

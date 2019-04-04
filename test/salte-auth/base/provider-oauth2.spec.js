@@ -1,4 +1,6 @@
-import chai from 'chai';
+const { describe, it, beforeEach, afterEach } = intern.getPlugin('interface.bdd');
+const chai = intern.getPlugin('chai');
+
 import chaiString from 'chai-string';
 import sinon from 'sinon';
 

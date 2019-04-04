@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+const { describe, it } = intern.getPlugin('interface.bdd');
+const { expect } = intern.getPlugin('chai');
 
 import { Events } from '../../../../src/base/core/events';
 

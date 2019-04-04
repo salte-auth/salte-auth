@@ -1,4 +1,5 @@
-import { expect } from 'chai';
+const { describe, it, beforeEach } = intern.getPlugin('interface.bdd');
+const { expect } = intern.getPlugin('chai');
 
 import { OAuth2, OpenID } from '../../src/generic';
 
