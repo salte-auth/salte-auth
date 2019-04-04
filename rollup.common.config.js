@@ -67,7 +67,9 @@ module.exports = function({ minified, es6, coverage, tests, server }) {
         plugins: [
           '@babel/proposal-class-properties',
           '@babel/proposal-object-rest-spread',
-          '@babel/plugin-transform-runtime',
+          ['@babel/plugin-transform-runtime', {
+            regenerator: true
+          }],
         ].concat(coverage ? [['istanbul', {
           include: [
             'src/**/*.ts'

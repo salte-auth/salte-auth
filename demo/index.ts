@@ -1,4 +1,7 @@
-import 'core-js/es6/promise';
+import 'whatwg-fetch';
+import 'core-js/es/promise';
+import 'core-js/web/url';
+
 import { Generic, SalteAuth } from '../src/salte-auth';
 import { Redirect } from './redirect';
 
