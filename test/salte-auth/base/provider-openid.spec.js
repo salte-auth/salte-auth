@@ -36,7 +36,10 @@ describe('OpenIDProvider', () => {
             redirectUrl: location.origin,
             responseType: 'id_token',
             scope: 'openid',
-            renewal: 'auto',
+            renewal: {
+              type: 'auto',
+              buffer: 60000
+            },
             storage: 'session',
             validation: true
           });
@@ -44,6 +47,34 @@ describe('OpenIDProvider', () => {
       };
 
       new Example();
+    });
+
+    it(`should support overriding renewal type and buffer`, () => {
+      class Example extends OpenIDProvider {
+        constructor(config) {
+          super(config);
+
+          expect(this.config).to.deep.equal({
+            level: 'warn',
+            redirectUrl: location.origin,
+            responseType: 'id_token',
+            scope: 'openid',
+            renewal: {
+              type: 'manual',
+              buffer: 5000
+            },
+            storage: 'session',
+            validation: true
+          });
+        }
+      };
+
+      new Example({
+        renewal: {
+          type: 'manual',
+          buffer: 5000
+        }
+      });
     });
   });
 

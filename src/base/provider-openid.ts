@@ -10,10 +10,15 @@ export abstract class OpenIDProvider extends OAuth2Provider {
   public constructor(config?: OpenIDProvider.Config) {
     super(config);
 
+    this.config.renewal = typeof(this.config.renewal) === 'object' ? this.config.renewal : { type: this.config.renewal };
+
     this.config = Common.defaults(this.config, {
       responseType: 'id_token',
       scope: 'openid',
-      renewal: 'auto'
+      renewal: {
+        type: 'auto',
+        buffer: 60000
+      }
     });
   }
 
@@ -132,7 +137,15 @@ export declare namespace OpenIDProvider {
      *
      * @default 'auto'
      */
-    renewal?: ('auto'|'manual');
+    renewal?: ('auto'|'manual'| {
+      type?: ('auto'|'manual');
+      /**
+       * The amount of time prior to experation to renew the `id_token`.
+       *
+       * @default 60000
+       */
+      buffer?: number
+    });
   }
 
   export interface ValidationOptions extends OAuth2Provider.ValidationOptions {

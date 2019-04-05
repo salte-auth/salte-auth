@@ -69,7 +69,7 @@ describe('Common', () => {
     });
   });
 
-  describe('function(defaults)', () => {
+  describe('function(assign)', () => {
     it('should override previous values', () => {
       const output = Common.assign({
         hello: 'world'
@@ -133,6 +133,26 @@ describe('Common', () => {
 
       expect(output).to.deep.equal({
         hello: false
+      });
+    });
+
+    it('should support nested objects', () => {
+      const output = Common.defaults({
+        renewal: {
+          type: 'auto'
+        }
+      }, {
+        renewal: {
+          type: 'manual',
+          buffer: 60000
+        }
+      });
+
+      expect(output).to.deep.equal({
+        renewal: {
+          type: 'auto',
+          buffer: 60000
+        }
       });
     });
   });
