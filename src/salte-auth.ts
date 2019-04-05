@@ -24,7 +24,6 @@ export class SalteAuth extends Shared {
     this.logger = new Logger(`@salte-auth/salte-auth:core`, this.config.level);
 
     Common.forEach(this.config.providers, (provider) => {
-      provider.config = Common.defaults(provider.config, this.config);
       provider.connected && provider.connected();
 
       provider.on('login', (error, data) => {
@@ -40,7 +39,6 @@ export class SalteAuth extends Shared {
     const provider = name ? this.provider(name) : null;
 
     Common.forEach(this.config.handlers, (handler) => {
-      handler.config = Common.defaults(handler.config, this.config);
       handler.connected && handler.connected({
         action: this.get('action'),
         handler: this.get('handler'),

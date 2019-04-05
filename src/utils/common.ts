@@ -58,13 +58,19 @@ export class Common {
   public static defaults(target: any, ...sources: any[]) {
     this.forEach(sources, (source) => {
       for (const key in source) {
-        if (target[key] !== undefined) continue;
-
-        target[key] = source[key];
+        if (this.isObject(target[key]) && this.isObject(source[key])) {
+          target[key] = this.defaults(target[key], source[key]);
+        } else if (target[key] === undefined) {
+          target[key] = source[key];
+        }
       }
     });
 
     return target;
+  }
+
+  public static isObject(value: any) {
+    return typeof(value) === 'object' && !Array.isArray(value);
   }
 
   public static async iframe({ url, redirectUrl, visible }: Common.IFrameOptions): Promise<any> {
