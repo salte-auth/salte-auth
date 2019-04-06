@@ -32,4 +32,8 @@ export class Events {
     event.detail = params.detail;
     return event;
   }
+
+  public static isCrossDomainError(e: Error): boolean {
+    return e instanceof DOMException || e.message === 'Permission denied';
+  }
 }

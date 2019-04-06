@@ -1,4 +1,5 @@
 import sinon from 'sinon';
+import { expect } from 'chai';
 
 import { Events } from '../../../src/utils/events';
 
@@ -36,6 +37,33 @@ describe('Events', () => {
 
         events.click.forEach((listener) => listener());
       });
+    });
+  });
+
+  describe('function(create)', () => {
+    it('should create an event', () => {
+      const e = Events.create('hello', {
+        detail: 'world'
+      });
+
+      expect(e.type).to.equal('hello');
+      expect(e.detail).to.equal('world');
+      expect(e.bubbles).to.equal(false);
+      expect(e.cancelable).to.equal(true);
+    });
+  });
+
+  describe('function(isCrossDomainError)', () => {
+    it('should return true if it is a DOMException', () => {
+      expect(Events.isCrossDomainError(new DOMException())).to.equal(true);
+    });
+
+    it('should return true if the message contains "Permission denied"', () => {
+      expect(Events.isCrossDomainError(new Error('Permission denied'))).to.equal(true);
+    });
+
+    it('should return false for generic errors', () => {
+      expect(Events.isCrossDomainError(new Error('Hello world!'))).to.equal(false);
     });
   });
 });
