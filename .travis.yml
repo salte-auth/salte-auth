@@ -10,11 +10,13 @@ script:
   - npm start lint
   - npm start check-types
   - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm start test.ci; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm start test.smoke; fi
   - npm start test
 after_success:
   - npm start report-coverage
   # - npm start semantic-release
 addons:
   sauce_connect: true
+  chrome: stable
 notifications:
   email: change

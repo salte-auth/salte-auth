@@ -32,6 +32,7 @@
 
   [![semantic-release][semantic-release-image]][semantic-release-url]
   [![Greenkeeper badge][greenkeeper-image]][greenkeeper-url]
+  [![Chat with us!][chat-image]][chat-url]
   
 </div>
 
@@ -89,3 +90,6 @@ _These are issues that we know about, but don't have a clear fix for!_
 
 [greenkeeper-image]: https://badges.greenkeeper.io/salte-auth/salte-auth.svg
 [greenkeeper-url]: https://greenkeeper.io
+
+[chat-image]: https://img.shields.io/badge/chat-telegram-informational.svg
+[chat-url]: https://t.me/salte_auth
