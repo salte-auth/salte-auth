@@ -9,11 +9,11 @@ module.exports = (config) => {
     ],
 
     files: [
-      'test/index.js'
+      'test/unit/index.js'
     ],
 
     preprocessors: {
-      'test/index.js': ['rollup', 'sourcemap'],
+      'test/unit/index.js': ['rollup', 'sourcemap'],
     },
 
     rollupPreprocessor: common({

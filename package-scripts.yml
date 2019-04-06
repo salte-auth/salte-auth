@@ -15,6 +15,9 @@ scripts:
     ci:
       script: karma start karma.ci.conf.js
       description: Executes the Test Suite on Sauce Labs
+    smoke:
+      script: mocha test/smoke/smoke.spec.js
+      description: Executes the Test Suite on Sauce Labs
   serve:
     script: rollup -c rollup.serve.config.js --watch
     description: Starts a server at http://localhost:8080
