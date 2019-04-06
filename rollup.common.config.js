@@ -10,9 +10,11 @@ const copy = require('rollup-plugin-copy-assets-to');
 
 const { name, contributors, version, browserslist } = require('./package.json');
 
-module.exports = function({ minified, es6, coverage, tests, server }) {
+module.exports = function({ minified, es6, tests, coverage, demo, server }) {
+  demo = demo || server;
+
   return {
-    input: server ? 'demo/index.ts' : 'src/salte-auth.ts',
+    input: demo ? 'demo/index.ts' : 'src/salte-auth.ts',
     external: ['regenerator-runtime/runtime'],
     output: {
       file: `dist/salte-auth${minified ? '.min' : ''}.${es6 ? 'mjs' : 'js'}`,
@@ -92,7 +94,7 @@ module.exports = function({ minified, es6, coverage, tests, server }) {
         }
       }),
 
-      server && copy({
+      demo && copy({
         assets: [
           './demo/index.html'
         ],

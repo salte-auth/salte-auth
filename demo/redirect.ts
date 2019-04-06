@@ -1,51 +1,61 @@
 import { Handler, SalteAuthError, Utils } from '../src/salte-auth';
 
 export class Redirect extends Handler {
-  get name() {
+  public constructor(config?: Redirect.Config) {
+    super(config);
+
+    this.config = Utils.Common.defaults(this.config, {
+      timeout: 10000
+    });
+  }
+
+  public get name() {
     return 'redirect';
   }
 
-  get auto() {
+  public get auto() {
     return true;
   }
 
-  public connected({ action, handler, provider }: Handler.ConnectedOptions) {
+  public async connected({ action, handler, provider }: Handler.ConnectedOptions) {
     if (handler !== this.name) return;
 
-    if (action === 'login') {
-      const origin = this.get('origin');
+    const origin = this.get('origin');
 
-      if (!origin) return;
+    if (!origin) return;
 
-      this.clear('origin');
+    this.clear('origin');
 
-      if (provider) {
-        provider.validate(Utils.URL.parse(location));
-        this.navigate(origin);
-      } else {
-        throw new SalteAuthError({
-          code: 'unknown_provider',
-          message: 'Unable to validate due to unknown provider!',
-        });
-      }
-    } else if (action === 'logout') {
-      if (provider) {
-        provider.reset();
-      } else {
-        throw new SalteAuthError({
-          code: 'unknown_provider',
-          message: 'Unable to reset due to unknown provider!',
-        });
-      }
+    if (!provider) {
+      throw new SalteAuthError({
+        code: 'unknown_provider',
+        message: 'Unable to finish redirect due to an unknown provider!',
+      });
     }
+
+    await new Promise((resolve) => setTimeout(resolve));
+
+    if (action === 'login') {
+      provider.validate(Utils.URL.parse(location));
+    } else if (action === 'logout') {
+      provider.reset();
+      provider.emit('logout');
+    } else {
+      throw new SalteAuthError({
+        code: 'unknown_action',
+        message: `Unable to finish redirect due to an unknown action! (${action})`,
+      });
+    }
+
+    this.navigate(origin);
   }
 
-  public open({ url, timeout = 10000 }: Redirect.OpenOptions) {
+  public open({ url, timeout = this.config.timeout }: Redirect.OpenOptions) {
     this.set('origin', location.href);
 
     this.navigate(url);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((_resolve, reject) => {
       setTimeout(() => {
         reject(new SalteAuthError({
           code: 'redirect_timeout',
@@ -56,8 +66,24 @@ export class Redirect extends Handler {
   }
 }
 
+export interface Redirect {
+  config: Redirect.Config;
+}
+
 export declare namespace Redirect {
+  export interface Config extends Handler.Config {
+    /**
+     * The amount of time in ms before any login / logout requests will timeout.
+     *
+     * @default 10000
+     */
+    timeout?: number;
+  }
+
   export interface OpenOptions extends Handler.OpenOptions {
+    /**
+     * Override the configured timeout.
+     */
     timeout?: number;
   }
 }

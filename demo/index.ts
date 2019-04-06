@@ -1,6 +1,6 @@
 import 'whatwg-fetch';
-import 'core-js/es/promise';
-import 'core-js/web/url';
+import 'url-polyfill';
+import 'es6-promise/auto';
 
 import { Generic, SalteAuth } from '../src/salte-auth';
 import { Redirect } from './redirect';
@@ -48,6 +48,7 @@ auth.on('login', (error, data) => {
 });
 
 const loginButton = document.createElement('button');
+loginButton.id = 'login';
 loginButton.innerHTML = `Login`;
 loginButton.addEventListener('click', () => {
   auth.login('generic.openid');
@@ -55,6 +56,7 @@ loginButton.addEventListener('click', () => {
 document.body.appendChild(loginButton);
 
 const logoutButton = document.createElement('button');
+logoutButton.id = 'logout';
 logoutButton.innerHTML = `Logout`;
 logoutButton.addEventListener('click', () => {
   auth.logout('generic.openid');
