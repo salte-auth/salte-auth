@@ -67,7 +67,7 @@
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-copy-assets-to": "^1.0.0",
     "rollup-plugin-glob-import": "^0.3.1",
-    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-node-resolve": "^4.2.0",
     "rollup-plugin-replace": "^2.1.1",
     "rollup-plugin-serve": "^1.0.1",
     "rollup-plugin-terser": "^4.0.4",

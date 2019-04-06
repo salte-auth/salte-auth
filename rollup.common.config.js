@@ -15,7 +15,7 @@ module.exports = function({ minified, es6, tests, coverage, demo, server }) {
 
   return {
     input: demo ? 'demo/index.ts' : 'src/salte-auth.ts',
-    external: ['regenerator-runtime/runtime'],
+    external: [],
     output: {
       file: `dist/salte-auth${minified ? '.min' : ''}.${es6 ? 'mjs' : 'js'}`,
       format: es6 ? 'es' : 'umd',
@@ -39,8 +39,7 @@ module.exports = function({ minified, es6, tests, coverage, demo, server }) {
       }),
 
       resolve({
-        module: false,
-        browser: true,
+        mainFields: ['main', 'browser'],
 
         extensions: [ '.mjs', '.js', '.jsx', '.json', '.ts' ]
       }),
