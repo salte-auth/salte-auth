@@ -2,6 +2,7 @@ import chai from 'chai';
 import sinon from 'sinon';
 
 import { Common } from '../../../src/utils/common';
+import { Events } from '../../../src/utils/events';
 import { getError } from '../../utils/get-error';
 
 const { expect } = chai;
@@ -177,6 +178,7 @@ describe('Common', () => {
 
   describe('function(iframe)', () => {
     beforeEach(() => {
+      sinon.spy(document, 'createElement');
       /**
        * IE 11 hates iframes in iframes and ignore src being changed for some reason.
        * I couldn't find any information as to why this is the case, but it seems to be.
@@ -204,8 +206,7 @@ describe('Common', () => {
     });
 
     afterEach(() => {
-      /* In the event of a timeout we need to clean up the iframe */
-      const iframe = document.body.querySelector('iframe[owner="@salte-auth/salte-auth"]');
+      const iframe = document.createElement.firstCall.returnValue;
       iframe && iframe.parentElement && iframe.parentElement.removeChild(iframe);
     });
 
@@ -215,7 +216,7 @@ describe('Common', () => {
         url,
         redirectUrl: url
       });
-      const iframe = document.body.querySelector('iframe[owner="@salte-auth/salte-auth"]');
+      const iframe = document.createElement.firstCall.returnValue;
 
       expect(iframe).to.not.be.undefined;
       expect(iframe.style.display).to.equal('none');
@@ -229,7 +230,7 @@ describe('Common', () => {
         url: 'https://google.com',
         redirectUrl: url
       });
-      const iframe = document.body.querySelector('iframe[owner="@salte-auth/salte-auth"]');
+      const iframe = document.createElement.firstCall.returnValue;
 
       expect(iframe).to.not.be.undefined;
       expect(iframe.style.display).to.equal('none');
@@ -248,7 +249,7 @@ describe('Common', () => {
         redirectUrl: url,
         visible: true
       });
-      const iframe = document.body.querySelector('iframe[owner="@salte-auth/salte-auth"]');
+      const iframe = document.createElement.firstCall.returnValue;
 
       expect(iframe).to.not.be.undefined;
       expect(iframe.style.display).to.equal('');
@@ -260,12 +261,32 @@ describe('Common', () => {
       const promise = Common.iframe({
         url: 'https://google.com'
       });
-      const iframe = document.body.querySelector('iframe[owner="@salte-auth/salte-auth"]');
+      const iframe = document.createElement.firstCall.returnValue;
       setTimeout(() => {
         document.body.removeChild(iframe);
       }, 100);
 
       expect(await getError(promise)).instanceOf(Error);
+    });
+
+    it('should ignore CrossDomainErrors', async () => {
+      sinon.stub(Events, 'isCrossDomainError').returns(true);
+
+      const promise = Common.iframe({
+        url: location.href,
+        redirectUrl: location.href
+      });
+      const iframe = document.createElement.firstCall.returnValue;
+      sinon.stub(iframe.parentElement, 'removeChild').callsFake(() => {
+        throw Error('test');
+      });
+
+      setTimeout(() => {
+        Events.isCrossDomainError.restore();
+        iframe.parentElement.removeChild.restore();
+      }, 200);
+
+      return promise;
     });
   });
 });

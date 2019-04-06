@@ -1,4 +1,5 @@
 import { URL } from './url';
+import { Events } from './events';
 
 const debounces: {
   [key: string]: number;
@@ -112,12 +113,13 @@ export class Common {
           iframe.parentElement && iframe.parentElement.removeChild(iframe);
           clearInterval(checker);
           resolve(parsed);
-        } catch (e) {
-          if (e instanceof DOMException || e.message === 'Permission denied') return;
+        } catch (error) {
+          if (Events.isCrossDomainError(error)) return;
 
           iframe.parentElement && iframe.parentElement.removeChild(iframe);
           clearInterval(checker);
-          reject(e);
+
+          reject(error);
         }
       });
     });
