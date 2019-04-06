@@ -39,7 +39,7 @@ module.exports = function({ minified, es6, tests, coverage, demo, server }) {
       }),
 
       resolve({
-        mainFields: ['main', 'browser'],
+        mainFields: ['browser', 'main'],
 
         extensions: [ '.mjs', '.js', '.jsx', '.json', '.ts' ]
       }),

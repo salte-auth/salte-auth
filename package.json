@@ -82,11 +82,6 @@
     "access": "public",
     "tag": "next"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged && remove-lockfiles"
-    }
-  },
   "browserslist": [
     "last 2 Chrome versions",
     "last 2 Firefox versions",
@@ -94,6 +89,11 @@
     "last 2 Edge versions",
     "IE 11"
   ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && remove-lockfiles"
+    }
+  },
   "lint-staged": {
     "*.{js,ts}": [
       "eslint --fix",
