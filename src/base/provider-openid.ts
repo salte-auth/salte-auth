@@ -144,7 +144,7 @@ export declare namespace OpenIDProvider {
        *
        * @default 60000
        */
-      buffer?: number
+      buffer?: number;
     });
   }
 

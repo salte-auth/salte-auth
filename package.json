@@ -54,6 +54,7 @@
     "karma-rollup-preprocessor": "^7.0.0",
     "karma-sauce-launcher": "^2.0.2",
     "karma-sourcemap-loader": "^0.3.7",
+    "lint-staged": "^8.1.5",
     "mocha": "^6.0.2",
     "nanoid": "^2.0.1",
     "nps": "^5.9.4",
@@ -79,7 +80,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "remove-lockfiles"
+      "pre-commit": "lint-staged && remove-lockfiles"
     }
   },
   "browserslist": [
@@ -88,5 +89,11 @@
     "last 2 Safari versions",
     "last 2 Edge versions",
     "IE 11"
-  ]
+  ],
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
 }
