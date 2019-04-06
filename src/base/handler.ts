@@ -1,6 +1,5 @@
 import { Storage } from './core/storage';
 import { Provider } from './core/provider';
-import { Shared } from './core/shared';
 import { Common, Logger } from '../utils';
 
 export abstract class Handler extends Storage {
@@ -88,6 +87,6 @@ export declare namespace Handler {
 
   export interface OpenOptions {
     url: string;
-    redirectUrl: string | Shared.RedirectUrl;
+    redirectUrl: string;
   }
 }

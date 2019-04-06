@@ -11,7 +11,7 @@ import { Handler } from './base/handler';
 export class SalteAuth extends Shared {
   public logger: Logger;
 
-  constructor(config: SalteAuth.Config) {
+  public constructor(config: SalteAuth.Config) {
     super(config);
 
     this.required('providers', 'handlers');
@@ -96,7 +96,7 @@ export class SalteAuth extends Shared {
                 this.set('handler', handler.$name);
 
                 const params = await handler.open({
-                  redirectUrl: provider.config.redirectUrl,
+                  redirectUrl: provider.redirectUrl('login'),
                   url: response,
                 });
 
@@ -142,7 +142,7 @@ export class SalteAuth extends Shared {
       this.set('handler', handler.$name);
 
       const params = await handler.open({
-        redirectUrl: provider.config.redirectUrl,
+        redirectUrl: provider.redirectUrl('login'),
         url: provider.$login(),
       });
 
@@ -178,7 +178,7 @@ export class SalteAuth extends Shared {
       this.set('handler', handler.$name);
 
       await handler.open({
-        redirectUrl: provider.config.redirectUrl,
+        redirectUrl: provider.redirectUrl('logout'),
         url: provider.logout,
       });
 
