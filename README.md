@@ -17,7 +17,7 @@
 	<strong>
 		<!-- <a href="https://salte.io">Website</a> -->
 		<!-- • -->
-		<a href="https://salte-auth.gitbook.io/salte-auth">Docs</a>
+		<a href="https://salte-auth.gitbook.io">Docs</a>
 		•
 		<a href="https://salte-auth-demo.glitch.me">Demo</a>
 	</strong>
