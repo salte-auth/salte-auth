@@ -104,7 +104,20 @@ export abstract class OpenIDProvider extends OAuth2Provider {
       this.sync();
     }
 
-    this.emit('login', null, this.code || this.idToken);
+    const responseType = this.get('response-type', '');
+    const types = responseType.split(' ');
+    if (Common.includes(types, 'id_token')) {
+      this.emit('login', null, this.idToken);
+    } else if (Common.includes(types, 'token')) {
+      this.emit('login', null, this.accessToken);
+    } else if (Common.includes(types, 'code')) {
+      this.emit('login', null, this.code);
+    } else {
+      throw new SalteAuthError({
+        code: 'invalid_response_type',
+        message: `Unknown Response Type (${responseType})`
+      });
+    }
   }
 
   public $login(options?: OpenIDProvider.OverrideOptions): string {

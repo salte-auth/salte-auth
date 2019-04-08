@@ -286,6 +286,44 @@ describe('OpenIDProvider', () => {
       });
     });
 
+    it(`should skip clearing the ID Token when validating an Access Token`, async () => {
+      class Example extends OpenIDProvider {};
+
+      const example = new Example();
+
+      example.set('response-type', 'token');
+      example.set('state', '12345');
+
+      return new Promise((resolve) => {
+        example.on('login', (error, accessToken) => {
+          expect(error).to.equal(null);
+          expect(accessToken.raw).to.equal('54321');
+          resolve();
+        });
+
+        example.validate({
+          state: '12345',
+          access_token: '54321'
+        });
+      });
+    });
+
+    it(`should throw an error on unknown response types`, async () => {
+      class Example extends OpenIDProvider {};
+
+      const example = new Example();
+
+      example.set('response-type', 'hello');
+      example.set('state', '12345');
+
+      const error = getError(() => example.validate({
+        state: '12345',
+        access_token: '54321'
+      }));
+
+      expect(error.code).to.equal('invalid_response_type');
+    });
+
     it('should throw an error if the ID Token is invalid', () => {
       class Example extends OpenIDProvider {};
 

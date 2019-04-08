@@ -35,10 +35,9 @@ export class SalteAuth extends Shared {
       });
     });
 
-    const name = this.get('provider');
-    const provider = name ? this.provider(name) : null;
     const action = this.get('action');
-    const handlerName = this.get('handler');
+    const provider = action ? this.provider(this.get('provider')) : null;
+    const handlerName = action ? this.get('handler') : null;
 
     Common.forEach(this.config.handlers, (handler) => {
       if (!handler.connected) return;
