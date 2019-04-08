@@ -37,13 +37,29 @@ export class SalteAuth extends Shared {
 
     const name = this.get('provider');
     const provider = name ? this.provider(name) : null;
+    const action = this.get('action');
+    const handlerName = this.get('handler');
 
     Common.forEach(this.config.handlers, (handler) => {
-      handler.connected && handler.connected({
-        action: this.get('action'),
-        handler: this.get('handler'),
-        provider,
-      });
+      if (!handler.connected) return;
+
+      const responsible = handler.$name === handlerName;
+
+      const parsed = handler.connected({ action: responsible ? action : null });
+
+      if (!responsible) return;
+
+      if (action === 'login') {
+        provider.validate(parsed);
+      } else if (action === 'logout') {
+        provider.reset();
+        provider.emit('logout');
+      } else {
+        throw new SalteAuthError({
+          code: 'unknown_action',
+          message: `Unable to finish redirect due to an unknown action! (${action})`,
+        });
+      }
     });
 
     this.clear('action');

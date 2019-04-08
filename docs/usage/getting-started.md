@@ -68,7 +68,7 @@ const auth = new SalteAuth({
   ]
 });
 
-if (auth.provider('auth0').idToken().expired) {
+if (auth.provider('auth0').idToken.expired) {
   // Redirects the user to your Auth0 login page!
   auth.login('auth0');
 }

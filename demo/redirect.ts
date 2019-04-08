@@ -17,8 +17,8 @@ export class Redirect extends Handler {
     return true;
   }
 
-  public async connected({ action, handler, provider }: Handler.ConnectedOptions) {
-    if (handler !== this.name) return;
+  public connected({ action }: Handler.ConnectedOptions) {
+    if (!action) return;
 
     const origin = this.get('origin');
 
@@ -26,28 +26,11 @@ export class Redirect extends Handler {
 
     this.clear('origin');
 
-    if (!provider) {
-      throw new SalteAuthError({
-        code: 'unknown_provider',
-        message: 'Unable to finish redirect due to an unknown provider!',
-      });
-    }
-
-    await new Promise((resolve) => setTimeout(resolve));
+    this.navigate(origin);
 
     if (action === 'login') {
-      provider.validate(Utils.URL.parse(location));
-    } else if (action === 'logout') {
-      provider.reset();
-      provider.emit('logout');
-    } else {
-      throw new SalteAuthError({
-        code: 'unknown_action',
-        message: `Unable to finish redirect due to an unknown action! (${action})`,
-      });
+      return Utils.URL.parse(location);
     }
-
-    this.navigate(origin);
   }
 
   public open({ url, timeout = this.config.timeout }: Redirect.OpenOptions) {

@@ -5,26 +5,29 @@ import { Provider } from './core/provider';
 import { SalteAuthError } from './core/salte-auth-error';
 
 export abstract class OAuth2Provider extends Provider {
+  public accessToken?: AccessToken;
+
   public constructor(config?: OAuth2Provider.Config) {
     super(config);
+
+    this.sync();
   }
 
   public connected() {
-    this.required('responseType');
+    this.required('clientID', 'responseType');
   }
 
   public async secure(request: Interceptors.XHR.ExtendedXMLHttpRequest | Request): Promise<string | boolean> {
-    if (Common.includes(['token'], this.config.responseType)) {
-      const accessToken = this.accessToken();
-      if (accessToken.expired) {
+    if (this.config.responseType === 'token') {
+      if (this.accessToken.expired) {
         return this.$login();
       }
 
       if (request) {
         if (request instanceof Request) {
-          request.headers.set('Authorization', `Bearer ${accessToken.raw}`);
+          request.headers.set('Authorization', `Bearer ${this.accessToken.raw}`);
         } else if (request instanceof XMLHttpRequest) {
-          request.setRequestHeader('Authorization', `Bearer ${accessToken.raw}`);
+          request.setRequestHeader('Authorization', `Bearer ${this.accessToken.raw}`);
         } else {
           throw new SalteAuthError({
             code: 'unknown_request',
@@ -39,6 +42,13 @@ export abstract class OAuth2Provider extends Provider {
 
   protected $validate(options: OAuth2Provider.Validation): void {
     try {
+      if (!options) {
+        throw new SalteAuthError({
+          code: 'empty_response',
+          message: `The response provided was empty, this is most likely due to the configured handler not providing it.`
+        });
+      }
+
       if (options.error) {
         throw new SalteAuthError({
           code: options.error,
@@ -94,19 +104,11 @@ export abstract class OAuth2Provider extends Provider {
     } catch (error) {
       this.emit('login', error);
       throw error;
+    } finally {
+      this.sync();
     }
 
-    this.emit('login', null, this.code || this.accessToken());
-  }
-
-  public accessToken(): AccessToken {
-    const expiration = this.get('access-token.expiration');
-
-    return new AccessToken(
-      this.get('access-token.raw'),
-      Common.includes([undefined, null], expiration) ? null : Number(expiration),
-      this.get('access-token.type')
-    );
+    this.emit('login', null, this.code || this.accessToken);
   }
 
   public get code() {
@@ -134,6 +136,14 @@ export abstract class OAuth2Provider extends Provider {
       code: 'logout_not_supported',
       message: `OAuth 2.0 doesn't support logout!`,
     });
+  }
+
+  protected sync() {
+    this.accessToken = new AccessToken(
+      this.get('access-token.raw'),
+      this.get('access-token.expiration'),
+      this.get('access-token.type')
+    );
   }
 }
 
@@ -166,7 +176,7 @@ export declare namespace OAuth2Provider {
     validation?: boolean | ValidationOptions;
   }
 
-  export interface OverrideOptions extends Provider.OverrideOptions {
+  export interface OverrideOptions {
     /**
      * Determines whether a authorization code (server) or access token (client) should be returned.
      * @type {('code'|'token')}

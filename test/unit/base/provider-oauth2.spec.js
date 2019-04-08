@@ -47,6 +47,7 @@ describe('OAuth2Provider', () => {
 
       example.set('access-token.raw', '12345');
       example.set('access-token.expiration', Date.now() + 1);
+      example.sync();
 
       const request = new Request('https://google.com');
 
@@ -62,6 +63,7 @@ describe('OAuth2Provider', () => {
 
       example.set('access-token.raw', '12345');
       example.set('access-token.expiration', Date.now() + 1);
+      example.sync();
 
       const request = new XMLHttpRequest();
       sinon.stub(request, 'setRequestHeader');
@@ -92,6 +94,7 @@ describe('OAuth2Provider', () => {
 
       example.set('access-token.raw', '12345');
       example.set('access-token.expiration', Date.now() + 1);
+      example.sync();
 
       expect(await example.secure()).to.equal(true);
     });
@@ -125,13 +128,15 @@ describe('OAuth2Provider', () => {
       class Example extends OAuth2Provider {};
 
       const example = new Example({
+        clientID: '<client-id>',
         responseType: 'token'
       });
 
       example.set('access-token.raw', '12345');
       example.set('access-token.expiration', Date.now() + 1);
+      example.sync();
 
-      const error = await getError(example.secure(new Error()));
+      const error = await example.secure(new Error()).catch((error) => error);
 
       expect(error.code).to.equal('unknown_request');
     });
@@ -178,10 +183,9 @@ describe('OAuth2Provider', () => {
           expect(error).to.equal(null);
           expect(code).to.equal('hello');
 
-          const token = example.accessToken();
-          expect(token.type).to.equal(null);
-          expect(token.expiration).to.equal(null);
-          expect(token.raw).to.equal(null);
+          expect(example.accessToken.type).to.equal(null);
+          expect(example.accessToken.expiration).to.equal(null);
+          expect(example.accessToken.raw).to.equal(null);
           resolve();
         });
 
@@ -313,6 +317,18 @@ describe('OAuth2Provider', () => {
           access_token: 'hello'
         });
       });
+    });
+
+    it('should throw an error if an empty response is provided', async () => {
+      class Example extends OAuth2Provider {};
+
+      const example = new Example();
+
+      example.set('response-type', 'token');
+
+      const error = getError(() => example.validate());
+
+      expect(error.code).to.equal('empty_response');
     });
   });
 

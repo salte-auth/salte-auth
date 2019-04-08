@@ -5,7 +5,7 @@ import { Common, Interceptors, Logger } from '../../utils';
 export abstract class Provider extends Shared {
   protected logger: Logger;
 
-  constructor(config: Provider.Config) {
+  public constructor(config: Provider.Config) {
     super(config);
 
     this.config = Common.defaults(this.config, {
@@ -18,7 +18,7 @@ export abstract class Provider extends Shared {
   /**
    * An internal login command to `salte-auth` that enables enhancing the login with common parameters.
    */
-  public abstract $login(options?: Provider.OverrideOptions): string;
+  public abstract $login(options?: object): string;
 
   /**
    * Checks for errors returned from the provider.
@@ -26,7 +26,7 @@ export abstract class Provider extends Shared {
    */
   protected abstract $validate(options: object): void;
 
-  public abstract validate(options: object): void;
+  public abstract validate(options: object | void): void;
 
   /**
    * Determines if validation is enabled for the given key.
@@ -104,8 +104,8 @@ export interface Provider {
    */
   secure?(request?: Interceptors.XHR.ExtendedXMLHttpRequest | Request): Promise<string | boolean>;
 
-  on(name: 'login', listener: (error?: Error, data?: any) => void): void
-  on(name: 'logout', listener: (error?: Error) => void): void
+  on(name: 'login', listener: (error?: Error, data?: any) => void): void;
+  on(name: 'logout', listener: (error?: Error) => void): void;
 }
 
 export interface Provider {
@@ -134,12 +134,12 @@ export declare namespace Provider {
     /**
      * The routes to secure for this provider.
      */
-    routes?: Array<string | RegExp> | boolean;
+    routes?: (string | RegExp)[] | boolean;
 
     /**
      * The endpoints to secure for this provider.
      */
-    endpoints?: Array<string | RegExp>;
+    endpoints?: (string | RegExp)[];
 
     /**
      * Determines the level of verbosity of the logs.
@@ -148,8 +148,6 @@ export declare namespace Provider {
      */
     level?: ('error'|'warn'|'info'|'trace');
   }
-
-  export interface OverrideOptions {}
 
   export interface ValidationOptions {
     [key: string]: boolean;

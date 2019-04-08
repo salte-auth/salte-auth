@@ -7,6 +7,8 @@ import { SalteAuthError } from './core/salte-auth-error';
 import { Common, IDToken, Interceptors } from '../utils';
 
 export abstract class OpenIDProvider extends OAuth2Provider {
+  public idToken?: IDToken;
+
   public constructor(config?: OpenIDProvider.Config) {
     super(config);
 
@@ -20,15 +22,17 @@ export abstract class OpenIDProvider extends OAuth2Provider {
         buffer: 60000
       }
     });
+
+    this.sync();
   }
 
   public async secure(request: Interceptors.XHR.ExtendedXMLHttpRequest | Request): Promise<string | boolean> {
     if (Common.includes(['id_token', 'id_token token', 'token'], this.config.responseType)) {
-      if (this.idToken().expired) {
+      if (this.idToken.expired) {
         return this.$login();
       }
 
-      if (this.accessToken().expired) {
+      if (this.accessToken.expired) {
         const parsed = await Common.iframe({
           redirectUrl: this.redirectUrl('login'),
           url: this.$login({
@@ -42,9 +46,9 @@ export abstract class OpenIDProvider extends OAuth2Provider {
 
       if (request) {
         if (request instanceof Request) {
-          request.headers.set('Authorization', `Bearer ${this.accessToken().raw}`);
+          request.headers.set('Authorization', `Bearer ${this.accessToken.raw}`);
         } else if (request instanceof XMLHttpRequest) {
-          request.setRequestHeader('Authorization', `Bearer ${this.accessToken().raw}`);
+          request.setRequestHeader('Authorization', `Bearer ${this.accessToken.raw}`);
         } else {
           throw new SalteAuthError({
             code: 'unknown_request',
@@ -82,6 +86,8 @@ export abstract class OpenIDProvider extends OAuth2Provider {
         }
 
         this.set('id-token.raw', id_token);
+      } else if (Common.includes(types, 'code')) {
+        this.clear('id-token.raw');
       }
     } finally {
       this.clear('nonce');
@@ -94,13 +100,11 @@ export abstract class OpenIDProvider extends OAuth2Provider {
     } catch (error) {
       this.emit('login', error);
       throw error;
+    } finally {
+      this.sync();
     }
 
-    this.emit('login', null, this.code || this.idToken());
-  }
-
-  public idToken(): IDToken {
-    return new IDToken(this.get('id-token.raw'));
+    this.emit('login', null, this.code || this.idToken);
   }
 
   public $login(options?: OpenIDProvider.OverrideOptions): string {
@@ -112,6 +116,12 @@ export abstract class OpenIDProvider extends OAuth2Provider {
       prompt: options && options.prompt,
       nonce
     });
+  }
+
+  protected sync() {
+    super.sync();
+
+    this.idToken = new IDToken(this.get('id-token.raw'));
   }
 }
 

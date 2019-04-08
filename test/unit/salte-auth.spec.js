@@ -85,6 +85,43 @@ describe('SalteAuth', () => {
       custom.connected = sinon.stub();
       sinon.stub(openid, 'connected');
       sinon.stub(openid, 'on');
+
+      new SalteAuth({
+        providers: [openid],
+
+        handlers: [custom]
+      });
+
+      expect(custom.connected.callCount).to.equal(1);
+      expect(custom.connected).calledWith({
+        action: null
+      });
+      expect(openid.connected.callCount).to.equal(1);
+      expect(openid.on.callCount).to.equal(2);
+      expect(Utils.Interceptors.Fetch.add.callCount).to.equal(1);
+      expect(Utils.Interceptors.XHR.add.callCount).to.equal(1);
+      expect(Utils.Events.route.callCount).to.equal(1);
+    });
+
+    it('should support authentication wrap up for "login" on "connected"', () => {
+      sinon.stub(Utils.Interceptors.Fetch, 'add');
+      sinon.stub(Utils.Interceptors.XHR, 'add');
+
+      class Custom extends Handler {
+        get name() {
+          return 'custom';
+        }
+
+        connected({ action }) {
+          expect(action).to.equal('login');
+
+          return { state: 'hello-world' };
+        }
+      }
+
+      const custom = new Custom({ default: true });
+
+      sinon.stub(openid, 'validate');
       sinon.stub(SalteAuth.prototype, 'get').callsFake((key) => {
         switch (key) {
           case 'action': return 'login';
@@ -100,17 +137,79 @@ describe('SalteAuth', () => {
         handlers: [custom]
       });
 
-      expect(custom.connected.callCount).to.equal(1);
-      expect(custom.connected).calledWith({
-        action: 'login',
-        provider: openid,
-        handler: 'custom'
+      expect(openid.validate.callCount).to.equal(1);
+      expect(openid.validate).to.be.calledWith({
+        state: 'hello-world'
       });
-      expect(openid.connected.callCount).to.equal(1);
-      expect(openid.on.callCount).to.equal(2);
-      expect(Utils.Interceptors.Fetch.add.callCount).to.equal(1);
-      expect(Utils.Interceptors.XHR.add.callCount).to.equal(1);
-      expect(Utils.Events.route.callCount).to.equal(1);
+    });
+
+    it('should support authentication wrap up for "logout" on "connected"', () => {
+      sinon.stub(Utils.Interceptors.Fetch, 'add');
+      sinon.stub(Utils.Interceptors.XHR, 'add');
+
+      class Custom extends Handler {
+        get name() {
+          return 'custom';
+        }
+
+        connected({ action }) {
+          expect(action).to.equal('logout');
+        }
+      }
+
+      const custom = new Custom({ default: true });
+
+      sinon.stub(openid, 'reset');
+      sinon.stub(SalteAuth.prototype, 'get').callsFake((key) => {
+        switch (key) {
+          case 'action': return 'logout';
+          case 'handler': return 'custom';
+          case 'provider': return 'generic.openid';
+          default: throw new Error(`Unknown key. (${key})`);
+        }
+      });
+
+      new SalteAuth({
+        providers: [openid],
+
+        handlers: [custom]
+      });
+
+      expect(openid.reset.callCount).to.equal(1);
+    });
+
+    it('should throw an error on authentication wrap up if the action is unknown', () => {
+      sinon.stub(Utils.Interceptors.Fetch, 'add');
+      sinon.stub(Utils.Interceptors.XHR, 'add');
+
+      class Custom extends Handler {
+        get name() {
+          return 'custom';
+        }
+
+        connected({ action }) {
+          expect(action).to.equal('hello');
+        }
+      }
+
+      const custom = new Custom({ default: true });
+
+      sinon.stub(SalteAuth.prototype, 'get').callsFake((key) => {
+        switch (key) {
+          case 'action': return 'hello';
+          case 'handler': return 'custom';
+          case 'provider': return 'generic.openid';
+          default: throw new Error(`Unknown key. (${key})`);
+        }
+      });
+
+      const error = getError(() => new SalteAuth({
+        providers: [openid],
+
+        handlers: [custom]
+      }));
+
+      expect(error.code).to.equal('unknown_action');
     });
   });
 
@@ -202,6 +301,7 @@ describe('SalteAuth', () => {
       )}.0`);
       openid.set('access-token.raw', '12345');
       openid.set('access-token.expiration', 99999);
+      openid.sync();
 
       const promise = new Promise((resolve) => {
         Utils.Interceptors.Fetch.add((request) => {

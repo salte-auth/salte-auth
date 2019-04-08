@@ -95,6 +95,7 @@ describe('OpenIDProvider', () => {
       )}.0`);
       example.set('access-token.raw', '12345');
       example.set('access-token.expiration', 99999);
+      example.sync();
 
       const request = new Request('https://google.com');
 
@@ -118,6 +119,7 @@ describe('OpenIDProvider', () => {
       )}.0`);
       example.set('access-token.raw', '12345');
       example.set('access-token.expiration', 99999);
+      example.sync();
 
       const request = new XMLHttpRequest();
       sinon.stub(request, 'setRequestHeader');
@@ -174,6 +176,7 @@ describe('OpenIDProvider', () => {
           exp: Date.now() + 99999
         })
       )}.0`);
+      example.sync();
 
       sinon.stub(Common, 'iframe').callsFake(() => Promise.resolve());
       sinon.stub(example, 'validate');
@@ -188,6 +191,7 @@ describe('OpenIDProvider', () => {
       class Example extends OpenIDProvider {};
 
       const example = new Example({
+        clientID: '<client-id>',
         responseType: 'token'
       });
 
@@ -201,6 +205,7 @@ describe('OpenIDProvider', () => {
       example.set('access-token.raw', '12345');
       example.set('access-token.expiration', '12345');
       example.set('access-token.expiration', 99999);
+      example.sync();
 
       const error = await getError(example.secure(new Error()));
 
@@ -336,37 +341,6 @@ describe('OpenIDProvider', () => {
           id_token: token
         });
       });
-    });
-  });
-
-  describe('function(idToken)', () => {
-    it('should parse the user info from the id token', () => {
-      const rawToken = `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe',
-          exp: Date.now() + 99999
-        })
-      )}.0`;
-
-      class Example extends OpenIDProvider {
-        get name() {
-          return 'example';
-        }
-      };
-
-      const example = new Example();
-
-      example.set('id-token.raw', rawToken);
-
-      const token = example.idToken();
-      expect(token.raw).to.equal(rawToken);
-      expect(token.user).to.deep.equal({
-        sub: '1234567890',
-        name: 'John Doe',
-        exp: Date.now() + 99999
-      });
-      expect(token.expired).to.equal(false);
     });
   });
 
