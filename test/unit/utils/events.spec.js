@@ -54,9 +54,11 @@ describe('Events', () => {
   });
 
   describe('function(isCrossDomainError)', () => {
-    it('should return true if it is a DOMException', () => {
-      expect(Events.isCrossDomainError(new DOMException())).to.equal(true);
-    });
+    // TODO: IE 11 and Edge don't allow us to create this Exception
+    // it('should return true if it is a DOMException', () => {
+    //   new DOMException('Hello World');
+    //   expect(Events.isCrossDomainError(new DOMException())).to.equal(true);
+    // });
 
     it('should return true if the message contains "Permission denied"', () => {
       expect(Events.isCrossDomainError(new Error('Permission denied'))).to.equal(true);

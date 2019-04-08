@@ -1,5 +1,4 @@
 import { Storage } from './core/storage';
-import { Provider } from './core/provider';
 import { Common, Logger } from '../utils';
 
 export abstract class Handler extends Storage {
@@ -13,8 +12,6 @@ export abstract class Handler extends Storage {
     });
     this.logger = new Logger(`@salte-auth/salte-auth:handlers/${this.$name}`, this.config.level);
   }
-
-  public abstract open(options: Handler.OpenOptions): Promise<any>;
 
   /**
    * The unique name of the handler
@@ -56,7 +53,8 @@ export abstract class Handler extends Storage {
 export interface Handler {
   config: Handler.Config;
 
-  connected?(options: Handler.ConnectedOptions): void;
+  open(options: Handler.OpenOptions): Promise<object>;
+  connected?(options: Handler.ConnectedOptions): object | void;
 }
 
 export declare namespace Handler {
@@ -81,8 +79,6 @@ export declare namespace Handler {
 
   export interface ConnectedOptions {
     action?: string;
-    handler?: string;
-    provider?: Provider;
   }
 
   export interface OpenOptions {

@@ -91,7 +91,7 @@ auth.on('login', (error, idToken) => {
   else console.log(idToken.user);
 });
 
-if (auth.provider('auth0').idToken().expired) {
+if (auth.provider('auth0').idToken.expired) {
   auth.login({
     provider: 'auth0',
     handler: 'redirect'

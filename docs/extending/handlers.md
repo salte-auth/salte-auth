@@ -83,7 +83,7 @@ export class CustomHandler extends Handler {
   /**
    * This is invoked when `salte-auth` starts up.
    */
-  connected({ action, handler, provider }) {
+  connected({ action, handler, provider }): object | void {
     // Generally this won't be needed, however in certain cases such 
     // as `@salte-auth/redirect` it's used to wrap up authentication.
   }
@@ -95,7 +95,7 @@ export class CustomHandler extends Handler {
    * For fully implemented examples check out our official handlers.
    * https://salte-auth.gitbook.io/salte-auth/usage/handlers
    */
-  open({ url, redirectUrl }) {
+  open({ url, redirectUrl }): Promise<object> {
     // For the given example: https://google.com?token=12345&state=54321
     // This would be the expected response.
     Promise.resolve({
