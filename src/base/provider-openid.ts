@@ -6,7 +6,7 @@ import { SalteAuthError } from './core/salte-auth-error';
 
 import { Common, IDToken, Interceptors } from '../utils';
 
-export abstract class OpenIDProvider extends OAuth2Provider {
+export class OpenIDProvider extends OAuth2Provider {
   public idToken?: IDToken;
 
   public constructor(config?: OpenIDProvider.Config) {
@@ -61,7 +61,7 @@ export abstract class OpenIDProvider extends OAuth2Provider {
     return true;
   }
 
-  protected $validate(options: OpenIDProvider.Validation): void {
+  public $validate(options: OpenIDProvider.Validation): void {
     try {
       super.$validate(options);
 

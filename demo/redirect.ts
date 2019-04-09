@@ -26,10 +26,12 @@ export class Redirect extends Handler {
 
     this.clear('origin');
 
+    const parsed = Utils.URL.parse(location);
+
     this.navigate(origin);
 
     if (action === 'login') {
-      return Utils.URL.parse(location);
+      return parsed;
     }
   }
 

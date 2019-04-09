@@ -1,4 +1,4 @@
-
+import { AuthMixinGenerator, SalteAuthMixedIn, Constructor } from './mixins/auth';
 import { Shared } from './base/core/shared';
 import * as Generic from './generic';
 import * as Utils from './utils';
@@ -10,6 +10,7 @@ import { Handler } from './base/handler';
 
 export class SalteAuth extends Shared {
   public logger: Logger;
+  public mixin: (base: Constructor) => SalteAuthMixedIn;
 
   public constructor(config: SalteAuth.Config) {
     super(config);
@@ -39,26 +40,30 @@ export class SalteAuth extends Shared {
     const provider = action ? this.provider(this.get('provider')) : null;
     const handlerName = action ? this.get('handler') : null;
 
+    if (!Common.includes([undefined, null, 'login', 'logout'], action)) {
+      throw new SalteAuthError({
+        code: 'unknown_action',
+        message: `Unable to finish redirect due to an unknown action! (${action})`,
+      });
+    }
+
     Common.forEach(this.config.handlers, (handler) => {
       if (!handler.connected) return;
 
       const responsible = handler.$name === handlerName;
 
-      const parsed = handler.connected({ action: responsible ? action : null });
+      setTimeout(() => {
+        const parsed = handler.connected({ action: responsible ? action : null });
 
-      if (!responsible) return;
+        if (!responsible) return;
 
-      if (action === 'login') {
-        provider.validate(parsed);
-      } else if (action === 'logout') {
-        provider.reset();
-        provider.emit('logout');
-      } else {
-        throw new SalteAuthError({
-          code: 'unknown_action',
-          message: `Unable to finish redirect due to an unknown action! (${action})`,
-        });
-      }
+        if (action === 'login') {
+          provider.validate(parsed);
+        } else {
+          provider.reset();
+          provider.emit('logout');
+        }
+      });
     });
 
     this.clear('action');
@@ -131,6 +136,8 @@ export class SalteAuth extends Shared {
         throw error;
       }
     });
+
+    this.mixin = AuthMixinGenerator(this);
   }
 
   /**

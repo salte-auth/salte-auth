@@ -2,8 +2,8 @@ import { Events } from './events';
 
 import { Common } from '../../utils';
 
-export abstract class Shared extends Events {
-  constructor(config?: Shared.Config) {
+export class Shared extends Events {
+  public constructor(config?: Shared.Config) {
     super(config);
 
     this.config = Common.defaults(this.config, {
@@ -16,7 +16,7 @@ export abstract class Shared extends Events {
    * Returns a redirect url for the given login type.
    * @param type Are we logging in or logging out?
    */
-  redirectUrl(type: 'login'|'logout'): string {
+  public redirectUrl(type: 'login'|'logout'): string {
     if (typeof(this.config.redirectUrl) === 'string') {
       return this.config.redirectUrl;
     }

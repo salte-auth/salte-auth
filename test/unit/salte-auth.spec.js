@@ -67,10 +67,11 @@ describe('SalteAuth', () => {
 
   describe('constructor', () => {
     beforeEach(() => {
+      clock.restore();
       sinon.reset();
     });
 
-    it('should register various listeners', () => {
+    it('should register various listeners', async () => {
       sinon.stub(Utils.Interceptors.Fetch, 'add');
       sinon.stub(Utils.Interceptors.XHR, 'add');
 
@@ -92,6 +93,8 @@ describe('SalteAuth', () => {
         handlers: [custom]
       });
 
+      await new Promise((resolve) => setTimeout(resolve));
+
       expect(custom.connected.callCount).to.equal(1);
       expect(custom.connected).calledWith({
         action: null
@@ -103,7 +106,7 @@ describe('SalteAuth', () => {
       expect(Utils.Events.route.callCount).to.equal(1);
     });
 
-    it('should support authentication wrap up for "login" on "connected"', () => {
+    it('should support authentication wrap up for "login" on "connected"', async () => {
       sinon.stub(Utils.Interceptors.Fetch, 'add');
       sinon.stub(Utils.Interceptors.XHR, 'add');
 
@@ -137,13 +140,15 @@ describe('SalteAuth', () => {
         handlers: [custom]
       });
 
+      await new Promise((resolve) => setTimeout(resolve));
+
       expect(openid.validate.callCount).to.equal(1);
       expect(openid.validate).to.be.calledWith({
         state: 'hello-world'
       });
     });
 
-    it('should support authentication wrap up for "logout" on "connected"', () => {
+    it('should support authentication wrap up for "logout" on "connected"', async () => {
       sinon.stub(Utils.Interceptors.Fetch, 'add');
       sinon.stub(Utils.Interceptors.XHR, 'add');
 
@@ -174,6 +179,8 @@ describe('SalteAuth', () => {
 
         handlers: [custom]
       });
+
+      await new Promise((resolve) => setTimeout(resolve));
 
       expect(openid.reset.callCount).to.equal(1);
     });

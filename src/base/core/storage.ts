@@ -4,8 +4,8 @@ import { Required } from './required';
 
 import { Common } from '../../utils';
 
-export abstract class Storage extends Required {
-  constructor(config?: Storage.Config) {
+export class Storage extends Required {
+  public constructor(config?: Storage.Config) {
     super(config);
 
     this.config = Common.defaults(this.config, {

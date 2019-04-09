@@ -38,6 +38,7 @@ const auth = new SalteAuth({
   handlers: [
     new Redirect({
       default: true,
+      navigate: 'history',
     })
   ],
 });

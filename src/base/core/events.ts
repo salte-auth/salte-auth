@@ -1,7 +1,7 @@
 import { Storage } from './storage';
 import { Common } from '../../utils';
 
-export abstract class Events extends Storage {
+export class Events extends Storage {
   private listeners: Map<string, Function[]> = new Map();
 
   public on(name: string, listener: Function) {
@@ -38,5 +38,6 @@ export interface Events {
 };
 
 export declare namespace Events {
-  export interface Config extends Storage.Config {}
+  // TODO: What's the best way to forward a configuration?
+  export interface Config extends Storage.Config {} // eslint-disable-line
 }

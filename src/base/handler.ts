@@ -1,13 +1,14 @@
 import { Storage } from './core/storage';
-import { Common, Logger } from '../utils';
+import { Common, Logger, URL } from '../utils';
 
-export abstract class Handler extends Storage {
+export class Handler extends Storage {
   protected logger: Logger;
 
   public constructor(config?: Handler.Config) {
     super(config);
 
     this.config = Common.defaults(this.config, {
+      navigate: 'reload',
       level: 'warn'
     });
     this.logger = new Logger(`@salte-auth/salte-auth:handlers/${this.$name}`, this.config.level);
@@ -36,22 +37,26 @@ export abstract class Handler extends Storage {
    */
   /* istanbul ignore next */
   protected navigate(url: string) {
+    if (this.config.navigate === 'history' && url.indexOf(URL.origin) === 0) {
+      history.pushState('', document.title, url);
+    }
+
     location.href = url;
   }
-
-  /**
-   * The unique name of the handler
-   */
-  protected abstract get name(): string;
-
-  /**
-   * Determines whether the handler supports automatic login.
-   */
-  public abstract get auto(): boolean;
 }
 
 export interface Handler {
   config: Handler.Config;
+
+  /**
+   * The unique name of the handler
+   */
+  name: string;
+
+  /**
+   * Determines whether the handler supports automatic login.
+   */
+  auto: boolean;
 
   open(options: Handler.OpenOptions): Promise<object>;
   connected?(options: Handler.ConnectedOptions): object | void;
@@ -68,6 +73,16 @@ export declare namespace Handler {
      * Dictates that this is the default handler.
      */
     default?: boolean;
+
+    /**
+     * Determines how page navigations are interpreted by this handler.
+     *
+     * * **reload:** Reloads the whole page when `navigate` is invoked.
+     * * **history:** Utilizes the history api to prevent page reloads when possible.
+     *
+     * @default 'reload'
+     */
+    navigate?: ('reload'|'history');
 
     /**
      * Determines the level of verbosity of the logs.
