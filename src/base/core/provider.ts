@@ -2,7 +2,7 @@ import { Shared } from './shared';
 
 import { Common, Interceptors, Logger } from '../../utils';
 
-export abstract class Provider extends Shared {
+export class Provider extends Shared {
   protected logger: Logger;
 
   public constructor(config: Provider.Config) {
@@ -14,19 +14,6 @@ export abstract class Provider extends Shared {
     });
     this.logger = new Logger(`@salte-auth/salte-auth:providers/${this.$name}`, this.config.level);
   }
-
-  /**
-   * An internal login command to `salte-auth` that enables enhancing the login with common parameters.
-   */
-  public abstract $login(options?: object): string;
-
-  /**
-   * Checks for errors returned from the provider.
-   * @returns true if validation is enabled, false otherwise.
-   */
-  protected abstract $validate(options: object): void;
-
-  public abstract validate(options: object | void): void;
 
   /**
    * Determines if validation is enabled for the given key.
@@ -75,24 +62,36 @@ export abstract class Provider extends Shared {
 
     return url;
   }
+}
 
+export interface Provider {
   /**
    * The unique name of the provider
    */
-  protected abstract get name(): string;
+  name: string;
 
   /**
    * Returns the login url for the provider.
    */
-  protected abstract get login(): string;
+  login: string;
 
   /**
    * Returns the logout url for the provider.
    */
-  public abstract get logout(): string;
-}
+  logout: string;
 
-export interface Provider {
+  /**
+   * An internal login command to `salte-auth` that enables enhancing the login with common parameters.
+   */
+  $login(options?: object): string;
+
+  validate(options: object | void): void;
+
+  /**
+   * Checks for errors returned from the provider.
+   */
+  $validate(options: object): void;
+
   /**
    * Invoked when Salte Auth is initialized
    */

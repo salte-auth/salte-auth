@@ -4,7 +4,7 @@ import { AccessToken, Common, Interceptors } from '../utils';
 import { Provider } from './core/provider';
 import { SalteAuthError } from './core/salte-auth-error';
 
-export abstract class OAuth2Provider extends Provider {
+export class OAuth2Provider extends Provider {
   public accessToken?: AccessToken;
 
   public constructor(config?: OAuth2Provider.Config) {
@@ -40,7 +40,7 @@ export abstract class OAuth2Provider extends Provider {
     return true;
   }
 
-  protected $validate(options: OAuth2Provider.Validation): void {
+  public $validate(options: OAuth2Provider.Validation): void {
     try {
       if (!options) {
         throw new SalteAuthError({

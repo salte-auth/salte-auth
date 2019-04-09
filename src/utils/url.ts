@@ -5,6 +5,13 @@ let base: HTMLBaseElement;
 let anchor: HTMLAnchorElement;
 
 export class URL {
+  /**
+   * Outputs a result equivalent to `location.origin`
+   */
+  public static get origin() {
+    return `${location.protocol}//${location.host}`;
+  }
+
   public static resolve(path: string) {
     if (!urlDocument) {
       urlDocument = document.implementation.createHTMLDocument('url');

@@ -3,6 +3,24 @@ import { expect } from 'chai';
 import { URL } from '../../../src/utils/url';
 
 describe('URL', () => {
+  describe('getter(origin)', () => {
+    it('should return the equivalent of "location.origin"', () => {
+      expect(URL.origin).to.equal(`${location.protocol}//${location.host}`);
+    });
+
+    it('should support paths', () => {
+      expect(URL.resolve('/api/test')).to.equal(
+        `${location.protocol}//${location.host}/api/test`
+      );
+    });
+
+    it('should support full urls', () => {
+      expect(URL.resolve('https://api.salte.io/api/test')).to.equal(
+        'https://api.salte.io/api/test'
+      );
+    });
+  });
+
   describe('function(resolve)', () => {
     it('should support site root urls', () => {
       expect(URL.resolve('https://google.com')).to.equal('https://google.com');
