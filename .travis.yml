@@ -8,7 +8,7 @@ branches:
     - /^greenkeeper/.*$/
 script:
   - npm start lint
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm start test.sauce; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then npm start test.sauce; fi
   - npm start test
   - if [ "${TRAVIS_PULL_REQUEST}" = "true" ]; then npm start build; fi
   - npm start docs
