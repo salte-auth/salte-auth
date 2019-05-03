@@ -85,6 +85,8 @@ class SalteAuthProfile {
       case 'error_description':
         this.$errorDescription = value;
         break;
+      case 'scope':
+        this.$scope = value;
     }
   }
 
@@ -224,6 +226,19 @@ class SalteAuthProfile {
 
   set $errorDescription(errorDescription) {
     this.$saveItem('salte.auth.error-description', errorDescription);
+  }
+
+  /**
+   * The scope returned by the identity provider
+   * @return {String} The scope
+   * @private
+   */
+  get $scope() {
+    return this.$getItem('salte.auth.scope');
+  }
+
+  set $scope(scope) {
+    this.$saveItem('salte.auth.scope', scope);
   }
 
   /**

@@ -170,7 +170,7 @@ var logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-auth/salte-aut
  * The configuration for salte auth
  * @typedef {Object} Config
  * @property {String} providerUrl The base url of your identity provider.
- * @property {('id_token'|'id_token token')} responseType The response type to authenticate with.
+ * @property {('id_token'|'id_token token'|'code')} responseType The response type to authenticate with.
  * @property {String|RedirectURLs} redirectUrl The redirect url specified in your identity provider.
  * @property {String} clientId The client id of your identity provider
  * @property {String} scope A list of space-delimited claims used to determine what user information is provided and what access is given. Most providers require 'openid'.
@@ -6498,6 +6498,9 @@ function () {
         case 'error_description':
           this.$errorDescription = value;
           break;
+
+        case 'scope':
+          this.$scope = value;
       }
     }
     /**
@@ -6868,6 +6871,20 @@ function () {
     },
     set: function set(errorDescription) {
       this.$saveItem('salte.auth.error-description', errorDescription);
+    }
+    /**
+     * The scope returned by the identity provider
+     * @return {String} The scope
+     * @private
+     */
+
+  }, {
+    key: "$scope",
+    get: function get() {
+      return this.$getItem('salte.auth.scope');
+    },
+    set: function set(scope) {
+      this.$saveItem('salte.auth.scope', scope);
     }
     /**
      * The url the user originated from before authentication occurred
