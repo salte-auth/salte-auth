@@ -128,9 +128,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(125);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _salte_auth_providers_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(126);
-/* harmony import */ var _salte_auth_profile_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(132);
-/* harmony import */ var _salte_auth_utilities_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(176);
-/* harmony import */ var _salte_auth_mixin_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(177);
+/* harmony import */ var _salte_auth_profile_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(133);
+/* harmony import */ var _salte_auth_utilities_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(177);
+/* harmony import */ var _salte_auth_mixin_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(178);
 
 
 
@@ -5935,6 +5935,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _providers_cognito_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(129);
 /* harmony import */ var _providers_wso2_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(130);
 /* harmony import */ var _providers_okta_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(131);
+/* harmony import */ var _providers_php_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(132);
+
 
 
 
@@ -5987,6 +5989,15 @@ class Providers {
 
   static get okta() {
     return _providers_okta_js__WEBPACK_IMPORTED_MODULE_4__["default"];
+  }
+  /**
+   * Provider for PHP OAuth 2.0 Server
+   * @type {SalteAuthPhpProvider}
+   */
+
+
+  static get php() {
+    return _providers_php_js__WEBPACK_IMPORTED_MODULE_5__["default"];
   }
 
 }
@@ -6168,10 +6179,48 @@ class SalteAuthOktaProvider {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/**
+ * Provider for PHP OAuth 2.0 Server
+ * A spec compliant, secure by default PHP OAuth 2.0 Server
+ * @see https://oauth2.thephpleague.com
+ */
+class SalteAuthPhpProvider {
+  /**
+   * Computes the authorization endpoint
+   * @param {Config} config configuration for salte auth
+   * @return {String} the authorization endpoint
+   */
+  static authorizeEndpoint(config) {
+    return "".concat(config.providerUrl, "/implicit.php/authorize");
+  }
+  /**
+   * Computes the deauthorization url
+   * @param {Config} config configuration for salte auth
+   * @return {String} the deauthorization url
+   */
+
+
+  static deauthorizeUrl(config) {
+    return this.$utilities.createUrl("".concat(config.providerUrl, "/implicit.php/logout"), {
+      returnTo: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
+      client_id: config.clientId
+    });
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (SalteAuthPhpProvider);
+
+/***/ }),
+/* 133 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SalteAuthProfile", function() { return SalteAuthProfile; });
 /* harmony import */ var lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(54);
 /* harmony import */ var lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_defaultsDeep__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(133);
+/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(134);
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(125);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_2__);
@@ -6700,11 +6749,11 @@ class SalteAuthProfile {
 /* harmony default export */ __webpack_exports__["default"] = (SalteAuthProfile);
 
 /***/ }),
-/* 133 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var createFind = __webpack_require__(134),
-    findIndex = __webpack_require__(171);
+var createFind = __webpack_require__(135),
+    findIndex = __webpack_require__(172);
 
 /**
  * Iterates over elements of `collection`, returning the first element
@@ -6748,10 +6797,10 @@ module.exports = find;
 
 
 /***/ }),
-/* 134 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIteratee = __webpack_require__(135),
+var baseIteratee = __webpack_require__(136),
     isArrayLike = __webpack_require__(33),
     keys = __webpack_require__(37);
 
@@ -6779,14 +6828,14 @@ module.exports = createFind;
 
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseMatches = __webpack_require__(136),
-    baseMatchesProperty = __webpack_require__(164),
+var baseMatches = __webpack_require__(137),
+    baseMatchesProperty = __webpack_require__(165),
     identity = __webpack_require__(25),
     isArray = __webpack_require__(43),
-    property = __webpack_require__(168);
+    property = __webpack_require__(169);
 
 /**
  * The base implementation of `_.iteratee`.
@@ -6816,12 +6865,12 @@ module.exports = baseIteratee;
 
 
 /***/ }),
-/* 136 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIsMatch = __webpack_require__(137),
-    getMatchData = __webpack_require__(161),
-    matchesStrictComparable = __webpack_require__(163);
+var baseIsMatch = __webpack_require__(138),
+    getMatchData = __webpack_require__(162),
+    matchesStrictComparable = __webpack_require__(164);
 
 /**
  * The base implementation of `_.matches` which doesn't clone `source`.
@@ -6844,11 +6893,11 @@ module.exports = baseMatches;
 
 
 /***/ }),
-/* 137 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Stack = __webpack_require__(57),
-    baseIsEqual = __webpack_require__(138);
+    baseIsEqual = __webpack_require__(139);
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1,
@@ -6912,10 +6961,10 @@ module.exports = baseIsMatch;
 
 
 /***/ }),
-/* 138 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIsEqualDeep = __webpack_require__(139),
+var baseIsEqualDeep = __webpack_require__(140),
     isObjectLike = __webpack_require__(42);
 
 /**
@@ -6946,14 +6995,14 @@ module.exports = baseIsEqual;
 
 
 /***/ }),
-/* 139 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Stack = __webpack_require__(57),
-    equalArrays = __webpack_require__(140),
-    equalByTag = __webpack_require__(146),
-    equalObjects = __webpack_require__(149),
-    getTag = __webpack_require__(156),
+    equalArrays = __webpack_require__(141),
+    equalByTag = __webpack_require__(147),
+    equalObjects = __webpack_require__(150),
+    getTag = __webpack_require__(157),
     isArray = __webpack_require__(43),
     isBuffer = __webpack_require__(44),
     isTypedArray = __webpack_require__(47);
@@ -7035,12 +7084,12 @@ module.exports = baseIsEqualDeep;
 
 
 /***/ }),
-/* 140 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var SetCache = __webpack_require__(141),
-    arraySome = __webpack_require__(144),
-    cacheHas = __webpack_require__(145);
+var SetCache = __webpack_require__(142),
+    arraySome = __webpack_require__(145),
+    cacheHas = __webpack_require__(146);
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1,
@@ -7124,12 +7173,12 @@ module.exports = equalArrays;
 
 
 /***/ }),
-/* 141 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var MapCache = __webpack_require__(71),
-    setCacheAdd = __webpack_require__(142),
-    setCacheHas = __webpack_require__(143);
+    setCacheAdd = __webpack_require__(143),
+    setCacheHas = __webpack_require__(144);
 
 /**
  *
@@ -7157,7 +7206,7 @@ module.exports = SetCache;
 
 
 /***/ }),
-/* 142 */
+/* 143 */
 /***/ (function(module, exports) {
 
 /** Used to stand-in for `undefined` hash values. */
@@ -7182,7 +7231,7 @@ module.exports = setCacheAdd;
 
 
 /***/ }),
-/* 143 */
+/* 144 */
 /***/ (function(module, exports) {
 
 /**
@@ -7202,7 +7251,7 @@ module.exports = setCacheHas;
 
 
 /***/ }),
-/* 144 */
+/* 145 */
 /***/ (function(module, exports) {
 
 /**
@@ -7231,7 +7280,7 @@ module.exports = arraySome;
 
 
 /***/ }),
-/* 145 */
+/* 146 */
 /***/ (function(module, exports) {
 
 /**
@@ -7250,15 +7299,15 @@ module.exports = cacheHas;
 
 
 /***/ }),
-/* 146 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Symbol = __webpack_require__(10),
     Uint8Array = __webpack_require__(93),
     eq = __webpack_require__(21),
-    equalArrays = __webpack_require__(140),
-    mapToArray = __webpack_require__(147),
-    setToArray = __webpack_require__(148);
+    equalArrays = __webpack_require__(141),
+    mapToArray = __webpack_require__(148),
+    setToArray = __webpack_require__(149);
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1,
@@ -7368,7 +7417,7 @@ module.exports = equalByTag;
 
 
 /***/ }),
-/* 147 */
+/* 148 */
 /***/ (function(module, exports) {
 
 /**
@@ -7392,7 +7441,7 @@ module.exports = mapToArray;
 
 
 /***/ }),
-/* 148 */
+/* 149 */
 /***/ (function(module, exports) {
 
 /**
@@ -7416,10 +7465,10 @@ module.exports = setToArray;
 
 
 /***/ }),
-/* 149 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getAllKeys = __webpack_require__(150);
+var getAllKeys = __webpack_require__(151);
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1;
@@ -7511,11 +7560,11 @@ module.exports = equalObjects;
 
 
 /***/ }),
-/* 150 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetAllKeys = __webpack_require__(151),
-    getSymbols = __webpack_require__(153),
+var baseGetAllKeys = __webpack_require__(152),
+    getSymbols = __webpack_require__(154),
     keys = __webpack_require__(37);
 
 /**
@@ -7533,10 +7582,10 @@ module.exports = getAllKeys;
 
 
 /***/ }),
-/* 151 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayPush = __webpack_require__(152),
+var arrayPush = __webpack_require__(153),
     isArray = __webpack_require__(43);
 
 /**
@@ -7559,7 +7608,7 @@ module.exports = baseGetAllKeys;
 
 
 /***/ }),
-/* 152 */
+/* 153 */
 /***/ (function(module, exports) {
 
 /**
@@ -7585,11 +7634,11 @@ module.exports = arrayPush;
 
 
 /***/ }),
-/* 153 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayFilter = __webpack_require__(154),
-    stubArray = __webpack_require__(155);
+var arrayFilter = __webpack_require__(155),
+    stubArray = __webpack_require__(156);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -7621,7 +7670,7 @@ module.exports = getSymbols;
 
 
 /***/ }),
-/* 154 */
+/* 155 */
 /***/ (function(module, exports) {
 
 /**
@@ -7652,7 +7701,7 @@ module.exports = arrayFilter;
 
 
 /***/ }),
-/* 155 */
+/* 156 */
 /***/ (function(module, exports) {
 
 /**
@@ -7681,14 +7730,14 @@ module.exports = stubArray;
 
 
 /***/ }),
-/* 156 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var DataView = __webpack_require__(157),
+var DataView = __webpack_require__(158),
     Map = __webpack_require__(70),
-    Promise = __webpack_require__(158),
-    Set = __webpack_require__(159),
-    WeakMap = __webpack_require__(160),
+    Promise = __webpack_require__(159),
+    Set = __webpack_require__(160),
+    WeakMap = __webpack_require__(161),
     baseGetTag = __webpack_require__(9),
     toSource = __webpack_require__(19);
 
@@ -7745,7 +7794,7 @@ module.exports = getTag;
 
 
 /***/ }),
-/* 157 */
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var getNative = __webpack_require__(6),
@@ -7758,7 +7807,7 @@ module.exports = DataView;
 
 
 /***/ }),
-/* 158 */
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var getNative = __webpack_require__(6),
@@ -7771,7 +7820,7 @@ module.exports = Promise;
 
 
 /***/ }),
-/* 159 */
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var getNative = __webpack_require__(6),
@@ -7784,7 +7833,7 @@ module.exports = Set;
 
 
 /***/ }),
-/* 160 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var getNative = __webpack_require__(6),
@@ -7797,10 +7846,10 @@ module.exports = WeakMap;
 
 
 /***/ }),
-/* 161 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isStrictComparable = __webpack_require__(162),
+var isStrictComparable = __webpack_require__(163),
     keys = __webpack_require__(37);
 
 /**
@@ -7827,7 +7876,7 @@ module.exports = getMatchData;
 
 
 /***/ }),
-/* 162 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isObject = __webpack_require__(16);
@@ -7848,7 +7897,7 @@ module.exports = isStrictComparable;
 
 
 /***/ }),
-/* 163 */
+/* 164 */
 /***/ (function(module, exports) {
 
 /**
@@ -7874,15 +7923,15 @@ module.exports = matchesStrictComparable;
 
 
 /***/ }),
-/* 164 */
+/* 165 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIsEqual = __webpack_require__(138),
+var baseIsEqual = __webpack_require__(139),
     get = __webpack_require__(106),
-    hasIn = __webpack_require__(165),
+    hasIn = __webpack_require__(166),
     isKey = __webpack_require__(109),
-    isStrictComparable = __webpack_require__(162),
-    matchesStrictComparable = __webpack_require__(163),
+    isStrictComparable = __webpack_require__(163),
+    matchesStrictComparable = __webpack_require__(164),
     toKey = __webpack_require__(117);
 
 /** Used to compose bitmasks for value comparisons. */
@@ -7913,11 +7962,11 @@ module.exports = baseMatchesProperty;
 
 
 /***/ }),
-/* 165 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseHasIn = __webpack_require__(166),
-    hasPath = __webpack_require__(167);
+var baseHasIn = __webpack_require__(167),
+    hasPath = __webpack_require__(168);
 
 /**
  * Checks if `path` is a direct or inherited property of `object`.
@@ -7953,7 +8002,7 @@ module.exports = hasIn;
 
 
 /***/ }),
-/* 166 */
+/* 167 */
 /***/ (function(module, exports) {
 
 /**
@@ -7972,7 +8021,7 @@ module.exports = baseHasIn;
 
 
 /***/ }),
-/* 167 */
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var castPath = __webpack_require__(108),
@@ -8017,11 +8066,11 @@ module.exports = hasPath;
 
 
 /***/ }),
-/* 168 */
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseProperty = __webpack_require__(169),
-    basePropertyDeep = __webpack_require__(170),
+var baseProperty = __webpack_require__(170),
+    basePropertyDeep = __webpack_require__(171),
     isKey = __webpack_require__(109),
     toKey = __webpack_require__(117);
 
@@ -8055,7 +8104,7 @@ module.exports = property;
 
 
 /***/ }),
-/* 169 */
+/* 170 */
 /***/ (function(module, exports) {
 
 /**
@@ -8075,7 +8124,7 @@ module.exports = baseProperty;
 
 
 /***/ }),
-/* 170 */
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseGet = __webpack_require__(107);
@@ -8097,12 +8146,12 @@ module.exports = basePropertyDeep;
 
 
 /***/ }),
-/* 171 */
+/* 172 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseFindIndex = __webpack_require__(172),
-    baseIteratee = __webpack_require__(135),
-    toInteger = __webpack_require__(173);
+var baseFindIndex = __webpack_require__(173),
+    baseIteratee = __webpack_require__(136),
+    toInteger = __webpack_require__(174);
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeMax = Math.max;
@@ -8158,7 +8207,7 @@ module.exports = findIndex;
 
 
 /***/ }),
-/* 172 */
+/* 173 */
 /***/ (function(module, exports) {
 
 /**
@@ -8188,10 +8237,10 @@ module.exports = baseFindIndex;
 
 
 /***/ }),
-/* 173 */
+/* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var toFinite = __webpack_require__(174);
+var toFinite = __webpack_require__(175);
 
 /**
  * Converts `value` to an integer.
@@ -8230,10 +8279,10 @@ module.exports = toInteger;
 
 
 /***/ }),
-/* 174 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var toNumber = __webpack_require__(175);
+var toNumber = __webpack_require__(176);
 
 /** Used as references for various `Number` constants. */
 var INFINITY = 1 / 0,
@@ -8278,7 +8327,7 @@ module.exports = toFinite;
 
 
 /***/ }),
-/* 175 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isObject = __webpack_require__(16),
@@ -8350,7 +8399,7 @@ module.exports = toNumber;
 
 
 /***/ }),
-/* 176 */
+/* 177 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8715,7 +8764,7 @@ class SalteAuthUtilities {
 /* harmony default export */ __webpack_exports__["default"] = (SalteAuthUtilities);
 
 /***/ }),
-/* 177 */
+/* 178 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
