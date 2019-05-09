@@ -1,16 +1,16 @@
 /**
- * Provider for PHP OAuth 2.0 Server
- * A spec compliant, secure by default PHP OAuth 2.0 Server
- * @see https://oauth2.thephpleague.com
+ * Provider for Keycloak.
+ * Keycloak is an open source identity and access management solution.
+ * @see https://www.keycloak.org/
  */
-class SalteAuthPhpProvider {
+class SalteAuthKeycloakProvider {
   /**
    * Computes the authorization endpoint
    * @param {Config} config configuration for salte auth
    * @return {String} the authorization endpoint
    */
   static authorizeEndpoint(config) {
-    return `${config.providerUrl}/implicit.php/authorize`;
+    return `${config.providerUrl}/protocol/openid-connect/auth`;
   }
 
   /**
@@ -19,11 +19,10 @@ class SalteAuthPhpProvider {
    * @return {String} the deauthorization url
    */
   static deauthorizeUrl(config) {
-    return this.$utilities.createUrl(`${config.providerUrl}/implicit.php/logout`, {
-      returnTo: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
+    return this.$utilities.createUrl(`${config.providerUrl}/protocol/openid-connect/logout`, {
       client_id: config.clientId
     });
   }
 }
 
-export default SalteAuthPhpProvider;
+export default SalteAuthKeycloakProvider;

@@ -3,7 +3,7 @@ import azure from './providers/azure.js';
 import cognito from './providers/cognito.js';
 import wso2 from './providers/wso2.js';
 import okta from './providers/okta.js';
-import php from './providers/php.js';
+import keycloak from './providers/keycloak.js';
 
 /**
  * A collection of overrides for specific Identity Providers
@@ -50,11 +50,11 @@ class Providers {
   }
 
   /**
-   * Provider for PHP OAuth 2.0 Server
-   * @type {SalteAuthPhpProvider}
+   * Provider for Keycloak
+   * @type {SalteAuthKeycloakProvider}
    */
-  static get php() {
-    return php;
+  static get keycloak() {
+    return keycloak;
   }
 };
 
