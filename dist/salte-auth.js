@@ -6025,7 +6025,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _providers_cognito_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(129);
 /* harmony import */ var _providers_wso2_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(130);
 /* harmony import */ var _providers_okta_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(131);
-/* harmony import */ var _providers_php_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(132);
+/* harmony import */ var _providers_keycloak_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(132);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -6100,14 +6100,14 @@ function () {
       return _providers_okta_js__WEBPACK_IMPORTED_MODULE_4__["default"];
     }
     /**
-     * Provider for PHP OAuth 2.0 Server
-     * @type {SalteAuthPhpProvider}
+     * Provider for Keycloak
+     * @type {SalteAuthKeycloakProvider}
      */
 
   }, {
-    key: "php",
+    key: "keycloak",
     get: function get() {
-      return _providers_php_js__WEBPACK_IMPORTED_MODULE_5__["default"];
+      return _providers_keycloak_js__WEBPACK_IMPORTED_MODULE_5__["default"];
     }
   }]);
 
@@ -6387,18 +6387,18 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 /**
- * Provider for PHP OAuth 2.0 Server
- * A spec compliant, secure by default PHP OAuth 2.0 Server
- * @see https://oauth2.thephpleague.com
+ * Provider for Keycloak.
+ * Keycloak is an open source identity and access management solution.
+ * @see https://www.keycloak.org/
  */
-var SalteAuthPhpProvider =
+var SalteAuthKeycloakProvider =
 /*#__PURE__*/
 function () {
-  function SalteAuthPhpProvider() {
-    _classCallCheck(this, SalteAuthPhpProvider);
+  function SalteAuthKeycloakProvider() {
+    _classCallCheck(this, SalteAuthKeycloakProvider);
   }
 
-  _createClass(SalteAuthPhpProvider, null, [{
+  _createClass(SalteAuthKeycloakProvider, null, [{
     key: "authorizeEndpoint",
 
     /**
@@ -6407,7 +6407,7 @@ function () {
      * @return {String} the authorization endpoint
      */
     value: function authorizeEndpoint(config) {
-      return "".concat(config.providerUrl, "/implicit.php/authorize");
+      return "".concat(config.providerUrl, "/protocol/openid-connect/auth");
     }
     /**
      * Computes the deauthorization url
@@ -6418,17 +6418,16 @@ function () {
   }, {
     key: "deauthorizeUrl",
     value: function deauthorizeUrl(config) {
-      return this.$utilities.createUrl("".concat(config.providerUrl, "/implicit.php/logout"), {
-        returnTo: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
+      return this.$utilities.createUrl("".concat(config.providerUrl, "/protocol/openid-connect/logout"), {
         client_id: config.clientId
       });
     }
   }]);
 
-  return SalteAuthPhpProvider;
+  return SalteAuthKeycloakProvider;
 }();
 
-/* harmony default export */ __webpack_exports__["default"] = (SalteAuthPhpProvider);
+/* harmony default export */ __webpack_exports__["default"] = (SalteAuthKeycloakProvider);
 
 /***/ }),
 /* 133 */
