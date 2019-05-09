@@ -6419,6 +6419,7 @@ function () {
     key: "deauthorizeUrl",
     value: function deauthorizeUrl(config) {
       return this.$utilities.createUrl("".concat(config.providerUrl, "/protocol/openid-connect/logout"), {
+        redirect_uri: config.redirectUrl && config.redirectUrl.logoutUrl || config.redirectUrl,
         client_id: config.clientId
       });
     }
