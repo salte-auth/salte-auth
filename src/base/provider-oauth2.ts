@@ -131,13 +131,6 @@ export class OAuth2Provider extends Provider {
     });
   }
 
-  public get logout(): string {
-    throw new SalteAuthError({
-      code: 'logout_not_supported',
-      message: `OAuth 2.0 doesn't support logout!`,
-    });
-  }
-
   protected sync() {
     this.accessToken = new AccessToken(
       this.get('access-token.raw'),

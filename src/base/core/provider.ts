@@ -1,6 +1,7 @@
 import { Shared } from './shared';
 
 import { Common, Interceptors, Logger } from '../../utils';
+import { SalteAuthError } from './salte-auth-error';
 
 export class Provider extends Shared {
   protected logger: Logger;
@@ -62,6 +63,16 @@ export class Provider extends Shared {
 
     return url;
   }
+
+  /**
+   * Returns the logout url for the provider.
+   */
+  public get logout(): string {
+    throw new SalteAuthError({
+      code: 'logout_not_supported',
+      message: `This provider doesn't support logout.`,
+    });
+  }
 }
 
 export interface Provider {
@@ -74,11 +85,6 @@ export interface Provider {
    * Returns the login url for the provider.
    */
   login: string;
-
-  /**
-   * Returns the logout url for the provider.
-   */
-  logout: string;
 
   /**
    * An internal login command to `salte-auth` that enables enhancing the login with common parameters.
