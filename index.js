@@ -1,3 +1,4 @@
+require('url-polyfill');
 require('@babel/polyfill');
 require('@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js');
 require('@webcomponents/webcomponentsjs');
@@ -47,6 +48,8 @@ const configs = {
   }
 };
 
+const url = new URL(location.href);
+
 const queryParams = Object.assign({
   'provider': localStorage.getItem('salte.demo.provider') || 'auth0',
   'login-type': 'redirect',
@@ -54,18 +57,17 @@ const queryParams = Object.assign({
   'redirect-url': 'single',
   'storage-type': localStorage.getItem('salte.demo.storage-type') || 'session',
   'secured': localStorage.getItem('salte.demo.secured') || 'not-secured'
-}, location.search.replace(/^\?/, '').split('&').reduce((r, a) => {
-  const match = a.match(/([^=]+)(?:=([^&]+))?/);
-  const key = match && match[1] || null;
-  const value = match && match[2] || null;
+}, Array.from(url.searchParams.keys()).reduce((output, key) => {
+  const value = url.searchParams.get(key);
   if (value === 'false') {
-    r[key] = false;
+    output[key] = false;
   } else if (value === 'true') {
-    r[key] = true;
+    output[key] = true;
   } else {
-    r[key] = value;
+    output[key] = value;
   }
-  return r;
+
+  return output;
 }, {}));
 
 elements.provider.value = queryParams.provider;
