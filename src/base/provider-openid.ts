@@ -95,6 +95,8 @@ export class OpenIDProvider extends OAuth2Provider {
   }
 
   public validate(options: OpenIDProvider.Validation): any {
+    this.logger.trace('[validate] (options): ', options);
+
     try {
       this.$validate(options);
     } catch (error) {
@@ -133,6 +135,7 @@ export class OpenIDProvider extends OAuth2Provider {
 
   public sync() {
     super.sync();
+    this.logger.trace('[sync] updating id token');
 
     this.idToken = new IDToken(this.get('id-token.raw'));
   }
