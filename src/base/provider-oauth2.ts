@@ -99,6 +99,8 @@ export class OAuth2Provider extends Provider {
   }
 
   public validate(options: OAuth2Provider.Validation) {
+    this.logger.trace('[validate] (options): ', options);
+
     try {
       this.$validate(options);
     } catch (error) {
@@ -132,6 +134,8 @@ export class OAuth2Provider extends Provider {
   }
 
   public sync() {
+    this.logger.trace('[sync] updating access token');
+
     this.accessToken = new AccessToken(
       this.get('access-token.raw'),
       this.get('access-token.expiration'),

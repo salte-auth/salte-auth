@@ -59,10 +59,12 @@ export class SalteAuth extends Shared {
 
         if (action === 'login') {
           provider.validate(parsed);
+          this.logger.info('[constructor]: login complete');
         } else {
           provider.reset();
           provider.sync();
           provider.emit('logout');
+          this.logger.info('[constructor]: logout complete');
         }
       });
     });
@@ -164,12 +166,14 @@ export class SalteAuth extends Shared {
       this.set('provider', provider.$name);
       this.set('handler', handler.$name);
 
+      this.logger.info(`[login]: logging in with ${provider.$name} via ${handler.$name}...`);
       const params = await handler.open({
         redirectUrl: provider.redirectUrl('login'),
         url: provider.$login(),
       });
 
       provider.validate(params);
+      this.logger.info('[login]: login complete');
     } finally {
       this.clear('action');
       this.clear('provider');
@@ -200,6 +204,7 @@ export class SalteAuth extends Shared {
       this.set('provider', provider.$name);
       this.set('handler', handler.$name);
 
+      this.logger.info(`[logout]: logging out with ${provider.$name} via ${handler.$name}...`);
       await handler.open({
         redirectUrl: provider.redirectUrl('logout'),
         url: provider.logout,
@@ -207,6 +212,7 @@ export class SalteAuth extends Shared {
 
       provider.reset();
       provider.emit('logout');
+      this.logger.info('[logout]: logout complete');
     } catch (error) {
       provider.emit('logout', error);
       throw error;
