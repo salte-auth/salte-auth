@@ -165,6 +165,7 @@ describe('SalteAuth', () => {
       const custom = new Custom({ default: true });
 
       sinon.stub(openid, 'reset');
+      sinon.stub(openid, 'sync');
       sinon.stub(SalteAuth.prototype, 'get').callsFake((key) => {
         switch (key) {
           case 'action': return 'logout';
@@ -183,6 +184,7 @@ describe('SalteAuth', () => {
       await new Promise((resolve) => setTimeout(resolve));
 
       expect(openid.reset.callCount).to.equal(1);
+      expect(openid.sync.callCount).to.equal(1);
     });
 
     it('should throw an error on authentication wrap up if the action is unknown', () => {

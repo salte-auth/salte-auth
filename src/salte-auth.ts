@@ -61,6 +61,7 @@ export class SalteAuth extends Shared {
           provider.validate(parsed);
         } else {
           provider.reset();
+          provider.sync();
           provider.emit('logout');
         }
       });

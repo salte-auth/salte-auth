@@ -131,7 +131,7 @@ export class OpenIDProvider extends OAuth2Provider {
     });
   }
 
-  protected sync() {
+  public sync() {
     super.sync();
 
     this.idToken = new IDToken(this.get('id-token.raw'));

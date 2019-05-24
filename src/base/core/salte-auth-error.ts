@@ -1,18 +1,16 @@
-class SalteAuthError extends Error {
+export class SalteAuthError extends Error {
   public code: string;
 
-  constructor({ message, code }: SalteAuthError.Options) {
+  public constructor({ message, code }: SalteAuthError.Options) {
     super(message);
 
     this.code = code;
   }
 }
 
-declare namespace SalteAuthError {
-  interface Options {
+export declare namespace SalteAuthError {
+  export interface Options {
     message: string;
     code: string;
   }
 }
-
-export { SalteAuthError };
