@@ -131,7 +131,7 @@ export class OAuth2Provider extends Provider {
     });
   }
 
-  protected sync() {
+  public sync() {
     this.accessToken = new AccessToken(
       this.get('access-token.raw'),
       this.get('access-token.expiration'),

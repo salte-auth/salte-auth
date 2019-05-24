@@ -5,7 +5,7 @@ export type SalteAuthMixedIn<T = {
 }> = new (...args: any[]) => T;
 
 export type Constructor<T = {
-  requestUpdate?(): void;
+  requestUpdate?(field: string): void;
 }> = new (...args: any[]) => T;
 
 export function AuthMixinGenerator(auth: SalteAuth) {
@@ -19,11 +19,11 @@ export function AuthMixinGenerator(auth: SalteAuth) {
         this.auth = auth;
 
         this.auth.on('login', () => {
-          if (this.requestUpdate) this.requestUpdate();
+          if (this.requestUpdate) this.requestUpdate('auth');
         });
 
         this.auth.on('logout', () => {
-          if (this.requestUpdate) this.requestUpdate();
+          if (this.requestUpdate) this.requestUpdate('auth');
         });
       }
     };

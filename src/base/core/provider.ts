@@ -99,6 +99,11 @@ export interface Provider {
   $validate(options: object): void;
 
   /**
+   * Reinitializes the ID and Access Tokens of the given provider.
+   */
+  sync(): void;
+
+  /**
    * Invoked when Salte Auth is initialized
    */
   connected?(): void;
