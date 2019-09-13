@@ -45,7 +45,7 @@
     "esdoc-plugin-require-coverage": "^0.1.2",
     "esdoc-standard-plugin": "^1.0.0",
     "eslint": "^6.0.0",
-    "eslint-config-google": "^0.13.0",
+    "eslint-config-google": "^0.14.0",
     "eslint-plugin-compat": "^3.3.0",
     "eslint-plugin-mocha": "^6.1.1",
     "html-loader": "^0.5.1",
