@@ -29,4 +29,16 @@ describe('function(createIframe)', () => {
 
     return promise;
   });
+
+  it('should support timing out', async () => {
+    const promise = utilities.createIframe('https://www.google.com', true, 100);
+    const iframe = document.body.querySelector('iframe[owner="salte-auth"]');
+
+    expect(iframe).to.not.be.undefined;
+    expect(iframe.style.display).to.equal('');
+
+    const error = await promise.catch((error) => error);
+
+    expect(error).to.equal('Iframe failed to respond in time.');
+  });
 });

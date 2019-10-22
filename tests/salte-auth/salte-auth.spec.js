@@ -1653,7 +1653,7 @@ describe('salte-auth', () => {
       const promise = auth.refreshToken();
 
       expect(promise).to.equal(auth.refreshToken());
-      expect(auth.$promises.token).to.equal(promise);
+      expect(auth.$promises.refresh).to.equal(promise);
 
       return promise.catch(error => {
         return error;
@@ -1666,7 +1666,7 @@ describe('salte-auth', () => {
       const promise = auth.refreshToken();
 
       expect(promise).to.equal(auth.refreshToken());
-      expect(auth.$promises.token).to.equal(promise);
+      expect(auth.$promises.refresh).to.equal(promise);
 
       return promise;
     });

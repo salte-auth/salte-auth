@@ -217,9 +217,10 @@ class SalteAuthUtilities {
    * Opens an iframe in the background
    * @param {String} url the url to be loaded
    * @param {Boolean} show whether the iframe should be visible
+   * @param {Number} timeout duration to wait before rejecting the request
    * @return {Promise} resolves when the iframe is closed
    */
-  createIframe(url, show) {
+  createIframe(url, show, timeout) {
     const iframe = document.createElement('iframe');
     iframe.setAttribute('owner', 'salte-auth');
     if (show) {
@@ -246,9 +247,13 @@ class SalteAuthUtilities {
     }
     iframe.src = url;
     document.body.appendChild(iframe);
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+      const autoReject = timeout && setTimeout(() => {
+        reject('Iframe failed to respond in time.');
+      }, timeout);
       iframe.addEventListener('DOMNodeRemoved', () => {
         setTimeout(resolve);
+        clearTimeout(autoReject);
       }, { passive: true });
     });
   }
