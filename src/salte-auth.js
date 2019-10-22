@@ -672,27 +672,27 @@ class SalteAuth {
    * @return {Promise} a promise that resolves when we finish renewing the users tokens.
    */
   refreshToken() {
-    if (this.$promises.token) {
-      return this.$promises.token;
+    if (this.$promises.refresh) {
+      return this.$promises.refresh;
     }
 
-    this.$promises.token = this.loginWithIframe(true).then((user) => {
-      this.$promises.token = null;
+    this.$promises.refresh = this.loginWithIframe(true).then((user) => {
+      this.$promises.refresh = null;
       const error = this.profile.$validate(true);
 
       if (error) {
         return Promise.reject(error);
       }
-      this.$promises.token = null;
+      this.$promises.refresh = null;
       this.$fire('refresh', null, user);
       return user;
     }).catch((error) => {
-      this.$promises.token = null;
+      this.$promises.refresh = null;
       this.$fire('refresh', error);
       return Promise.reject(error);
     });
 
-    return this.$promises.token;
+    return this.$promises.refresh;
   }
   /**
    * Registers a timeout that will automatically refresh the id token
