@@ -411,7 +411,8 @@ class SalteAuth {
       config = {
         noPrompt: config,
         clear: config ? 'errors' : undefined,
-        events: false
+        events: false,
+        timeout: 3000
       };
     }
 
@@ -427,7 +428,7 @@ class SalteAuth {
       this.profile.$clearErrors();
     }
 
-    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt).then(() => {
+    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt, config.timeout).then(() => {
       this.$promises.login = null;
       const error = this.profile.$validate();
 
