@@ -276,3 +276,9 @@ class MyPolymerElement extends auth.mixin(PolymerElement) {
 }
 
 customElements.define('my-polymer-element', MyPolymerElement);
+            
+salte.auth.retrieveAccessToken().then(response => {
+  console.log(response);
+  salte.auth.refreshToken(); // this starts ID token refresh
+  salte.auth.retrieveAccessToken().then(response => console.log(response));
+}); // this invokes the retrieveAccessToken method
