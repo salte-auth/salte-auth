@@ -1,5 +1,5 @@
 /**
- * @salte-auth/salte-auth JavaScript Library v2.14.0
+ * @salte-auth/salte-auth JavaScript Library v2.14.1
  *
  * @license MIT (https://github.com/salte-auth/salte-auth/blob/master/LICENSE)
  *
@@ -170,7 +170,7 @@ var logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-auth/salte-aut
  * The configuration for salte auth
  * @typedef {Object} Config
  * @property {String} providerUrl The base url of your identity provider.
- * @property {('id_token'|'id_token token')} responseType The response type to authenticate with.
+ * @property {('id_token'|'id_token token'|'code')} responseType The response type to authenticate with.
  * @property {String|RedirectURLs} redirectUrl The redirect url specified in your identity provider.
  * @property {String} clientId The client id of your identity provider
  * @property {String} scope A list of space-delimited claims used to determine what user information is provided and what access is given. Most providers require 'openid'.
@@ -529,7 +529,8 @@ function () {
         config = {
           noPrompt: config,
           clear: config ? 'errors' : undefined,
-          events: false
+          events: false,
+          timeout: 3000
         };
       }
 
@@ -545,7 +546,7 @@ function () {
         this.profile.$clearErrors();
       }
 
-      this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt).then(function () {
+      this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt, config.timeout).then(function () {
         _this2.$promises.login = null;
 
         var error = _this2.profile.$validate();
@@ -834,12 +835,12 @@ function () {
     value: function refreshToken() {
       var _this8 = this;
 
-      if (this.$promises.token) {
-        return this.$promises.token;
+      if (this.$promises.refresh) {
+        return this.$promises.refresh;
       }
 
-      this.$promises.token = this.loginWithIframe(true).then(function (user) {
-        _this8.$promises.token = null;
+      this.$promises.refresh = this.loginWithIframe(true).then(function (user) {
+        _this8.$promises.refresh = null;
 
         var error = _this8.profile.$validate(true);
 
@@ -847,19 +848,19 @@ function () {
           return Promise.reject(error);
         }
 
-        _this8.$promises.token = null;
+        _this8.$promises.refresh = null;
 
         _this8.$fire('refresh', null, user);
 
         return user;
       }).catch(function (error) {
-        _this8.$promises.token = null;
+        _this8.$promises.refresh = null;
 
         _this8.$fire('refresh', error);
 
         return Promise.reject(error);
       });
-      return this.$promises.token;
+      return this.$promises.refresh;
     }
     /**
      * Registers a timeout that will automatically refresh the id token
@@ -2856,8 +2857,8 @@ function baseMerge(object, source, srcIndex, customizer, stack) {
     return;
   }
   baseFor(source, function(srcValue, key) {
+    stack || (stack = new Stack);
     if (isObject(srcValue)) {
-      stack || (stack = new Stack);
       baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
     }
     else {
@@ -4132,7 +4133,7 @@ module.exports = isPlainObject;
 /***/ (function(module, exports) {
 
 /**
- * Gets the value at `key`, unless `key` is "__proto__".
+ * Gets the value at `key`, unless `key` is "__proto__" or "constructor".
  *
  * @private
  * @param {Object} object The object to query.
@@ -4140,6 +4141,10 @@ module.exports = isPlainObject;
  * @returns {*} Returns the property value.
  */
 function safeGet(object, key) {
+  if (key === 'constructor' && typeof object[key] === 'function') {
+    return;
+  }
+
   if (key == '__proto__') {
     return;
   }
@@ -8838,12 +8843,13 @@ function () {
      * Opens an iframe in the background
      * @param {String} url the url to be loaded
      * @param {Boolean} show whether the iframe should be visible
+     * @param {Number} timeout duration to wait before rejecting the request
      * @return {Promise} resolves when the iframe is closed
      */
 
   }, {
     key: "createIframe",
-    value: function createIframe(url, show) {
+    value: function createIframe(url, show, timeout) {
       var iframe = document.createElement('iframe');
       iframe.setAttribute('owner', 'salte-auth');
 
@@ -8870,9 +8876,13 @@ function () {
 
       iframe.src = url;
       document.body.appendChild(iframe);
-      return new Promise(function (resolve) {
+      return new Promise(function (resolve, reject) {
+        var autoReject = timeout && setTimeout(function () {
+          reject('Iframe failed to respond in time.');
+        }, timeout);
         iframe.addEventListener('DOMNodeRemoved', function () {
           setTimeout(resolve);
+          clearTimeout(autoReject);
         }, {
           passive: true
         });

@@ -1,5 +1,5 @@
 /**
- * @salte-auth/salte-auth JavaScript Library v2.14.0
+ * @salte-auth/salte-auth JavaScript Library v2.14.1
  *
  * @license MIT (https://github.com/salte-auth/salte-auth/blob/master/LICENSE)
  *
@@ -143,7 +143,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /** @ignore */
 
-const logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-auth/salte-auth');
+var logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-auth/salte-auth');
 /**
  * Disable certain security validations if your provider doesn't support them.
  * @typedef {Object} Validation
@@ -164,7 +164,7 @@ const logger = debug__WEBPACK_IMPORTED_MODULE_5___default()('@salte-auth/salte-a
  * The configuration for salte auth
  * @typedef {Object} Config
  * @property {String} providerUrl The base url of your identity provider.
- * @property {('id_token'|'id_token token')} responseType The response type to authenticate with.
+ * @property {('id_token'|'id_token token'|'code')} responseType The response type to authenticate with.
  * @property {String|RedirectURLs} redirectUrl The redirect url specified in your identity provider.
  * @property {String} clientId The client id of your identity provider
  * @property {String} scope A list of space-delimited claims used to determine what user information is provided and what access is given. Most providers require 'openid'.
@@ -282,10 +282,10 @@ class SalteAuth {
     } else if (this.profile.$redirectUrl && location.href !== this.profile.$redirectUrl) {
       logger('Redirect detected!');
       this.profile.$parseParams();
-      const error = this.profile.$validate(); // Delay for an event loop to give users time to register a listener.
+      var error = this.profile.$validate(); // Delay for an event loop to give users time to register a listener.
 
       setTimeout(() => {
-        const action = this.profile.$actions(this.profile.$state);
+        var action = this.profile.$actions(this.profile.$state);
 
         if (error) {
           this.profile.$clear();
@@ -371,7 +371,7 @@ class SalteAuth {
     }
 
     if (typeof this.$config.provider === 'string') {
-      const provider = this.$providers[this.$config.provider];
+      var provider = this.$providers[this.$config.provider];
 
       if (!provider) {
         throw new ReferenceError("Unknown Provider (".concat(this.$config.provider, ")"));
@@ -392,7 +392,7 @@ class SalteAuth {
   get $accessTokenUrl() {
     this.profile.$localState = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
     this.profile.$nonce = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
-    let authorizeEndpoint = "".concat(this.$config.providerUrl, "/authorize");
+    var authorizeEndpoint = "".concat(this.$config.providerUrl, "/authorize");
 
     if (this.$provider.authorizeEndpoint) {
       authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
@@ -419,7 +419,7 @@ class SalteAuth {
   $loginUrl(refresh) {
     this.profile.$localState = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
     this.profile.$nonce = uuid__WEBPACK_IMPORTED_MODULE_4___default.a.v4();
-    let authorizeEndpoint = "".concat(this.$config.providerUrl, "/authorize");
+    var authorizeEndpoint = "".concat(this.$config.providerUrl, "/authorize");
 
     if (this.$provider.authorizeEndpoint) {
       authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
@@ -503,9 +503,9 @@ class SalteAuth {
       throw new ReferenceError('Invalid callback provided!');
     }
 
-    const eventListeners = this.$listeners[eventType];
+    var eventListeners = this.$listeners[eventType];
     if (!eventListeners || !eventListeners.length) return;
-    const index = eventListeners.indexOf(callback);
+    var index = eventListeners.indexOf(callback);
     eventListeners.splice(index, 1);
   }
   /**
@@ -518,14 +518,14 @@ class SalteAuth {
 
 
   $fire(eventType, error, data) {
-    const event = document.createEvent('Event');
+    var event = document.createEvent('Event');
     event.initEvent("salte-auth-".concat(eventType), false, true);
     event.detail = {
       error,
       data
     };
     window.dispatchEvent(event);
-    const eventListeners = this.$listeners[eventType];
+    var eventListeners = this.$listeners[eventType];
     if (!eventListeners || !eventListeners.length) return;
     eventListeners.forEach(listener => listener(error, data));
   }
@@ -553,7 +553,8 @@ class SalteAuth {
       config = {
         noPrompt: config,
         clear: config ? 'errors' : undefined,
-        events: false
+        events: false,
+        timeout: 3000
       };
     }
 
@@ -569,15 +570,15 @@ class SalteAuth {
       this.profile.$clearErrors();
     }
 
-    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt).then(() => {
+    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt, config.timeout).then(() => {
       this.$promises.login = null;
-      const error = this.profile.$validate();
+      var error = this.profile.$validate();
 
       if (error) {
         return Promise.reject(error);
       }
 
-      const response = this.profile.code || this.profile.userInfo;
+      var response = this.profile.code || this.profile.userInfo;
 
       if (config.events) {
         this.$fire('login', null, response);
@@ -617,14 +618,14 @@ class SalteAuth {
     this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(() => {
       this.$promises.login = null;
       this.profile.$parseParams();
-      const error = this.profile.$validate();
+      var error = this.profile.$validate();
 
       if (error) {
         this.profile.$clear();
         return Promise.reject(error);
       }
 
-      const response = this.profile.code || this.profile.userInfo;
+      var response = this.profile.code || this.profile.userInfo;
       this.$fire('login', null, response);
       return response;
     }).catch(error => {
@@ -656,14 +657,14 @@ class SalteAuth {
     this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(() => {
       this.$promises.login = null;
       this.profile.$parseParams();
-      const error = this.profile.$validate();
+      var error = this.profile.$validate();
 
       if (error) {
         this.profile.$clear();
         return Promise.reject(error);
       }
 
-      const response = this.profile.code || this.profile.userInfo;
+      var response = this.profile.code || this.profile.userInfo;
       this.$fire('login', null, response);
       return response;
     }).catch(error => {
@@ -698,7 +699,7 @@ class SalteAuth {
     this.$promises.login = new Promise(() => {});
     this.profile.$clear();
     this.profile.$redirectUrl = redirectUrl && this.$utilities.resolveUrl(redirectUrl) || this.profile.$redirectUrl || location.href;
-    const url = this.$loginUrl();
+    var url = this.$loginUrl();
     this.profile.$actions(this.profile.$localState, 'login');
     this.$utilities.$navigate(url);
     return this.$promises.login;
@@ -721,7 +722,7 @@ class SalteAuth {
       return this.$promises.logout;
     }
 
-    const deauthorizeUrl = this.$deauthorizeUrl;
+    var deauthorizeUrl = this.$deauthorizeUrl;
     this.profile.$clear();
     this.$promises.logout = this.$utilities.createIframe(deauthorizeUrl).then(() => {
       this.$promises.logout = null;
@@ -751,7 +752,7 @@ class SalteAuth {
       return this.$promises.logout;
     }
 
-    const deauthorizeUrl = this.$deauthorizeUrl;
+    var deauthorizeUrl = this.$deauthorizeUrl;
     this.profile.$clear();
     this.$promises.logout = this.$utilities.openPopup(deauthorizeUrl).then(() => {
       this.$promises.logout = null;
@@ -781,7 +782,7 @@ class SalteAuth {
       return this.$promises.logout;
     }
 
-    const deauthorizeUrl = this.$deauthorizeUrl;
+    var deauthorizeUrl = this.$deauthorizeUrl;
     this.profile.$clear();
     this.$promises.logout = this.$utilities.openNewTab(deauthorizeUrl).then(() => {
       this.$promises.logout = null;
@@ -802,7 +803,7 @@ class SalteAuth {
 
 
   logoutWithRedirect() {
-    const deauthorizeUrl = this.$deauthorizeUrl;
+    var deauthorizeUrl = this.$deauthorizeUrl;
     this.profile.$clear();
     this.profile.$actions(this.profile.$localState, 'logout');
     this.$utilities.$navigate(deauthorizeUrl);
@@ -814,27 +815,27 @@ class SalteAuth {
 
 
   refreshToken() {
-    if (this.$promises.token) {
-      return this.$promises.token;
+    if (this.$promises.refresh) {
+      return this.$promises.refresh;
     }
 
-    this.$promises.token = this.loginWithIframe(true).then(user => {
-      this.$promises.token = null;
-      const error = this.profile.$validate(true);
+    this.$promises.refresh = this.loginWithIframe(true).then(user => {
+      this.$promises.refresh = null;
+      var error = this.profile.$validate(true);
 
       if (error) {
         return Promise.reject(error);
       }
 
-      this.$promises.token = null;
+      this.$promises.refresh = null;
       this.$fire('refresh', null, user);
       return user;
     }).catch(error => {
-      this.$promises.token = null;
+      this.$promises.refresh = null;
       this.$fire('refresh', error);
       return Promise.reject(error);
     });
-    return this.$promises.token;
+    return this.$promises.refresh;
   }
   /**
    * Registers a timeout that will automatically refresh the id token
@@ -850,7 +851,7 @@ class SalteAuth {
       clearTimeout(this.$timeouts.expired);
     }
 
-    const timeToExpiration = this.profile.userInfo.exp * 1000 - Date.now();
+    var timeToExpiration = this.profile.userInfo.exp * 1000 - Date.now();
     this.$timeouts.refresh = setTimeout(() => {
       // Allows Auto Refresh to be disabled
       if (this.$config.autoRefresh) {
@@ -907,7 +908,7 @@ class SalteAuth {
         if (this.profile.accessTokenExpired) {
           logger('Access token has expired, renewing...');
           return this.$utilities.createIframe(this.$accessTokenUrl).then(() => {
-            const error = this.profile.$validate(true);
+            var error = this.profile.$validate(true);
 
             if (error) {
               return Promise.reject(error);
@@ -2766,8 +2767,8 @@ function baseMerge(object, source, srcIndex, customizer, stack) {
     return;
   }
   baseFor(source, function(srcValue, key) {
+    stack || (stack = new Stack);
     if (isObject(srcValue)) {
-      stack || (stack = new Stack);
       baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
     }
     else {
@@ -4042,7 +4043,7 @@ module.exports = isPlainObject;
 /***/ (function(module, exports) {
 
 /**
- * Gets the value at `key`, unless `key` is "__proto__".
+ * Gets the value at `key`, unless `key` is "__proto__" or "constructor".
  *
  * @private
  * @param {Object} object The object to query.
@@ -4050,6 +4051,10 @@ module.exports = isPlainObject;
  * @returns {*} Returns the property value.
  */
 function safeGet(object, key) {
+  if (key === 'constructor' && typeof object[key] === 'function') {
+    return;
+  }
+
   if (key == '__proto__') {
     return;
   }
@@ -6175,20 +6180,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(125);
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_2__);
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
-
-function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
 
 
 
 /** @ignore */
 
-const logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('@salte-auth/salte-auth:profile');
+var logger = debug__WEBPACK_IMPORTED_MODULE_2___default()('@salte-auth/salte-auth:profile');
 /**
  * All the profile information associated with the current authentication session
  */
@@ -6226,17 +6223,12 @@ class SalteAuthProfile {
 
   $parseParams() {
     if (location.search || location.hash) {
-      const params = location.search.replace(/^\?/, '').split('&').concat(location.hash.replace(/(#!?[^#]+)?#/, '').split('&'));
+      var params = location.search.replace(/^\?/, '').split('&').concat(location.hash.replace(/(#!?[^#]+)?#/, '').split('&'));
       logger("Hash detected, parsing...", params);
 
-      for (let i = 0; i < params.length; i++) {
-        const param = params[i];
-
-        const _param$split = param.split('='),
-              _param$split2 = _slicedToArray(_param$split, 2),
-              key = _param$split2[0],
-              value = _param$split2[1];
-
+      for (var i = 0; i < params.length; i++) {
+        var param = params[i];
+        var [key, value] = param.split('=');
         this.$parse(key, decodeURIComponent(value));
       }
 
@@ -6327,7 +6319,7 @@ class SalteAuthProfile {
 
 
   get $expiration() {
-    const expiration = this.$getItem('salte.auth.expiration');
+    var expiration = this.$getItem('salte.auth.expiration');
     return expiration ? Number(expiration) : null;
   }
 
@@ -6488,17 +6480,17 @@ class SalteAuthProfile {
 
 
   $refreshUserInfo() {
-    let idToken = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.$idToken;
-    let userInfo = null;
+    var idToken = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.$idToken;
+    var userInfo = null;
 
     if (idToken) {
-      const separatedToken = idToken.split('.');
+      var separatedToken = idToken.split('.');
 
       if (separatedToken.length === 3) {
         // This fixes an issue where various providers will encode values
         // incorrectly and cause the browser to fail to decode.
         // https://stackoverflow.com/questions/43065553/base64-decoded-differently-in-java-jjwt
-        const payload = separatedToken[1].replace(/-/g, '+').replace(/_/g, '/');
+        var payload = separatedToken[1].replace(/-/g, '+').replace(/_/g, '/');
         userInfo = JSON.parse(atob(payload));
       }
     }
@@ -6569,7 +6561,7 @@ class SalteAuthProfile {
       }
 
       if (this.$$config.validation.aud) {
-        const aud = lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(this.userInfo.aud, audience => {
+        var aud = lodash_find__WEBPACK_IMPORTED_MODULE_1___default()(this.userInfo.aud, audience => {
           return audience === this.$$config.clientId;
         });
 
@@ -6597,7 +6589,7 @@ class SalteAuthProfile {
 
 
   $getItem(key, overrideStorageType) {
-    const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
+    var storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
     return storage.getItem(key);
   }
   /**
@@ -6610,7 +6602,7 @@ class SalteAuthProfile {
 
 
   $saveItem(key, value, overrideStorageType) {
-    const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
+    var storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
 
     if ([undefined, null].indexOf(value) !== -1) {
       storage.removeItem(key);
@@ -6652,15 +6644,15 @@ class SalteAuthProfile {
 
 
   $clear() {
-    for (const key in localStorage) {
+    for (var key in localStorage) {
       if (key.match(/^salte\.auth\.[^$]/)) {
         localStorage.removeItem(key);
       }
     }
 
-    for (const key in sessionStorage) {
-      if (key.match(/^salte\.auth\.[^$]/)) {
-        sessionStorage.removeItem(key);
+    for (var _key in sessionStorage) {
+      if (_key.match(/^salte\.auth\.[^$]/)) {
+        sessionStorage.removeItem(_key);
       }
     }
 
@@ -8347,7 +8339,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /** @ignore */
 
-const logger = debug__WEBPACK_IMPORTED_MODULE_1___default()('@salte-auth/salte-auth:utilities');
+var logger = debug__WEBPACK_IMPORTED_MODULE_1___default()('@salte-auth/salte-auth:utilities');
 /**
  * Basic utilities to support the authentication flow
  */
@@ -8376,21 +8368,21 @@ class SalteAuthUtilities {
       };
     })(XMLHttpRequest.prototype.open);
 
-    const self = this;
+    var self = this;
 
     (function (send) {
       XMLHttpRequest.prototype.send = function (data) {
-        const promises = [];
+        var promises = [];
 
-        for (let i = 0; i < self.$interceptors.xhr.length; i++) {
-          const interceptor = self.$interceptors.xhr[i];
+        for (var i = 0; i < self.$interceptors.xhr.length; i++) {
+          var interceptor = self.$interceptors.xhr[i];
           promises.push(interceptor(this, data));
         }
 
         Promise.all(promises).then(() => {
           send.call(this, data);
         }).catch(error => {
-          const event = document.createEvent('Event');
+          var event = document.createEvent('Event');
           event.initEvent('error', false, true);
           event.detail = error;
           this.dispatchEvent(event);
@@ -8403,11 +8395,11 @@ class SalteAuthUtilities {
 
       (function (fetch) {
         window.fetch = function (input, options) {
-          const request = input instanceof Request ? input : new Request(input, options);
-          const promises = [];
+          var request = input instanceof Request ? input : new Request(input, options);
+          var promises = [];
 
-          for (let i = 0; i < self.$interceptors.fetch.length; i++) {
-            const interceptor = self.$interceptors.fetch[i];
+          for (var i = 0; i < self.$interceptors.fetch.length; i++) {
+            var interceptor = self.$interceptors.fetch[i];
             promises.push(interceptor(request));
           }
 
@@ -8427,10 +8419,10 @@ class SalteAuthUtilities {
 
 
   createUrl(baseUrl) {
-    let queryParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    let url = baseUrl;
+    var queryParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var url = baseUrl;
     Object.keys(queryParams).forEach(key => {
-      const value = queryParams[key];
+      var value = queryParams[key];
 
       if ([undefined, null, ''].indexOf(value) === -1) {
         url += "".concat(url.indexOf('?') === -1 ? '?' : '&').concat(key, "=").concat(encodeURIComponent(value));
@@ -8471,11 +8463,11 @@ class SalteAuthUtilities {
 
 
   checkForMatchingUrl(url) {
-    let tests = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-    const resolvedUrl = this.resolveUrl(url);
+    var tests = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    var resolvedUrl = this.resolveUrl(url);
 
-    for (let i = 0; i < tests.length; i++) {
-      const test = tests[i];
+    for (var i = 0; i < tests.length; i++) {
+      var test = tests[i];
 
       if (test instanceof RegExp) {
         if (resolvedUrl.match(test)) return true;
@@ -8514,12 +8506,12 @@ class SalteAuthUtilities {
 
 
   openPopup(url) {
-    let name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'salte-auth';
-    let height = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 600;
-    let width = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 400;
-    const top = window.innerHeight / 2 - height / 2 + window.screenTop;
-    const left = window.innerWidth / 2 - width / 2 + window.screenLeft;
-    const popupWindow = window.open(url, name, "height=".concat(height, ", width=").concat(width, ", status=yes, toolbar=no, menubar=no, location=no, top=").concat(top, ", left=").concat(left));
+    var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'salte-auth';
+    var height = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 600;
+    var width = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 400;
+    var top = window.innerHeight / 2 - height / 2 + window.screenTop;
+    var left = window.innerWidth / 2 - width / 2 + window.screenLeft;
+    var popupWindow = window.open(url, name, "height=".concat(height, ", width=").concat(width, ", status=yes, toolbar=no, menubar=no, location=no, top=").concat(top, ", left=").concat(left));
 
     if (!popupWindow) {
       return Promise.reject(new ReferenceError('We were unable to open the popup window, its likely that the request was blocked.'));
@@ -8528,12 +8520,12 @@ class SalteAuthUtilities {
     popupWindow.focus(); // TODO: Find a better way of tracking when a Window closes.
 
     return new Promise(resolve => {
-      const checker = setInterval(() => {
+      var checker = setInterval(() => {
         try {
           if (!popupWindow.closed) {
             // This could throw cross-domain errors, so we need to silence them.
-            const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
-            const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+            var loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+            var logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
             if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
             location.hash = popupWindow.location.hash;
             popupWindow.close();
@@ -8553,7 +8545,7 @@ class SalteAuthUtilities {
 
 
   openNewTab(url) {
-    const tabWindow = window.open(url, '_blank');
+    var tabWindow = window.open(url, '_blank');
 
     if (!tabWindow) {
       return Promise.reject(new ReferenceError('We were unable to open the new tab, its likely that the request was blocked.'));
@@ -8563,12 +8555,12 @@ class SalteAuthUtilities {
     tabWindow.focus(); // TODO: Find a better way of tracking when a Window closes.
 
     return new Promise(resolve => {
-      const checker = setInterval(() => {
+      var checker = setInterval(() => {
         try {
           if (!tabWindow.closed) {
             // This could throw cross-domain errors, so we need to silence them.
-            const loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
-            const logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+            var loginUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+            var logoutUrl = this.$$config.redirectUrl && this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
             if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
             location.hash = tabWindow.location.hash;
             tabWindow.close();
@@ -8584,12 +8576,13 @@ class SalteAuthUtilities {
    * Opens an iframe in the background
    * @param {String} url the url to be loaded
    * @param {Boolean} show whether the iframe should be visible
+   * @param {Number} timeout duration to wait before rejecting the request
    * @return {Promise} resolves when the iframe is closed
    */
 
 
-  createIframe(url, show) {
-    const iframe = document.createElement('iframe');
+  createIframe(url, show, timeout) {
+    var iframe = document.createElement('iframe');
     iframe.setAttribute('owner', 'salte-auth');
 
     if (show) {
@@ -8615,9 +8608,13 @@ class SalteAuthUtilities {
 
     iframe.src = url;
     document.body.appendChild(iframe);
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
+      var autoReject = timeout && setTimeout(() => {
+        reject('Iframe failed to respond in time.');
+      }, timeout);
       iframe.addEventListener('DOMNodeRemoved', () => {
         setTimeout(resolve);
+        clearTimeout(autoReject);
       }, {
         passive: true
       });
@@ -8704,15 +8701,15 @@ class SalteAuthUtilities {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SalteAuthMixinGenerator", function() { return SalteAuthMixinGenerator; });
-const SalteAuthMixinGenerator = function SalteAuthMixinGenerator(auth) {
-  const registeredMixedIns = [];
+var SalteAuthMixinGenerator = function SalteAuthMixinGenerator(auth) {
+  var registeredMixedIns = [];
   auth.on('login', (error, user) => {
     if (error) {
       console.error(error);
       return;
     }
 
-    for (let i = 0; i < registeredMixedIns.length; i++) {
+    for (var i = 0; i < registeredMixedIns.length; i++) {
       registeredMixedIns[i].user = user;
       registeredMixedIns[i].authenticated = !auth.profile.idTokenExpired;
     }
@@ -8723,13 +8720,13 @@ const SalteAuthMixinGenerator = function SalteAuthMixinGenerator(auth) {
       return;
     }
 
-    for (let i = 0; i < registeredMixedIns.length; i++) {
+    for (var i = 0; i < registeredMixedIns.length; i++) {
       registeredMixedIns[i].user = null;
       registeredMixedIns[i].authenticated = false;
     }
   });
   auth.on('expired', () => {
-    for (let i = 0; i < registeredMixedIns.length; i++) {
+    for (var i = 0; i < registeredMixedIns.length; i++) {
       registeredMixedIns[i].authenticated = false;
     }
   });
@@ -8751,7 +8748,7 @@ const SalteAuthMixinGenerator = function SalteAuthMixinGenerator(auth) {
       }
 
       set user(user) {
-        const oldUser = this.$$user;
+        var oldUser = this.$$user;
         this.$$user = user;
 
         if (this.requestUpdate) {
@@ -8764,7 +8761,7 @@ const SalteAuthMixinGenerator = function SalteAuthMixinGenerator(auth) {
       }
 
       set authenticated(authenticated) {
-        const oldAuthenticated = this.$$authenticated;
+        var oldAuthenticated = this.$$authenticated;
         this.$$authenticated = authenticated;
 
         if (this.requestUpdate) {
