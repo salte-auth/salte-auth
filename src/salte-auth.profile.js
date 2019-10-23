@@ -1,3 +1,4 @@
+import Cookie from 'js-cookie';
 import defaultsDeep from 'lodash/defaultsDeep';
 import find from 'lodash/find';
 import debug from 'debug';
@@ -110,11 +111,11 @@ class SalteAuthProfile {
    * @private
    */
   get $tokenType() {
-    return this.$getItem('salte.auth.$token-type', 'session');
+    return this.$getItem('salte.auth.$token-type', 'cookie');
   }
 
   set $tokenType(tokenType) {
-    this.$saveItem('salte.auth.$token-type', tokenType, 'session');
+    this.$saveItem('salte.auth.$token-type', tokenType, 'cookie');
   }
 
   /**
@@ -178,11 +179,11 @@ class SalteAuthProfile {
    * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
    */
   get $state() {
-    return this.$getItem('salte.auth.$state', 'session');
+    return this.$getItem('salte.auth.$state', 'cookie');
   }
 
   set $state(state) {
-    this.$saveItem('salte.auth.$state', state, 'session');
+    this.$saveItem('salte.auth.$state', state, 'cookie');
   }
 
   /**
@@ -193,11 +194,11 @@ class SalteAuthProfile {
    * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
    */
   get $localState() {
-    return this.$getItem('salte.auth.$local-state', 'session');
+    return this.$getItem('salte.auth.$local-state', 'cookie');
   }
 
   set $localState(localState) {
-    this.$saveItem('salte.auth.$local-state', localState, 'session');
+    this.$saveItem('salte.auth.$local-state', localState, 'cookie');
   }
 
   /**
@@ -232,11 +233,11 @@ class SalteAuthProfile {
    * @private
    */
   get $redirectUrl() {
-    return this.$getItem('salte.auth.$redirect-url', 'session');
+    return this.$getItem('salte.auth.$redirect-url', 'cookie');
   }
 
   set $redirectUrl(redirectUrl) {
-    this.$saveItem('salte.auth.$redirect-url', redirectUrl, 'session');
+    this.$saveItem('salte.auth.$redirect-url', redirectUrl, 'cookie');
   }
 
   /**
@@ -245,11 +246,11 @@ class SalteAuthProfile {
    * @private
    */
   get $nonce() {
-    return this.$getItem('salte.auth.$nonce', 'session');
+    return this.$getItem('salte.auth.$nonce', 'cookie');
   }
 
   set $nonce(nonce) {
-    this.$saveItem('salte.auth.$nonce', nonce, 'session');
+    this.$saveItem('salte.auth.$nonce', nonce, 'cookie');
   }
 
   /**
@@ -379,8 +380,15 @@ class SalteAuthProfile {
    * @private
    */
   $getItem(key, overrideStorageType) {
-    const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
-    return storage.getItem(key);
+    let value;
+    if (overrideStorageType === 'cookie') {
+      value = Cookie.get(key);
+    } else {
+      const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
+      value = storage.getItem(key);
+    }
+
+    return [undefined, null].indexOf(value) === -1 ? value : null;
   }
 
   /**
@@ -391,11 +399,19 @@ class SalteAuthProfile {
    * @private
    */
   $saveItem(key, value, overrideStorageType) {
-    const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
-    if ([undefined, null].indexOf(value) !== -1) {
-      storage.removeItem(key);
+    if (overrideStorageType === 'cookie') {
+      if ([undefined, null].indexOf(value) !== -1) {
+        Cookie.remove(key);
+      } else {
+        Cookie.set(key, value);
+      }
     } else {
-      storage.setItem(key, value);
+      const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
+      if ([undefined, null].indexOf(value) !== -1) {
+        storage.removeItem(key);
+      } else {
+        storage.setItem(key, value);
+      }
     }
   }
 
@@ -425,19 +441,28 @@ class SalteAuthProfile {
   }
 
   /**
-   * Clears all `salte.auth` values from localStorage
+   * Clears out all `salte.auth` values from localStorage, sessionStorage, and Cookies
+   * @param {Boolean} withPrivates whether we should also clear out the private values.
    * @private
    */
-  $clear() {
+  $clear(withPrivates) {
+    const regex = withPrivates ? new RegExp(/^salte\.auth\./) : new RegExp(/^salte\.auth\.[^$]/);
+
     for (const key in localStorage) {
-      if (key.match(/^salte\.auth\.[^$]/)) {
+      if (key.match(regex)) {
         localStorage.removeItem(key);
       }
     }
 
     for (const key in sessionStorage) {
-      if (key.match(/^salte\.auth\.[^$]/)) {
+      if (key.match(regex)) {
         sessionStorage.removeItem(key);
+      }
+    }
+
+    for (const key in Cookie.getJSON()) {
+      if (key.match(regex)) {
+        Cookie.remove(key);
       }
     }
 

@@ -35,7 +35,7 @@ describe('salte-auth', () => {
   });
 
   afterEach(() => {
-    auth.profile.$clear();
+    auth.profile.$clear(true);
     delete window.salte.auth;
     sinon.restore();
   });
@@ -875,7 +875,7 @@ describe('salte-auth', () => {
 
   describe('function(loginWithIframe)', () => {
     beforeEach(() => {
-      auth.profile.$clear();
+      auth.profile.$clear(true);
       sinon.stub(SalteAuthProfile.prototype, '$clear');
       sinon.stub(SalteAuthUtilities.prototype, 'createIframe').returns(Promise.resolve());
       delete window.salte.auth;
@@ -1630,18 +1630,17 @@ describe('salte-auth', () => {
       });
     });
 
-    it('should throw validation errors', () => {
+    it('should throw validation errors', async () => {
       auth.profile.$validate.restore();
+      sinon.stub(auth.profile, '$state').get(() => 'test');
       sinon.stub(auth.profile, 'idTokenExpired').get(() => false);
       sinon.stub(auth.profile, 'accessTokenExpired').get(() => true);
 
       const promise = auth.refreshToken();
 
-      return promise.catch(error => {
-        return error;
-      }).then(error => {
-        expect(error.code).to.equal('invalid_state');
-      });
+      const error = await promise.catch(error => error);
+
+      expect(error.code).to.equal('invalid_state');
     });
 
     it('should support errors', () => {

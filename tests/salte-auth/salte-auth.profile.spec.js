@@ -1,3 +1,4 @@
+import Cookie from 'js-cookie';
 import { expect } from 'chai';
 import base64url from 'base64url';
 
@@ -8,6 +9,7 @@ describe('salte-auth.profile', () => {
   beforeEach(() => {
     sessionStorage.clear();
     profile = new SalteAuthProfile();
+    profile.$clear(true);
   });
 
   afterEach(() => {
@@ -15,11 +17,6 @@ describe('salte-auth.profile', () => {
   });
 
   describe('function(constructor)', () => {
-    beforeEach(() => {
-      localStorage.clear();
-      sessionStorage.clear();
-    });
-
     it('should recreate the path to the instance', () => {
       profile.bogus = 'test';
       expect(profile.bogus).to.equal('test');
@@ -43,11 +40,6 @@ describe('salte-auth.profile', () => {
   });
 
   describe('function($parseParams)', () => {
-    beforeEach(() => {
-      localStorage.clear();
-      sessionStorage.clear();
-    });
-
     it('should support parsing hash parameters', () => {
       history.replaceState(
         null,
@@ -182,9 +174,9 @@ describe('salte-auth.profile', () => {
   });
 
   describe('setter(redirectUrl)', () => {
-    it('should set sessionStorage', () => {
+    it('should store a cookie', () => {
       profile.$redirectUrl = location.href;
-      expect(sessionStorage.getItem('salte.auth.$redirect-url')).to.equal(
+      expect(Cookie.get('salte.auth.$redirect-url')).to.equal(
         location.href
       );
     });
