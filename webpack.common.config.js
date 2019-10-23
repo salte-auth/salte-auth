@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const deindent = require('deindent');
-const { name, version, contributors } = require('./package.json');
+const { name, version, contributors, browserslist } = require('./package.json');
 
 module.exports = function({ minified, es6, coverage, test }) {
   return {
@@ -30,13 +30,7 @@ module.exports = function({ minified, es6, coverage, test }) {
             targets: es6 ? {
               esmodules: true
             } : {
-              browsers: [
-                'last 2 chrome versions',
-                'last 2 firefox versions',
-                'last 2 edge versions',
-                'IE >= 10',
-                'Safari >= 7'
-              ]
+              browsers: browserslist
             }
           }]]
         }

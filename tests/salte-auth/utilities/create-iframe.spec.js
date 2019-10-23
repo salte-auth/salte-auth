@@ -39,6 +39,6 @@ describe('function(createIframe)', () => {
 
     const error = await promise.catch((error) => error);
 
-    expect(error).to.equal('Iframe failed to respond in time.');
+    expect(error.message).to.equal('Iframe failed to respond in time.');
   });
 });

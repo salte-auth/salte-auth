@@ -249,7 +249,7 @@ class SalteAuthUtilities {
     document.body.appendChild(iframe);
     return new Promise((resolve, reject) => {
       const autoReject = timeout && setTimeout(() => {
-        reject('Iframe failed to respond in time.');
+        reject(new Error('Iframe failed to respond in time.'));
       }, timeout);
       iframe.addEventListener('DOMNodeRemoved', () => {
         setTimeout(resolve);

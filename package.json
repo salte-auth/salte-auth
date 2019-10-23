@@ -31,6 +31,7 @@
     "@semantic-release/exec": "^3.0.2",
     "@semantic-release/git": "^7.0.2",
     "@webcomponents/webcomponentsjs": "^2.0.0",
+    "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.0",
     "base64url": "^3.0.1",
     "chai": "^4.0.0",
@@ -52,6 +53,7 @@
     "http-server": "^0.11.0",
     "husky": "^3.0.5",
     "istanbul-instrumenter-loader": "^3.0.0",
+    "js-cookie": "^2.2.1",
     "karma": "^4.3.0",
     "karma-chrome-launcher": "^3.0.0",
     "karma-coverage": "^2.0.0",
@@ -86,5 +88,12 @@
     "hooks": {
       "pre-commit": "remove-lockfiles"
     }
-  }
+  },
+  "browserslist": [
+    "last 2 chrome versions",
+    "last 2 firefox versions",
+    "last 2 edge versions",
+    "IE >= 10",
+    "Safari >= 7"
+  ]
 }
