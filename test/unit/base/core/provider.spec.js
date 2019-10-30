@@ -86,7 +86,7 @@ describe('Provider', () => {
         constructor(options) {
           super(options);
 
-          expect(this.key('hello')).to.equal('salte.auth.provider.example.hello');
+          expect(this.key).to.equal('salte.auth.provider.example');
         }
       };
 

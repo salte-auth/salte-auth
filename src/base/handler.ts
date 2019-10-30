@@ -21,14 +21,8 @@ export class Handler extends Storage {
     return this.config.name || this.name;
   }
 
-  /**
-   * Returns a scoped key for storage.
-   * @param key The storage key.
-   *
-   * @example redirect.key('hello') // 'salte.auth.handler.redirect.hello'
-   */
-  protected key(key: string) {
-    return `salte.auth.handler.${this.$name}.${key}`;
+  protected get key() {
+    return `salte.auth.handler.${this.$name}`;
   }
 
   /**

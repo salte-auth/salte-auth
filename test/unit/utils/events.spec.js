@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { Events } from '../../../src/utils/events';
 
 describe('Events', () => {
-  let events = {};
+  const events = {};
   before(() => {
     sinon.stub(window, 'addEventListener').callsFake((name, listener) => {
       events[name] = events[name] || [];

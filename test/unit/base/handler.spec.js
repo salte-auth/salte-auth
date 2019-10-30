@@ -41,7 +41,7 @@ describe('Handler', () => {
         constructor(options) {
           super(options);
 
-          expect(this.key('hello')).to.equal('salte.auth.handler.example.hello');
+          expect(this.key).to.equal('salte.auth.handler.example');
         }
       };
 

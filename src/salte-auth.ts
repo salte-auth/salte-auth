@@ -36,9 +36,9 @@ export class SalteAuth extends Shared {
       });
     });
 
-    const action = this.get('action');
-    const provider = action ? this.provider(this.get('provider')) : null;
-    const handlerName = action ? this.get('handler') : null;
+    const action = this.storage.get('action');
+    const provider = action ? this.provider(this.storage.get('provider')) : null;
+    const handlerName = action ? this.storage.get('handler') : null;
 
     if (!Common.includes([undefined, null, 'login', 'logout'], action)) {
       throw new SalteAuthError({
@@ -61,7 +61,7 @@ export class SalteAuth extends Shared {
           provider.validate(parsed);
           this.logger.info('[constructor]: login complete');
         } else {
-          provider.reset();
+          provider.storage.clear();
           provider.sync();
           provider.emit('logout');
           this.logger.info('[constructor]: logout complete');
@@ -69,9 +69,9 @@ export class SalteAuth extends Shared {
       });
     });
 
-    this.clear('action');
-    this.clear('provider');
-    this.clear('handler');
+    this.storage.delete('action');
+    this.storage.delete('provider');
+    this.storage.delete('handler');
 
     Interceptors.Fetch.add(async (request) => {
       for (let i = 0; i < this.config.providers.length; i++) {
@@ -114,9 +114,9 @@ export class SalteAuth extends Shared {
                   });
                 }
 
-                this.set('action', 'login');
-                this.set('provider', provider.$name);
-                this.set('handler', handler.$name);
+                this.storage.set('action', 'login');
+                this.storage.set('provider', provider.$name);
+                this.storage.set('handler', handler.$name);
 
                 const params = await handler.open({
                   redirectUrl: provider.redirectUrl('login'),
@@ -125,17 +125,17 @@ export class SalteAuth extends Shared {
 
                 provider.validate(params);
 
-                this.clear('action');
-                this.clear('provider');
-                this.clear('handler');
+                this.storage.delete('action');
+                this.storage.delete('provider');
+                this.storage.delete('handler');
               }
             }
           }
         }
       } catch (error) {
-        this.clear('action');
-        this.clear('provider');
-        this.clear('handler');
+        this.storage.delete('action');
+        this.storage.delete('provider');
+        this.storage.delete('handler');
         throw error;
       }
     });
@@ -162,9 +162,9 @@ export class SalteAuth extends Shared {
       const provider = this.provider(options.provider);
       const handler = this.handler(options.handler);
 
-      this.set('action', 'login');
-      this.set('provider', provider.$name);
-      this.set('handler', handler.$name);
+      this.storage.set('action', 'login');
+      this.storage.set('provider', provider.$name);
+      this.storage.set('handler', handler.$name);
 
       this.logger.info(`[login]: logging in with ${provider.$name} via ${handler.$name}...`);
       const params = await handler.open({
@@ -175,9 +175,9 @@ export class SalteAuth extends Shared {
       provider.validate(params);
       this.logger.info('[login]: login complete');
     } finally {
-      this.clear('action');
-      this.clear('provider');
-      this.clear('handler');
+      this.storage.delete('action');
+      this.storage.delete('provider');
+      this.storage.delete('handler');
     }
   }
 
@@ -200,9 +200,9 @@ export class SalteAuth extends Shared {
     try {
       const handler = this.handler(options.handler);
 
-      this.set('action', 'logout');
-      this.set('provider', provider.$name);
-      this.set('handler', handler.$name);
+      this.storage.set('action', 'logout');
+      this.storage.set('provider', provider.$name);
+      this.storage.set('handler', handler.$name);
 
       this.logger.info(`[logout]: logging out with ${provider.$name} via ${handler.$name}...`);
       await handler.open({
@@ -210,16 +210,16 @@ export class SalteAuth extends Shared {
         url: provider.logout,
       });
 
-      provider.reset();
+      provider.storage.clear();
       provider.emit('logout');
       this.logger.info('[logout]: logout complete');
     } catch (error) {
       provider.emit('logout', error);
       throw error;
     } finally {
-      this.clear('action');
-      this.clear('provider');
-      this.clear('handler');
+      this.storage.delete('action');
+      this.storage.delete('provider');
+      this.storage.delete('handler');
     }
   }
 

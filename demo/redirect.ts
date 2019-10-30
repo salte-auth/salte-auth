@@ -20,11 +20,11 @@ export class Redirect extends Handler {
   public connected({ action }: Handler.ConnectedOptions) {
     if (!action) return;
 
-    const origin = this.get('origin');
+    const origin = this.storage.get('origin');
 
     if (!origin) return;
 
-    this.clear('origin');
+    this.storage.delete('origin');
 
     const parsed = Utils.URL.parse(location);
 
@@ -35,8 +35,8 @@ export class Redirect extends Handler {
     }
   }
 
-  public open({ url, timeout = this.config.timeout }: Redirect.OpenOptions) {
-    this.set('origin', location.href);
+  public async open({ url, timeout = this.config.timeout }: Redirect.OpenOptions): Promise<object> {
+    this.storage.set('origin', location.href.replace(location.hash, ''));
 
     this.navigate(url);
 
