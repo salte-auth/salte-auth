@@ -125,7 +125,7 @@ describe('SalteAuth', () => {
       const custom = new Custom({ default: true });
 
       sinon.stub(openid, 'validate');
-      sinon.stub(SalteAuth.prototype, 'get').callsFake((key) => {
+      sinon.stub(Utils.StorageHelpers.CookieStorage.prototype, 'get').callsFake((key) => {
         switch (key) {
           case 'action': return 'login';
           case 'handler': return 'custom';
@@ -164,9 +164,9 @@ describe('SalteAuth', () => {
 
       const custom = new Custom({ default: true });
 
-      sinon.stub(openid, 'reset');
+      sinon.spy(openid.storage, 'clear');
       sinon.stub(openid, 'sync');
-      sinon.stub(SalteAuth.prototype, 'get').callsFake((key) => {
+      sinon.stub(Utils.StorageHelpers.CookieStorage.prototype, 'get').callsFake((key) => {
         switch (key) {
           case 'action': return 'logout';
           case 'handler': return 'custom';
@@ -183,7 +183,7 @@ describe('SalteAuth', () => {
 
       await new Promise((resolve) => setTimeout(resolve));
 
-      expect(openid.reset.callCount).to.equal(1);
+      expect(openid.storage.clear.callCount).to.equal(1);
       expect(openid.sync.callCount).to.equal(1);
     });
 
@@ -203,7 +203,7 @@ describe('SalteAuth', () => {
 
       const custom = new Custom({ default: true });
 
-      sinon.stub(SalteAuth.prototype, 'get').callsFake((key) => {
+      sinon.stub(Utils.StorageHelpers.CookieStorage.prototype, 'get').callsFake((key) => {
         switch (key) {
           case 'action': return 'hello';
           case 'handler': return 'custom';
@@ -300,16 +300,16 @@ describe('SalteAuth', () => {
 
   describe('interceptor(fetch)', () => {
     it('should enhance fetch requests', async () => {
-      openid.set('response-type', 'id_token');
-      openid.set('id-token.raw', `0.${btoa(
+      openid.storage.set('response-type', 'id_token');
+      openid.storage.set('id-token.raw', `0.${btoa(
         JSON.stringify({
           sub: '1234567890',
           name: 'John Doe',
           exp: Date.now() + 99999
         })
       )}.0`);
-      openid.set('access-token.raw', '12345');
-      openid.set('access-token.expiration', 99999);
+      openid.storage.set('access-token.raw', '12345');
+      openid.storage.set('access-token.expiration', 99999);
       openid.sync();
 
       const promise = new Promise((resolve) => {

@@ -2,64 +2,32 @@ import { SalteAuthError } from './salte-auth-error';
 
 import { Required } from './required';
 
-import { Common } from '../../utils';
+import { Common, StorageHelpers } from '../../utils';
 
 export class Storage extends Required {
+  public storage: (StorageHelpers.CookieStorage | StorageHelpers.LocalStorage | StorageHelpers.SessionStorage);
+
   public constructor(config?: Storage.Config) {
     super(config);
 
     this.config = Common.defaults(this.config, {
-      storage: 'session'
+      storage: 'cookie'
     });
-  }
 
-  public get(key: string, defaultValue: string = null): string {
-    return this.storage.getItem(this.key(key)) || defaultValue;
-  }
+    const Storage = StorageHelpers.StorageTypes[this.config.storage];
 
-  public set(key: string, value?: any): void {
-    if (Common.includes([undefined, null], value)) {
-      this.clear(key);
+    if (Storage) {
+      this.storage = new Storage(this.key);
     } else {
-      this.storage.setItem(this.key(key), value);
+      throw new SalteAuthError({
+        code: 'invalid_storage',
+        message: `Storage doesn't exist for the given value. (${this.config.storage})`,
+      });
     }
   }
 
-  public clear(key: string) {
-    this.storage.removeItem(this.key(key));
-  }
-
-  public reset(): void {
-    const baseKey = this.key('');
-    for (const key in localStorage) {
-      if (key.indexOf(baseKey) === 0) {
-        localStorage.removeItem(key);
-      }
-    }
-
-    for (const key in sessionStorage) {
-      if (key.indexOf(baseKey) === 0) {
-        sessionStorage.removeItem(key);
-      }
-    }
-  }
-
-  protected key(key?: string): string {
-    return `salte.auth.${key}`;
-  }
-
-  private get storage() {
-    const storage = this.config && this.config.storage;
-
-    switch (storage) {
-      case 'local': return localStorage;
-      case 'session': return sessionStorage;
-    }
-
-    throw new SalteAuthError({
-      code: 'invalid_storage',
-      message: `Storage doesn't exist for the given value. (${storage})`,
-    });
+  protected get key(): string {
+    return 'salte.auth';
   }
 }
 
@@ -72,8 +40,11 @@ export declare namespace Storage {
     /**
      * The storage api to keep authenticate information stored in.
      *
-     * @default 'session'
+     * Due to a known issue in Edge we recommend utilizing the 'cookie' storage type.
+     * https://github.com/AzureAD/azure-activedirectory-library-for-js/wiki/Known-issues-on-Edge
+     *
+     * @default 'cookie'
      */
-    storage?: ('local'|'session');
+    storage?: ('local'|'session'|'cookie');
   }
 }

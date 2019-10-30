@@ -65,7 +65,7 @@ export class OpenIDProvider extends OAuth2Provider {
     try {
       super.$validate(options);
 
-      const types = this.get('response-type', '').split(' ');
+      const types = this.storage.get('response-type', '').split(' ');
       if (Common.includes(types, 'id_token')) {
         const { id_token } = options;
 
@@ -78,19 +78,19 @@ export class OpenIDProvider extends OAuth2Provider {
           });
         }
 
-        if (this.validation('nonce') && this.get('nonce') !== user.nonce) {
+        if (this.validation('nonce') && this.storage.get('nonce') !== user.nonce) {
           throw new SalteAuthError({
             code: 'invalid_nonce',
             message: 'Nonce provided by identity provider did not match the local nonce.',
           });
         }
 
-        this.set('id-token.raw', id_token);
+        this.storage.set('id-token.raw', id_token);
       } else if (Common.includes(types, 'code')) {
-        this.clear('id-token.raw');
+        this.storage.delete('id-token.raw');
       }
     } finally {
-      this.clear('nonce');
+      this.storage.delete('nonce');
     }
   }
 
@@ -106,7 +106,7 @@ export class OpenIDProvider extends OAuth2Provider {
       this.sync();
     }
 
-    const responseType = this.get('response-type', '');
+    const responseType = this.storage.get('response-type', '');
     const types = responseType.split(' ');
     if (Common.includes(types, 'id_token')) {
       this.emit('login', null, this.idToken);
@@ -125,7 +125,7 @@ export class OpenIDProvider extends OAuth2Provider {
   public $login(options?: OpenIDProvider.OverrideOptions): string {
     const nonce = `${this.$name}-nonce-${nanoid()}`;
 
-    this.set('nonce', nonce);
+    this.storage.set('nonce', nonce);
 
     return this.url(super.$login(options), {
       prompt: options && options.prompt,
@@ -137,7 +137,7 @@ export class OpenIDProvider extends OAuth2Provider {
     super.sync();
     this.logger.trace('[sync] updating id token');
 
-    this.idToken = new IDToken(this.get('id-token.raw'));
+    this.idToken = new IDToken(this.storage.get('id-token.raw'));
   }
 }
 

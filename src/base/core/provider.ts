@@ -42,8 +42,8 @@ export class Provider extends Shared {
    *
    * @example auth0.key('hello') // 'salte.auth.provider.auth0.hello'
    */
-  protected key(key: string) {
-    return `salte.auth.provider.${this.$name}.${key}`;
+  protected get key() {
+    return `salte.auth.provider.${this.$name}`;
   }
 
   /**

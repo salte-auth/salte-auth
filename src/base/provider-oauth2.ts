@@ -58,14 +58,14 @@ export class OAuth2Provider extends Provider {
 
       const { code, access_token, state, expires_in, token_type } = options;
 
-      if (this.validation('state') && this.get('state') !== state) {
+      if (this.validation('state') && this.storage.get('state') !== state) {
         throw new SalteAuthError({
           code: 'invalid_state',
           message: 'State provided by identity provider did not match local state.',
         });
       }
 
-      const types = this.get('response-type', '').split(' ');
+      const types = this.storage.get('response-type', '').split(' ');
       if (Common.includes(types, 'code')) {
         if (!code) {
           throw new SalteAuthError({
@@ -83,18 +83,18 @@ export class OAuth2Provider extends Provider {
       }
 
       if (code) {
-        this.set('code.raw', code);
-        this.clear('access-token.raw');
-        this.clear('access-token.expiration');
-        this.clear('access-token.type');
+        this.storage.set('code.raw', code);
+        this.storage.delete('access-token.raw');
+        this.storage.delete('access-token.expiration');
+        this.storage.delete('access-token.type');
       } else if (access_token) {
-        this.set('access-token.raw', access_token);
-        this.set('access-token.expiration', Date.now() + (Number(expires_in) * 1000));
-        this.set('access-token.type', token_type);
-        this.clear('code.raw');
+        this.storage.set('access-token.raw', access_token);
+        this.storage.set('access-token.expiration', Date.now() + (Number(expires_in) * 1000));
+        this.storage.set('access-token.type', token_type);
+        this.storage.delete('code.raw');
       }
     } finally {
-      this.clear('state');
+      this.storage.delete('state');
     }
   }
 
@@ -114,15 +114,15 @@ export class OAuth2Provider extends Provider {
   }
 
   public get code() {
-    return this.get('code.raw');
+    return this.storage.get('code.raw');
   }
 
   public $login(options: OAuth2Provider.OverrideOptions = {}): string {
     const state = `${this.$name}-state-${nanoid()}`;
     const responseType = options.responseType || this.config.responseType;
 
-    this.set('state', state);
-    this.set('response-type', responseType);
+    this.storage.set('state', state);
+    this.storage.set('response-type', responseType);
 
     return this.url(this.login, {
       client_id: this.config.clientID,
@@ -137,9 +137,9 @@ export class OAuth2Provider extends Provider {
     this.logger.trace('[sync] updating access token');
 
     this.accessToken = new AccessToken(
-      this.get('access-token.raw'),
-      this.get('access-token.expiration'),
-      this.get('access-token.type')
+      this.storage.get('access-token.raw'),
+      this.storage.get('access-token.expiration'),
+      this.storage.get('access-token.type')
     );
   }
 }

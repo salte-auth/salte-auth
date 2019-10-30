@@ -18,7 +18,7 @@ export class Common {
         cb(source[i], i);
       }
     } else {
-      for (let key in source) {
+      for (const key in source) {
         cb(source[key], key);
       }
     }
@@ -35,7 +35,7 @@ export class Common {
         }
       }
     } else {
-      for (let key in source) {
+      for (const key in source) {
         const item = source[key];
         if (cb(item, key)) {
           return item;

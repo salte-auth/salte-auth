@@ -45,8 +45,8 @@ describe('OAuth2Provider', () => {
         responseType: 'token'
       });
 
-      example.set('access-token.raw', '12345');
-      example.set('access-token.expiration', Date.now() + 1);
+      example.storage.set('access-token.raw', '12345');
+      example.storage.set('access-token.expiration', Date.now() + 1);
       example.sync();
 
       const request = new Request('https://google.com');
@@ -61,8 +61,8 @@ describe('OAuth2Provider', () => {
         responseType: 'token'
       });
 
-      example.set('access-token.raw', '12345');
-      example.set('access-token.expiration', Date.now() + 1);
+      example.storage.set('access-token.raw', '12345');
+      example.storage.set('access-token.expiration', Date.now() + 1);
       example.sync();
 
       const request = new XMLHttpRequest();
@@ -92,8 +92,8 @@ describe('OAuth2Provider', () => {
         responseType: 'token'
       });
 
-      example.set('access-token.raw', '12345');
-      example.set('access-token.expiration', Date.now() + 1);
+      example.storage.set('access-token.raw', '12345');
+      example.storage.set('access-token.expiration', Date.now() + 1);
       example.sync();
 
       expect(await example.secure()).to.equal(true);
@@ -132,8 +132,8 @@ describe('OAuth2Provider', () => {
         responseType: 'token'
       });
 
-      example.set('access-token.raw', '12345');
-      example.set('access-token.expiration', Date.now() + 1);
+      example.storage.set('access-token.raw', '12345');
+      example.storage.set('access-token.expiration', Date.now() + 1);
       example.sync();
 
       const error = await example.secure(new Error()).catch((error) => error);
@@ -148,8 +148,8 @@ describe('OAuth2Provider', () => {
 
       const example = new Example();
 
-      example.set('state', '12345');
-      example.set('response-type', 'token');
+      example.storage.set('state', '12345');
+      example.storage.set('response-type', 'token');
 
       return new Promise((resolve) => {
         example.on('login', (error, accessToken) => {
@@ -175,8 +175,8 @@ describe('OAuth2Provider', () => {
 
       const example = new Example();
 
-      example.set('state', '12345');
-      example.set('response-type', 'code');
+      example.storage.set('state', '12345');
+      example.storage.set('response-type', 'code');
 
       return new Promise((resolve) => {
         example.on('login', (error, code) => {
@@ -203,7 +203,7 @@ describe('OAuth2Provider', () => {
 
       const example = new Example();
 
-      example.set('response-type', 'token');
+      example.storage.set('response-type', 'token');
 
       const error = getError(() => example.validate({
         error: 'hello_world'
@@ -218,7 +218,7 @@ describe('OAuth2Provider', () => {
 
       const example = new Example();
 
-      example.set('response-type', 'token');
+      example.storage.set('response-type', 'token');
 
       const error = getError(() => example.validate({
         error: 'hello_world',
@@ -234,7 +234,7 @@ describe('OAuth2Provider', () => {
 
       const example = new Example();
 
-      example.set('response-type', 'token');
+      example.storage.set('response-type', 'token');
 
       const error = getError(() => example.validate({
         error: 'hello_world',
@@ -251,8 +251,8 @@ describe('OAuth2Provider', () => {
 
       const example = new Example();
 
-      example.set('state', '54321');
-      example.set('response-type', 'token');
+      example.storage.set('state', '54321');
+      example.storage.set('response-type', 'token');
 
       const error = getError(() => example.validate({
         state: '12345'
@@ -268,8 +268,8 @@ describe('OAuth2Provider', () => {
         responseType: 'token'
       });
 
-      example.set('state', '12345');
-      example.set('response-type', 'code');
+      example.storage.set('state', '12345');
+      example.storage.set('response-type', 'code');
 
       const error = getError(() => example.validate({
         state: '12345'
@@ -285,8 +285,8 @@ describe('OAuth2Provider', () => {
         responseType: 'token'
       });
 
-      example.set('state', '12345');
-      example.set('response-type', 'token');
+      example.storage.set('state', '12345');
+      example.storage.set('response-type', 'token');
 
       const error = getError(() => example.validate({
         state: '12345'
@@ -302,8 +302,8 @@ describe('OAuth2Provider', () => {
         validation: false
       });
 
-      example.set('state', '54321');
-      example.set('response-type', 'token');
+      example.storage.set('state', '54321');
+      example.storage.set('response-type', 'token');
 
       return new Promise((resolve) => {
         example.on('login', (error, accessToken) => {
@@ -324,7 +324,7 @@ describe('OAuth2Provider', () => {
 
       const example = new Example();
 
-      example.set('response-type', 'token');
+      example.storage.set('response-type', 'token');
 
       const error = getError(() => example.validate());
 

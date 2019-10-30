@@ -40,7 +40,7 @@ describe('OpenIDProvider', () => {
               type: 'auto',
               buffer: 60000
             },
-            storage: 'session',
+            storage: 'cookie',
             validation: true
           });
         }
@@ -63,7 +63,7 @@ describe('OpenIDProvider', () => {
               type: 'manual',
               buffer: 5000
             },
-            storage: 'session',
+            storage: 'cookie',
             validation: true
           });
         }
@@ -86,15 +86,15 @@ describe('OpenIDProvider', () => {
         responseType: 'token'
       });
 
-      example.set('id-token.raw', `0.${btoa(
+      example.storage.set('id-token.raw', `0.${btoa(
         JSON.stringify({
           sub: '1234567890',
           name: 'John Doe',
           exp: Date.now() + 99999
         })
       )}.0`);
-      example.set('access-token.raw', '12345');
-      example.set('access-token.expiration', 99999);
+      example.storage.set('access-token.raw', '12345');
+      example.storage.set('access-token.expiration', 99999);
       example.sync();
 
       const request = new Request('https://google.com');
@@ -110,15 +110,15 @@ describe('OpenIDProvider', () => {
         responseType: 'token'
       });
 
-      example.set('id-token.raw', `0.${btoa(
+      example.storage.set('id-token.raw', `0.${btoa(
         JSON.stringify({
           sub: '1234567890',
           name: 'John Doe',
           exp: Date.now() + 99999
         })
       )}.0`);
-      example.set('access-token.raw', '12345');
-      example.set('access-token.expiration', 99999);
+      example.storage.set('access-token.raw', '12345');
+      example.storage.set('access-token.expiration', 99999);
       example.sync();
 
       const request = new XMLHttpRequest();
@@ -169,7 +169,7 @@ describe('OpenIDProvider', () => {
         clientID: '12345'
       });
 
-      example.set('id-token.raw', `0.${btoa(
+      example.storage.set('id-token.raw', `0.${btoa(
         JSON.stringify({
           sub: '1234567890',
           name: 'John Doe',
@@ -195,16 +195,16 @@ describe('OpenIDProvider', () => {
         responseType: 'token'
       });
 
-      example.set('id-token.raw', `0.${btoa(
+      example.storage.set('id-token.raw', `0.${btoa(
         JSON.stringify({
           sub: '1234567890',
           name: 'John Doe',
           exp: Date.now() + 99999
         })
       )}.0`);
-      example.set('access-token.raw', '12345');
-      example.set('access-token.expiration', '12345');
-      example.set('access-token.expiration', 99999);
+      example.storage.set('access-token.raw', '12345');
+      example.storage.set('access-token.expiration', '12345');
+      example.storage.set('access-token.expiration', 99999);
       example.sync();
 
       const error = await getError(example.secure(new Error()));
@@ -229,9 +229,9 @@ describe('OpenIDProvider', () => {
 
       const example = new Example();
 
-      example.set('response-type', 'id_token');
-      example.set('state', '12345');
-      example.set('nonce', '54321');
+      example.storage.set('response-type', 'id_token');
+      example.storage.set('state', '12345');
+      example.storage.set('nonce', '54321');
 
       return new Promise((resolve) => {
         const token = `0.${btoa(
@@ -268,9 +268,9 @@ describe('OpenIDProvider', () => {
 
       const example = new Example();
 
-      example.set('response-type', 'code');
-      example.set('state', '12345');
-      example.set('nonce', '54321');
+      example.storage.set('response-type', 'code');
+      example.storage.set('state', '12345');
+      example.storage.set('nonce', '54321');
 
       return new Promise((resolve) => {
         example.on('login', (error, code) => {
@@ -291,8 +291,8 @@ describe('OpenIDProvider', () => {
 
       const example = new Example();
 
-      example.set('response-type', 'token');
-      example.set('state', '12345');
+      example.storage.set('response-type', 'token');
+      example.storage.set('state', '12345');
 
       return new Promise((resolve) => {
         example.on('login', (error, accessToken) => {
@@ -313,8 +313,8 @@ describe('OpenIDProvider', () => {
 
       const example = new Example();
 
-      example.set('response-type', 'hello');
-      example.set('state', '12345');
+      example.storage.set('response-type', 'hello');
+      example.storage.set('state', '12345');
 
       const error = getError(() => example.validate({
         state: '12345',
@@ -329,9 +329,9 @@ describe('OpenIDProvider', () => {
 
       const example = new Example();
 
-      example.set('response-type', 'id_token');
-      example.set('state', '12345');
-      example.set('nonce', '54321');
+      example.storage.set('response-type', 'id_token');
+      example.storage.set('state', '12345');
+      example.storage.set('nonce', '54321');
 
       return new Promise((resolve) => {
         const token = `0.0.0`;
@@ -354,9 +354,9 @@ describe('OpenIDProvider', () => {
 
       const example = new Example();
 
-      example.set('response-type', 'id_token');
-      example.set('state', '12345');
-      example.set('nonce', '54321');
+      example.storage.set('response-type', 'id_token');
+      example.storage.set('state', '12345');
+      example.storage.set('nonce', '54321');
 
       return new Promise((resolve) => {
         const token = `0.${btoa(

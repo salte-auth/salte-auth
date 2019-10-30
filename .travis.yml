@@ -1,6 +1,6 @@
 sudo: false
 language: node_js
-node_js: stable
+node_js: lts/*
 cache: npm
 branches:
   only:
