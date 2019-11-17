@@ -79,7 +79,7 @@
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.2.1",
     "whatwg-fetch": "^3.0.0",
-    "yargs": "^14.0.0"
+    "yargs": "^15.0.1"
   },
   "publishConfig": {
     "access": "public"
