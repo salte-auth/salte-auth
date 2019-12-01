@@ -50,7 +50,7 @@
     "eslint-plugin-compat": "^3.3.0",
     "eslint-plugin-mocha": "^6.1.1",
     "html-loader": "^0.5.1",
-    "http-server": "^0.11.0",
+    "http-server": "^0.12.0",
     "husky": "^3.0.5",
     "istanbul-instrumenter-loader": "^3.0.0",
     "js-cookie": "^2.2.1",
