@@ -224,12 +224,18 @@ describe('SalteAuth', () => {
 
   describe('events(login)', () => {
     it('should forward provider login events', () => {
+      const expectedData = { hello: 'world' };
       return new Promise((resolve) => {
-        auth.on('login', () => {
+        auth.on('login', (error, data) => {
+          expect(error).equals(undefined);
+          expect(data).deep.equals({
+            provider: 'generic.openid',
+            data: expectedData
+          })
           resolve();
         });
 
-        openid.emit('login');
+        openid.emit('login', undefined, expectedData);
       });
     });
   });
@@ -237,7 +243,11 @@ describe('SalteAuth', () => {
   describe('events(logout)', () => {
     it('should forward provider logout events', () => {
       return new Promise((resolve) => {
-        auth.on('logout', () => {
+        auth.on('logout', (error, data) => {
+          expect(error).equals(undefined);
+          expect(data).deep.equals({
+            provider: 'generic.openid'
+          });
           resolve();
         });
 
