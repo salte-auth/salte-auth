@@ -28,11 +28,16 @@ export class SalteAuth extends Shared {
       provider.connected && provider.connected();
 
       provider.on('login', (error, data) => {
-        this.emit('login', error, data);
+        this.emit('login', error, {
+          provider: provider.name,
+          data: data
+        });
       });
 
       provider.on('logout', (error) => {
-        this.emit('logout', error);
+        this.emit('logout', error, {
+          provider: provider.name
+        });
       });
     });
 
@@ -266,6 +271,7 @@ export interface SalteAuth {
   config: SalteAuth.Config;
   on(name: 'login', listener: (error?: Error, data?: SalteAuth.EventWrapper) => void): void;
   on(name: 'logout', listener: (error?: Error, data?: SalteAuth.EventWrapper) => void): void;
+  emit(name: 'login'|'logout', error?: Error, data?: SalteAuth.EventWrapper): void;
 }
 
 export declare namespace SalteAuth {
