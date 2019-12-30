@@ -6,8 +6,6 @@ import { CookieStorage } from '../../../../src/utils/storage';
 describe('CookieStorage', () => {
   const storage = new CookieStorage();
 
-  const noop = () => '';
-
   beforeEach(() => {
     storage.clear();
   });
@@ -22,7 +20,7 @@ describe('CookieStorage', () => {
     });
 
     it('should return false if we fail to save the cookie', () => {
-      sinon.stub(document, 'cookie').set(noop).get(noop);
+      sinon.stub(navigator, 'cookieEnabled').get(() => false);
 
       expect(CookieStorage.supported()).equals(false);
     });

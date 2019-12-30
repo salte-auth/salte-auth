@@ -4,19 +4,10 @@ import { Storage } from './storage';
 export class CookieStorage extends Storage {
   /**
    * Determines if the current browser allows cookies.
-   * @returns true if we are able to successfully save the test cookie.
+   * @returns true if cookies aren't disabled.
    */
   public static supported() {
-    const name = 'salte-auth-test-cookie';
-    document.cookie = `${name}=${name}; SameSite=Strict`;
-
-    const supported = document.cookie.indexOf(name) !== -1;
-
-    if (supported) {
-      document.cookie = `${name}=; expires=${new Date(0).toUTCString()}`;
-    }
-
-    return supported;
+    return navigator.cookieEnabled === true;
   }
 
   public get(name: string, defaultValue?: string) {
@@ -33,7 +24,7 @@ export class CookieStorage extends Storage {
     if (Common.includes([undefined, null], value)) {
       this.delete(name);
     } else {
-      document.cookie = `${this.key(name)}=${value}; SameSite=Strict`;
+      document.cookie = `${this.key(name)}=${value}; SameSite=Lax`;
     }
   }
 

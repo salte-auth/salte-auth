@@ -7,6 +7,14 @@ export abstract class Storage {
     this.baseKey = baseKey;
   }
 
+  /**
+   * Determines if the current browser supports this storage type.
+   * @returns true if the storage type is supported
+   */
+  public static supported() {
+    return true;
+  }
+
   public has(name: string): boolean {
     return !Common.includes([undefined, null], this.get(name));
   }
