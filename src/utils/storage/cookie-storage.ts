@@ -2,6 +2,23 @@ import { Common } from '../common';
 import { Storage } from './storage';
 
 export class CookieStorage extends Storage {
+  /**
+   * Determines if the current browser allows cookies.
+   * @returns true if we are able to successfully save the test cookie.
+   */
+  public static supported() {
+    const name = 'salte-auth-test-cookie';
+    document.cookie = `${name}=${name}; SameSite=Strict`;
+
+    const supported = document.cookie.indexOf(name) !== -1;
+
+    if (supported) {
+      document.cookie = `${name}=; expires=${new Date(0).toUTCString()}`;
+    }
+
+    return supported;
+  }
+
   public get(name: string, defaultValue?: string) {
     const match = document.cookie.match(new RegExp(`${this.key(name)}=([^;]+)`));
     const result = match && match[1].trim();

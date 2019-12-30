@@ -1,12 +1,31 @@
 import { expect } from 'chai';
+import sinon from 'sinon';
 
 import { CookieStorage } from '../../../../src/utils/storage';
 
 describe('CookieStorage', () => {
   const storage = new CookieStorage();
 
+  const noop = () => '';
+
   beforeEach(() => {
     storage.clear();
+  });
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  describe('function(supported)', () => {
+    it('should return true if we successfully save the cookie', () => {
+      expect(CookieStorage.supported()).equals(true);
+    });
+
+    it('should return false if we fail to save the cookie', () => {
+      sinon.stub(document, 'cookie').set(noop).get(noop);
+
+      expect(CookieStorage.supported()).equals(false);
+    });
   });
 
   describe('function(get)', () => {
