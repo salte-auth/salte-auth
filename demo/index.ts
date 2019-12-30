@@ -63,3 +63,9 @@ logoutButton.addEventListener('click', () => {
   auth.logout('generic.openid');
 });
 document.body.appendChild(logoutButton);
+
+declare global {
+  interface Window { auth: SalteAuth }
+}
+
+window.auth = auth;

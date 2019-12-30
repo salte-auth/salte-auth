@@ -85,7 +85,8 @@ describe(`💨`, async function () {
 
     await page.waitFor(3000);
     expect(await page.evaluate(`location.href`)).to.equal('http://localhost:8081/');
-    const idToken = await page.evaluate(`sessionStorage.getItem('salte.auth.provider.generic.openid.id-token.raw')`);
+
+    const idToken = await page.evaluate(`window.auth.provider('generic.openid').idToken.raw`);
 
     expect(idToken).to.be.ok;
     expect(idToken.split('.').length).to.equal(3);
