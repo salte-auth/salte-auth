@@ -77,7 +77,7 @@ module.exports = function({ minified, es6, tests, coverage, demo, server }) {
           ]
         }]] : []),
 
-        exclude: 'node_modules/!(chai-as-promised|chai|sinon|universal-base64url)/**',
+        exclude: 'node_modules/!(chai-as-promised|chai|sinon|universal-base64|universal-base64url)/**',
         extensions: [".ts", ".js", ".jsx", ".es6", ".es", ".mjs"]
       }),
 

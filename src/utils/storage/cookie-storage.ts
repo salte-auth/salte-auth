@@ -36,12 +36,12 @@ export class CookieStorage extends Storage {
     const base = this.key();
 
     const cookies = document.cookie.split(';');
-    for (const cookie of cookies) {
+    Common.forEach(cookies, (cookie) => {
       const [name] = cookie.trim().split('=');
 
       if (name.indexOf(base) === 0) {
         this.delete(name);
       }
-    }
+    });
   }
 }
