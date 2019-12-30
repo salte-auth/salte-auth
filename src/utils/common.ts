@@ -110,19 +110,26 @@ export class Common {
           if (location.href.indexOf(redirectUrl) !== 0) return;
           const parsed = URL.parse(location);
 
-          iframe.parentElement && iframe.parentElement.removeChild(iframe);
+          this.removeIframe(iframe);
           clearInterval(checker);
           resolve(parsed);
         } catch (error) {
           if (Events.isCrossDomainError(error)) return;
 
-          iframe.parentElement && iframe.parentElement.removeChild(iframe);
+          this.removeIframe(iframe);
           clearInterval(checker);
 
           reject(error);
         }
       });
     });
+  }
+
+  private static removeIframe(iframe: HTMLIFrameElement): void {
+    /* istanbul ignore if */
+    if (!iframe.parentElement) return;
+
+    iframe.parentElement.removeChild(iframe);
   }
 
   public static debounce(identifier: string, callback: () => void, timeout?: number): void {
