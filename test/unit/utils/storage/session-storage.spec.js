@@ -9,6 +9,12 @@ describe('SessionStorage', () => {
     storage.clear();
   });
 
+  describe('function(supported)', () => {
+    it('should return true', () => {
+      expect(SessionStorage.supported()).to.equal(true);
+    });
+  });
+
   describe('function(get)', () => {
     it('should pull from cookies', () => {
       sessionStorage.setItem('hello', 'world');

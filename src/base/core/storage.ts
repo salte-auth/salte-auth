@@ -4,6 +4,12 @@ import { Required } from './required';
 
 import { Common, StorageHelpers } from '../../utils';
 
+const defaultStorageOrder: ('cookie'|'session'|'local')[] = [
+  'cookie',
+  'session',
+  'local'
+];
+
 export class Storage extends Required {
   public storage: (StorageHelpers.CookieStorage | StorageHelpers.LocalStorage | StorageHelpers.SessionStorage);
 
@@ -11,7 +17,7 @@ export class Storage extends Required {
     super(config);
 
     this.config = Common.defaults(this.config, {
-      storage: StorageHelpers.CookieStorage.supported() ? 'cookie' : 'session'
+      storage: defaultStorageOrder.find((storageType) => StorageHelpers.StorageTypes[storageType].supported())
     });
 
     const Storage = StorageHelpers.StorageTypes[this.config.storage];

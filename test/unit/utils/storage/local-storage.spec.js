@@ -9,6 +9,12 @@ describe('LocalStorage', () => {
     storage.clear();
   });
 
+  describe('function(supported)', () => {
+    it('should return true', () => {
+      expect(LocalStorage.supported()).to.equal(true);
+    });
+  });
+
   describe('function(get)', () => {
     it('should pull from cookies', () => {
       localStorage.setItem('hello', 'world');
