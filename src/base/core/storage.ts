@@ -11,7 +11,7 @@ export class Storage extends Required {
     super(config);
 
     this.config = Common.defaults(this.config, {
-      storage: 'cookie'
+      storage: StorageHelpers.CookieStorage.supported() ? 'cookie' : 'session'
     });
 
     const Storage = StorageHelpers.StorageTypes[this.config.storage];
@@ -40,10 +40,10 @@ export declare namespace Storage {
     /**
      * The storage api to keep authenticate information stored in.
      *
-     * Due to a known issue in Edge we recommend utilizing the 'cookie' storage type.
+     * Due to a known issue in Edge we recommend utilizing the default storage type.
      * https://github.com/AzureAD/azure-activedirectory-library-for-js/wiki/Known-issues-on-Edge
      *
-     * @default 'cookie'
+     * @default 'cookie' or 'session' if cookies aren't enabled.
      */
     storage?: ('local'|'session'|'cookie');
   }

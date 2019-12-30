@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import sinon from 'sinon';
 
 import { SalteAuthError } from '../../../../src/base/core/salte-auth-error';
 import { LocalStorage, SessionStorage, CookieStorage } from '../../../../src/utils/storage';
@@ -6,13 +7,29 @@ import { LocalStorage, SessionStorage, CookieStorage } from '../../../../src/uti
 import { Storage } from '../../../../src/base/core/storage';
 
 describe('Storage', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('constructor', () => {
-    it('should default to CookieStorage', () => {
+    it('should default to CookieStorage if cookies are supported', () => {
+      sinon.stub(CookieStorage, 'supported').returns(true);
+
       class Example extends Storage {}
 
       const example = new Example();
 
       expect(example.storage).to.be.an.instanceOf(CookieStorage);
+    });
+
+    it('should default to SessionStorage if cookies are not supported', () => {
+      sinon.stub(CookieStorage, 'supported').returns(false);
+
+      class Example extends Storage {}
+
+      const example = new Example();
+
+      expect(example.storage).to.be.an.instanceOf(SessionStorage);
     });
 
     it('should support pulling from LocalStorage', () => {
