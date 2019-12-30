@@ -17,7 +17,7 @@ export class Storage extends Required {
     super(config);
 
     this.config = Common.defaults(this.config, {
-      storage: defaultStorageOrder.find((storageType) => StorageHelpers.StorageTypes[storageType].supported())
+      storage: Common.find(defaultStorageOrder, (storageType) => StorageHelpers.StorageTypes[storageType].supported())
     });
 
     const Storage = StorageHelpers.StorageTypes[this.config.storage];
