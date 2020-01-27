@@ -65,7 +65,7 @@
     "karma-webpack": "^4.0.2",
     "lit-element": "^2.1.0",
     "lodash": "^4.17.15",
-    "mocha": "^6.2.0",
+    "mocha": "^7.0.1",
     "moment": "^2.22.1",
     "nps": "^5.9.8",
     "promise-polyfill": "^8.1.0",
