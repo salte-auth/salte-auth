@@ -71,7 +71,7 @@
     "promise-polyfill": "^8.1.0",
     "remove-lockfiles": "^2.0.0",
     "semantic-release": "^17.0.0",
-    "sinon": "^8.0.0",
+    "sinon": "^9.0.0",
     "url-polyfill": "^1.1.7",
     "uuid": "^3.3.3",
     "watch": "^1.0.2",
