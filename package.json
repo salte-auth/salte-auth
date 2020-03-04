@@ -73,7 +73,7 @@
     "semantic-release": "^17.0.0",
     "sinon": "^9.0.0",
     "url-polyfill": "^1.1.7",
-    "uuid": "^3.3.3",
+    "uuid": "^7.0.2",
     "watch": "^1.0.2",
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3",
