@@ -49,7 +49,7 @@
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-compat": "^3.3.0",
     "eslint-plugin-mocha": "^6.1.1",
-    "html-loader": "^0.5.1",
+    "html-loader": "^1.1.0",
     "http-server": "^0.12.0",
     "husky": "^4.0.2",
     "istanbul-instrumenter-loader": "^3.0.0",
