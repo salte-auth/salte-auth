@@ -7,6 +7,7 @@ const { terser } = require('rollup-plugin-terser');
 const replace = require('rollup-plugin-replace');
 const serve = require('rollup-plugin-serve');
 const copy = require('rollup-plugin-copy-assets-to');
+const builtins = require('rollup-plugin-node-builtins');
 
 const { name, contributors, version, browserslist } = require('./package.json');
 
@@ -38,10 +39,13 @@ module.exports = function({ minified, es6, tests, coverage, demo, server }) {
         'process.env.NODE_ENV': JSON.stringify('production')
       }),
 
+      tests && builtins(),
+
       resolve({
         mainFields: ['browser', 'main'],
 
-        extensions: [ '.mjs', '.js', '.jsx', '.json', '.ts' ]
+        extensions: [ '.mjs', '.js', '.jsx', '.json', '.ts' ],
+        preferBuiltins: true
       }),
 
       commonjs({
