@@ -5,7 +5,6 @@ cache: npm
 branches:
   only:
     - next
-    - /^greenkeeper/.*$/
 script:
   - npm start lint
   - npm start check-types
