@@ -469,6 +469,7 @@ describe('SalteAuth', () => {
       }));
 
       sinon.stub(openid, 'validate');
+      sinon.stub(openid, 'sync');
 
       const auth = new SalteAuth({
         providers: [openid],
@@ -485,6 +486,8 @@ describe('SalteAuth', () => {
       const [options] = auth.handler('custom').open.firstCall.args;
       expect(options.url).to.equal('https://google.com/logout');
       expect(options.redirectUrl).to.equal(location.origin);
+
+      sinon.assert.calledOnce(openid.sync);
     });
 
     it('should support providing a set of options', async () => {
