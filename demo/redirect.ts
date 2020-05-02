@@ -1,4 +1,4 @@
-import { Handler, SalteAuthError, Utils } from '../src/salte-auth';
+import { Handler, SalteAuthError, Utils, OAuth2Provider, OpenIDProvider } from '../src/salte-auth';
 
 export class Redirect extends Handler {
   public constructor(config?: Redirect.Config) {
@@ -17,7 +17,7 @@ export class Redirect extends Handler {
     return true;
   }
 
-  public connected({ action }: Handler.ConnectedOptions) {
+  public connected({ action }: Handler.ConnectedOptions): OAuth2Provider.Validation | OpenIDProvider.Validation | void {
     if (!action) return;
 
     const origin = this.storage.get('origin');
@@ -35,7 +35,7 @@ export class Redirect extends Handler {
     }
   }
 
-  public async open({ url, timeout = this.config.timeout }: Redirect.OpenOptions): Promise<object> {
+  public async open({ url, timeout = this.config.timeout }: Redirect.OpenOptions): Promise<OAuth2Provider.Validation | OpenIDProvider.Validation | void> {
     this.storage.set('origin', location.href.replace(location.hash, ''));
 
     this.navigate(url);

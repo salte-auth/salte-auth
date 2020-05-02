@@ -98,7 +98,7 @@ export class OAuth2Provider extends Provider {
     }
   }
 
-  public validate(options: OAuth2Provider.Validation) {
+  public validate(options: OAuth2Provider.Validation): void {
     this.logger.trace('[validate] (options): ', options);
 
     try {

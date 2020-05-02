@@ -11,7 +11,7 @@ We highly recommend you write your Provider in TypeScript to take advantage of o
 {% code-tabs %}
 {% code-tabs-item title="TypeScript" %}
 ```typescript
-// my-custom-handler.ts
+// my-custom-provider.ts
 import { OpenIDProvider } from '@salte-auth/salte-auth';
 
 export class Auth0 extends OpenIDProvider {
@@ -62,7 +62,7 @@ export declare namespace Auth0 {
 
 {% code-tabs-item title="JavaScript" %}
 ```javascript
-// my-custom-handler.js
+// my-custom-provider.js
 import { OpenIDProvider } from '@salte-auth/salte-auth';
 
 export class CustomProvider extends OpenIDProvider {
