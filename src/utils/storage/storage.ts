@@ -21,7 +21,7 @@ export abstract class Storage {
 
   /**
    * Returns a scoped key for storage.
-   * @param key The storage key.
+   * @param key - The storage key.
    *
    * @example Storage.key('hello') // 'salte.auth.handler.redirect.hello'
    */

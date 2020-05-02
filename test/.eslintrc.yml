@@ -1,3 +1,5 @@
 extends: ../.eslintrc.yml
 env:
   mocha: true
+rules:
+  'tsdoc/syntax': off

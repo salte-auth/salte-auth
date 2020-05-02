@@ -1,4 +1,7 @@
 parser: '@typescript-eslint/parser'
+plugins:
+  - '@typescript-eslint/eslint-plugin'
+  - eslint-plugin-tsdoc
 extends:
   - plugin:@typescript-eslint/recommended
   - plugin:compat/recommended
@@ -15,6 +18,7 @@ rules:
   '@typescript-eslint/camelcase': 0
   '@typescript-eslint/no-var-requires': off
   '@typescript-eslint/no-explicit-any': off
+  'tsdoc/syntax': 'error'
 overrides:
   - files:
     - karma.*

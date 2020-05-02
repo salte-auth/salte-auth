@@ -1,5 +1,6 @@
 node_modules/
 coverage/
 dist/
+generated-docs/
 npm-debug.log*
 .env

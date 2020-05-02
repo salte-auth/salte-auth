@@ -104,7 +104,7 @@ It's equally as easy to use a custom provider.
 
 ```js
 import { SalteAuth } from '@salte-auth/salte-auth';
-import { Redirect } from '@salte-auth/redirect';
+import { Tab } from '@salte-auth/tab';
 import { CustomProvider } from './my-custom-provider.js';
 
 const auth = new SalteAuth({
@@ -118,7 +118,9 @@ const auth = new SalteAuth({
   ],
 
   handlers: [
-    new Redirect()
+    new Tab({
+      default: true
+    })
   ]
 });
 

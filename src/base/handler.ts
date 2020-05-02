@@ -29,7 +29,7 @@ export class Handler extends Storage {
 
   /**
    * Navigates to the url provided.
-   * @param url the url to navigate to
+   * @param url - the url to navigate to
    */
   /* istanbul ignore next */
   protected navigate(url: string) {
@@ -76,14 +76,14 @@ export declare namespace Handler {
      * * **reload:** Reloads the whole page when `navigate` is invoked.
      * * **history:** Utilizes the history api to prevent page reloads when possible.
      *
-     * @default 'reload'
+     * @defaultValue 'reload'
      */
     navigate?: ('reload'|'history');
 
     /**
      * Determines the level of verbosity of the logs.
      *
-     * @default 'warn'
+     * @defaultValue 'warn'
      */
     level?: ('error'|'warn'|'info'|'trace');
   }

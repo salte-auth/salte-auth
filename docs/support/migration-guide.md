@@ -81,7 +81,7 @@ const auth = new SalteAuth({
   ]
 });
 
-auth.on('login', (error, idToken) => {
+auth.on('login', (error, { data: idToken }) => {
   if (error) console.error(error);
   else console.log(idToken.user);
 });

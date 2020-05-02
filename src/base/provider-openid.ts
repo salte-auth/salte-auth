@@ -161,14 +161,14 @@ export declare namespace OpenIDProvider {
     /**
      * Determines whether token renewal should be handled automatically or manually.
      *
-     * @default 'auto'
+     * @defaultValue 'auto'
      */
     renewal?: ('auto'|'manual'| {
       type?: ('auto'|'manual');
       /**
        * The amount of time prior to experation to renew the `id_token`.
        *
-       * @default 60000
+       * @defaultValue 60000
        */
       buffer?: number;
     });
