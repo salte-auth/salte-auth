@@ -11,6 +11,7 @@ script:
   - if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then npm start test.ci; fi
   - if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then npm start test.smoke; fi
   - npm start test
+  - npm start build.docs
 after_success:
   - npm start report-coverage
   - npm start semantic-release
