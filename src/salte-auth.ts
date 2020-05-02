@@ -151,13 +151,13 @@ export class SalteAuth extends Shared {
   /**
    * Login to the specified provider.
    *
-   * @param options the authentication options
+   * @param options - the authentication options
    */
   public async login(options: SalteAuth.AuthOptions): Promise<void>;
   /**
    * Login to the specified provider.
    *
-   * @param provider the provider to login with
+   * @param provider - the provider to login with
    */
   public async login(provider: string): Promise<void>;
   public async login(options: SalteAuth.AuthOptions | string): Promise<void> {
@@ -189,13 +189,13 @@ export class SalteAuth extends Shared {
   /**
    * Logout of the specified provider.
    *
-   * @param options the authentication options
+   * @param options - the authentication options
    */
   public async logout(options: SalteAuth.AuthOptions): Promise<void>;
   /**
    * Logout of the specified provider.
    *
-   * @param provider the provider to logout of
+   * @param provider - the provider to logout of
    */
   public async logout(provider: string): Promise<void>;
   public async logout(options: SalteAuth.AuthOptions | string): Promise<void> {
@@ -231,7 +231,7 @@ export class SalteAuth extends Shared {
 
   /**
    * Returns a provider that matches the given name.
-   * @param name the name of the provider
+   * @param name - the name of the provider
    * @returns the provider with the given name.
    */
   public provider(name?: string): Provider {
@@ -249,12 +249,12 @@ export class SalteAuth extends Shared {
 
   /**
    * Returns a handler that matches the given name.
-   * @param name the name of the handler
+   * @param name - the name of the handler
    * @returns the handler with the given name, if no name is specified then the default handler.
    */
   public handler(name?: string): Handler {
     const handler = name === undefined ?
-      Common.find(this.config.handlers, (handler) => !!handler.config.default) :
+      Common.find(this.config.handlers, (handler) => Boolean(handler.config.default)) :
       Common.find(this.config.handlers, (handler) => handler.$name === name)
 
     if (!handler) {
@@ -284,7 +284,7 @@ export declare namespace SalteAuth {
     /**
      * Determines the level of verbosity of the logs.
      *
-     * @default 'warn'
+     * @defaultValue 'warn'
      */
     level?: ('error'|'warn'|'info'|'trace');
   }

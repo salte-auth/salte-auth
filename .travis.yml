@@ -13,9 +13,18 @@ script:
   - npm start test
 after_success:
   - npm start report-coverage
-  # - npm start semantic-release
+  - npm start semantic-release
 addons:
   sauce_connect: true
   chrome: stable
+deploy:
+  provider: pages
+  skip_cleanup: true
+  email: bot@salte.io
+  name: Salte Bot
+  github_token: $GH_TOKEN
+  local_dir: generated-docs
+  on:
+    branch: master
 notifications:
   email: change

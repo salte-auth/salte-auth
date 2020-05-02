@@ -154,11 +154,14 @@ export interface OAuth2Provider {
 
 export declare namespace OAuth2Provider {
   export interface Config extends Provider.Config {
+    // TODO: Need to figure how to fix this, might require separating OpenIDProvider from OAuth2Provider...
+    /* eslint-disable tsdoc/syntax */
     /**
      * Determines whether a authorization code (server) or access token (client) should be returned.
      * @type {('code'|'token')}
      */
     responseType?: string;
+    /* eslint-enable tsdoc/syntax */
 
     /**
      * A list of space-delimited claims used to determine what user information is provided and what access is given.
@@ -174,11 +177,14 @@ export declare namespace OAuth2Provider {
   }
 
   export interface OverrideOptions {
+    // TODO: Need to figure how to fix this, might require separating OpenIDProvider from OAuth2Provider...
+    /* eslint-disable tsdoc/syntax */
     /**
      * Determines whether a authorization code (server) or access token (client) should be returned.
      * @type {('code'|'token')}
      */
     responseType?: string;
+    /* eslint-enable tsdoc/syntax */
   }
 
   export interface ValidationOptions extends Provider.ValidationOptions {

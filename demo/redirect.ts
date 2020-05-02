@@ -60,7 +60,7 @@ export declare namespace Redirect {
     /**
      * The amount of time in ms before any login / logout requests will timeout.
      *
-     * @default 10000
+     * @defaultValue 10000
      */
     timeout?: number;
   }

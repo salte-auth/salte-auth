@@ -14,7 +14,7 @@ export class Shared extends Events {
 
   /**
    * Returns a redirect url for the given login type.
-   * @param type Are we logging in or logging out?
+   * @param type - Are we logging in or logging out?
    */
   public redirectUrl(type: 'login'|'logout'): string {
     if (typeof(this.config.redirectUrl) === 'string') {

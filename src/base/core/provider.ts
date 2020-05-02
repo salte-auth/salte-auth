@@ -18,7 +18,7 @@ export class Provider extends Shared {
 
   /**
    * Determines if validation is enabled for the given key.
-   * @param key the key to determine whether validation is enabled for
+   * @param key - the key to determine whether validation is enabled for
    * @returns whether validation is enabled for the key.
    */
   protected validation(key: string): boolean {
@@ -38,7 +38,7 @@ export class Provider extends Shared {
 
   /**
    * Returns a scoped key for storage.
-   * @param key The storage key.
+   * @param key - The storage key.
    *
    * @example auth0.key('hello') // 'salte.auth.provider.auth0.hello'
    */
@@ -48,8 +48,8 @@ export class Provider extends Shared {
 
   /**
    * Creates a url with the given query parameters
-   * @param base the base url without query parameters
-   * @param params the query parameters to attache to the url
+   * @param base - the base url without query parameters
+   * @param params - the query parameters to attache to the url
    * @returns the built url
    */
   protected url(base: string, params: object = {}): string {
@@ -137,7 +137,7 @@ export declare namespace Provider {
     /**
      * Used to disable certain security validations if your provider doesn't support them.
      *
-     * @default true
+     * @defaultValue true
      */
     validation?: ValidationOptions | boolean;
 
@@ -154,7 +154,7 @@ export declare namespace Provider {
     /**
      * Determines the level of verbosity of the logs.
      *
-     * @default 'warn'
+     * @defaultValue 'warn'
      */
     level?: ('error'|'warn'|'info'|'trace');
   }

@@ -49,7 +49,7 @@ export declare namespace Storage {
      * Due to a known issue in Edge we recommend utilizing the default storage type.
      * https://github.com/AzureAD/azure-activedirectory-library-for-js/wiki/Known-issues-on-Edge
      *
-     * @default 'cookie' or 'session' if cookies aren't enabled.
+     * @defaultValue 'cookie' or 'session' if cookies aren't enabled.
      */
     storage?: ('local'|'session'|'cookie');
   }
