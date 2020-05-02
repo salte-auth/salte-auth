@@ -18,7 +18,7 @@ That primarily depends on where your priorities are.
 
 #### I need all the features!
 
-If you're worried about SSO (Single Sign-On) then an OpenID Connect Provider like [Auth0](https://github.com/salte-auth/auth0), [Azure](https://github.com/salte-auth/azure), etc. are probaby your best bet.
+If you're worried about SSO (Single Sign-On) then an OpenID Connect Provider like [Auth0](https://github.com/salte-auth/auth0), [Azure](https://github.com/salte-auth/azure), etc. are probably your best bet.
 
 #### I'm not made of money!
 
@@ -57,7 +57,9 @@ const auth = new SalteAuth({
   providers: [
     new Auth0({
       url: 'https://salte-os.auth0.com',
-      clientID: '9JTBXBREtckkFHTxTNBceewrnn7NeDd0'
+      clientID: '9JTBXBREtckkFHTxTNBceewrnn7NeDd0',
+
+      routes: true
     })
   ],
 
@@ -67,9 +69,8 @@ const auth = new SalteAuth({
     })
   ]
 });
-
-if (auth.provider('auth0').idToken.expired) {
-  // Redirects the user to your Auth0 login page!
-  auth.login('auth0');
-}
 ```
+
+### Examples
+
+For more examples check out...

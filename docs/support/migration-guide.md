@@ -35,10 +35,6 @@ const auth = new SalteAuth({
     audience: 'my-audience'
   }
 });
-
-if (auth.profile.idTokenExpired) {
-  auth.loginWithRedirect();
-}
 ```
 {% endcode-tabs-item %}
 
@@ -53,14 +49,13 @@ const auth = new SalteAuth({
     new Auth0({
       url: 'https://salte-os.auth0.com',
 
-      // This parameter is specifically handled by `@salte-auth/auth0`
-      audience: 'my-audience',
+      audience: 'my-audience', // This is a `@salte-auth/auth0` specific parameter.
       responseType: 'id_token token',
       redirectUrl: 'https://salte.io/authorize',
       clientID: 'my-client-id',
       scope: 'openid',
 
-      routes: ['/account'],
+      routes: true,
 
       endpoints: [
         'https://api.google.com'
@@ -90,16 +85,6 @@ auth.on('login', (error, idToken) => {
   if (error) console.error(error);
   else console.log(idToken.user);
 });
-
-if (auth.provider('auth0').idToken.expired) {
-  auth.login({
-    provider: 'auth0',
-    handler: 'redirect'
-  });
-
-  // The above example can also be shortened to the following:
-  auth.login('auth0'); // This will use the default handler.
-}
 ```
 {% endcode-tabs-item %}
 {% endcode-tabs %}

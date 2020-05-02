@@ -34,7 +34,7 @@ export class CustomHandler extends Handler {
   /**
    * This is invoked when `salte-auth` starts up.
    */
-  connected({ action, handler, provider }: Handler.ConnectedOptions) {
+  connected({ action }: Handler.ConnectedOptions): OAuth2Provider.Validation | OpenIDProvider.Validation | void {
     // Generally this won't be needed, however in certain cases such 
     // as `@salte-auth/redirect` it's used to wrap up authentication.
   }
@@ -46,10 +46,10 @@ export class CustomHandler extends Handler {
    * For fully implemented examples check out our official handlers.
    * https://salte-auth.gitbook.io/salte-auth/usage/handlers
    */
-  open({ url, redirectUrl }: Handler.OpenOptions): Promise<any> {
+  open({ url, redirectUrl }: Handler.OpenOptions): Promise<OAuth2Provider.Validation | OpenIDProvider.Validation> {
     // For the given example: https://google.com?token=12345&state=54321
     // This would be the expected response.
-    Promise.resolve({
+    return Promise.resolve({
       token: '12345',
       state: '54321'
     });
@@ -83,7 +83,7 @@ export class CustomHandler extends Handler {
   /**
    * This is invoked when `salte-auth` starts up.
    */
-  connected({ action, handler, provider }): object | void {
+  connected({ action }) {
     // Generally this won't be needed, however in certain cases such 
     // as `@salte-auth/redirect` it's used to wrap up authentication.
   }
@@ -95,10 +95,10 @@ export class CustomHandler extends Handler {
    * For fully implemented examples check out our official handlers.
    * https://salte-auth.gitbook.io/salte-auth/usage/handlers
    */
-  open({ url, redirectUrl }): Promise<object> {
+  open({ url, redirectUrl }) {
     // For the given example: https://google.com?token=12345&state=54321
     // This would be the expected response.
-    Promise.resolve({
+    return Promise.resolve({
       token: '12345',
       state: '54321'
     });
@@ -128,7 +128,9 @@ const auth = new SalteAuth({
   ],
 
   handlers: [
-    new CustomHandler()
+    new CustomHandler({
+      default: true
+    })
   ]
 });
 

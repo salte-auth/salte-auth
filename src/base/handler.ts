@@ -1,5 +1,7 @@
 import { Storage } from './core/storage';
 import { Common, Logger, URL } from '../utils';
+import { OAuth2Provider } from './provider-oauth2';
+import { OpenIDProvider } from './provider-openid';
 
 export class Handler extends Storage {
   protected logger: Logger;
@@ -52,8 +54,8 @@ export interface Handler {
    */
   auto: boolean;
 
-  open(options: Handler.OpenOptions): Promise<object>;
-  connected?(options: Handler.ConnectedOptions): object | void;
+  open(options: Handler.OpenOptions): Promise<OAuth2Provider.Validation | OpenIDProvider.Validation | void>;
+  connected?(options: Handler.ConnectedOptions): OAuth2Provider.Validation | OpenIDProvider.Validation | void;
 }
 
 export declare namespace Handler {

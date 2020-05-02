@@ -94,7 +94,7 @@ export class OpenIDProvider extends OAuth2Provider {
     }
   }
 
-  public validate(options: OpenIDProvider.Validation): any {
+  public validate(options: OpenIDProvider.Validation): void {
     this.logger.trace('[validate] (options): ', options);
 
     try {

@@ -24,9 +24,9 @@ export class Common {
     }
   }
 
-  public static find<T>(source: T[], cb: (value: T, key: number | string) => boolean): T;
-  public static find<T extends object>(source: T, cb: (item: any, key: number | string) => boolean): any;
-  public static find<T>(source: T[] | T, cb: (item: T | any, key: number | string) => boolean): T | any {
+  public static find<T>(source: T[], cb: (value: T, key: any) => boolean): T;
+  public static find<T extends object>(source: T, cb: (item: any, key: any) => boolean): any;
+  public static find<T>(source: T[] | T, cb: (item: T | any, key: any) => boolean): T | any {
     if (Array.isArray(source)) {
       for (let i = 0; i < source.length; i++) {
         const item = source[i];
