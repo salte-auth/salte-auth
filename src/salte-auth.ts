@@ -216,6 +216,7 @@ export class SalteAuth extends Shared {
       });
 
       provider.storage.clear();
+      provider.sync();
       provider.emit('logout');
       this.logger.info('[logout]: logout complete');
     } catch (error) {
