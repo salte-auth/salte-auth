@@ -73,15 +73,15 @@ _These are issues that we know about, but don't have a clear fix for!_
 
 **There are currently no known issues, thanks for checking!**
 
-[npm-version-image]: https://img.shields.io/npm/v/@salte-auth/salte-auth/next.svg?style=flat
+[npm-version-image]: https://img.shields.io/npm/v/@salte-auth/salte-auth.svg?style=flat
 [npm-downloads-image]: https://img.shields.io/npm/dm/@salte-auth/salte-auth.svg?style=flat
 [npm-url]: https://npmjs.org/package/@salte-auth/salte-auth
 
-[travis-ci-image]: https://img.shields.io/travis/com/salte-auth/salte-auth/next.svg?style=flat
+[travis-ci-image]: https://img.shields.io/travis/com/salte-auth/salte-auth.svg?style=flat
 [travis-ci-url]: https://travis-ci.com/salte-auth/salte-auth
 
-[coveralls-image]: https://img.shields.io/coveralls/salte-auth/salte-auth/next.svg
-[coveralls-url]: https://coveralls.io/github/salte-auth/salte-auth?branch=next
+[coveralls-image]: https://img.shields.io/coveralls/salte-auth/salte-auth.svg
+[coveralls-url]: https://coveralls.io/github/salte-auth/salte-auth?branch=master
 
 [semantic-release-url]: https://github.com/semantic-release/semantic-release
 [semantic-release-image]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
