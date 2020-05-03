@@ -12,4 +12,3 @@
 ## Support
 - [Supported Browsers](support/supported-browsers.md)
 - [Migration Guide](support/migration-guide.md)
-- [API Documentation](https://salte-auth.github.io)
