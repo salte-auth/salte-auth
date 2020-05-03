@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/salte-auth.profile.js | @salte-auth/salte-auth</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="OAuth 2.0 for the masses!"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="@salte-auth/salte-auth"><meta property="twitter:description" content="OAuth 2.0 for the masses!"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/salte-auth/salte-auth.git"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.js~SalteAuth.html">SalteAuth</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.profile.js~SalteAuthProfile.html">SalteAuthProfile</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.providers.js~Providers.html">Providers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.utilities.js~SalteAuthUtilities.html">SalteAuthUtilities</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-SalteAuthMixinGenerator">SalteAuthMixinGenerator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Config">Config</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-LoginConfig">LoginConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RedirectURLs">RedirectURLs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Validation">Validation</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#providers">providers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/auth0.js~SalteAuthAuth0Provider.html">SalteAuthAuth0Provider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/azure.js~SalteAuthAzureProvider.html">SalteAuthAzureProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/cognito.js~SalteAuthCognitoProvider.html">SalteAuthCognitoProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/okta.js~SalteAuthOktaProvider.html">SalteAuthOktaProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/wso2.js~SalteAuthWSO2Provider.html">SalteAuthWSO2Provider</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/salte-auth.profile.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Cookie from &apos;js-cookie&apos;;
+import defaultsDeep from &apos;lodash/defaultsDeep&apos;;
+import find from &apos;lodash/find&apos;;
+import debug from &apos;debug&apos;;
+
+/** @ignore */
+const logger = debug(&apos;@salte-auth/salte-auth:profile&apos;);
+
+/**
+ * All the profile information associated with the current authentication session
+ */
+class SalteAuthProfile {
+  /**
+   * Parses the current url for the authentication values
+   * @param {Config} config configuration for salte auth
+   */
+  constructor(config) {
+    logger(&apos;Appending defaults to config...&apos;);
+    /** @ignore */
+    this.$$config = defaultsDeep(config, {
+      validation: {
+        nonce: true,
+        state: true,
+        azp: true,
+        aud: true
+      },
+      storageType: &apos;session&apos;
+    });
+
+    /**
+     * The parsed user information from the id token
+     * @type {Object}
+     */
+    this.userInfo = null;
+    this.$refreshUserInfo();
+  }
+
+  /**
+   * Checks for a hash / query params, parses it, and removes it.
+   */
+  $parseParams() {
+    if (location.search || location.hash) {
+      const params = location.search.replace(/^\?/, &apos;&apos;).split(&apos;&amp;&apos;)
+        .concat(location.hash.replace(/(#!?[^#]+)?#/, &apos;&apos;).split(&apos;&amp;&apos;));
+
+      logger(`Hash detected, parsing...`, params);
+      for (let i = 0; i &lt; params.length; i++) {
+        const param = params[i];
+        const [key, value] = param.split(&apos;=&apos;);
+        this.$parse(key, decodeURIComponent(value));
+      }
+      logger(`Removing hash...`);
+      history.pushState(&apos;&apos;, document.title, location.href.replace(location.search, &apos;&apos;).replace(location.hash, &apos;&apos;));
+    }
+  }
+
+  /**
+   * Parse a key-value pair
+   * @param {String} key the key to parse
+   * @param {Object} value the matching value to parse
+   * @private
+   */
+  $parse(key, value) {
+    switch (key) {
+      case &apos;token_type&apos;:
+        this.$tokenType = value;
+        break;
+      case &apos;expires_in&apos;:
+        this.$expiration = Date.now() + (Number(value) * 1000);
+        break;
+      case &apos;access_token&apos;:
+        this.$accessToken = value;
+        break;
+      case &apos;id_token&apos;:
+        this.$idToken = value;
+        break;
+      case &apos;code&apos;:
+        this.code = value;
+        break;
+      case &apos;state&apos;:
+        this.$state = value;
+        break;
+      case &apos;error&apos;:
+        this.$error = value;
+        break;
+      case &apos;error_description&apos;:
+        this.$errorDescription = value;
+        break;
+    }
+  }
+
+  /**
+   * Whether the ID Token has expired
+   * @return {Boolean} true if the &quot;id_token&quot; has expired
+   */
+  get idTokenExpired() {
+    return !this.$idToken || Date.now() &gt;= (this.userInfo.exp * 1000);
+  }
+
+  /**
+   * Whether the Access Token has expired
+   * @return {Boolean} true if the &quot;access_token&quot; has expired
+   */
+  get accessTokenExpired() {
+    return !this.$accessToken || Date.now() &gt;= this.$expiration;
+  }
+
+  /**
+   * The type of Access Token that was returned by the identity provider
+   * @return {String} the type of access token
+   * @private
+   */
+  get $tokenType() {
+    return this.$getItem(&apos;salte.auth.$token-type&apos;, &apos;cookie&apos;);
+  }
+
+  set $tokenType(tokenType) {
+    this.$saveItem(&apos;salte.auth.$token-type&apos;, tokenType, &apos;cookie&apos;);
+  }
+
+  /**
+   * The date and time that the access token will expire
+   * @return {Number} the expiration time as unix timestamp
+   * @private
+   */
+  get $expiration() {
+    const expiration = this.$getItem(&apos;salte.auth.expiration&apos;);
+    return expiration ? Number(expiration) : null;
+  }
+
+  set $expiration(expiration) {
+    this.$saveItem(&apos;salte.auth.expiration&apos;, expiration);
+  }
+
+  /**
+   * The Access Token returned by the identity provider
+   * @return {String} the access token
+   * @private
+   */
+  get $accessToken() {
+    return this.$getItem(&apos;salte.auth.access-token&apos;);
+  }
+
+  set $accessToken(accessToken) {
+    this.$saveItem(&apos;salte.auth.access-token&apos;, accessToken);
+  }
+
+  /**
+   * The ID Token returned by the identity provider
+   * @return {String} the id token
+   * @private
+   */
+  get $idToken() {
+    return this.$getItem(&apos;salte.auth.id-token&apos;);
+  }
+
+  set $idToken(idToken) {
+    this.$saveItem(&apos;salte.auth.id-token&apos;, idToken);
+  }
+
+  /**
+   * The Authorization Code returned by the identity provider
+   * @return {String} the authorization code
+   * @private
+   */
+  get code() {
+    return this.$getItem(&apos;salte.auth.code&apos;);
+  }
+
+  set code(code) {
+    this.$saveItem(&apos;salte.auth.code&apos;, code);
+  }
+
+  /**
+   * The authentication state returned by the identity provider
+   * @return {String} the state value
+   * @private
+   *
+   * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
+   */
+  get $state() {
+    return this.$getItem(&apos;salte.auth.$state&apos;, &apos;cookie&apos;);
+  }
+
+  set $state(state) {
+    this.$saveItem(&apos;salte.auth.$state&apos;, state, &apos;cookie&apos;);
+  }
+
+  /**
+   * The locally generate authentication state
+   * @return {String} the local state value
+   * @private
+   *
+   * @see https://tools.ietf.org/html/rfc6749#section-4.1.1
+   */
+  get $localState() {
+    return this.$getItem(&apos;salte.auth.$local-state&apos;, &apos;cookie&apos;);
+  }
+
+  set $localState(localState) {
+    this.$saveItem(&apos;salte.auth.$local-state&apos;, localState, &apos;cookie&apos;);
+  }
+
+  /**
+   * The error returned by the identity provider
+   * @return {String} the state value
+   * @private
+   */
+  get $error() {
+    return this.$getItem(&apos;salte.auth.error&apos;);
+  }
+
+  set $error(error) {
+    this.$saveItem(&apos;salte.auth.error&apos;, error);
+  }
+
+  /**
+   * The error description returned by the identity provider
+   * @return {String} a string that describes the error that occurred
+   * @private
+   */
+  get $errorDescription() {
+    return this.$getItem(&apos;salte.auth.error-description&apos;);
+  }
+
+  set $errorDescription(errorDescription) {
+    this.$saveItem(&apos;salte.auth.error-description&apos;, errorDescription);
+  }
+
+  /**
+   * The url the user originated from before authentication occurred
+   * @return {String} The url the user originated from before authentication occurred
+   * @private
+   */
+  get $redirectUrl() {
+    return this.$getItem(&apos;salte.auth.$redirect-url&apos;, &apos;cookie&apos;);
+  }
+
+  set $redirectUrl(redirectUrl) {
+    this.$saveItem(&apos;salte.auth.$redirect-url&apos;, redirectUrl, &apos;cookie&apos;);
+  }
+
+  /**
+   * Parses the User Info from the ID Token
+   * @return {String} The User Info from the ID Token
+   * @private
+   */
+  get $nonce() {
+    return this.$getItem(&apos;salte.auth.$nonce&apos;, &apos;cookie&apos;);
+  }
+
+  set $nonce(nonce) {
+    this.$saveItem(&apos;salte.auth.$nonce&apos;, nonce, &apos;cookie&apos;);
+  }
+
+  /**
+   * Sets or Gets an action based on whether a action was passed.
+   * @param {String} state The state this action is tied to.
+   * @param {String} action The action to store.
+   * @return {String|undefined} Returns a string if an action wasn&apos;t provided.
+   * @private
+   */
+  $actions(state, action) {
+    if (action) {
+      this.$saveItem(`salte.auth.action.${state}`, action);
+    } else {
+      return this.$getItem(`salte.auth.action.${state}`);
+    }
+  }
+
+  /**
+   * Parses the User Info from the ID Token
+   * @param {String} idToken the id token to update based off
+   * @private
+   */
+  $refreshUserInfo(idToken = this.$idToken) {
+    let userInfo = null;
+
+    if (idToken) {
+      const separatedToken = idToken.split(&apos;.&apos;);
+      if (separatedToken.length === 3) {
+        // This fixes an issue where various providers will encode values
+        // incorrectly and cause the browser to fail to decode.
+        // https://stackoverflow.com/questions/43065553/base64-decoded-differently-in-java-jjwt
+        const payload = separatedToken[1].replace(/-/g, &apos;+&apos;).replace(/_/g, &apos;/&apos;);
+        userInfo = JSON.parse(atob(payload));
+      }
+    }
+
+    this.userInfo = userInfo;
+  }
+
+  /**
+   * Verifies that we were logged in successfully and that all security checks pass
+   * @param {Boolean} accessTokenRequest if the request we&apos;re validating was an access token request
+   * @return {Object} the error message
+   * @private
+   */
+  $validate(accessTokenRequest) {
+    this.$refreshUserInfo();
+
+    if (!this.$$config.validation) {
+      logger(&apos;Validation is disabled, skipping...&apos;);
+      return;
+    }
+
+    if (this.$error) {
+      return {
+        code: this.$error,
+        description: this.$errorDescription
+      };
+    }
+
+    if ((this.$$config.responseType === &apos;code&apos; &amp;&amp; !this.code) || (this.$$config.responseType !== &apos;code&apos; &amp;&amp; !this.$idToken)) {
+      return {
+        code: &apos;login_canceled&apos;,
+        description: &apos;User likely canceled the login or something unexpected occurred.&apos;
+      };
+    }
+
+    if (this.$$config.validation.state &amp;&amp; this.$localState !== this.$state) {
+      return {
+        code: &apos;invalid_state&apos;,
+        description: &apos;State provided by identity provider did not match local state.&apos;
+      };
+    }
+
+    if (this.$$config.responseType === &apos;code&apos; || accessTokenRequest) return;
+
+    if (this.$$config.validation.nonce &amp;&amp; this.$nonce !== this.userInfo.nonce) {
+      return {
+        code: &apos;invalid_nonce&apos;,
+        description: &apos;Nonce provided by identity provider did not match local nonce.&apos;
+      };
+    }
+
+    if (Array.isArray(this.userInfo.aud)) {
+      if (this.$$config.validation.azp) {
+        if (!this.userInfo.azp) {
+          return {
+            code: &apos;invalid_azp&apos;,
+            description: &apos;Audience was returned as an array and AZP was not present on the ID Token.&apos;
+          };
+        }
+
+        if (this.userInfo.azp !== this.$$config.clientId) {
+          return {
+            code: &apos;invalid_azp&apos;,
+            description: &apos;AZP does not match the Client ID.&apos;
+          };
+        }
+      }
+
+
+      if (this.$$config.validation.aud) {
+        const aud = find(this.userInfo.aud, (audience) =&gt; {
+          return audience === this.$$config.clientId;
+        });
+
+        if (!aud) {
+          return {
+            code: &apos;invalid_aud&apos;,
+            description: &apos;None of the audience values matched the Client ID.&apos;
+          };
+        }
+      }
+    } else if (this.$$config.validation.aud &amp;&amp; this.userInfo.aud !== this.$$config.clientId) {
+      return {
+        code: &apos;invalid_aud&apos;,
+        description: &apos;The audience did not match the Client ID.&apos;
+      };
+    }
+  }
+
+  /**
+   * Saves a value to the Web Storage API
+   * @param {String} key The key to save to
+   * @param {String} overrideStorageType the name of the storageType to use
+   * @return {*} the storage value for the given key
+   * @private
+   */
+  $getItem(key, overrideStorageType) {
+    let value;
+    if (overrideStorageType === &apos;cookie&apos;) {
+      value = Cookie.get(key);
+    } else {
+      const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
+      value = storage.getItem(key);
+    }
+
+    return [undefined, null].indexOf(value) === -1 ? value : null;
+  }
+
+  /**
+   * Saves a value to the Web Storage API
+   * @param {String} key The key to save to
+   * @param {*} value The value to save, if this is undefined or null it will delete the key
+   * @param {String} overrideStorageType the name of the storageType to use
+   * @private
+   */
+  $saveItem(key, value, overrideStorageType) {
+    if (overrideStorageType === &apos;cookie&apos;) {
+      if ([undefined, null].indexOf(value) !== -1) {
+        Cookie.remove(key);
+      } else {
+        Cookie.set(key, value);
+      }
+    } else {
+      const storage = overrideStorageType ? this.$$getStorage(overrideStorageType) : this.$storage;
+      if ([undefined, null].indexOf(value) !== -1) {
+        storage.removeItem(key);
+      } else {
+        storage.setItem(key, value);
+      }
+    }
+  }
+
+  /**
+   * Return the active Web Storage API
+   * @return {Storage} the storage api to save and pull values from
+   * @private
+   */
+  get $storage() {
+    return this.$$getStorage(this.$$config.storageType);
+  }
+
+  /**
+   * Determines which Web Storage API to return using the name provided
+   * @param {String} storageType the name of the storageType to use
+   * @return {Storage} the web storage api that matches the given string
+   * @ignore
+   */
+  $$getStorage(storageType) {
+    if (storageType === &apos;local&apos;) {
+      return localStorage;
+    } else if (storageType === &apos;session&apos;) {
+      return sessionStorage;
+    } else {
+      throw new ReferenceError(`Unknown Storage Type (${storageType})`);
+    }
+  }
+
+  /**
+   * Clears out all `salte.auth` values from localStorage, sessionStorage, and Cookies
+   * @param {Boolean} withPrivates whether we should also clear out the private values.
+   * @private
+   */
+  $clear(withPrivates) {
+    const regex = withPrivates ? new RegExp(/^salte\.auth\./) : new RegExp(/^salte\.auth\.[^$]/);
+
+    for (const key in localStorage) {
+      if (key.match(regex)) {
+        localStorage.removeItem(key);
+      }
+    }
+
+    for (const key in sessionStorage) {
+      if (key.match(regex)) {
+        sessionStorage.removeItem(key);
+      }
+    }
+
+    for (const key in Cookie.getJSON()) {
+      if (key.match(regex)) {
+        Cookie.remove(key);
+      }
+    }
+
+    this.$refreshUserInfo();
+  }
+
+  /**
+   * Clears all `salte.auth` error values from localStorage
+   * @private
+   */
+  $clearErrors() {
+    this.$error = undefined;
+    this.$errorDescription = undefined;
+  }
+}
+
+export { SalteAuthProfile };
+export default SalteAuthProfile;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl">
+  <title data-ice="title">Home | @salte-auth/salte-auth</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="OAuth 2.0 for the masses!"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="@salte-auth/salte-auth"><meta property="twitter:description" content="OAuth 2.0 for the masses!"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/salte-auth/salte-auth.git"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.js~SalteAuth.html">SalteAuth</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.profile.js~SalteAuthProfile.html">SalteAuthProfile</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.providers.js~Providers.html">Providers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.utilities.js~SalteAuthUtilities.html">SalteAuthUtilities</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-SalteAuthMixinGenerator">SalteAuthMixinGenerator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Config">Config</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-LoginConfig">LoginConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RedirectURLs">RedirectURLs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Validation">Validation</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#providers">providers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/auth0.js~SalteAuthAuth0Provider.html">SalteAuthAuth0Provider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/azure.js~SalteAuthAzureProvider.html">SalteAuthAzureProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/cognito.js~SalteAuthCognitoProvider.html">SalteAuthCognitoProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/okta.js~SalteAuthOktaProvider.html">SalteAuthOktaProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/wso2.js~SalteAuthWSO2Provider.html">SalteAuthWSO2Provider</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><div data-ice="index" class="github-markdown"><p></p><h2>
+  <div>
+    <a href="https://github.com/salte-auth/logos">
+      <img height="190px" src="https://raw.githubusercontent.com/salte-auth/logos/master/images/logo.svg?sanitize=true">
+      <br>
+      <br>
+      <img height="50px" src="https://raw.githubusercontent.com/salte-auth/logos/master/images/%40salte-auth/salte-auth.svg?sanitize=true">
+    </a>
+  </div>
+</h2>
+
+<p></p>
+<p></p><h3>
+    OAuth 2.0 for the masses!
+</h3>
+
+<p></p>
+<p></p><p>
+    &lt;strong&gt;
+        <!-- <a href="https://salte.io">Website</a> -->
+        <!-- • -->
+        <a href="https://salte-auth.github.io/salte-auth">Docs</a>
+        &#x2022;
+        <a href="https://salte-auth-demo.glitch.me">Demo</a>
+    &lt;/strong&gt;
+</p>
+
+<p></p>
+<p><div>
+
+  <a href="https://npmjs.org/package/@salte-auth/salte-auth"><img src="https://img.shields.io/npm/v/@salte-auth/salte-auth.svg?style=flat" alt="NPM Version"></a>
+  <a href="https://npmjs.org/package/@salte-auth/salte-auth"><img src="https://img.shields.io/npm/dm/@salte-auth/salte-auth.svg?style=flat" alt="NPM Downloads"></a>
+  <a href="https://travis-ci.com/salte-auth/salte-auth"><img src="https://img.shields.io/travis/com/salte-auth/salte-auth/master.svg?style=flat" alt="Travis"></a>
+  <a href="https://coveralls.io/github/salte-auth/salte-auth?branch=master"><img src="https://img.shields.io/coveralls/salte-auth/salte-auth/master.svg" alt="Coveralls"></a>
+
+  <a href="https://github.com/semantic-release/semantic-release"><img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" alt="semantic-release"></a>
+  <a href="https://greenkeeper.io"><img src="https://badges.greenkeeper.io/salte-auth/salte-auth.svg" alt="Greenkeeper badge"></a>
+
+</div>
+
+</p>
+<h2 id="supported-browsers">Supported Browsers</h2><p><em>If a version isn&apos;t specified that means we test on the latest and greatest, however most versions of that browser should work.</em></p>
+<ul>
+<li>Chrome</li>
+<li>Firefox</li>
+<li>Safari 8+ (7.1 and below require a <a href="#promise-polyfill">Promise polyfill</a>)</li>
+<li>Edge</li>
+<li>IE 10+ (Requires a <a href="#promise-polyfill">Promise polyfill</a>)</li>
+</ul>
+<h2 id="promise-polyfill">Promise Polyfill</h2><p>Here&apos;s a list of well known ES6 Promise implementations developed by the community!</p>
+<ul>
+<li><a href="https://www.npmjs.com/package/es6-promise">es6-promise</a></li>
+<li><a href="https://www.npmjs.com/package/native-promise-only">native-promise-only</a></li>
+<li><a href="https://www.npmjs.com/package/bluebird">bluebird</a></li>
+</ul>
+<p><strong>Any other ES6 Promise implementation will work as well!</strong></p>
+<h2 id="install">Install</h2><p>You can install this package either with <code>npm</code> or with <code>bower</code>.</p>
+<h2 id="npm">npm</h2><pre><code class="lang-sh"><code class="source-code prettyprint">$ npm install @salte-auth/salte-auth</code>
+</code></pre>
+<p>Then add a <code>&lt;script&gt;</code> to your index.html:</p>
+<pre><code class="lang-html"><code class="source-code prettyprint">&lt;script src=&quot;/node_modules/@salte-auth/dist/salte-auth.js&quot;&gt;&lt;/script&gt;</code>
+</code></pre>
+<p>Or <code>require(&apos;@salte-auth/salte-auth&apos;)</code> from your code.</p>
+<h2 id="bower">bower</h2><pre><code class="lang-sh"><code class="source-code prettyprint">$ bower install salte-auth/salte-auth</code>
+</code></pre>
+<p>Then add a <code>&lt;script&gt;</code> to your index.html:</p>
+<pre><code class="lang-html"><code class="source-code prettyprint">&lt;script src=&quot;/bower_components/salte-auth/dist/salte-auth.js&quot;&gt;&lt;/script&gt;</code>
+</code></pre>
+<h3 id="html-imports--polymer-1-x---2-x-">HTML Imports (Polymer 1.x - 2.x)</h3><p>We also support HTML Imports:</p>
+<pre><code class="lang-html"><code class="source-code prettyprint">&lt;link rel=&quot;import&quot; href=&quot;/bower_components/salte-auth/salte-auth.html&quot;&gt;</code>
+</code></pre>
+<h2 id="es6-usage">ES6 Usage</h2><pre><code class="lang-js"><code class="source-code prettyprint">import { SalteAuth } from &apos;@salte-auth/salte-auth&apos;;
+
+// Configure SalteAuth with Auth0&apos;s url and client id.
+const auth = new SalteAuth({
+  providerUrl: &apos;https://salte-os.auth0.com&apos;,
+  responseType: &apos;id_token&apos;,
+  redirectUrl: location.origin,
+  clientId: &apos;9JTBXBREtckkFHTxTNBceewrnn7NeDd0&apos;,
+  scope: &apos;openid&apos;,
+
+  routes: [
+    &apos;http://localhost:8080/account&apos;
+  ],
+
+  endpoints: [
+    &apos;https://jsonplaceholder.typicode.com/posts/1&apos;
+  ],
+
+  provider: &apos;auth0&apos;
+});
+
+// Display an iframe to the user that allows them to login
+auth.loginWithIframe();</code>
+</code></pre>
+<h2 id="es5-usage">ES5 Usage</h2><pre><code class="lang-html"><code class="source-code prettyprint">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;script src=&quot;/node_modules/@salte-auth/salte-auth/dist/salte-auth.js&quot;&gt;&lt;/script&gt;
+    &lt;script&gt;
+      const auth = new salte.SalteAuth({
+        providerUrl: &apos;https://salte-alpha.auth0.com&apos;,
+        responseType: &apos;id_token&apos;,
+        redirectUrl: location.origin,
+        clientId: &apos;mM6h2LHJikwdbkvdoiyE8kHhL7gcV8Wb&apos;,
+        scope: &apos;openid&apos;,
+
+        routes: [
+          &apos;http://localhost:8080/account&apos;
+        ],
+
+        endpoints: [
+          &apos;https://jsonplaceholder.typicode.com/posts/1&apos;
+        ],
+
+        provider: &apos;auth0&apos;,
+      });
+
+      auth.loginWithIframe();
+    &lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    ...
+  &lt;/body&gt;
+&lt;/html&gt;</code>
+</code></pre>
+<h2 id="known-issues">Known Issues</h2><p><em>These are issues that we know about, but don&apos;t have a clear fix for!</em></p>
+<p><strong>There are currently no known issues, thanks for checking!</strong></p>
+<h2 id="debugging">Debugging</h2><p>Debug logging can be enabled by setting a <code>localStorage</code> variable of <code>debug</code> to <code>@salte-auth/salte-auth*</code>.</p>
+<h2 id="documentation">Documentation</h2><p><a href="https://salte-auth.github.io/salte-auth/">Click here to view the documentation!</a></p>
+<p><strong>Use private or undocumented methods at your own risk, as they will not require a major version bump when breaking changes are made!</strong></p>
+<h2 id="shoutouts">Shoutouts</h2><ul>
+<li><a href="https://auth0.com/?utm_source=oss&amp;utm_medium=gp&amp;utm_campaign=oss">Auth0</a> - For providing us with an open source tenant!</li>
+</ul>
+<p><a href="https://auth0.com/?utm_source=oss&amp;utm_medium=gp&amp;utm_campaign=oss" target="_blank">
+  <img height="50" src="https://cdn.auth0.com/oss/badges/a0-badge-dark.png">
+</a></p>
+</div>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

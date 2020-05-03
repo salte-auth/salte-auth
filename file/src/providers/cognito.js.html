@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/providers/cognito.js | @salte-auth/salte-auth</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="OAuth 2.0 for the masses!"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="@salte-auth/salte-auth"><meta property="twitter:description" content="OAuth 2.0 for the masses!"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/salte-auth/salte-auth.git"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.js~SalteAuth.html">SalteAuth</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.profile.js~SalteAuthProfile.html">SalteAuthProfile</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.providers.js~Providers.html">Providers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.utilities.js~SalteAuthUtilities.html">SalteAuthUtilities</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-SalteAuthMixinGenerator">SalteAuthMixinGenerator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Config">Config</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-LoginConfig">LoginConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RedirectURLs">RedirectURLs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Validation">Validation</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#providers">providers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/auth0.js~SalteAuthAuth0Provider.html">SalteAuthAuth0Provider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/azure.js~SalteAuthAzureProvider.html">SalteAuthAzureProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/cognito.js~SalteAuthCognitoProvider.html">SalteAuthCognitoProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/okta.js~SalteAuthOktaProvider.html">SalteAuthOktaProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/wso2.js~SalteAuthWSO2Provider.html">SalteAuthWSO2Provider</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/providers/cognito.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/** Provider for Amazon&apos;s Cognito */
+class SalteAuthCognitoProvider {
+  /**
+   * Computes the authorization endpoint
+   * @param {Config} config configuration for salte auth
+   * @return {String} the authorization endpoint
+   */
+  static authorizeEndpoint(config) {
+    return `${config.providerUrl}/oauth2/authorize`;
+  }
+
+  /**
+   * Computes the deauthorization url
+   * @param {Config} config configuration for salte auth
+   * @return {String} the deauthorization url
+   */
+  static deauthorizeUrl(config) {
+    return this.$utilities.createUrl(`${config.providerUrl}/logout`, {
+      logout_uri: config.redirectUrl &amp;&amp; config.redirectUrl.logoutUrl || config.redirectUrl,
+      client_id: config.clientId
+    });
+  }
+
+  /**
+   * Provides a set of default config options required for cognito
+   */
+  static get defaultConfig() {
+    return {
+      validation: {
+        // Amazon Cognito doesn&apos;t support nonce validation
+        nonce: false
+      }
+    };
+  }
+}
+
+export default SalteAuthCognitoProvider;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

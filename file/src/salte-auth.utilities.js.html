@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/salte-auth.utilities.js | @salte-auth/salte-auth</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="OAuth 2.0 for the masses!"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="@salte-auth/salte-auth"><meta property="twitter:description" content="OAuth 2.0 for the masses!"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/salte-auth/salte-auth.git"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.js~SalteAuth.html">SalteAuth</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.profile.js~SalteAuthProfile.html">SalteAuthProfile</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.providers.js~Providers.html">Providers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.utilities.js~SalteAuthUtilities.html">SalteAuthUtilities</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-SalteAuthMixinGenerator">SalteAuthMixinGenerator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Config">Config</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-LoginConfig">LoginConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RedirectURLs">RedirectURLs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Validation">Validation</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#providers">providers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/auth0.js~SalteAuthAuth0Provider.html">SalteAuthAuth0Provider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/azure.js~SalteAuthAzureProvider.html">SalteAuthAzureProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/cognito.js~SalteAuthCognitoProvider.html">SalteAuthCognitoProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/okta.js~SalteAuthOktaProvider.html">SalteAuthOktaProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/wso2.js~SalteAuthWSO2Provider.html">SalteAuthWSO2Provider</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/salte-auth.utilities.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import assign from &apos;lodash/assign&apos;;
+import debug from &apos;debug&apos;;
+
+/** @ignore */
+const logger = debug(&apos;@salte-auth/salte-auth:utilities&apos;);
+
+/**
+ * Basic utilities to support the authentication flow
+ */
+class SalteAuthUtilities {
+  /**
+   * Wraps all XHR and Fetch (if available) requests to allow promise interceptors
+   * @param {Config} config configuration for salte auth
+   */
+  constructor(config) {
+    /** @ignore */
+    this.$$config = config;
+
+    /** @ignore */
+    this.$interceptors = {
+      fetch: [],
+      xhr: []
+    };
+
+    logger(&apos;Setting up wrappers for XMLHttpRequest...&apos;);
+    (function(open) {
+      XMLHttpRequest.prototype.open = function(method, url) {
+        /** @ignore */
+        this.$url = url;
+        return open.call(this, method, url);
+      };
+    })(XMLHttpRequest.prototype.open);
+
+    const self = this;
+    (function(send) {
+      XMLHttpRequest.prototype.send = function(data) {
+        const promises = [];
+        for (let i = 0; i &lt; self.$interceptors.xhr.length; i++) {
+          const interceptor = self.$interceptors.xhr[i];
+          promises.push(interceptor(this, data));
+        }
+        Promise.all(promises).then(() =&gt; {
+          send.call(this, data);
+        }).catch((error) =&gt; {
+          const event = document.createEvent(&apos;Event&apos;);
+          event.initEvent(&apos;error&apos;, false, true);
+          event.detail = error;
+          this.dispatchEvent(event);
+        });
+      };
+    })(XMLHttpRequest.prototype.send);
+
+    if (window.fetch) {
+      logger(&apos;Fetch detected, setting up wrappers...&apos;);
+      (function(fetch) {
+        window.fetch = function(input, options) {
+          const request = input instanceof Request ? input : new Request(input, options);
+
+          const promises = [];
+          for (let i = 0; i &lt; self.$interceptors.fetch.length; i++) {
+            const interceptor = self.$interceptors.fetch[i];
+            promises.push(interceptor(request));
+          }
+          return Promise.all(promises).then(() =&gt; {
+            return fetch.call(this, request);
+          });
+        };
+      })(fetch);
+    }
+  }
+
+  /**
+   * Creates a URL using a base url and a queryParams object
+   * @param {String} baseUrl the base url to attach the queryParams to
+   * @param {Object} queryParams the queryParams to attach to the baseUrl
+   * @return {String} the url with the request queryParams
+   */
+  createUrl(baseUrl, queryParams = {}) {
+    let url = baseUrl;
+
+    Object.keys(queryParams).forEach((key) =&gt; {
+      const value = queryParams[key];
+      if ([undefined, null, &apos;&apos;].indexOf(value) === -1) {
+        url += `${url.indexOf(&apos;?&apos;) === -1 ? &apos;?&apos; : &apos;&amp;&apos;}${key}=${encodeURIComponent(value)}`;
+      }
+    });
+
+    return url;
+  }
+
+  /**
+   * Converts a url to an absolute url
+   * @param {String} path the url path to resolve to an absolute url
+   * @return {String} the absolutely resolved url
+   */
+  resolveUrl(path) {
+    if (!this.$$urlDocument) {
+      /** @ignore */
+      this.$$urlDocument = document.implementation.createHTMLDocument(&apos;url&apos;);
+      /** @ignore */
+      this.$$urlBase = this.$$urlDocument.createElement(&apos;base&apos;);
+      /** @ignore */
+      this.$$urlAnchor = this.$$urlDocument.createElement(&apos;a&apos;);
+      this.$$urlDocument.head.appendChild(this.$$urlBase);
+    }
+    this.$$urlBase.href = window.location.protocol + &apos;//&apos; + window.location.host;
+    this.$$urlAnchor.href = path.replace(/ /g, &apos;%20&apos;);
+    return this.$$urlAnchor.href.replace(/\/$/, &apos;&apos;);
+  }
+
+  /**
+   * Checks if the given url matches any of the test urls
+   * @param {String} url The url to test
+   * @param {Array&lt;String|RegExp&gt;} tests The urls to match the test url against
+   * @return {Boolean} true if the url matches one of the tests
+   */
+  checkForMatchingUrl(url, tests = []) {
+    const resolvedUrl = this.resolveUrl(url);
+    for (let i = 0; i &lt; tests.length; i++) {
+      const test = tests[i];
+      if (test instanceof RegExp) {
+        if (resolvedUrl.match(test)) return true;
+      } else {
+        if (resolvedUrl.indexOf(this.resolveUrl(test)) === 0) return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Determines if the given route is a secured route
+   * @param {String} route the route to verify
+   * @param {Boolean|Array&lt;String&gt;} securedRoutes a list of routes that require authentication
+   * @return {Boolean} true if the route provided is a secured route
+   */
+  isRouteSecure(route, securedRoutes) {
+    if (securedRoutes === true) {
+      return true;
+    } else if (securedRoutes instanceof Array) {
+      return this.checkForMatchingUrl(route, securedRoutes);
+    }
+    return false;
+  }
+
+  /**
+   * Opens a popup window in the middle of the viewport
+   * @param {String} url the url to be loaded
+   * @param {String} name the name of the window
+   * @param {Number} height the height of the window
+   * @param {Number} width the width of the window
+   * @return {Promise} resolves when the popup is closed
+   */
+  openPopup(url, name = &apos;salte-auth&apos;, height = 600, width = 400) {
+    const top = ((window.innerHeight / 2) - (height / 2)) + window.screenTop;
+    const left = ((window.innerWidth / 2) - (width / 2)) + window.screenLeft;
+    const popupWindow = window.open(url, name, `height=${height}, width=${width}, status=yes, toolbar=no, menubar=no, location=no, top=${top}, left=${left}`);
+    if (!popupWindow) {
+      return Promise.reject(new ReferenceError(&apos;We were unable to open the popup window, its likely that the request was blocked.&apos;));
+    }
+
+    popupWindow.focus();
+    // TODO: Find a better way of tracking when a Window closes.
+    return new Promise((resolve) =&gt; {
+      const checker = setInterval(() =&gt; {
+        try {
+          if (!popupWindow.closed) {
+            // This could throw cross-domain errors, so we need to silence them.
+            const loginUrl = this.$$config.redirectUrl &amp;&amp; this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+            const logoutUrl = this.$$config.redirectUrl &amp;&amp; this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+            if (popupWindow.location.href.indexOf(loginUrl) !== 0 || popupWindow.location.href.indexOf(logoutUrl) !== 0) return;
+
+            location.hash = popupWindow.location.hash;
+            popupWindow.close();
+          }
+          clearInterval(checker);
+          setTimeout(resolve);
+        } catch (e) {}
+      }, 100);
+    });
+  }
+
+  /**
+   * Opens a new tab
+   * @param {String} url the url to be loaded
+   * @return {Promise} resolves when the tab is closed
+   */
+  openNewTab(url) {
+    const tabWindow = window.open(url, &apos;_blank&apos;);
+    if (!tabWindow) {
+      return Promise.reject(new ReferenceError(&apos;We were unable to open the new tab, its likely that the request was blocked.&apos;));
+    }
+
+    tabWindow.name = &apos;salte-auth&apos;;
+    tabWindow.focus();
+    // TODO: Find a better way of tracking when a Window closes.
+    return new Promise((resolve) =&gt; {
+      const checker = setInterval(() =&gt; {
+        try {
+          if (!tabWindow.closed) {
+            // This could throw cross-domain errors, so we need to silence them.
+            const loginUrl = this.$$config.redirectUrl &amp;&amp; this.$$config.redirectUrl.loginUrl || this.$$config.redirectUrl;
+            const logoutUrl = this.$$config.redirectUrl &amp;&amp; this.$$config.redirectUrl.logoutUrl || this.$$config.redirectUrl;
+            if (tabWindow.location.href.indexOf(loginUrl) !== 0 || tabWindow.location.href.indexOf(logoutUrl) !== 0) return;
+
+            location.hash = tabWindow.location.hash;
+            tabWindow.close();
+          }
+          clearInterval(checker);
+          setTimeout(resolve);
+        } catch (e) {}
+      }, 100);
+    });
+  }
+
+  /**
+   * Opens an iframe in the background
+   * @param {String} url the url to be loaded
+   * @param {Boolean} show whether the iframe should be visible
+   * @param {Number} timeout duration to wait before rejecting the request
+   * @return {Promise} resolves when the iframe is closed
+   */
+  createIframe(url, show, timeout) {
+    const iframe = document.createElement(&apos;iframe&apos;);
+    iframe.setAttribute(&apos;owner&apos;, &apos;salte-auth&apos;);
+    if (show) {
+      assign(iframe.style, {
+        position: &apos;fixed&apos;,
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: &apos;100%&apos;,
+        width: &apos;100%&apos;,
+        zIndex: 9999,
+        border: &apos;none&apos;,
+
+        opacity: 0,
+        transition: &apos;0.5s opacity&apos;
+      });
+
+      setTimeout(() =&gt; {
+        iframe.style.opacity = 1;
+      });
+    } else {
+      iframe.style.display = &apos;none&apos;;
+    }
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    return new Promise((resolve, reject) =&gt; {
+      const autoReject = timeout &amp;&amp; setTimeout(() =&gt; {
+        reject(new Error(&apos;Iframe failed to respond in time.&apos;));
+      }, timeout);
+      iframe.addEventListener(&apos;DOMNodeRemoved&apos;, () =&gt; {
+        setTimeout(resolve);
+        clearTimeout(autoReject);
+      }, { passive: true });
+    });
+  }
+
+  /**
+   * Adds a XMLHttpRequest interceptor
+   * @param {Function} interceptor the interceptor function
+   */
+  addXHRInterceptor(interceptor) {
+    this.$interceptors.xhr.push(interceptor);
+  }
+
+  /**
+   * Adds a fetch interceptor
+   * @param {Function} interceptor the interceptor function
+   */
+  addFetchInterceptor(interceptor) {
+    this.$interceptors.fetch.push(interceptor);
+  }
+
+  /**
+   * Checks if the current window is an iframe
+   * @return {HTMLIFrameElement} true if the current window is an iframe.
+   * @private
+   */
+  get $iframe() {
+    if (window.self === window.top) {
+      return null;
+    }
+    return parent.document.querySelector(&apos;body &gt; iframe[owner=&quot;salte-auth&quot;]&apos;);
+  }
+
+  /**
+   * Determines if the current window is a popup window opened by salte auth
+   * @return {Window} the window object
+   * @private
+   */
+  get $popup() {
+    if (window.opener &amp;&amp; window.name === &apos;salte-auth&apos;) {
+      return window;
+    }
+    return null;
+  }
+
+  /**
+   * Determines if the page is currently hidden
+   * @return {Boolean} true if the page is hidden
+   * @private
+   */
+  get $hidden() {
+    return document.hidden;
+  }
+
+  /**
+   * Navigates to the url provided.
+   * @param {String} url the url to navigate to
+   * @private
+   */
+  /* istanbul ignore next */
+  $navigate(url) {
+    location.href = url;
+  }
+}
+
+export { SalteAuthUtilities };
+export default SalteAuthUtilities;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/salte-auth.js | @salte-auth/salte-auth</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="OAuth 2.0 for the masses!"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="@salte-auth/salte-auth"><meta property="twitter:description" content="OAuth 2.0 for the masses!"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/salte-auth/salte-auth.git"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.js~SalteAuth.html">SalteAuth</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.profile.js~SalteAuthProfile.html">SalteAuthProfile</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.providers.js~Providers.html">Providers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/salte-auth.utilities.js~SalteAuthUtilities.html">SalteAuthUtilities</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-SalteAuthMixinGenerator">SalteAuthMixinGenerator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Config">Config</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-LoginConfig">LoginConfig</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RedirectURLs">RedirectURLs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Validation">Validation</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#providers">providers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/auth0.js~SalteAuthAuth0Provider.html">SalteAuthAuth0Provider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/azure.js~SalteAuthAzureProvider.html">SalteAuthAzureProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/cognito.js~SalteAuthCognitoProvider.html">SalteAuthCognitoProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/okta.js~SalteAuthOktaProvider.html">SalteAuthOktaProvider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/providers/wso2.js~SalteAuthWSO2Provider.html">SalteAuthWSO2Provider</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/salte-auth.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import assign from &apos;lodash/assign&apos;;
+import defaultsDeep from &apos;lodash/defaultsDeep&apos;;
+import get from &apos;lodash/get&apos;;
+import set from &apos;lodash/set&apos;;
+import uuid from &apos;uuid&apos;;
+import debug from &apos;debug&apos;;
+
+import { Providers } from &apos;./salte-auth.providers.js&apos;;
+import { SalteAuthProfile } from &apos;./salte-auth.profile.js&apos;;
+import { SalteAuthUtilities } from &apos;./salte-auth.utilities.js&apos;;
+import { SalteAuthMixinGenerator } from &apos;./salte-auth.mixin.js&apos;;
+
+/** @ignore */
+const logger = debug(&apos;@salte-auth/salte-auth&apos;);
+
+/**
+ * Disable certain security validations if your provider doesn&apos;t support them.
+ * @typedef {Object} Validation
+ * @property {Boolean} [nonce=true] Passing false will disable nonce validation, leaving you vulnerable to replay attacks.
+ * @property {Boolean} [state=true] Passing false will disable state validation, leaving you vulnerable to XSRF attacks.
+ * @property {Boolean} [azp=true] Passing false will disable azp validation.
+ * @property {Boolean} [aud=true] Passing false will disable aud validation.
+ */
+
+/**
+ * Disable certain security validations if your provider doesn&apos;t support them.
+ * @typedef {Object} RedirectURLs
+ * @property {String} [loginUrl] The redirect url specified in your identity provider for logging in.
+ * @property {String} [logoutUrl] The redirect url specified in your identity provider for logging out.
+ */
+
+/**
+ * The configuration for salte auth
+ * @typedef {Object} Config
+ * @property {String} providerUrl The base url of your identity provider.
+ * @property {(&apos;id_token&apos;|&apos;id_token token&apos;|&apos;code&apos;)} responseType The response type to authenticate with.
+ * @property {String|RedirectURLs} redirectUrl The redirect url specified in your identity provider.
+ * @property {String} clientId The client id of your identity provider
+ * @property {String} scope A list of space-delimited claims used to determine what user information is provided and what access is given. Most providers require &apos;openid&apos;.
+ * @property {Boolean|Array&lt;String&gt;} routes A list of secured routes. If true is provided then all routes are secured.
+ * @property {Array&lt;String|RegExp&gt;} endpoints A list of secured endpoints.
+ * @property {(&apos;auth0&apos;|&apos;azure&apos;|&apos;cognito&apos;|&apos;wso2&apos;|&apos;okta&apos;)} provider The identity provider you&apos;re using.
+ * @property {(&apos;iframe&apos;|&apos;redirect&apos;|false)} [loginType=&apos;iframe&apos;] The automated login type to use.
+ * @property {Function} [redirectLoginCallback] A callback that is invoked when a redirect login fails or succeeds.
+ * @property {(&apos;session&apos;|&apos;local&apos;)} [storageType=&apos;session&apos;] The Storage api to keep authenticate information stored in.
+ * @property {Boolean|Validation} [validation] Used to disable certain security validations if your provider doesn&apos;t support them.
+ * @property {Boolean} [autoRefresh=true] Automatically refreshes the users token upon switching tabs or one minute prior to expiration.
+ * @property {Number} [autoRefreshBuffer=60000] A number of miliseconds before token expiration to refresh.
+ * @property {Object} [queryParams] A key-value set of additional query params to attached to the login request.
+ */
+
+/**
+ * The configuration for salte auth
+ * @typedef {Object} LoginConfig
+ * @property {Boolean} [noPrompt=false] Disables login prompts, this should only be used for token renewal!
+ * @property {(false|&apos;errors&apos;|&apos;all&apos;)} [clear=&apos;all&apos;] Whether to clear &quot;all&quot; profile information, only &quot;errors&quot;, or nothing.
+ * @property {Boolean} [events=true] Whether events should be fired off if the login is successful or not.
+ */
+
+/**
+ * Authentication Controller
+ */
+class SalteAuth {
+  /**
+   * Sets up Salte Auth
+   * @param {Config} config configuration for salte auth
+   */
+  constructor(config) {
+    if (window.salte.auth) {
+      return window.salte.auth;
+    }
+
+    if (!config) {
+      throw new ReferenceError(&apos;A config must be provided.&apos;);
+    }
+
+    /**
+     * The supported identity providers
+     * @type {Providers}
+     * @private
+     */
+    this.$providers = Providers;
+    /**
+     * The active authentication promises
+     * @private
+     */
+    this.$promises = {};
+    /**
+     * The active authentication timeouts
+     * @private
+     */
+    this.$timeouts = {};
+    /**
+     * The registered listeners
+     * @private
+     */
+    this.$listeners = {};
+    /**
+     * The configuration for salte auth
+     * @type {Config}
+     * @private
+     */
+    this.$config = config;
+    this.$config = defaultsDeep(config, this.$provider.defaultConfig, {
+      loginType: &apos;iframe&apos;,
+      autoRefresh: true,
+      autoRefreshBuffer: 60000
+    });
+    /**
+     * Various utility functions for salte auth
+     * @type {SalteAuthUtilities}
+     * @private
+     */
+    this.$utilities = new SalteAuthUtilities(this.$config);
+
+    /**
+     * The user profile for salte auth
+     * @type {SalteAuthProfile}
+     */
+    this.profile = new SalteAuthProfile(this.$config);
+
+    /**
+     * A mixin built for Web Components
+     *
+     * @example
+     * class MyElement extends auth.mixin(HTMLElement) {
+     *   constructor() {
+     *     super();
+     *
+     *     console.log(this.auth); // This is the same as auth
+     *     console.log(this.user); // This is the same as auth.profile.userInfo.
+     *     console.log(this.authenticated); // This is the same as auth.profile.idTokenExpired.
+     *   }
+     * }
+     */
+    this.mixin = SalteAuthMixinGenerator(this);
+
+    if (this.$utilities.$iframe) {
+      logger(&apos;Detected iframe, removing...&apos;);
+      this.profile.$parseParams();
+      parent.document.body.removeChild(this.$utilities.$iframe);
+    } else if (this.$utilities.$popup) {
+      logger(&apos;Popup detected!&apos;);
+    } else if (this.profile.$redirectUrl &amp;&amp; location.href !== this.profile.$redirectUrl) {
+      logger(&apos;Redirect detected!&apos;);
+      this.profile.$parseParams();
+      const error = this.profile.$validate();
+
+      // Delay for an event loop to give users time to register a listener.
+      setTimeout(() =&gt; {
+        const action = this.profile.$actions(this.profile.$state);
+
+        if (error) {
+          this.profile.$clear();
+        } else {
+          logger(`Navigating to Redirect URL... (${this.profile.$redirectUrl})`);
+          this.$utilities.$navigate(this.profile.$redirectUrl);
+          this.profile.$redirectUrl = undefined;
+        }
+
+        if (action === &apos;login&apos;) {
+          this.$fire(&apos;login&apos;, error || null, this.profile.code || this.profile.userInfo);
+        } else if (action === &apos;logout&apos;) {
+          this.$fire(&apos;logout&apos;, error);
+        }
+
+        // TODO(v3.0.0): Remove the `redirectLoginCallback` api from `salte-auth`.
+        this.$config.redirectLoginCallback &amp;&amp; this.$config.redirectLoginCallback(error);
+      });
+    } else {
+      logger(&apos;Setting up interceptors...&apos;);
+      this.$utilities.addXHRInterceptor((request, data) =&gt; {
+        if (this.$config.responseType !== &apos;code&apos; &amp;&amp; this.$utilities.checkForMatchingUrl(request.$url, this.$config.endpoints)) {
+          return this.retrieveAccessToken().then((accessToken) =&gt; {
+            request.setRequestHeader(&apos;Authorization&apos;, `Bearer ${accessToken}`);
+          });
+        }
+      });
+
+      this.$utilities.addFetchInterceptor((request) =&gt; {
+        if (this.$config.responseType !== &apos;code&apos; &amp;&amp; this.$utilities.checkForMatchingUrl(request.url, this.$config.endpoints)) {
+          return this.retrieveAccessToken().then((accessToken) =&gt; {
+            request.headers.set(&apos;Authorization&apos;, `Bearer ${accessToken}`);
+          });
+        }
+      });
+
+      logger(&apos;Setting up route change detectors...&apos;);
+      window.addEventListener(&apos;popstate&apos;, this.$$onRouteChanged.bind(this), { passive: true });
+      document.addEventListener(&apos;click&apos;, this.$$onRouteChanged.bind(this), { passive: true });
+      setTimeout(this.$$onRouteChanged.bind(this));
+
+      logger(&apos;Setting up automatic renewal of token...&apos;);
+      this.on(&apos;login&apos;, (error) =&gt; {
+        if (error) return;
+
+        this.$$refreshToken();
+      });
+
+      this.on(&apos;refresh&apos;, (error) =&gt; {
+        if (error) return;
+
+        this.$$refreshToken();
+      });
+
+      this.on(&apos;logout&apos;, () =&gt; {
+        clearTimeout(this.$timeouts.refresh);
+      });
+
+      if (!this.profile.idTokenExpired) {
+        this.$$refreshToken();
+      }
+
+      document.addEventListener(&apos;visibilitychange&apos;, this.$$onVisibilityChanged.bind(this), {
+        passive: true
+      });
+
+      this.$fire(&apos;create&apos;, null, this);
+    }
+
+    // TODO(v3.0.0): Revoke singleton status from `salte-auth`.
+    window.salte.auth = this;
+
+    if (this.$config.redirectLoginCallback) {
+      console.warn(`The &quot;redirectLoginCallback&quot; api has been deprecated in favor of the &quot;on&quot; api, see http://bit.ly/salte-auth-on for more info.`);
+    }
+  }
+
+  /**
+   * Returns the configured provider
+   * @type {Class|Object}
+   * @private
+   */
+  get $provider() {
+    if (!this.$config.provider) {
+      throw new ReferenceError(&apos;A provider must be specified&apos;);
+    }
+
+    if (typeof this.$config.provider === &apos;string&apos;) {
+      const provider = this.$providers[this.$config.provider];
+      if (!provider) {
+        throw new ReferenceError(`Unknown Provider (${this.$config.provider})`);
+      }
+      return provider;
+    }
+
+    return this.$config.provider;
+  }
+
+  /**
+   * The authentication url to retrieve the access token
+   * @type {String}
+   * @private
+   */
+  get $accessTokenUrl() {
+    this.profile.$localState = uuid.v4();
+    this.profile.$nonce = uuid.v4();
+
+    let authorizeEndpoint = `${this.$config.providerUrl}/authorize`;
+    if (this.$provider.authorizeEndpoint) {
+      authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
+    }
+
+    return this.$utilities.createUrl(authorizeEndpoint, assign({
+      &apos;state&apos;: this.profile.$localState,
+      &apos;nonce&apos;: this.profile.$nonce,
+      &apos;response_type&apos;: &apos;token&apos;,
+      &apos;redirect_uri&apos;: this.$config.redirectUrl &amp;&amp; this.$config.redirectUrl.loginUrl || this.$config.redirectUrl,
+      &apos;client_id&apos;: this.$config.clientId,
+      &apos;scope&apos;: this.$config.scope,
+      &apos;prompt&apos;: &apos;none&apos;
+    }, this.$config.queryParams));
+  }
+
+  /**
+   * The authentication url to retrieve the id token
+   * @param {Boolean} refresh Whether this request is intended to refresh the token.
+   * @return {String} the computed login url
+   * @private
+   */
+  $loginUrl(refresh) {
+    this.profile.$localState = uuid.v4();
+    this.profile.$nonce = uuid.v4();
+
+    let authorizeEndpoint = `${this.$config.providerUrl}/authorize`;
+    if (this.$provider.authorizeEndpoint) {
+      authorizeEndpoint = this.$provider.authorizeEndpoint.call(this, this.$config);
+    }
+
+    return this.$utilities.createUrl(authorizeEndpoint, assign({
+      &apos;state&apos;: this.profile.$localState,
+      &apos;nonce&apos;: this.profile.$nonce,
+      &apos;response_type&apos;: this.$config.responseType,
+      &apos;redirect_uri&apos;: this.$config.redirectUrl &amp;&amp; this.$config.redirectUrl.loginUrl || this.$config.redirectUrl,
+      &apos;client_id&apos;: this.$config.clientId,
+      &apos;scope&apos;: this.$config.scope,
+      &apos;prompt&apos;: refresh ? &apos;none&apos; : undefined
+    }, this.$config.queryParams));
+  }
+
+  /**
+   * The url to logout of the configured provider
+   * @type {String}
+   * @private
+   */
+  get $deauthorizeUrl() {
+    return this.$provider.deauthorizeUrl.call(this, defaultsDeep(this.$config, {
+      idToken: this.profile.$idToken
+    }));
+  }
+
+  /**
+   * Listens for an event to be invoked.
+   * @param {(&apos;login&apos;|&apos;logout&apos;|&apos;refresh&apos;|&apos;expired&apos;)} eventType the event to listen for.
+   * @param {Function} callback A callback that fires when the specified event occurs.
+   *
+   * @example
+   * auth.on(&apos;login&apos;, (error, user) =&gt; {
+   *   if (error) {
+   *     console.log(&apos;something bad happened!&apos;);
+   *   }
+   *
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * });
+   *
+   * @example
+   * window.addEventListener(&apos;salte-auth-login&apos;, (event) =&gt; {
+   *   if (event.detail.error) {
+   *     console.log(&apos;something bad happened!&apos;);
+   *   }
+   *
+   *   console.log(event.detail.data); // This is the same as auth.profile.userInfo.
+   * });
+   */
+  on(eventType, callback) {
+    if ([&apos;login&apos;, &apos;logout&apos;, &apos;refresh&apos;, &apos;expired&apos;].indexOf(eventType) === -1) {
+      throw new ReferenceError(`Unknown Event Type (${eventType})`);
+    } else if (typeof callback !== &apos;function&apos;) {
+      throw new ReferenceError(&apos;Invalid callback provided!&apos;);
+    }
+
+    this.$listeners[eventType] = this.$listeners[eventType] || [];
+    this.$listeners[eventType].push(callback);
+  }
+
+  /**
+   * Deregister a callback previously registered.
+   * @param {(&apos;login&apos;|&apos;logout&apos;|&apos;refresh&apos;|&apos;expired&apos;)} eventType the event to deregister.
+   * @param {Function} callback A callback that fires when the specified event occurs.
+   *
+   * @example
+   * const someFunction = function() {};
+   *
+   * auth.on(&apos;login&apos;, someFunction);
+   *
+   * auth.off(&apos;login&apos;, someFunction);
+   */
+  off(eventType, callback) {
+    if ([&apos;login&apos;, &apos;logout&apos;, &apos;refresh&apos;, &apos;expired&apos;].indexOf(eventType) === -1) {
+      throw new ReferenceError(`Unknown Event Type (${eventType})`);
+    } else if (typeof callback !== &apos;function&apos;) {
+      throw new ReferenceError(&apos;Invalid callback provided!&apos;);
+    }
+
+    const eventListeners = this.$listeners[eventType];
+    if (!eventListeners || !eventListeners.length) return;
+
+    const index = eventListeners.indexOf(callback);
+    eventListeners.splice(index, 1);
+  }
+
+  /**
+   * Fires off an event to a given set of listeners
+   * @param {String} eventType The event that occurred.
+   * @param {Error} error The error tied to this event.
+   * @param {*} data The data tied to this event.
+   * @private
+   */
+  $fire(eventType, error, data) {
+    const event = document.createEvent(&apos;Event&apos;);
+    event.initEvent(`salte-auth-${eventType}`, false, true);
+    event.detail = { error, data };
+    window.dispatchEvent(event);
+
+    const eventListeners = this.$listeners[eventType];
+
+    if (!eventListeners || !eventListeners.length) return;
+
+    eventListeners.forEach((listener) =&gt; listener(error, data));
+  }
+
+  /**
+   * Authenticates using the iframe-based OAuth flow.
+   * @param {Boolean|LoginConfig} config Whether this request is intended to refresh the token.
+   * @return {Promise&lt;Object&gt;} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithIframe().then((user) =&gt; {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * }).catch((error) =&gt; {
+   *   console.error(&apos;Whoops something went wrong!&apos;, error);
+   * });
+   */
+  loginWithIframe(config) {
+    if (this.$promises.login) {
+      return this.$promises.login;
+    }
+
+    // TODO(v3.0.0): Remove backwards compatibility with refresh boolean.
+    if (typeof config === &apos;boolean&apos;) {
+      config = {
+        noPrompt: config,
+        clear: config ? &apos;errors&apos; : undefined,
+        events: false,
+        timeout: 3000
+      };
+    }
+
+    config = defaultsDeep(config, {
+      noPrompt: false,
+      clear: &apos;all&apos;,
+      events: true
+    });
+
+    if (config.clear === &apos;all&apos;) {
+      this.profile.$clear();
+    } else if (config.clear === &apos;errors&apos;) {
+      this.profile.$clearErrors();
+    }
+
+    this.$promises.login = this.$utilities.createIframe(this.$loginUrl(config.noPrompt), !config.noPrompt, config.timeout).then(() =&gt; {
+      this.$promises.login = null;
+      const error = this.profile.$validate();
+
+      if (error) {
+        return Promise.reject(error);
+      }
+
+      const response = this.profile.code || this.profile.userInfo;
+      if (config.events) {
+        this.$fire(&apos;login&apos;, null, response);
+      }
+      return response;
+    }).catch((error) =&gt; {
+      this.$promises.login = null;
+      if (config.events) {
+        this.$fire(&apos;login&apos;, error);
+      }
+      return Promise.reject(error);
+    });
+
+    return this.$promises.login;
+  }
+
+  /**
+   * Authenticates using the popup-based OAuth flow.
+   * @return {Promise&lt;Object&gt;} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithPopup().then((user) =&gt; {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * }).catch((error) =&gt; {
+   *   console.error(&apos;Whoops something went wrong!&apos;, error);
+   * });
+   */
+  loginWithPopup() {
+    if (this.$promises.login) {
+      return this.$promises.login;
+    }
+
+    this.profile.$clear();
+    this.$promises.login = this.$utilities.openPopup(this.$loginUrl()).then(() =&gt; {
+      this.$promises.login = null;
+      this.profile.$parseParams();
+      const error = this.profile.$validate();
+
+      if (error) {
+        this.profile.$clear();
+        return Promise.reject(error);
+      }
+
+      const response = this.profile.code || this.profile.userInfo;
+      this.$fire(&apos;login&apos;, null, response);
+      return response;
+    }).catch((error) =&gt; {
+      this.$promises.login = null;
+      this.$fire(&apos;login&apos;, error);
+      return Promise.reject(error);
+    });
+
+    return this.$promises.login;
+  }
+
+  /**
+   * Authenticates using the tab-based OAuth flow.
+   * @return {Promise&lt;Object&gt;} a promise that resolves when we finish authenticating
+   *
+   * @example
+   * auth.loginWithNewTab().then((user) =&gt; {
+   *   console.log(user); // This is the same as auth.profile.userInfo.
+   * }).catch((error) =&gt; {
+   *   console.error(&apos;Whoops something went wrong!&apos;, error);
+   * });
+   */
+  loginWithNewTab() {
+    if (this.$promises.login) {
+      return this.$promises.login;
+    }
+
+    this.profile.$clear();
+    this.$promises.login = this.$utilities.openNewTab(this.$loginUrl()).then(() =&gt; {
+      this.$promises.login = null;
+      this.profile.$parseParams();
+      const error = this.profile.$validate();
+
+      if (error) {
+        this.profile.$clear();
+        return Promise.reject(error);
+      }
+
+      const response = this.profile.code || this.profile.userInfo;
+      this.$fire(&apos;login&apos;, null, response);
+      return response;
+    }).catch((error) =&gt; {
+      this.$promises.login = null;
+      this.$fire(&apos;login&apos;, error);
+      return Promise.reject(error);
+    });
+
+    return this.$promises.login;
+  }
+
+  /**
+   * Authenticates using the redirect-based OAuth flow.
+   * @param {String} redirectUrl override for the redirect url, by default this will try to redirect the user back where they started.
+   * @return {Promise} a promise intended to block future login attempts.
+   *
+   * @example
+   * auth.loginWithRedirect(); // Don&apos;t bother with utilizing the promise here, it never resolves.
+   */
+  loginWithRedirect(redirectUrl) {
+    if (this.$config.redirectLoginCallback) {
+      console.warn(`The &quot;redirectLoginCallback&quot; api has been deprecated in favor of the &quot;on&quot; api, see http://bit.ly/salte-auth-on for more info.`);
+    }
+
+    if (this.$promises.login) {
+      return this.$promises.login;
+    }
+
+    // NOTE: This prevents the other login types from racing &quot;loginWithRedirect&quot;.
+    // Without this someone could potentially call login somewhere else before
+    // the app has a change to redirect. Which could result in an invalid state.
+    this.$promises.login = new Promise(() =&gt; {});
+
+    this.profile.$clear();
+    this.profile.$redirectUrl = redirectUrl &amp;&amp; this.$utilities.resolveUrl(redirectUrl) || this.profile.$redirectUrl || location.href;
+    const url = this.$loginUrl();
+
+    this.profile.$actions(this.profile.$localState, &apos;login&apos;);
+    this.$utilities.$navigate(url);
+
+    return this.$promises.login;
+  }
+
+  /**
+   * Unauthenticates using the iframe-based OAuth flow.
+   * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithIframe().then(() =&gt; {
+   *   console.log(&apos;success!&apos;);
+   * }).catch((error) =&gt; {
+   *   console.error(&apos;Whoops something went wrong!&apos;, error);
+   * });
+   */
+  logoutWithIframe() {
+    if (this.$promises.logout) {
+      return this.$promises.logout;
+    }
+
+    const deauthorizeUrl = this.$deauthorizeUrl;
+    this.profile.$clear();
+
+    this.$promises.logout = this.$utilities.createIframe(deauthorizeUrl).then(() =&gt; {
+      this.$promises.logout = null;
+      this.$fire(&apos;logout&apos;);
+    }).catch((error) =&gt; {
+      this.$promises.logout = null;
+      this.$fire(&apos;logout&apos;, error);
+      return Promise.reject(error);
+    });
+    return this.$promises.logout;
+  }
+
+  /**
+   * Unauthenticates using the popup-based OAuth flow.
+   * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithPopup().then(() =&gt; {
+   *   console.log(&apos;success!&apos;);
+   * }).catch((error) =&gt; {
+   *   console.error(&apos;Whoops something went wrong!&apos;, error);
+   * });
+   */
+  logoutWithPopup() {
+    if (this.$promises.logout) {
+      return this.$promises.logout;
+    }
+
+    const deauthorizeUrl = this.$deauthorizeUrl;
+    this.profile.$clear();
+
+    this.$promises.logout = this.$utilities.openPopup(deauthorizeUrl).then(() =&gt; {
+      this.$promises.logout = null;
+      this.$fire(&apos;logout&apos;);
+    }).catch((error) =&gt; {
+      this.$promises.logout = null;
+      this.$fire(&apos;logout&apos;, error);
+      return Promise.reject(error);
+    });
+
+    return this.$promises.logout;
+  }
+
+  /**
+   * Unauthenticates using the tab-based OAuth flow.
+   * @return {Promise} a promise that resolves when we finish deauthenticating
+   *
+   * @example
+   * auth.logoutWithNewTab().then(() =&gt; {
+   *   console.log(&apos;success!&apos;);
+   * }).catch((error) =&gt; {
+   *   console.error(&apos;Whoops something went wrong!&apos;, error);
+   * });
+   */
+  logoutWithNewTab() {
+    if (this.$promises.logout) {
+      return this.$promises.logout;
+    }
+
+    const deauthorizeUrl = this.$deauthorizeUrl;
+    this.profile.$clear();
+
+    this.$promises.logout = this.$utilities.openNewTab(deauthorizeUrl).then(() =&gt; {
+      this.$promises.logout = null;
+      this.$fire(&apos;logout&apos;);
+    }).catch((error) =&gt; {
+      this.$promises.logout = null;
+      this.$fire(&apos;logout&apos;, error);
+      return Promise.reject(error);
+    });
+
+    return this.$promises.logout;
+  }
+
+  /**
+   * Logs the user out of their configured identity provider.
+   *
+   * @example
+   * auth.logoutWithRedirect();
+   */
+  logoutWithRedirect() {
+    const deauthorizeUrl = this.$deauthorizeUrl;
+    this.profile.$clear();
+
+    this.profile.$actions(this.profile.$localState, &apos;logout&apos;);
+    this.$utilities.$navigate(deauthorizeUrl);
+  }
+
+  /**
+   * Refreshes the users tokens and renews their session.
+   * @return {Promise} a promise that resolves when we finish renewing the users tokens.
+   */
+  refreshToken() {
+    if (this.$promises.refresh) {
+      return this.$promises.refresh;
+    }
+
+    this.$promises.refresh = this.loginWithIframe(true).then((user) =&gt; {
+      this.$promises.refresh = null;
+      const error = this.profile.$validate(true);
+
+      if (error) {
+        return Promise.reject(error);
+      }
+      this.$promises.refresh = null;
+      this.$fire(&apos;refresh&apos;, null, user);
+      return user;
+    }).catch((error) =&gt; {
+      this.$promises.refresh = null;
+      this.$fire(&apos;refresh&apos;, error);
+      return Promise.reject(error);
+    });
+
+    return this.$promises.refresh;
+  }
+  /**
+   * Registers a timeout that will automatically refresh the id token
+   */
+  $$refreshToken() {
+    if (this.$timeouts.refresh !== undefined) {
+      clearTimeout(this.$timeouts.refresh);
+    }
+
+    if (this.$timeouts.expired !== undefined) {
+      clearTimeout(this.$timeouts.expired);
+    }
+
+    const timeToExpiration = (this.profile.userInfo.exp * 1000) - Date.now();
+
+    this.$timeouts.refresh = setTimeout(() =&gt; {
+      // Allows Auto Refresh to be disabled
+      if (this.$config.autoRefresh) {
+        this.refreshToken().catch((error) =&gt; {
+          console.error(error);
+        });
+      } else {
+        this.$fire(&apos;refresh&apos;);
+      }
+    }, Math.max(timeToExpiration - this.$config.autoRefreshBuffer, 0));
+
+    this.$timeouts.expired = setTimeout(() =&gt; {
+      this.$fire(&apos;expired&apos;);
+    }, Math.max(timeToExpiration, 0));
+  }
+
+  /**
+   * Authenticates, requests the access token, and returns it if necessary.
+   * @return {Promise&lt;string&gt;} a promise that resolves when we retrieve the access token
+   */
+  retrieveAccessToken() {
+    if (this.$promises.token) {
+      logger(&apos;Existing token request detected, resolving...&apos;);
+      return this.$promises.token;
+    }
+
+    this.$promises.token = Promise.resolve();
+    if ((this.$config.responseType === &apos;code&apos; &amp;&amp; !this.profile.code) || (this.$config.responseType !== &apos;code&apos; &amp;&amp; this.profile.idTokenExpired)) {
+      logger(&apos;id token has expired, reauthenticating...&apos;);
+      if (this.$config.loginType === &apos;iframe&apos;) {
+        logger(&apos;Initiating the iframe flow...&apos;);
+        this.$promises.token = this.loginWithIframe();
+      } else if (this.$config.loginType === &apos;redirect&apos;) {
+        this.$promises.token = this.loginWithRedirect();
+      } else if (this.$config.loginType === false) {
+        if (this.$promises.login) {
+          this.$promises.token = this.$promises.login;
+        } else {
+          this.$promises.token = null;
+          return Promise.reject(new ReferenceError(&apos;Automatic login is disabled, please login before making any requests!&apos;));
+        }
+      } else {
+        this.$promises.token = null;
+        return Promise.reject(new ReferenceError(`Invalid Login Type (${this.$config.loginType})`));
+      }
+    }
+
+    if (this.$config.responseType !== &apos;code&apos;) {
+      this.$promises.token = this.$promises.token.then(() =&gt; {
+        this.profile.$clearErrors();
+        if (this.profile.accessTokenExpired) {
+          logger(&apos;Access token has expired, renewing...&apos;);
+          return this.$utilities.createIframe(this.$accessTokenUrl).then(() =&gt; {
+            const error = this.profile.$validate(true);
+
+            if (error) {
+              return Promise.reject(error);
+            }
+            return this.profile.$accessToken;
+          });
+        }
+        return this.profile.$accessToken;
+      });
+    }
+
+    if (this.$promises.token) {
+      this.$promises.token = this.$promises.token.then((response) =&gt; {
+        this.$promises.token = null;
+        return response;
+      }).catch((error) =&gt; {
+        this.$promises.token = null;
+        return Promise.reject(error);
+      });
+    }
+
+    return this.$promises.token;
+  }
+
+  /**
+   * Checks if the current route is secured and authenticates the user if necessary
+   * @ignore
+   */
+  $$onRouteChanged() {
+    logger(&apos;Route change detected, determining if the route is secured...&apos;);
+    if (!this.$utilities.isRouteSecure(location.href, this.$config.routes)) return;
+
+    logger(&apos;Route is secure, verifying tokens...&apos;);
+    this.retrieveAccessToken();
+  }
+
+  /**
+   * Disables automatic refresh of the token if the page is no longer visible
+   * @ignore
+   */
+  $$onVisibilityChanged() {
+    logger(&apos;Visibility change detected, deferring to the next event loop...&apos;);
+    logger(&apos;Determining if the id token has expired...&apos;);
+    if (this.profile.idTokenExpired || !this.$config.autoRefresh) return;
+
+    if (this.$utilities.$hidden) {
+      logger(&apos;Page is hidden, refreshing the token...&apos;);
+      this.refreshToken().then(() =&gt; {
+        logger(&apos;Disabling automatic renewal of the token...&apos;);
+        clearTimeout(this.$timeouts.refresh);
+        this.$timeouts.refresh = null;
+      });
+    } else {
+      logger(&apos;Page is visible restarting automatic token renewal...&apos;);
+      this.$$refreshToken();
+    }
+  }
+}
+
+set(window, &apos;salte.SalteAuth&apos;, get(window, &apos;salte.SalteAuth&apos;, SalteAuth));
+export { SalteAuth };
+export default SalteAuth;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
