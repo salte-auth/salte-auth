@@ -10,7 +10,7 @@ This guide will attempt to quickly walk you through how you can utilize Salte Au
 
 A `Provider` (Identity Provider) tells Salte Auth _who_ you're going to be authenticating with.
 
-For a list of examples you should check out the [providers](usage/providers) page!.
+For a list of examples you should check out the [providers](usage/providers.md) page!.
 
 ### 😱 Which Provider should I use?!?
 
