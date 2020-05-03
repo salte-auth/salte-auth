@@ -24,6 +24,7 @@ deploy:
   email: bot@salte.io
   name: Salte Bot
   github_token: $GH_TOKEN
+  repo: salte-auth/salte-auth.github.io
   local_dir: generated-docs
   on:
     branch: master
