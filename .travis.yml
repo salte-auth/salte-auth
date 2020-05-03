@@ -25,6 +25,7 @@ deploy:
   name: Salte Bot
   github_token: $GH_TOKEN
   repo: salte-auth/salte-auth.github.io
+  target_branch: master
   local_dir: generated-docs
   on:
     branch: master
