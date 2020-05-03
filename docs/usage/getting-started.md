@@ -10,7 +10,7 @@ This guide will attempt to quickly walk you through how you can utilize Salte Au
 
 A `Provider` (Identity Provider) tells Salte Auth _who_ you're going to be authenticating with.
 
-For a list of examples you should check out the [providers](usage/providers.md) page!.
+For a list of examples you should check out the [providers](providers.md) page!.
 
 ### 😱 Which Provider should I use?!?
 
@@ -30,7 +30,7 @@ If cost is more of a concern I'd recommend using one of the OAuth2 Providers lik
 
 A `Handler` tells Salte Auth _how_ you're going to be authenticating.
 
-For a list of examples you should check out the [handlers](usage/handlers.md) page!.
+For a list of examples you should check out the [handlers](handlers.md) page!.
 
 ## Setting up Salte Auth
 
