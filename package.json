@@ -1,6 +1,7 @@
 {
   "name": "@salte-auth/salte-auth",
   "version": "3.0.0",
+  "browser": "dist/salte-auth.min.js",
   "main": "dist/salte-auth.min.js",
   "module": "dist/salte-auth.min.mjs",
   "types": "dist/salte-auth.d.ts",
