@@ -23,7 +23,8 @@
     "url": "https://github.com/salte-auth/salte-auth.git"
   },
   "scripts": {
-    "start": "nps"
+    "start": "nps",
+    "prepublishOnly": "npm start build"
   },
   "license": "MIT",
   "devDependencies": {
