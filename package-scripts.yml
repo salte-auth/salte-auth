@@ -29,7 +29,7 @@ scripts:
       script: tsc --emitDeclarationOnly
       description: Builds both a minified and unminified artifacts
     docs:
-      script: typedoc --out generated-docs src
+      script: typedoc --out generated-docs src && touch generated-docs/.nojekyll
       description: Automatically generates documentation!
   report-coverage:
     script: coveralls < coverage/lcov.info
