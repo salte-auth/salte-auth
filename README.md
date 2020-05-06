@@ -15,8 +15,8 @@
 
 <p align="center">
 	<strong>
-		<!-- <a href="https://salte.io">Website</a> -->
-		<!-- • -->
+		<a href="https://salte-auth.github.io">API</a>
+		•
 		<a href="https://salte-auth.gitbook.io">Docs</a>
 		•
 		<a href="https://salte-auth-demo.glitch.me">Demo</a>
