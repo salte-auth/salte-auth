@@ -212,7 +212,7 @@ export class SalteAuth extends Shared {
       this.logger.info(`[logout]: logging out with ${provider.$name} via ${handler.$name}...`);
       await handler.open({
         redirectUrl: provider.redirectUrl('logout'),
-        url: provider.logout,
+        url: URL.url(provider.logout, provider.config.queryParams && provider.config.queryParams('logout')),
       });
 
       provider.storage.clear();
