@@ -303,4 +303,4 @@ export declare namespace SalteAuth {
 export { SalteAuthError } from './base/core/salte-auth-error';
 export { OAuth2Provider } from './base/provider-oauth2';
 export { OpenIDProvider } from './base/provider-openid';
-export { Handler, Utils, Generic };
+export { Provider, Handler, Utils, Generic };
