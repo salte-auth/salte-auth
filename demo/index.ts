@@ -23,6 +23,16 @@ const auth = new SalteAuth({
       responseType: 'id_token',
 
       routes: true,
+
+      queryParams: (type) => {
+        if (type === 'login') {
+          return {
+            customParameter: 'value'
+          };
+        }
+
+        return null;
+      },
     }),
 
     new Generic.OAuth2({

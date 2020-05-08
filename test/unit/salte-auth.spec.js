@@ -523,6 +523,57 @@ describe('SalteAuth', () => {
       expect(options.redirectUrl).to.equal(location.origin);
     });
 
+    it('should support extra query parameters', async () => {
+      openid = new OpenID({
+        clientID: '12345',
+        routes: true,
+        endpoints: [
+          'https://google.com'
+        ],
+
+        login() {
+          return 'https://google.com/login';
+        },
+
+        logout() {
+          return 'https://google.com/logout';
+        },
+
+        queryParams: (type) => type === 'logout' ? { hello: 'world' } : null,
+      });
+
+      class Custom extends Handler {
+        get name() {
+          return 'custom';
+        }
+      }
+
+      Custom.prototype.open = sinon.stub().returns(Promise.resolve({
+        state: '12345'
+      }));
+
+      sinon.stub(openid, 'validate');
+      sinon.stub(openid, 'sync');
+
+      const auth = new SalteAuth({
+        providers: [openid],
+
+        handlers: [
+          new Custom({ default: true })
+        ]
+      });
+
+      await auth.logout('generic.openid');
+
+      expect(auth.handler('custom').open.callCount).to.equal(1);
+
+      const [options] = auth.handler('custom').open.firstCall.args;
+      expect(options.url).to.equal('https://google.com/logout?hello=world');
+      expect(options.redirectUrl).to.equal(location.origin);
+
+      sinon.assert.calledOnce(openid.sync);
+    });
+
     it('should support throwing errors', async () => {
       class Custom extends Handler {
         get name() {

@@ -386,6 +386,30 @@ describe('OAuth2Provider', () => {
       expect(params.scope).to.equal('hello');
       expect(params.state).to.match(/^example-state-.+/);
     });
+
+    it('should support providing extra parameters', () => {
+      class Example extends OAuth2Provider {
+        get name() {
+          return 'example';
+        }
+
+        get login() {
+          return 'https://google.com';
+        }
+      };
+
+      const example = new Example({
+        clientID: '12345',
+        responseType: 'token',
+        scope: 'hello',
+
+        queryParams: (type) => type === 'login' ? { hello: 'world' } : null,
+      });
+
+      const params = getParams(example.$login());
+
+      expect(params.hello).to.equal('world');
+    });
   });
 
   describe('function(logout)', () => {

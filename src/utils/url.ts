@@ -58,4 +58,22 @@ export class URL {
 
     return parsed;
   }
+
+  /**
+   * Creates a url with the given query parameters
+   * @param base - the base url without query parameters
+   * @param params - the query parameters to attache to the url
+   * @returns the built url
+   */
+  public static url(base: string, params: { [key: string]: any }): string {
+    let url = base;
+
+    Common.forEach(params, (value, key) => {
+      if (Common.includes([undefined, null, ''], value)) return;
+
+      url += `${url.indexOf('?') === -1 ? '?' : '&'}${key}=${encodeURIComponent(value)}`;
+    });
+
+    return url;
+  }
 }
