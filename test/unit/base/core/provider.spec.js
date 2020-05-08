@@ -1,6 +1,8 @@
 import { expect } from 'chai';
+import sinon from 'sinon';
 
 import { Provider } from '../../../../src/base/core/provider';
+import { URL } from '../../../../src/utils';
 
 describe('Provider', () => {
   describe('getter($name)', () => {
@@ -95,61 +97,12 @@ describe('Provider', () => {
   });
 
   describe('function(url)', () => {
-    it(`should support building a url`, () => {
-      class Example extends Provider {
-        constructor(options) {
-          super(options);
+    it(`should invoke the URL util`, () => {
+      class Example extends Provider {};
 
-          expect(this.url('https://google.com', {
-            hello: 'world',
-            hallo: 'welt'
-          })).to.equal('https://google.com?hello=world&hallo=welt');
-        }
-      };
+      const example = new Example();
 
-      new Example();
-    });
-
-    it(`should ignore undefined, null, and empty values`, () => {
-      class Example extends Provider {
-        constructor(options) {
-          super(options);
-
-          expect(this.url('https://google.com', {
-            hello: undefined,
-            hallo: null,
-            example: ''
-          })).to.equal('https://google.com');
-        }
-      };
-
-      new Example();
-    });
-
-    it(`should support adding to a url with query params`, () => {
-      class Example extends Provider {
-        constructor(options) {
-          super(options);
-
-          expect(this.url('https://google.com?hello=world', {
-            hallo: 'welt'
-          })).to.equal('https://google.com?hello=world&hallo=welt');
-        }
-      };
-
-      new Example();
-    });
-
-    it(`should support not providing params`, () => {
-      class Example extends Provider {
-        constructor(options) {
-          super(options);
-
-          expect(this.url('https://google.com')).to.equal('https://google.com');
-        }
-      };
-
-      new Example();
+      expect(example.url).to.equal(URL.url);
     });
   });
 });

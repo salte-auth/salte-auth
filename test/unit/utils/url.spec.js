@@ -126,4 +126,31 @@ describe('URL', () => {
       });
     });
   });
+
+  describe('function(url)', () => {
+    it(`should support building a url`, () => {
+      expect(URL.url('https://google.com', {
+        hello: 'world',
+        hallo: 'welt'
+      })).to.equal('https://google.com?hello=world&hallo=welt');
+    });
+
+    it(`should ignore undefined, null, and empty values`, () => {
+      expect(URL.url('https://google.com', {
+        hello: undefined,
+        hallo: null,
+        example: ''
+      })).to.equal('https://google.com');
+    });
+
+    it(`should support adding to a url with query params`, () => {
+      expect(URL.url('https://google.com?hello=world', {
+        hallo: 'welt'
+      })).to.equal('https://google.com?hello=world&hallo=welt');
+    });
+
+    it(`should support not providing params`, () => {
+      expect(URL.url('https://google.com')).to.equal('https://google.com');
+    });
+  });
 });

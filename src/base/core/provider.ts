@@ -1,6 +1,6 @@
 import { Shared } from './shared';
 
-import { Common, Interceptors, Logger } from '../../utils';
+import { Common, Interceptors, Logger, URL } from '../../utils';
 import { SalteAuthError } from './salte-auth-error';
 
 export class Provider extends Shared {
@@ -46,23 +46,7 @@ export class Provider extends Shared {
     return `salte.auth.provider.${this.$name}`;
   }
 
-  /**
-   * Creates a url with the given query parameters
-   * @param base - the base url without query parameters
-   * @param params - the query parameters to attache to the url
-   * @returns the built url
-   */
-  protected url(base: string, params: object = {}): string {
-    let url = base;
-
-    Common.forEach(params, (value, key) => {
-      if (Common.includes([undefined, null, ''], value)) return;
-
-      url += `${url.indexOf('?') === -1 ? '?' : '&'}${key}=${encodeURIComponent(value)}`;
-    });
-
-    return url;
-  }
+  protected url = URL.url;
 
   /**
    * Returns the logout url for the provider.
@@ -157,6 +141,11 @@ export declare namespace Provider {
      * @defaultValue 'warn'
      */
     level?: ('error'|'warn'|'info'|'trace');
+
+    /**
+     * Add extra parameters to the given authentication request.
+     */
+    queryParams?: (type: 'login' | 'logout') => { [key: string]: any };
   }
 
   export interface ValidationOptions {
