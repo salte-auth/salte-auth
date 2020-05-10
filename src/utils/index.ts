@@ -8,3 +8,4 @@ export { Common } from './common';
 export { Events } from './events';
 export { URL } from './url';
 export { Logger } from './logger';
+export { Dedupe } from './dedupe';

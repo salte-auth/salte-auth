@@ -1,4 +1,4 @@
-import { Handler, SalteAuthError, Utils, OAuth2Provider, OpenIDProvider } from '../src/salte-auth';
+import { Handler, SalteAuthError, Utils } from '../src/salte-auth';
 
 export class Redirect extends Handler {
   public constructor(config?: Redirect.Config) {
@@ -17,7 +17,7 @@ export class Redirect extends Handler {
     return true;
   }
 
-  public connected({ action }: Handler.ConnectedOptions): OAuth2Provider.Validation | OpenIDProvider.Validation | void {
+  public connected({ action }: Handler.ConnectedOptions) {
     if (!action) return;
 
     const origin = this.storage.get('origin');
@@ -26,17 +26,17 @@ export class Redirect extends Handler {
 
     this.storage.delete('origin');
 
-    const parsed = Utils.URL.parse(location);
-
-    this.navigate(origin);
-
     if (action === 'login') {
+      // Does it make sense to navigate on 'logout'?
+      // NOTE: This order, matters since navigate modifies the location.
+      const parsed = Utils.URL.parse(location);
+      this.navigate(origin);
       return parsed;
     }
   }
 
-  public async open({ url, timeout = this.config.timeout }: Redirect.OpenOptions): Promise<OAuth2Provider.Validation | OpenIDProvider.Validation | void> {
-    this.storage.set('origin', location.href.replace(location.hash, ''));
+  public open({ url, timeout = this.config.timeout }: Redirect.OpenOptions): Promise<void> {
+    this.storage.set('origin', location.href);
 
     this.navigate(url);
 

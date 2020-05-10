@@ -5,11 +5,12 @@ cache: npm
 branches:
   only:
     - master
+    - /^ci/.*$/
 script:
   - npm start lint
   - npm start check-types
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then npm start test.ci; fi
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then npm start test.smoke; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm start test.ci; fi
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then npm start test.smoke; fi
   - npm start test
   - npm start build.docs
 after_success:
