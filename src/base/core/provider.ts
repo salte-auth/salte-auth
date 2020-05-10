@@ -1,6 +1,6 @@
 import { Shared } from './shared';
 
-import { Common, Interceptors, Logger, URL } from '../../utils';
+import { Common, Interceptors, Logger, URL, Dedupe } from '../../utils';
 import { SalteAuthError } from './salte-auth-error';
 
 export class Provider extends Shared {
@@ -47,6 +47,8 @@ export class Provider extends Shared {
   }
 
   protected url = URL.url;
+
+  public dedupe = Dedupe.dedupe();
 
   /**
    * Returns the logout url for the provider.
@@ -96,7 +98,7 @@ export interface Provider {
    * Invoked when an endpoint is marked as secured.
    * @returns true if the endpoint is already secured, otherwise it returns a url to secure the endpoint.
    */
-  secure?(request?: Interceptors.XHR.ExtendedXMLHttpRequest | Request): Promise<string | boolean>;
+  secure?(request?: Interceptors.XHR.ExtendedXMLHttpRequest | Request): Promise<'login' | boolean>;
 
   on(name: 'login', listener: (error?: Error, data?: any) => void): void;
   on(name: 'logout', listener: (error?: Error) => void): void;

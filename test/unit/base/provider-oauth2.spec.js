@@ -99,7 +99,7 @@ describe('OAuth2Provider', () => {
       expect(await example.secure()).to.equal(true);
     });
 
-    it(`should return a url if we need to login`, async () => {
+    it(`should return 'login' if we need to login`, async () => {
       class Example extends OAuth2Provider {
         get name() {
           return 'example';
@@ -116,12 +116,7 @@ describe('OAuth2Provider', () => {
         scope: 'hello'
       });
 
-      expect(await example.secure()).startsWith(`${example.url('https://google.com', {
-        client_id: '12345',
-        response_type: 'token',
-        redirect_uri: location.origin,
-        scope: 'hello'
-      })}&state=example-state-`);
+      expect(await example.secure()).equals('login');
     });
 
     it('should throw an error on unknown request types', async () => {

@@ -5,7 +5,6 @@ import sinon from 'sinon';
 import { SalteAuth, Utils, Handler } from '../../src/salte-auth';
 import { OpenID } from '../../src/generic';
 import { getError } from '../utils/get-error';
-import { ignoreError } from '../utils/ignore-error';
 
 const { expect } = chai;
 chai.use(chaiSinon);
@@ -16,18 +15,24 @@ describe('SalteAuth', () => {
   /** @type {OpenID} */
   let openid;
 
-  let routeCallbacks, clock;
+  let routeCallbacks, fetchInterceptors, xhrInterceptors, clock;
   beforeEach(() => {
     localStorage.clear();
     sessionStorage.clear();
 
     clock = sinon.useFakeTimers(1000);
     routeCallbacks = [];
+    fetchInterceptors = [];
+    xhrInterceptors = [];
     sinon.stub(Utils.Events, 'route').callsFake((routeCallback) => {
       routeCallbacks.push(routeCallback);
     });
-    Utils.Interceptors.Fetch.setup(true);
-    Utils.Interceptors.XHR.setup(true);
+    sinon.stub(Utils.Interceptors.Fetch, 'add').callsFake((interceptor) => {
+      fetchInterceptors.push(interceptor);
+    });
+    sinon.stub(Utils.Interceptors.XHR, 'add').callsFake((interceptor) => {
+      xhrInterceptors.push(interceptor);
+    });
 
     openid = new OpenID({
       clientID: '12345',
@@ -46,6 +51,10 @@ describe('SalteAuth', () => {
     });
 
     class BasicHandler extends Handler {
+      get auto() {
+        return true;
+      }
+
       get name() {
         return 'basic';
       }
@@ -72,9 +81,6 @@ describe('SalteAuth', () => {
     });
 
     it('should register various listeners', async () => {
-      sinon.stub(Utils.Interceptors.Fetch, 'add');
-      sinon.stub(Utils.Interceptors.XHR, 'add');
-
       class Custom extends Handler {
         get name() {
           return 'custom';
@@ -107,9 +113,6 @@ describe('SalteAuth', () => {
     });
 
     it('should support authentication wrap up for "login" on "connected"', async () => {
-      sinon.stub(Utils.Interceptors.Fetch, 'add');
-      sinon.stub(Utils.Interceptors.XHR, 'add');
-
       class Custom extends Handler {
         get name() {
           return 'custom';
@@ -134,7 +137,7 @@ describe('SalteAuth', () => {
         }
       });
 
-      new SalteAuth({
+      auth = new SalteAuth({
         providers: [openid],
 
         handlers: [custom]
@@ -148,10 +151,48 @@ describe('SalteAuth', () => {
       });
     });
 
-    it('should support authentication wrap up for "logout" on "connected"', async () => {
-      sinon.stub(Utils.Interceptors.Fetch, 'add');
-      sinon.stub(Utils.Interceptors.XHR, 'add');
+    it('should prevent logging in while wrapping up authentication for "login"', async () => {
+      class Custom extends Handler {
+        get name() {
+          return 'custom';
+        }
 
+        connected({ action }) {
+          expect(action).to.equal('login');
+
+          return { state: 'hello-world' };
+        }
+      }
+
+      const custom = new Custom({ default: true });
+
+      sinon.stub(openid, 'validate');
+      sinon.stub(Utils.StorageHelpers.CookieStorage.prototype, 'get').callsFake((key) => {
+        switch (key) {
+          case 'action': return 'login';
+          case 'handler': return 'custom';
+          case 'provider': return 'generic.openid';
+          default: throw new Error(`Unknown key. (${key})`);
+        }
+      });
+
+      auth = new SalteAuth({
+        providers: [openid],
+
+        handlers: [custom]
+      });
+
+      await auth.login(openid.$name);
+
+      await new Promise((resolve) => setTimeout(resolve));
+
+      expect(openid.validate.callCount).to.equal(1);
+      expect(openid.validate).to.be.calledWith({
+        state: 'hello-world'
+      });
+    });
+
+    it('should support authentication wrap up for "logout" on "connected"', async () => {
       class Custom extends Handler {
         get name() {
           return 'custom';
@@ -187,10 +228,45 @@ describe('SalteAuth', () => {
       expect(openid.sync.callCount).to.equal(1);
     });
 
-    it('should throw an error on authentication wrap up if the action is unknown', () => {
-      sinon.stub(Utils.Interceptors.Fetch, 'add');
-      sinon.stub(Utils.Interceptors.XHR, 'add');
+    it('should prevent logging out while wrapping up authentication for "logout"', async () => {
+      class Custom extends Handler {
+        get name() {
+          return 'custom';
+        }
 
+        connected({ action }) {
+          expect(action).to.equal('logout');
+        }
+      }
+
+      const custom = new Custom({ default: true });
+
+      sinon.spy(openid.storage, 'clear');
+      sinon.stub(openid, 'sync');
+      sinon.stub(Utils.StorageHelpers.CookieStorage.prototype, 'get').callsFake((key) => {
+        switch (key) {
+          case 'action': return 'logout';
+          case 'handler': return 'custom';
+          case 'provider': return 'generic.openid';
+          default: throw new Error(`Unknown key. (${key})`);
+        }
+      });
+
+      auth = new SalteAuth({
+        providers: [openid],
+
+        handlers: [custom]
+      });
+
+      await auth.logout(openid.$name);
+
+      await new Promise((resolve) => setTimeout(resolve));
+
+      expect(openid.storage.clear.callCount).to.equal(1);
+      expect(openid.sync.callCount).to.equal(1);
+    });
+
+    it('should throw an error on authentication wrap up if the action is unknown', () => {
       class Custom extends Handler {
         get name() {
           return 'custom';
@@ -257,127 +333,78 @@ describe('SalteAuth', () => {
   });
 
   describe('events(route)', () => {
+    beforeEach(() => {
+      sinon.stub(auth, '$secure');
+    });
+
     it(`should attempt to automatically log us in`, async () => {
-      // TODO: Clean this up...
-      const handler = auth.handler();
-      handler.auto = true;
-      handler.open = sinon.stub().returns(Promise.resolve());
-
-      let count = 0;
-      sinon.stub(openid, 'secure').callsFake(async () => {
-        count++;
-        if (count === 1) {
-          return 'https://google.com';
-        } else {
-          return true;
-        }
-      });
-      sinon.stub(openid, 'validate');
-
       await routeCallbacks[0]();
 
-      expect(openid.secure.callCount).to.equal(2);
-      expect(openid.validate.callCount).to.equal(1);
-      expect(handler.open.callCount).to.equal(1);
-    });
-
-    it(`should skip if we're already logged in`, async () => {
-      sinon.stub(openid, 'secure').returns(Promise.resolve(true));
-      sinon.stub(openid, 'validate');
-
-      await routeCallbacks[0]();
-
-      expect(openid.validate.callCount).to.equal(0);
-    });
-
-    it(`should skip automatic login if the handler doesn't support it`, async () => {
-      sinon.stub(openid, 'validate');
-
-      expect(routeCallbacks.length).to.equal(1);
-
-      const error = await getError(routeCallbacks[0]());
-
-      expect(error.code).to.equal('auto_unsupported');
-      expect(openid.validate.callCount).to.equal(0);
+      expect(auth.$secure.callCount).to.equal(1);
     });
 
     it(`should skip automatic login if the provider isn't secured`, async () => {
       openid.config.routes = false;
 
       await routeCallbacks[0]();
+
+      expect(auth.$secure.callCount).to.equal(0);
     });
   });
 
   describe('interceptor(fetch)', () => {
-    it('should enhance fetch requests', async () => {
-      openid.storage.set('response-type', 'id_token');
-      openid.storage.set('id-token.raw', `0.${btoa(
-        JSON.stringify({
-          sub: '1234567890',
-          name: 'John Doe',
-          exp: Date.now() + 99999
-        })
-      )}.0`);
-      openid.storage.set('access-token.raw', '12345');
-      openid.storage.set('access-token.expiration', 99999);
-      openid.sync();
-
-      const promise = new Promise((resolve) => {
-        Utils.Interceptors.Fetch.add((request) => {
-          expect(request.headers.get('Authorization')).to.equal('Bearer 12345');
-          resolve();
-        })
-      });
-
-      await Promise.all([promise, ignoreError(fetch('https://google.com'))]);
+    beforeEach(() => {
+      sinon.stub(auth, '$secure');
     });
 
-    it(`should skip if a provider isn't secured`, async () => {
+    it(`should attempt to automatically log us in`, async () => {
+      openid.config.endpoints = ['https://google.com'];
+      const expectedRequest = {
+        url: 'https://google.com/hello/world'
+      };
+
+      await fetchInterceptors[0](expectedRequest);
+
+      sinon.assert.callCount(auth.$secure, 1);
+      sinon.assert.calledWith(auth.$secure, openid, expectedRequest);
+    });
+
+    it(`should skip automatic login if the provider isn't secured`, async () => {
       openid.config.endpoints = [];
 
-      const promise = new Promise((resolve) => {
-        Utils.Interceptors.Fetch.add((request) => {
-          expect(request.headers.get('Authorization')).to.equal(null);
-          resolve();
-        })
+      await fetchInterceptors[0]({
+        url: 'https://google.com/hello/world'
       });
 
-      await Promise.all([promise, ignoreError(fetch('https://google.com'))]);
+      sinon.assert.callCount(auth.$secure, 0);
     });
   });
 
   describe('interceptor(xhr)', () => {
-    it('should enhance XHR requests', async () => {
-      sinon.stub(openid, 'secure');
-
-      await new Promise((resolve) => {
-        const request = new XMLHttpRequest();
-
-        request.addEventListener('load', resolve, { passive: true });
-        request.addEventListener('error', resolve, { passive: true });
-
-        request.open('GET', 'https://google.com', false);
-        request.send();
-      });
-
-      expect(openid.secure.callCount).to.equal(1);
+    beforeEach(() => {
+      sinon.stub(auth, '$secure');
     });
 
-    it(`should skip if a provider isn't secured`, async () => {
+    it(`should attempt to automatically log us in`, async () => {
+      openid.config.endpoints = ['https://google.com'];
+      const expectedRequest = {
+        $url: 'https://google.com/hello/world'
+      };
+
+      await xhrInterceptors[0](expectedRequest);
+
+      sinon.assert.callCount(auth.$secure, 1);
+      sinon.assert.calledWith(auth.$secure, openid, expectedRequest);
+    });
+
+    it(`should skip automatic login if the provider isn't secured`, async () => {
       openid.config.endpoints = [];
-      sinon.stub(openid, 'secure');
 
-      await new Promise((resolve) => {
-        const request = new XMLHttpRequest();
-
-        request.addEventListener('load', resolve, { passive: true });
-        request.addEventListener('error', resolve, { passive: true });
-
-        request.open('GET', 'https://google.com', false);
-        request.send();
+      await xhrInterceptors[0]({
+        $url: 'https://google.com/hello/world'
       });
 
-      expect(openid.secure.callCount).to.equal(0);
+      sinon.assert.callCount(auth.$secure, 0);
     });
   });
 
@@ -631,6 +658,45 @@ describe('SalteAuth', () => {
       const error = getError(() => auth.handler('hello'));
 
       expect(error.code).to.equal('invalid_handler');
+    });
+  });
+
+  describe('function($secure)', () => {
+    it('should repeat until "secure" resolves to true', async () => {
+      sinon.stub(auth, 'login');
+      sinon.stub(openid, 'secure').onCall(0).resolves(false).resolves(true);
+
+      await auth.$secure(openid);
+
+      sinon.assert.callCount(auth.login, 0);
+      sinon.assert.callCount(openid.secure, 2);
+    });
+
+    it('should initiate a login if one is requested', async () => {
+      sinon.stub(auth, 'login');
+      sinon.stub(openid, 'secure').onCall(0).resolves('login').resolves(true);
+
+      await auth.$secure(openid);
+
+      sinon.assert.callCount(auth.login, 1);
+      sinon.assert.callCount(openid.secure, 2);
+    });
+
+    it('should throw an error if the default handler does not support automatic authentication', async () => {
+      sinon.stub(auth.handler(), 'auto').get(() => false);
+      sinon.stub(auth, 'login');
+      sinon.stub(openid, 'secure').onCall(0).resolves('login').resolves(true);
+
+      try {
+        await auth.$secure(openid);
+
+        expect.fail('Expected an error to be thrown.');
+      } catch (error) {
+        expect(error.code).equals('auto_unsupported');
+
+        sinon.assert.callCount(auth.login, 0);
+        sinon.assert.callCount(openid.secure, 1);
+      }
     });
   });
 });
