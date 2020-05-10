@@ -17,10 +17,10 @@ export class OAuth2Provider extends Provider {
     this.required('clientID', 'responseType');
   }
 
-  public async secure(request: Interceptors.XHR.ExtendedXMLHttpRequest | Request): Promise<string | boolean> {
+  public async secure(request: Interceptors.XHR.ExtendedXMLHttpRequest | Request): Promise<'login' | boolean> {
     if (this.config.responseType === 'token') {
       if (this.accessToken.expired) {
-        return this.$login();
+        return 'login';
       }
 
       if (request) {

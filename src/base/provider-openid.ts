@@ -26,22 +26,30 @@ export class OpenIDProvider extends OAuth2Provider {
     this.sync();
   }
 
-  public async secure(request: Interceptors.XHR.ExtendedXMLHttpRequest | Request): Promise<string | boolean> {
+  public async secure(request: Interceptors.XHR.ExtendedXMLHttpRequest | Request): Promise<'login' | boolean> {
     if (Common.includes(['id_token', 'id_token token', 'token'], this.config.responseType)) {
       if (this.idToken.expired) {
-        return this.$login();
+        this.logger.trace('[secure]: ID Token has expired, requesting login...');
+
+        return 'login';
       }
 
       if (this.accessToken.expired) {
-        const parsed = await Common.iframe({
-          redirectUrl: this.redirectUrl('login'),
-          url: this.$login({
-            prompt: 'none',
-            responseType: 'token',
-          }),
-        });
+        await this.dedupe('access-token', async () => {
+          this.logger.info(`[secure]: Expired access token detected, retrieving...`);
 
-        this.validate(parsed);
+          const parsed = await Common.iframe({
+            redirectUrl: this.redirectUrl('login'),
+            url: this.$login({
+              prompt: 'none',
+              responseType: 'token',
+            }),
+          });
+
+          this.logger.info(`[secure]: Access token retrieved! Validating...`);
+
+          this.validate(parsed);
+        })
       }
 
       if (request) {

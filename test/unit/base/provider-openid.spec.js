@@ -128,7 +128,7 @@ describe('OpenIDProvider', () => {
       expect(request.setRequestHeader.firstCall.args).to.deep.equal(['Authorization', 'Bearer 12345']);
     });
 
-    it('should return a login url if the id token is expired', async () => {
+    it(`should return 'login' if we need to login`, async () => {
       class Example extends OpenIDProvider {
         get name() {
           return 'example';
@@ -143,18 +143,10 @@ describe('OpenIDProvider', () => {
         clientID: '12345'
       });
 
-      const url = await example.secure();
-      const params = getParams(url);
-
-      expect(params.client_id).to.equal('12345');
-      expect(params.response_type).to.equal('id_token');
-      expect(params.redirect_uri).to.equal(encodeURIComponent(location.origin));
-      expect(params.scope).to.equal('openid');
-      expect(params.state).to.match(/^example-state-.+/);
-      expect(params.nonce).to.match(/^example-nonce-.+/);
+      expect(await example.secure()).equals('login');
     });
 
-    it('should return a login url if the access token is expired', async () => {
+    it('should automatically renew the access token if it has expired', async () => {
       class Example extends OpenIDProvider {
         get name() {
           return 'example';
