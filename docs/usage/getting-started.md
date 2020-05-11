@@ -50,7 +50,7 @@ $ npm install @salte-auth/redirect
 ```js
 import { SalteAuth } from '@salte-auth/salte-auth';
 import { Auth0 } from '@salte-auth/auth0';
-import { Tab } from '@salte-auth/tab';
+import { Redirect } from '@salte-auth/redirect';
 
 // Configure SalteAuth with Auth0's url and client id.
 const auth = new SalteAuth({
@@ -64,7 +64,7 @@ const auth = new SalteAuth({
   ],
 
   handlers: [
-    new Tab({
+    new Redirect({
       default: true
     })
   ]
