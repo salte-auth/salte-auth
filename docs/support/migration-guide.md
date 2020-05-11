@@ -35,6 +35,8 @@ const auth = new SalteAuth({
     audience: 'my-audience'
   }
 });
+
+console.log(auth.profile.userInfo);
 ```
 {% endcode-tabs-item %}
 
@@ -85,6 +87,8 @@ auth.on('login', (error, { data: idToken }) => {
   if (error) console.error(error);
   else console.log(idToken.user);
 });
+
+console.log(auth.provider('auth0').idToken.user);
 ```
 {% endcode-tabs-item %}
 {% endcode-tabs %}
