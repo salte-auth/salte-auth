@@ -19,6 +19,18 @@ describe('IDToken', () => {
       });
     });
 
+    it('should support accessing non-standard properties', () => {
+      const user = IDToken.parse(`0.${btoa(
+        JSON.stringify({
+          sub: '1234567890',
+          name: 'John Doe',
+          hello: 'world'
+        })
+      )}.0`);
+
+      expect(user.hello).equals('world');
+    });
+
     it('should support decoding base64 url encoded tokens', () => {
       const user = IDToken.parse(`0.${encode(
         JSON.stringify({

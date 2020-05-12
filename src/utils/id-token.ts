@@ -36,6 +36,8 @@ export class IDToken {
 
 export declare namespace IDToken {
   export interface UserInfo {
+    [key: string]: any;
+
     /**
      * Issuer Identifier for the Issuer of the response.
      */
