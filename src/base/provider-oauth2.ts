@@ -128,7 +128,7 @@ export class OAuth2Provider extends Provider {
       ...this.config.queryParams && this.config.queryParams('login'),
       client_id: this.config.clientID,
       response_type: responseType,
-      redirect_uri: this.config.redirectUrl,
+      redirect_uri: this.redirectUrl('login'),
       scope: this.config.scope,
       state,
     });
