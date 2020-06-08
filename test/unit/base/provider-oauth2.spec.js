@@ -354,6 +354,37 @@ describe('OAuth2Provider', () => {
       expect(params.state).to.match(/^example-state-.+/);
     });
 
+    it(`should support redirectUrl as an object`, () => {
+      const expectedRedirectUrl = 'https://google.com/auth';
+      class Example extends OAuth2Provider {
+        get name() {
+          return 'example';
+        }
+
+        get login() {
+          return 'https://google.com';
+        }
+      };
+
+      const example = new Example({
+        clientID: '12345',
+        responseType: 'token',
+        scope: 'hello',
+
+        redirectUrl: {
+          login: expectedRedirectUrl,
+        },
+      });
+
+      const params = getParams(example.$login());
+
+      expect(params.client_id).to.equal('12345');
+      expect(params.response_type).to.equal('token');
+      expect(params.redirect_uri).to.equal(encodeURIComponent(expectedRedirectUrl));
+      expect(params.scope).to.equal('hello');
+      expect(params.state).to.match(/^example-state-.+/);
+    });
+
     it('should support providing overrides', () => {
       class Example extends OAuth2Provider {
         get name() {
