@@ -4,3 +4,4 @@ dist/
 generated-docs/
 npm-debug.log*
 .env
+package-lock.json
