@@ -73,8 +73,8 @@ export class OpenIDProvider extends OAuth2Provider {
     try {
       super.$validate(options);
 
-      const types = this.storage.get('response-type', '').split(' ');
-      if (Common.includes(types, 'id_token')) {
+      const { id_token, code } = options;
+      if (id_token) {
         const { id_token } = options;
 
         const user = IDToken.parse(id_token);
@@ -94,7 +94,7 @@ export class OpenIDProvider extends OAuth2Provider {
         }
 
         this.storage.set('id-token.raw', id_token);
-      } else if (Common.includes(types, 'code')) {
+      } else if (code) {
         this.storage.delete('id-token.raw');
       }
     } finally {
