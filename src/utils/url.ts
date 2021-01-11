@@ -65,7 +65,7 @@ export class URL {
    * @param params - the query parameters to attache to the url
    * @returns the built url
    */
-  public static url(base: string, params: { [key: string]: any }): string {
+  public static url(base: string, params?: { [key: string]: any }): string {
     let url = base;
 
     Common.forEach(params, (value, key) => {
