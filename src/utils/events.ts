@@ -1,5 +1,8 @@
 let setup = false;
-const callbacks: Function[] = [];
+
+type EventCallback = () => void;
+
+const callbacks: EventCallback[] = [];
 export declare interface SalteAuthEvent extends Event {
   detail?: any;
 }
@@ -15,7 +18,7 @@ function onRouteChange() {
 }
 
 export class Events {
-  public static route(callback: () => void) {
+  public static route(callback: () => void): void {
     if (!setup) {
       window.addEventListener('popstate', onRouteChange, { passive: true });
       window.addEventListener('click', onRouteChange, { passive: true });

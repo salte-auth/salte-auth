@@ -19,11 +19,11 @@ export class Handler extends Storage {
   /**
    * The unique name of the handler
    */
-  public get $name() {
+  public get $name(): string {
     return this.config.name || this.name;
   }
 
-  protected get key() {
+  protected get key(): string {
     return `salte.auth.handler.${this.$name}`;
   }
 
@@ -32,7 +32,7 @@ export class Handler extends Storage {
    * @param url - the url to navigate to
    */
   /* istanbul ignore next */
-  protected navigate(url: string) {
+  protected navigate(url: string): void {
     if (this.config.navigate === 'history' && url.indexOf(URL.origin) === 0) {
       history.pushState('', document.title, url);
     }
