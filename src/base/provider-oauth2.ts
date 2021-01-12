@@ -13,7 +13,7 @@ export class OAuth2Provider extends Provider {
     this.sync();
   }
 
-  public connected() {
+  public connected(): void {
     this.required('clientID', 'responseType');
   }
 
@@ -113,7 +113,7 @@ export class OAuth2Provider extends Provider {
     this.emit('login', null, this.code || this.accessToken);
   }
 
-  public get code() {
+  public get code(): string {
     return this.storage.get('code.raw');
   }
 
@@ -134,7 +134,7 @@ export class OAuth2Provider extends Provider {
     });
   }
 
-  public sync() {
+  public sync(): void {
     this.logger.trace('[sync] updating access token');
 
     this.accessToken = new AccessToken(

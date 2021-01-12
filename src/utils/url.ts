@@ -8,11 +8,11 @@ export class URL {
   /**
    * Outputs a result equivalent to `location.origin`
    */
-  public static get origin() {
+  public static get origin(): string {
     return `${location.protocol}//${location.host}`;
   }
 
-  public static resolve(path: string) {
+  public static resolve(path: string): string {
     if (!urlDocument) {
       urlDocument = document.implementation.createHTMLDocument('url');
       base = urlDocument.createElement('base');
@@ -42,7 +42,7 @@ export class URL {
     return tests === true;
   }
 
-  public static parse({ search, hash }: Location) {
+  public static parse({ search, hash }: Location): any {
     let params: string[] = [];
 
     if (search) params = params.concat(search.replace('?', '').split('&'));

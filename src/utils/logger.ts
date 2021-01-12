@@ -20,19 +20,19 @@ export class Logger {
     this.level = typeof(level) === 'string' ? this.toLevel(level) : level;
   }
 
-  public trace(message: string, ...optionalParams: any[]) {
+  public trace(message: string, ...optionalParams: any[]): void {
     this.log('trace', message, ...optionalParams);
   }
 
-  public info(message: string, ...optionalParams: any[]) {
+  public info(message: string, ...optionalParams: any[]): void {
     this.log('info', message, ...optionalParams);
   }
 
-  public warn(message: string, ...optionalParams: any[]) {
+  public warn(message: string, ...optionalParams: any[]): void {
     this.log('warn', message, ...optionalParams);
   }
 
-  public error(message: string, ...optionalParams: any[]) {
+  public error(message: string, ...optionalParams: any[]): void {
     this.log('error', message, ...optionalParams);
   }
 
@@ -42,7 +42,7 @@ export class Logger {
     }
   }
 
-  public enabled(level: string) {
+  public enabled(level: string): boolean {
     if (this.level === false) return false;
 
     return this.level === true || this.level <= this.toLevel(level);

@@ -141,7 +141,7 @@ export class OpenIDProvider extends OAuth2Provider {
     });
   }
 
-  public sync() {
+  public sync(): void {
     super.sync();
     this.logger.trace('[sync] updating id token');
 

@@ -11,7 +11,7 @@ export class AccessToken {
     this.type = type;
   }
 
-  public get expired() {
+  public get expired(): boolean {
     return !this.raw || this.expiration <= Date.now();
   }
 }

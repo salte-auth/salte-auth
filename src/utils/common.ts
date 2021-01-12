@@ -6,12 +6,12 @@ const debounces: {
 } = {};
 
 export class Common {
-  public static includes(source: any[] | string, value: any) {
+  public static includes(source: any[] | string, value: any): boolean {
     return source.indexOf(value) !== -1;
   }
 
   public static forEach<T>(source: T[], cb: (value: T, key: number | string) => void): void;
-  public static forEach<T extends object>(source: T, cb: (item: any, key: number | string) => void): void;
+  public static forEach<T extends Record<string, unknown>>(source: T, cb: (item: any, key: number | string) => void): void;
   public static forEach<T>(source: T[] | T, cb: (item: T | any, key: number | string) => void): void {
     if (Array.isArray(source)) {
       for (let i = 0; i < source.length; i++) {
@@ -25,7 +25,7 @@ export class Common {
   }
 
   public static find<T>(source: T[], cb: (value: T, key: any) => boolean): T;
-  public static find<T extends object>(source: T, cb: (item: any, key: any) => boolean): any;
+  public static find<T extends Record<string, unknown>>(source: T, cb: (item: any, key: any) => boolean): any;
   public static find<T>(source: T[] | T, cb: (item: T | any, key: any) => boolean): T | any {
     if (Array.isArray(source)) {
       for (let i = 0; i < source.length; i++) {
@@ -46,7 +46,7 @@ export class Common {
     return null;
   }
 
-  public static assign(target: any, ...sources: any[]) {
+  public static assign(target: any, ...sources: any[]): any {
     this.forEach(sources, (source) => {
       for (const key in source) {
         target[key] = source[key];
@@ -56,7 +56,7 @@ export class Common {
     return target;
   }
 
-  public static defaults(target: any, ...sources: any[]) {
+  public static defaults(target: any, ...sources: any[]): any {
     this.forEach(sources, (source) => {
       for (const key in source) {
         if (this.isObject(target[key]) && this.isObject(source[key])) {
@@ -70,7 +70,7 @@ export class Common {
     return target;
   }
 
-  public static isObject(value: any) {
+  public static isObject(value: any): boolean {
     return typeof(value) === 'object' && !Array.isArray(value);
   }
 

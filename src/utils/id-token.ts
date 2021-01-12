@@ -9,7 +9,7 @@ export class IDToken {
     this.user = IDToken.parse(this.raw);
   }
 
-  public get expired() {
+  public get expired(): boolean {
     return !this.user || (this.user.exp * 1000) <= Date.now();
   }
 
