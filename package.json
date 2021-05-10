@@ -59,7 +59,7 @@
     "karma-rollup-preprocessor": "^7.0.5",
     "karma-sauce-launcher": "^4.1.4",
     "karma-sourcemap-loader": "^0.3.7",
-    "lint-staged": "^10.2.0",
+    "lint-staged": "^11.0.0",
     "mocha": "^8.0.1",
     "nanoid": "^2.0.0",
     "nps": "^5.9.12",
