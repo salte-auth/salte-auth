@@ -15,3 +15,4 @@ Here's a list of well known ES6 Promise implementations developed by the communi
 * [bluebird](https://www.npmjs.com/package/bluebird)
 
 **Any other ES6 Promise implementation will work as well!**
+

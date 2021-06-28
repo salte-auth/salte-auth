@@ -19,3 +19,4 @@ Its purpose is to allow developers to quickly and easily log in their users whil
 **Finally what Salte Auth doesn't do:**
 
 - Create or store user credentials (We aren't a [Provider](usage/getting-started.md#what-is-a-provider) and we're proud of it! ✊)
+

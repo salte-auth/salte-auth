@@ -74,3 +74,4 @@ const auth = new SalteAuth({
 ### Examples
 
 Checkout our [examples repository](https://github.com/salte-auth/examples) for a collection of examples in a variety of frameworks!
+

@@ -92,3 +92,4 @@ console.log(auth.provider('auth0').idToken.user);
 ```
 {% endcode-tabs-item %}
 {% endcode-tabs %}
+
