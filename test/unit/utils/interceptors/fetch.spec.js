@@ -1,11 +1,11 @@
 import chai from 'chai';
-import chaiSinon from 'chai-sinon';
+import sinonChai from 'sinon-chai';
 import sinon from 'sinon';
 
 import { Fetch } from '../../../../src/utils/interceptors/fetch';
 
 const { expect } = chai;
-chai.use(chaiSinon);
+chai.use(sinonChai);
 
 describe('Fetch', () => {
   beforeEach(() => {
