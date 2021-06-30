@@ -124,6 +124,6 @@ const auth = new SalteAuth({
   ]
 });
 
-auth0.login('auth0');
+auth.login('auth0');
 ```
 
