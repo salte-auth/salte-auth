@@ -77,7 +77,7 @@ _These are issues that we know about, but don't have a clear fix for!_
 [npm-downloads-image]: https://img.shields.io/npm/dm/@salte-auth/salte-auth.svg?style=flat
 [npm-url]: https://npmjs.org/package/@salte-auth/salte-auth
 
-[github-actions-image]: https://img.shields.io/CI Build/com/salte-auth/salte-auth.svg?style=flat
+[github-actions-image]: https://github.com/salte-auth/salte-auth/actions/workflows/ci.yml/badge.svg?branch=master
 [github-actions-url]: https://github.com/salte-auth/salte-auth/actions/workflows/ci.yml
 
 [coveralls-image]: https://img.shields.io/coveralls/salte-auth/salte-auth.svg
