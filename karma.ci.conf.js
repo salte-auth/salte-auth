@@ -3,10 +3,12 @@ const common = require('./rollup.common.config.js');
 module.exports = (config) => {
   const browsers = [
     'Chrome',
-    'Firefox',
-    'MicrosoftEdge',
-    'Safari',
-    'Internet Explorer'
+    // Puppeteer support dropped? (causes build to fail)
+    // Error: Only Nightly release channel is supported in Devtools/Puppeteer for Firefox. Refer to the following issue: https://bugzilla.mozilla.org/show_bug.cgi?id=1606604
+    // 'Firefox',
+    // 'MicrosoftEdge',
+    // 'Safari',
+    // 'Internet Explorer'
   ];
 
   const customLaunchers = browsers.reduce((output, browser) => {
@@ -71,8 +73,7 @@ module.exports = (config) => {
 
     sauceLabs: {
       testName: 'salte-auth/salte-auth',
-      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-      startConnect: false
+      startConnect: true
     },
 
     customLaunchers: customLaunchers,

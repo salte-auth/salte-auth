@@ -1,5 +1,5 @@
 import chai from 'chai';
-import chaiSinon from 'chai-sinon';
+import sinonChai from 'sinon-chai';
 import sinon from 'sinon';
 
 import { SalteAuth, Utils, Handler } from '../../src/salte-auth';
@@ -7,7 +7,7 @@ import { OpenID } from '../../src/generic';
 import { getError } from '../utils/get-error';
 
 const { expect } = chai;
-chai.use(chaiSinon);
+chai.use(sinonChai);
 
 describe('SalteAuth', () => {
   /** @type {SalteAuth} */
