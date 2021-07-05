@@ -56,7 +56,7 @@ jobs:
       - name: Run Tests
         run: npm start test
       - name: Coveralls
-        uses: coverallsapp/github-action@main
+        uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
