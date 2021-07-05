@@ -94,11 +94,6 @@
     "last 2 Edge versions",
     "IE 11"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged && remove-lockfiles"
-    }
-  },
   "lint-staged": {
     "*.{js,ts}": [
       "eslint --fix"
