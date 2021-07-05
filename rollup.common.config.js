@@ -28,7 +28,7 @@ module.exports = function({ minified, es6, tests, coverage, demo, server }) {
         /**
          * ${name} JavaScript Library v${version}
          *
-         * @license MIT (https://github.com/salte-auth/salte-auth/blob/master/LICENSE)
+         * @license MIT (https://github.com/salte-auth/salte-auth/blob/main/LICENSE)
          *
          * Made with ♥ by ${contributors.join(', ')}
          */
