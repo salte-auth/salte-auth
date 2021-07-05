@@ -11,7 +11,7 @@
 
 ## Community Handlers
 
-[Open a Pull Request](https://github.com/salte-auth/salte-auth/blob/master/CONTRIBUTING.md#submitting-a-pull-request) to add your handler to the list.
+[Open a Pull Request](https://github.com/salte-auth/salte-auth/blob/main/CONTRIBUTING.md#submitting-a-pull-request) to add your handler to the list.
 
 <!-- 
 ~ Example ~

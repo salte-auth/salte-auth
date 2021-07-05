@@ -1,10 +1,10 @@
 <h2 align="center">
   <div>
     <a href="https://github.com/salte-auth/logos">
-      <img height="180px" src="https://raw.githubusercontent.com/salte-auth/logos/master/images/logo.svg?sanitize=true">
+      <img height="180px" src="https://raw.githubusercontent.com/salte-auth/logos/main/images/logo.svg?sanitize=true">
       <br>
       <br>
-      <img height="50px" src="https://raw.githubusercontent.com/salte-auth/logos/master/images/%40salte-auth/salte-auth.svg?sanitize=true">
+      <img height="50px" src="https://raw.githubusercontent.com/salte-auth/logos/main/images/%40salte-auth/salte-auth.svg?sanitize=true">
     </a>
   </div>
 </h2>
@@ -77,11 +77,11 @@ _These are issues that we know about, but don't have a clear fix for!_
 [npm-downloads-image]: https://img.shields.io/npm/dm/@salte-auth/salte-auth.svg?style=flat
 [npm-url]: https://npmjs.org/package/@salte-auth/salte-auth
 
-[github-actions-image]: https://github.com/salte-auth/salte-auth/actions/workflows/ci.yml/badge.svg?branch=master
+[github-actions-image]: https://github.com/salte-auth/salte-auth/actions/workflows/ci.yml/badge.svg?branch=main
 [github-actions-url]: https://github.com/salte-auth/salte-auth/actions/workflows/ci.yml
 
 [coveralls-image]: https://img.shields.io/coveralls/salte-auth/salte-auth.svg
-[coveralls-url]: https://coveralls.io/github/salte-auth/salte-auth?branch=master
+[coveralls-url]: https://coveralls.io/github/salte-auth/salte-auth?branch=main
 
 [semantic-release-url]: https://github.com/semantic-release/semantic-release
 [semantic-release-image]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg

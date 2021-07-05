@@ -1,6 +1,6 @@
 # Supported Browsers
 
-![Supported Browsers](https://raw.githubusercontent.com/salte-auth/logos/master/images/supported-browsers.svg?sanitize=true)
+![Supported Browsers](https://raw.githubusercontent.com/salte-auth/logos/main/images/supported-browsers.svg?sanitize=true)
 
 _We test the current and prior versions of the above browsers, with the exception of only testing and supporting IE 11._
 
