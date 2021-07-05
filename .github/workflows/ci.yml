@@ -9,62 +9,82 @@ on:
       - master
 
 jobs:
-  validate:
-    name: Validate
-    runs-on: ubuntu-latest
+  install:
+    name: Install
+    runs-on: ubuntu-18.04
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Setup Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 14
-      - run: npm i
-      - run: npm start lint
-      - run: npm start check-types
-      - run: npm start test
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node--${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install Dependencies
+        run: npm i
+
+  validate:
+    name: Validate
+    runs-on: ubuntu-18.04
+    needs: [install]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Restore node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node--${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Run Tests
+        run: npm start test
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-  # Disabled while I figured out why saucelabs refuses to start.
-  # saucelabs:
-  #   name: SauceLabs
-  #   runs-on: ubuntu-latest
-  #   if: ${{ github.ref == 'refs/heads/master' }}
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v2
-  #       with:
-  #         fetch-depth: 0
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v2
-  #       with:
-  #         node-version: 14
-  #     - run: npm i
-  #     - run: npm start test.ci
-  #       env:
-  #         SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-  #         SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-
   release:
     name: Release
+    runs-on: ubuntu-18.04
     needs: [validate]
-    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Setup Node.js
+      - name: Use Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 14
-      - run: npm i
-      - run: npx semantic-release
+      - name: Restore node modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node--${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      # Release the Codes!!
+      - name: Release!
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm start semantic-release
