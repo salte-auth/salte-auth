@@ -8,7 +8,7 @@ updates:
   ignore:
   - dependency-name: nanoid
     versions:
-    - "^3.0.0"
+    - "> 2"
   - dependency-name: puppeteer-core
     versions:
     - 8.0.0
