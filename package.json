@@ -46,7 +46,7 @@
     "diff": "^5.0.0",
     "dotenv": "^10.0.0",
     "es6-promise": "^4.2.8",
-    "eslint": "^7.0.0",
+    "eslint": "^8.6.0",
     "eslint-plugin-compat": "^3.5.1",
     "eslint-plugin-tsdoc": "^0.2.4",
     "husky": "^7.0.0",
