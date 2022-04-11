@@ -78,7 +78,7 @@
     "serve-handler": "^6.0.0",
     "sinon": "^11.1.1",
     "sinon-chai": "^3.7.0",
-    "typedoc": "^0.21.2",
+    "typedoc": "^0.22.15",
     "typescript": "^4.0.2",
     "universal-base64url": "^1.0.0",
     "url-polyfill": "^1.1.8",
