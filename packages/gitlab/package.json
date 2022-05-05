@@ -1,0 +1,44 @@
+{
+  "name": "@salte-auth/gitlab",
+  "version": "3.0.0",
+  "browser": {
+    "./dist/salte-auth-gitlab.cjs.js": "./dist/salte-auth-gitlab.browser.cjs.js",
+    "./dist/salte-auth-gitlab.esm.js": "./dist/salte-auth-gitlab.browser.esm.js"
+  },
+  "main": "dist/salte-auth-gitlab.cjs.js",
+  "module": "dist/salte-auth-gitlab.esm.js",
+  "types": "dist/declarations/src/index.d.ts",
+  "description": "A Salte Auth provider for authenticating with GitLab!",
+  "homepage": "https://github.com/salte-auth/gitlab",
+  "bugs": "https://github.com/salte-auth/gitlab/issues",
+  "contributors": [
+    "Ceci <admin@cecilias.me>",
+    "Dave Woodward <dave@salte.io>"
+  ],
+  "keywords": [
+    "salte-auth",
+    "oauth",
+    "2.0",
+    "openid",
+    "gitlab",
+    "authentication"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salte-auth/gitlab.git"
+  },
+  "scripts": {
+    "start": "nps",
+    "prepublishOnly": "npm start build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

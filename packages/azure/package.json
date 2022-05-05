@@ -1,0 +1,44 @@
+{
+  "name": "@salte-auth/azure",
+  "version": "3.0.1",
+  "browser": {
+    "./dist/salte-auth-azure.cjs.js": "./dist/salte-auth-azure.browser.cjs.js",
+    "./dist/salte-auth-azure.esm.js": "./dist/salte-auth-azure.browser.esm.js"
+  },
+  "main": "dist/salte-auth-azure.cjs.js",
+  "module": "dist/salte-auth-azure.esm.js",
+  "types": "dist/declarations/src/index.d.ts",
+  "description": "A Salte Auth provider for authenticating with Azure AD!",
+  "homepage": "https://github.com/salte-auth/azure",
+  "bugs": "https://github.com/salte-auth/azure/issues",
+  "contributors": [
+    "Ceci <admin@cecilias.me>",
+    "Dave Woodward <dave@salte.io>"
+  ],
+  "keywords": [
+    "salte-auth",
+    "oauth",
+    "2.0",
+    "openid",
+    "azure",
+    "authentication"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salte-auth/azure.git"
+  },
+  "scripts": {
+    "start": "nps",
+    "prepublishOnly": "npm start build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

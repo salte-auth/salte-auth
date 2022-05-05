@@ -1,7 +1,4 @@
+.yarn/
+.next/
 node_modules/
-coverage/
 dist/
-generated-docs/
-npm-debug.log*
-.env
-package-lock.json

@@ -1,0 +1,44 @@
+{
+  "name": "@salte-auth/cognito",
+  "version": "3.0.0",
+  "browser": {
+    "./dist/salte-auth-cognito.cjs.js": "./dist/salte-auth-cognito.browser.cjs.js",
+    "./dist/salte-auth-cognito.esm.js": "./dist/salte-auth-cognito.browser.esm.js"
+  },
+  "main": "dist/salte-auth-cognito.cjs.js",
+  "module": "dist/salte-auth-cognito.esm.js",
+  "types": "dist/declarations/src/index.d.ts",
+  "description": "A Salte Auth provider for authenticating with Amazon's Cognito!",
+  "homepage": "https://github.com/salte-auth/cognito",
+  "bugs": "https://github.com/salte-auth/cognito/issues",
+  "contributors": [
+    "Ceci <admin@cecilias.me>",
+    "Dave Woodward <dave@salte.io>"
+  ],
+  "keywords": [
+    "salte-auth",
+    "oauth",
+    "2.0",
+    "openid",
+    "cognito",
+    "authentication"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salte-auth/cognito.git"
+  },
+  "scripts": {
+    "start": "nps",
+    "prepublishOnly": "npm start build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

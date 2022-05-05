@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@2.0.0/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "salte-auth/salte-auth" }
+  ],
+  "baseBranch": "main",
+  "commit": false,
+  "access": "public",
+  "ignore": ["@salte-auth/demo"],
+  "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
+    "updateInternalDependents": "always"
+  }
+}

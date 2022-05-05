@@ -1,0 +1,44 @@
+{
+  "name": "@salte-auth/okta",
+  "version": "3.0.0",
+  "browser": {
+    "./dist/salte-auth-okta.cjs.js": "./dist/salte-auth-okta.browser.cjs.js",
+    "./dist/salte-auth-okta.esm.js": "./dist/salte-auth-okta.browser.esm.js"
+  },
+  "main": "dist/salte-auth-okta.cjs.js",
+  "module": "dist/salte-auth-okta.esm.js",
+  "types": "dist/declarations/src/index.d.ts",
+  "description": "A Salte Auth provider for authenticating with Okta!",
+  "homepage": "https://github.com/salte-auth/okta",
+  "bugs": "https://github.com/salte-auth/okta/issues",
+  "contributors": [
+    "Ceci <admin@cecilias.me>",
+    "Dave Woodward <dave@salte.io>"
+  ],
+  "keywords": [
+    "salte-auth",
+    "oauth",
+    "2.0",
+    "openid",
+    "okta",
+    "authentication"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salte-auth/okta.git"
+  },
+  "scripts": {
+    "start": "nps",
+    "prepublishOnly": "npm start build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

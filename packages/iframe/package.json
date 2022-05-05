@@ -1,0 +1,44 @@
+{
+  "name": "@salte-auth/iframe",
+  "version": "3.0.0",
+  "browser": {
+    "./dist/salte-auth-iframe.cjs.js": "./dist/salte-auth-iframe.browser.cjs.js",
+    "./dist/salte-auth-iframe.esm.js": "./dist/salte-auth-iframe.browser.esm.js"
+  },
+  "main": "dist/salte-auth-iframe.cjs.js",
+  "module": "dist/salte-auth-iframe.esm.js",
+  "types": "dist/declarations/src/index.d.ts",
+  "description": "A Salte Auth handler for authenticating via IFrame!",
+  "homepage": "https://github.com/salte-auth/iframe",
+  "bugs": "https://github.com/salte-auth/iframe/issues",
+  "contributors": [
+    "Ceci <admin@cecilias.me>",
+    "Dave Woodward <dave@salte.io>"
+  ],
+  "keywords": [
+    "salte-auth",
+    "oauth",
+    "2.0",
+    "openid",
+    "iframe",
+    "authentication"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salte-auth/iframe.git"
+  },
+  "scripts": {
+    "start": "nps",
+    "prepublishOnly": "npm start build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "@salte-auth/discord",
+  "version": "3.0.0",
+  "browser": {
+    "./dist/salte-auth-discord.cjs.js": "./dist/salte-auth-discord.browser.cjs.js",
+    "./dist/salte-auth-discord.esm.js": "./dist/salte-auth-discord.browser.esm.js"
+  },
+  "main": "dist/salte-auth-discord.cjs.js",
+  "module": "dist/salte-auth-discord.esm.js",
+  "types": "dist/declarations/src/index.d.ts",
+  "description": "A Salte Auth provider for authenticating with Discord!",
+  "homepage": "https://github.com/salte-auth/discord",
+  "bugs": "https://github.com/salte-auth/discord/issues",
+  "contributors": [
+    "Ceci <admin@cecilias.me>",
+    "Dave Woodward <dave@salte.io>"
+  ],
+  "keywords": [
+    "salte-auth",
+    "oauth",
+    "2.0",
+    "openid",
+    "discord",
+    "authentication"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salte-auth/discord.git"
+  },
+  "scripts": {
+    "start": "nps",
+    "prepublishOnly": "npm start build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  }
+}
