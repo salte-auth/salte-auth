@@ -1,0 +1,44 @@
+{
+  "name": "@salte-auth/wso2",
+  "version": "3.0.0",
+  "browser": {
+    "./dist/salte-auth-wso2.cjs.js": "./dist/salte-auth-wso2.browser.cjs.js",
+    "./dist/salte-auth-wso2.esm.js": "./dist/salte-auth-wso2.browser.esm.js"
+  },
+  "main": "dist/salte-auth-wso2.cjs.js",
+  "module": "dist/salte-auth-wso2.esm.js",
+  "types": "dist/declarations/src/index.d.ts",
+  "description": "A Salte Auth provider for authenticating with WSO2!",
+  "homepage": "https://github.com/salte-auth/wso2",
+  "bugs": "https://github.com/salte-auth/wso2/issues",
+  "contributors": [
+    "Ceci <admin@cecilias.me>",
+    "Dave Woodward <dave@salte.io>"
+  ],
+  "keywords": [
+    "salte-auth",
+    "oauth",
+    "2.0",
+    "openid",
+    "wso2",
+    "authentication"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salte-auth/wso2.git"
+  },
+  "scripts": {
+    "start": "nps",
+    "prepublishOnly": "npm start build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

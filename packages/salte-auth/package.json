@@ -1,0 +1,36 @@
+{
+  "name": "@salte-auth/salte-auth",
+  "version": "3.0.0",
+  "description": "Authentication for the modern web!",
+  "main": "dist/salte-auth-salte-auth.cjs.js",
+  "module": "dist/salte-auth-salte-auth.esm.js",
+  "browser": {
+    "./dist/salte-auth-salte-auth.cjs.js": "./dist/salte-auth-salte-auth.browser.cjs.js",
+    "./dist/salte-auth-salte-auth.esm.js": "./dist/salte-auth-salte-auth.browser.esm.js"
+  },
+  "types": "dist/declarations/src/index.d.ts",
+  "homepage": "https://github.com/salte-auth/salte-auth",
+  "bugs": "https://github.com/salte-auth/salte-auth/issues",
+  "contributors": [
+    "Ceci <admin@cecilias.me>",
+    "Dave Woodward <dave@salte.io>"
+  ],
+  "keywords": [
+    "salte-auth",
+    "oauth",
+    "2.0",
+    "authentication"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salte-auth/salte-auth.git"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.17.9",
+    "uuid": "^8.3.2"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "@salte-auth/bitbucket",
+  "version": "3.0.0",
+  "browser": {
+    "./dist/salte-auth-bitbucket.cjs.js": "./dist/salte-auth-bitbucket.browser.cjs.js",
+    "./dist/salte-auth-bitbucket.esm.js": "./dist/salte-auth-bitbucket.browser.esm.js"
+  },
+  "main": "dist/salte-auth-bitbucket.cjs.js",
+  "module": "dist/salte-auth-bitbucket.esm.js",
+  "types": "dist/declarations/src/index.d.ts",
+  "description": "A Salte Auth provider for authenticating with Bitbucket!",
+  "homepage": "https://github.com/salte-auth/bitbucket",
+  "bugs": "https://github.com/salte-auth/bitbucket/issues",
+  "contributors": [
+    "Ceci <admin@cecilias.me>",
+    "Dave Woodward <dave@salte.io>"
+  ],
+  "keywords": [
+    "salte-auth",
+    "oauth",
+    "2.0",
+    "openid",
+    "bitbucket",
+    "authentication"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/salte-auth/bitbucket.git"
+  },
+  "scripts": {
+    "start": "nps",
+    "prepublishOnly": "npm start build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@salte-auth/salte-auth": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
