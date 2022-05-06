@@ -1,6 +1,6 @@
 {
   "name": "@salte-auth/redirect",
-  "version": "3.0.10",
+  "version": "3.1.0",
   "description": "A Salte Auth handler for authenticating via Redirect!",
   "main": "dist/salte-auth-redirect.cjs.js",
   "module": "dist/salte-auth-redirect.esm.js",
@@ -29,10 +29,10 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@salte-auth/salte-auth": "^3.0.1"
+    "@salte-auth/salte-auth": "^3.1.0"
   },
   "peerDependencies": {
-    "@salte-auth/salte-auth": "^3.0.1"
+    "@salte-auth/salte-auth": "^3.1.0"
   },
   "publishConfig": {
     "access": "public"
