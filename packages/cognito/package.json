@@ -1,6 +1,6 @@
 {
   "name": "@salte-auth/cognito",
-  "version": "3.0.0",
+  "version": "3.0.10",
   "browser": {
     "./dist/salte-auth-cognito.cjs.js": "./dist/salte-auth-cognito.browser.cjs.js",
     "./dist/salte-auth-cognito.esm.js": "./dist/salte-auth-cognito.browser.esm.js"
@@ -27,16 +27,12 @@
     "type": "git",
     "url": "https://github.com/salte-auth/cognito.git"
   },
-  "scripts": {
-    "start": "nps",
-    "prepublishOnly": "npm start build"
-  },
   "license": "MIT",
   "devDependencies": {
-    "@salte-auth/salte-auth": "^3.0.0"
+    "@salte-auth/salte-auth": "^3.0.1"
   },
   "peerDependencies": {
-    "@salte-auth/salte-auth": "^3.0.0"
+    "@salte-auth/salte-auth": "^3.0.1"
   },
   "publishConfig": {
     "access": "public"

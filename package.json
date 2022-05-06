@@ -10,7 +10,8 @@
   "scripts": {
     "postinstall": "preconstruct dev && manypkg check",
     "build": "preconstruct build",
-    "watch": "preconstruct watch"
+    "watch": "preconstruct watch",
+    "release": "yarn preconstruct build && yarn changeset publish"
   },
   "dependencies": {
     "@babel/core": "^7.17.10",

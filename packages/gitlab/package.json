@@ -1,6 +1,6 @@
 {
   "name": "@salte-auth/gitlab",
-  "version": "3.0.0",
+  "version": "3.0.10",
   "browser": {
     "./dist/salte-auth-gitlab.cjs.js": "./dist/salte-auth-gitlab.browser.cjs.js",
     "./dist/salte-auth-gitlab.esm.js": "./dist/salte-auth-gitlab.browser.esm.js"
@@ -27,16 +27,12 @@
     "type": "git",
     "url": "https://github.com/salte-auth/gitlab.git"
   },
-  "scripts": {
-    "start": "nps",
-    "prepublishOnly": "npm start build"
-  },
   "license": "MIT",
   "devDependencies": {
-    "@salte-auth/salte-auth": "^3.0.0"
+    "@salte-auth/salte-auth": "^3.0.1"
   },
   "peerDependencies": {
-    "@salte-auth/salte-auth": "^3.0.0"
+    "@salte-auth/salte-auth": "^3.0.1"
   },
   "publishConfig": {
     "access": "public"
