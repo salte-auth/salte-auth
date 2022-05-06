@@ -9,7 +9,7 @@
     },
     "dependencies": {
         "@preconstruct/next": "^4.0.0",
-        "@salte-auth/redirect": "^4.0.0",
+        "@salte-auth/redirect": "^3.1.0",
         "@salte-auth/salte-auth": "^3.1.0",
         "@types/node": "^17.0.31",
         "@types/react": "^18.0.8",
