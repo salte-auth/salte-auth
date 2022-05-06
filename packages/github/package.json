@@ -1,6 +1,6 @@
 {
   "name": "@salte-auth/github",
-  "version": "3.0.10",
+  "version": "3.1.0",
   "browser": {
     "./dist/salte-auth-github.cjs.js": "./dist/salte-auth-github.browser.cjs.js",
     "./dist/salte-auth-github.esm.js": "./dist/salte-auth-github.browser.esm.js"
@@ -29,10 +29,10 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@salte-auth/salte-auth": "^3.0.1"
+    "@salte-auth/salte-auth": "^3.1.0"
   },
   "peerDependencies": {
-    "@salte-auth/salte-auth": "^3.0.1"
+    "@salte-auth/salte-auth": "^3.1.0"
   },
   "publishConfig": {
     "access": "public"

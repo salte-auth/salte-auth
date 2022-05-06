@@ -1,6 +1,6 @@
 {
   "name": "@salte-auth/salte-auth",
-  "version": "3.0.10",
+  "version": "3.1.0",
   "description": "Authentication for the modern web!",
   "main": "dist/salte-auth-salte-auth.cjs.js",
   "module": "dist/salte-auth-salte-auth.esm.js",

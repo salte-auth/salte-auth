@@ -1,6 +1,6 @@
 {
   "name": "@salte-auth/discord",
-  "version": "3.0.10",
+  "version": "3.1.0",
   "browser": {
     "./dist/salte-auth-discord.cjs.js": "./dist/salte-auth-discord.browser.cjs.js",
     "./dist/salte-auth-discord.esm.js": "./dist/salte-auth-discord.browser.esm.js"
@@ -29,9 +29,9 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@salte-auth/salte-auth": "^3.0.1"
+    "@salte-auth/salte-auth": "^3.1.0"
   },
   "peerDependencies": {
-    "@salte-auth/salte-auth": "^3.0.1"
+    "@salte-auth/salte-auth": "^3.1.0"
   }
 }
