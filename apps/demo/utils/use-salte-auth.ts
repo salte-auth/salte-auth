@@ -10,7 +10,7 @@ import {Discord} from '@salte-auth/discord';
 import {Facebook} from '@salte-auth/facebook';
 import {GitHub} from '@salte-auth/github';
 import {GitLab} from '@salte-auth/gitlab';
-import {Google} from '@salte-auth/google';
+import {GoogleOAuth2, GoogleOpenID} from '@salte-auth/google';
 import {Okta} from '@salte-auth/okta';
 
 // Handlers
@@ -59,14 +59,20 @@ export function useSalteAuth() {
             responseType: 'code',
           }),
 
-          new Google({
+          new GoogleOAuth2({
+            name: 'google-oauth2',
             clientID: '701257675570-eno2h1b57kranmaoj4245hbk5pignduh.apps.googleusercontent.com',
             responseType: 'token',
           }),
 
+          new GoogleOpenID({
+            name: 'google-openid',
+            clientID: '701257675570-eno2h1b57kranmaoj4245hbk5pignduh.apps.googleusercontent.com',
+          }),
+
           new Okta({
             url: 'https://dev-960892.oktapreview.com',
-            clientID: '0oajg1bj8hxM1z7pa0h7'
+            clientID: '0oajg1bj8hxM1z7pa0h7',
           }),
         ],
 

@@ -26,7 +26,7 @@ export function ProviderInfo({
   if (!provider || !(provider instanceof Provider)) return null;
 
   const rows = [
-    row('Name', provider.name)
+    row('Name', provider.$name)
   ];
 
   if (provider instanceof OpenIDProvider) {

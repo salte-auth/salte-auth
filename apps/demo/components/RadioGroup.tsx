@@ -33,6 +33,8 @@ export function RadioGroup({
     _setValue(value);
   }, [value]);
 
+  console.log(options);
+
   return (
     <div className={classNames(
       styles.radioGroup,

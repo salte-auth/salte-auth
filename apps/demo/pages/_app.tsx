@@ -37,7 +37,7 @@ export function App() {
 
     setProviderOptions(auth.config.providers.reduce((output, provider) => ({
       ...output,
-      [provider.name]: `${provider.constructor.name} ${provider instanceof OpenIDProvider ? '(OpenID)' : '(OAuth2)'}`
+      [provider.$name]: `${provider.constructor.name.replace(/\$\d+$/, '')} ${provider instanceof OpenIDProvider ? '(OpenID)' : '(OAuth2)'}`
     }), {}))
   }, [auth]);
 
