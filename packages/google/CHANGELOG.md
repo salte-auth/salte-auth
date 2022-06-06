@@ -1,5 +1,11 @@
 # @salte-auth/google
 
+## 3.2.0
+
+### Minor Changes
+
+- added support for openid connect for google auth
+
 ## 3.1.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@salte-auth/google",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "browser": {
     "./dist/salte-auth-google.cjs.js": "./dist/salte-auth-google.browser.cjs.js",
     "./dist/salte-auth-google.esm.js": "./dist/salte-auth-google.browser.esm.js"
