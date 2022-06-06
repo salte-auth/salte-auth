@@ -1,0 +1,21 @@
+.header {
+  font-size: 20px;
+  margin: 0;
+}
+
+.providerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.code {
+  display: flex;
+  background-color: #636e72;
+  color: white;
+  padding: 10px;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

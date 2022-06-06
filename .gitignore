@@ -1,4 +1,7 @@
-.yarn/
+.yarn/cache/
+.yarn/sdks/
+.yarn/unplugged/
+.yarn/install-state.gz
 .next/
 node_modules/
 dist/

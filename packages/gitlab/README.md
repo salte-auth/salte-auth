@@ -48,7 +48,7 @@ import { Redirect } from '@salte-auth/redirect';
 const auth = new SalteAuth({
   providers: [
     new GitLab({
-      clientID: '12345'
+      clientID: '5031b3d3051210cfb8448cbe2af591a6bcc041e0170ab78a5d43d3e2d9f559ed'
     })
   ],
 

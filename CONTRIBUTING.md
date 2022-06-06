@@ -1,5 +1,22 @@
 # Contributing to Salte Auth
 
+## Prerequisites
+
+- Yarn 3.x+
+
+## Setting Up Locally
+
+```sh
+$ yarn
+$ yarn build
+```
+
+## Testing Locally
+
+```sh
+$ yarn demo
+```
+
 ## What should I know before I get started?
 
 ### Salte Auth, Providers, and more

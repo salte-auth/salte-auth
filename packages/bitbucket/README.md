@@ -48,7 +48,8 @@ import { Redirect } from '@salte-auth/redirect';
 const auth = new SalteAuth({
   providers: [
     new Bitbucket({
-      clientID: '12345'
+      clientID: 'rdAU2YGcBS2XMvDGQg',
+      responseType: 'code',
     })
   ],
 

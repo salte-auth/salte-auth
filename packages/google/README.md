@@ -54,7 +54,7 @@ import { Redirect } from '@salte-auth/redirect';
 const auth = new SalteAuth({
   providers: [
     new Google({
-      clientID: '680805279527-a1fpj4j0q31e58qstvih9p2rljsdadp9.apps.googleusercontent.com',
+      clientID: '701257675570-eno2h1b57kranmaoj4245hbk5pignduh.apps.googleusercontent.com',
       responseType: 'code',
     })
   ],

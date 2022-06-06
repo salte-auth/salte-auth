@@ -9,13 +9,25 @@
     },
     "dependencies": {
         "@preconstruct/next": "^4.0.0",
-        "@salte-auth/redirect": "^3.1.0",
-        "@salte-auth/salte-auth": "^3.1.0",
+        "@salte-auth/auth0": "*",
+        "@salte-auth/azure": "*",
+        "@salte-auth/bitbucket": "*",
+        "@salte-auth/cognito": "*",
+        "@salte-auth/discord": "*",
+        "@salte-auth/facebook": "*",
+        "@salte-auth/github": "*",
+        "@salte-auth/gitlab": "*",
+        "@salte-auth/google": "*",
+        "@salte-auth/okta": "*",
+        "@salte-auth/redirect": "*",
+        "@salte-auth/salte-auth": "*",
         "@types/node": "^17.0.31",
         "@types/react": "^18.0.8",
+        "classnames": "^2.3.1",
         "next": "^12.1.6",
         "react": "^18.1.0",
         "react-dom": "^18.1.0",
+        "sass": "^1.52.2",
         "typescript": "^4.6.4"
     }
 }

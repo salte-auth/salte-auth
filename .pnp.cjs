@@ -92,18 +92,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "enableTopLevelFallback": true,\
     "ignorePatternData": "(^(?:\\\\.yarn\\\\/sdks(?:\\\\/(?!\\\\.{1,2}(?:\\\\/|$))(?:(?:(?!(?:^|\\\\/)\\\\.{1,2}(?:\\\\/|$)).)*?)|$))$)",\
     "fallbackExclusionList": [\
-      ["@salte-auth/auth0", ["workspace:packages/auth0"]],\
-      ["@salte-auth/azure", ["workspace:packages/azure"]],\
-      ["@salte-auth/bitbucket", ["workspace:packages/bitbucket"]],\
-      ["@salte-auth/cognito", ["workspace:packages/cognito"]],\
+      ["@salte-auth/auth0", ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/auth0", "workspace:packages/auth0"]],\
+      ["@salte-auth/azure", ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/azure", "workspace:packages/azure"]],\
+      ["@salte-auth/bitbucket", ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/bitbucket", "workspace:packages/bitbucket"]],\
+      ["@salte-auth/cognito", ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/cognito", "workspace:packages/cognito"]],\
       ["@salte-auth/demo", ["workspace:apps/demo"]],\
-      ["@salte-auth/discord", ["workspace:packages/discord"]],\
-      ["@salte-auth/facebook", ["workspace:packages/facebook"]],\
-      ["@salte-auth/github", ["workspace:packages/github"]],\
-      ["@salte-auth/gitlab", ["workspace:packages/gitlab"]],\
-      ["@salte-auth/google", ["workspace:packages/google"]],\
+      ["@salte-auth/discord", ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/discord", "workspace:packages/discord"]],\
+      ["@salte-auth/facebook", ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/facebook", "workspace:packages/facebook"]],\
+      ["@salte-auth/github", ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/github", "workspace:packages/github"]],\
+      ["@salte-auth/gitlab", ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/gitlab", "workspace:packages/gitlab"]],\
+      ["@salte-auth/google", ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/google", "workspace:packages/google"]],\
       ["@salte-auth/iframe", ["workspace:packages/iframe"]],\
-      ["@salte-auth/okta", ["workspace:packages/okta"]],\
+      ["@salte-auth/okta", ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/okta", "workspace:packages/okta"]],\
       ["@salte-auth/popup", ["workspace:packages/popup"]],\
       ["@salte-auth/redirect", ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/redirect", "workspace:packages/redirect"]],\
       ["@salte-auth/root", ["workspace:."]],\
@@ -128,7 +128,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@changesets/cli", "npm:2.22.0"],\
             ["@manypkg/cli", "npm:0.19.1"],\
             ["@preconstruct/cli", "npm:2.1.5"],\
-            ["typescript", "patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=bda367"]\
+            ["concurrently", "npm:7.2.1"],\
+            ["typescript", "patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=7ad353"]\
           ],\
           "linkType": "SOFT"\
         }]\
@@ -3122,6 +3123,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@salte-auth/auth0", [\
+        ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/auth0", {\
+          "packageLocation": "./.yarn/__virtual__/@salte-auth-auth0-virtual-3d5c311dc6/1/packages/auth0/",\
+          "packageDependencies": [\
+            ["@salte-auth/auth0", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/auth0"],\
+            ["@salte-auth/salte-auth", "workspace:packages/salte-auth"],\
+            ["@types/salte-auth__salte-auth", null]\
+          ],\
+          "packagePeers": [\
+            "@salte-auth/salte-auth",\
+            "@types/salte-auth__salte-auth"\
+          ],\
+          "linkType": "SOFT"\
+        }],\
         ["workspace:packages/auth0", {\
           "packageLocation": "./packages/auth0/",\
           "packageDependencies": [\
@@ -3132,6 +3146,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@salte-auth/azure", [\
+        ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/azure", {\
+          "packageLocation": "./.yarn/__virtual__/@salte-auth-azure-virtual-35c60c2ea4/1/packages/azure/",\
+          "packageDependencies": [\
+            ["@salte-auth/azure", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/azure"],\
+            ["@salte-auth/salte-auth", "workspace:packages/salte-auth"],\
+            ["@types/salte-auth__salte-auth", null]\
+          ],\
+          "packagePeers": [\
+            "@salte-auth/salte-auth",\
+            "@types/salte-auth__salte-auth"\
+          ],\
+          "linkType": "SOFT"\
+        }],\
         ["workspace:packages/azure", {\
           "packageLocation": "./packages/azure/",\
           "packageDependencies": [\
@@ -3142,6 +3169,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@salte-auth/bitbucket", [\
+        ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/bitbucket", {\
+          "packageLocation": "./.yarn/__virtual__/@salte-auth-bitbucket-virtual-4d6f469494/1/packages/bitbucket/",\
+          "packageDependencies": [\
+            ["@salte-auth/bitbucket", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/bitbucket"],\
+            ["@salte-auth/salte-auth", "workspace:packages/salte-auth"],\
+            ["@types/salte-auth__salte-auth", null]\
+          ],\
+          "packagePeers": [\
+            "@salte-auth/salte-auth",\
+            "@types/salte-auth__salte-auth"\
+          ],\
+          "linkType": "SOFT"\
+        }],\
         ["workspace:packages/bitbucket", {\
           "packageLocation": "./packages/bitbucket/",\
           "packageDependencies": [\
@@ -3152,6 +3192,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@salte-auth/cognito", [\
+        ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/cognito", {\
+          "packageLocation": "./.yarn/__virtual__/@salte-auth-cognito-virtual-3f75bbf5be/1/packages/cognito/",\
+          "packageDependencies": [\
+            ["@salte-auth/cognito", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/cognito"],\
+            ["@salte-auth/salte-auth", "workspace:packages/salte-auth"],\
+            ["@types/salte-auth__salte-auth", null]\
+          ],\
+          "packagePeers": [\
+            "@salte-auth/salte-auth",\
+            "@types/salte-auth__salte-auth"\
+          ],\
+          "linkType": "SOFT"\
+        }],\
         ["workspace:packages/cognito", {\
           "packageLocation": "./packages/cognito/",\
           "packageDependencies": [\
@@ -3167,19 +3220,44 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["@salte-auth/demo", "workspace:apps/demo"],\
             ["@preconstruct/next", "npm:4.0.0"],\
+            ["@salte-auth/auth0", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/auth0"],\
+            ["@salte-auth/azure", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/azure"],\
+            ["@salte-auth/bitbucket", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/bitbucket"],\
+            ["@salte-auth/cognito", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/cognito"],\
+            ["@salte-auth/discord", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/discord"],\
+            ["@salte-auth/facebook", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/facebook"],\
+            ["@salte-auth/github", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/github"],\
+            ["@salte-auth/gitlab", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/gitlab"],\
+            ["@salte-auth/google", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/google"],\
+            ["@salte-auth/okta", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/okta"],\
             ["@salte-auth/redirect", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/redirect"],\
             ["@salte-auth/salte-auth", "workspace:packages/salte-auth"],\
             ["@types/node", "npm:17.0.31"],\
             ["@types/react", "npm:18.0.8"],\
+            ["classnames", "npm:2.3.1"],\
             ["next", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#npm:12.1.6"],\
             ["react", "npm:18.1.0"],\
             ["react-dom", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#npm:18.1.0"],\
-            ["typescript", "patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=bda367"]\
+            ["sass", "npm:1.52.2"],\
+            ["typescript", "patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=7ad353"]\
           ],\
           "linkType": "SOFT"\
         }]\
       ]],\
       ["@salte-auth/discord", [\
+        ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/discord", {\
+          "packageLocation": "./.yarn/__virtual__/@salte-auth-discord-virtual-82c764af5b/1/packages/discord/",\
+          "packageDependencies": [\
+            ["@salte-auth/discord", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/discord"],\
+            ["@salte-auth/salte-auth", "workspace:packages/salte-auth"],\
+            ["@types/salte-auth__salte-auth", null]\
+          ],\
+          "packagePeers": [\
+            "@salte-auth/salte-auth",\
+            "@types/salte-auth__salte-auth"\
+          ],\
+          "linkType": "SOFT"\
+        }],\
         ["workspace:packages/discord", {\
           "packageLocation": "./packages/discord/",\
           "packageDependencies": [\
@@ -3190,6 +3268,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@salte-auth/facebook", [\
+        ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/facebook", {\
+          "packageLocation": "./.yarn/__virtual__/@salte-auth-facebook-virtual-df0a3212e6/1/packages/facebook/",\
+          "packageDependencies": [\
+            ["@salte-auth/facebook", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/facebook"],\
+            ["@salte-auth/salte-auth", "workspace:packages/salte-auth"],\
+            ["@types/salte-auth__salte-auth", null]\
+          ],\
+          "packagePeers": [\
+            "@salte-auth/salte-auth",\
+            "@types/salte-auth__salte-auth"\
+          ],\
+          "linkType": "SOFT"\
+        }],\
         ["workspace:packages/facebook", {\
           "packageLocation": "./packages/facebook/",\
           "packageDependencies": [\
@@ -3200,6 +3291,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@salte-auth/github", [\
+        ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/github", {\
+          "packageLocation": "./.yarn/__virtual__/@salte-auth-github-virtual-130649145e/1/packages/github/",\
+          "packageDependencies": [\
+            ["@salte-auth/github", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/github"],\
+            ["@salte-auth/salte-auth", "workspace:packages/salte-auth"],\
+            ["@types/salte-auth__salte-auth", null]\
+          ],\
+          "packagePeers": [\
+            "@salte-auth/salte-auth",\
+            "@types/salte-auth__salte-auth"\
+          ],\
+          "linkType": "SOFT"\
+        }],\
         ["workspace:packages/github", {\
           "packageLocation": "./packages/github/",\
           "packageDependencies": [\
@@ -3210,6 +3314,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@salte-auth/gitlab", [\
+        ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/gitlab", {\
+          "packageLocation": "./.yarn/__virtual__/@salte-auth-gitlab-virtual-b30038913d/1/packages/gitlab/",\
+          "packageDependencies": [\
+            ["@salte-auth/gitlab", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/gitlab"],\
+            ["@salte-auth/salte-auth", "workspace:packages/salte-auth"],\
+            ["@types/salte-auth__salte-auth", null]\
+          ],\
+          "packagePeers": [\
+            "@salte-auth/salte-auth",\
+            "@types/salte-auth__salte-auth"\
+          ],\
+          "linkType": "SOFT"\
+        }],\
         ["workspace:packages/gitlab", {\
           "packageLocation": "./packages/gitlab/",\
           "packageDependencies": [\
@@ -3220,6 +3337,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@salte-auth/google", [\
+        ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/google", {\
+          "packageLocation": "./.yarn/__virtual__/@salte-auth-google-virtual-eadba3c2d7/1/packages/google/",\
+          "packageDependencies": [\
+            ["@salte-auth/google", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/google"],\
+            ["@salte-auth/salte-auth", "workspace:packages/salte-auth"],\
+            ["@types/salte-auth__salte-auth", null]\
+          ],\
+          "packagePeers": [\
+            "@salte-auth/salte-auth",\
+            "@types/salte-auth__salte-auth"\
+          ],\
+          "linkType": "SOFT"\
+        }],\
         ["workspace:packages/google", {\
           "packageLocation": "./packages/google/",\
           "packageDependencies": [\
@@ -3240,6 +3370,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@salte-auth/okta", [\
+        ["virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/okta", {\
+          "packageLocation": "./.yarn/__virtual__/@salte-auth-okta-virtual-100595fbfd/1/packages/okta/",\
+          "packageDependencies": [\
+            ["@salte-auth/okta", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#workspace:packages/okta"],\
+            ["@salte-auth/salte-auth", "workspace:packages/salte-auth"],\
+            ["@types/salte-auth__salte-auth", null]\
+          ],\
+          "packagePeers": [\
+            "@salte-auth/salte-auth",\
+            "@types/salte-auth__salte-auth"\
+          ],\
+          "linkType": "SOFT"\
+        }],\
         ["workspace:packages/okta", {\
           "packageLocation": "./packages/okta/",\
           "packageDependencies": [\
@@ -3297,7 +3440,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@changesets/cli", "npm:2.22.0"],\
             ["@manypkg/cli", "npm:0.19.1"],\
             ["@preconstruct/cli", "npm:2.1.5"],\
-            ["typescript", "patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=bda367"]\
+            ["concurrently", "npm:7.2.1"],\
+            ["typescript", "patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=7ad353"]\
           ],\
           "linkType": "SOFT"\
         }]\
@@ -3597,6 +3741,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["anymatch", [\
+        ["npm:3.1.2", {\
+          "packageLocation": "./.yarn/cache/anymatch-npm-3.1.2-1d5471acfa-985163db22.zip/node_modules/anymatch/",\
+          "packageDependencies": [\
+            ["anymatch", "npm:3.1.2"],\
+            ["normalize-path", "npm:3.0.0"],\
+            ["picomatch", "npm:2.3.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["aproba", [\
         ["npm:2.0.0", {\
           "packageLocation": "./.yarn/cache/aproba-npm-2.0.0-8716bcfde6-5615cadcfb.zip/node_modules/aproba/",\
@@ -3838,6 +3993,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["better-path-resolve", "npm:1.0.0"],\
             ["is-windows", "npm:1.0.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["binary-extensions", [\
+        ["npm:2.2.0", {\
+          "packageLocation": "./.yarn/cache/binary-extensions-npm-2.2.0-180c33fec7-ccd267956c.zip/node_modules/binary-extensions/",\
+          "packageDependencies": [\
+            ["binary-extensions", "npm:2.2.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4089,6 +4253,23 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["chokidar", [\
+        ["npm:3.5.3", {\
+          "packageLocation": "./.yarn/cache/chokidar-npm-3.5.3-c5f9b0a56a-b49fcde401.zip/node_modules/chokidar/",\
+          "packageDependencies": [\
+            ["chokidar", "npm:3.5.3"],\
+            ["anymatch", "npm:3.1.2"],\
+            ["braces", "npm:3.0.2"],\
+            ["fsevents", "patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=18f3a7"],\
+            ["glob-parent", "npm:5.1.2"],\
+            ["is-binary-path", "npm:2.1.0"],\
+            ["is-glob", "npm:4.0.3"],\
+            ["normalize-path", "npm:3.0.0"],\
+            ["readdirp", "npm:3.6.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["chownr", [\
         ["npm:2.0.0", {\
           "packageLocation": "./.yarn/cache/chownr-npm-2.0.0-638f1c9c61-c57cf9dd07.zip/node_modules/chownr/",\
@@ -4127,6 +4308,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["classnames", [\
+        ["npm:2.3.1", {\
+          "packageLocation": "./.yarn/cache/classnames-npm-2.3.1-f2ae0a8d3c-14db8889d5.zip/node_modules/classnames/",\
+          "packageDependencies": [\
+            ["classnames", "npm:2.3.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["clean-stack", [\
         ["npm:2.2.0", {\
           "packageLocation": "./.yarn/cache/clean-stack-npm-2.2.0-a8ce435a5c-2ac8cd2b2f.zip/node_modules/clean-stack/",\
@@ -4144,6 +4334,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["string-width", "npm:4.2.3"],\
             ["strip-ansi", "npm:6.0.1"],\
             ["wrap-ansi", "npm:6.2.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:7.0.4", {\
+          "packageLocation": "./.yarn/cache/cliui-npm-7.0.4-d6b8a9edb6-ce2e8f578a.zip/node_modules/cliui/",\
+          "packageDependencies": [\
+            ["cliui", "npm:7.0.4"],\
+            ["string-width", "npm:4.2.3"],\
+            ["strip-ansi", "npm:6.0.1"],\
+            ["wrap-ansi", "npm:7.0.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4253,6 +4453,24 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/concat-map-npm-0.0.1-85a921b7ee-902a9f5d89.zip/node_modules/concat-map/",\
           "packageDependencies": [\
             ["concat-map", "npm:0.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["concurrently", [\
+        ["npm:7.2.1", {\
+          "packageLocation": "./.yarn/cache/concurrently-npm-7.2.1-ba3d6059c9-384e9f48f2.zip/node_modules/concurrently/",\
+          "packageDependencies": [\
+            ["concurrently", "npm:7.2.1"],\
+            ["chalk", "npm:4.1.2"],\
+            ["date-fns", "npm:2.28.0"],\
+            ["lodash", "npm:4.17.21"],\
+            ["rxjs", "npm:6.6.7"],\
+            ["shell-quote", "npm:1.7.3"],\
+            ["spawn-command", "npm:0.0.2"],\
+            ["supports-color", "npm:8.1.1"],\
+            ["tree-kill", "npm:1.2.2"],\
+            ["yargs", "npm:17.5.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4369,6 +4587,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/dataloader-npm-2.1.0-d26357d865-bbd43496c4.zip/node_modules/dataloader/",\
           "packageDependencies": [\
             ["dataloader", "npm:2.1.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["date-fns", [\
+        ["npm:2.28.0", {\
+          "packageLocation": "./.yarn/cache/date-fns-npm-2.28.0-c19c5add1b-a0516b2e4f.zip/node_modules/date-fns/",\
+          "packageDependencies": [\
+            ["date-fns", "npm:2.28.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -5431,6 +5658,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["immutable", [\
+        ["npm:4.1.0", {\
+          "packageLocation": "./.yarn/cache/immutable-npm-4.1.0-f6635927b8-b9bc1f14fb.zip/node_modules/immutable/",\
+          "packageDependencies": [\
+            ["immutable", "npm:4.1.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["imurmurhash", [\
         ["npm:0.1.4", {\
           "packageLocation": "./.yarn/cache/imurmurhash-npm-0.1.4-610c5068a0-7cae75c8cd.zip/node_modules/imurmurhash/",\
@@ -5519,6 +5755,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/is-arrayish-npm-0.2.1-23927dfb15-eef4417e3c.zip/node_modules/is-arrayish/",\
           "packageDependencies": [\
             ["is-arrayish", "npm:0.2.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["is-binary-path", [\
+        ["npm:2.1.0", {\
+          "packageLocation": "./.yarn/cache/is-binary-path-npm-2.1.0-e61d46f557-84192eb88c.zip/node_modules/is-binary-path/",\
+          "packageDependencies": [\
+            ["is-binary-path", "npm:2.1.0"],\
+            ["binary-extensions", "npm:2.2.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -5967,6 +6213,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["locate-path", "npm:6.0.0"],\
             ["p-locate", "npm:5.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["lodash", [\
+        ["npm:4.17.21", {\
+          "packageLocation": "./.yarn/cache/lodash-npm-4.17.21-6382451519-eb835a2e51.zip/node_modules/lodash/",\
+          "packageDependencies": [\
+            ["lodash", "npm:4.17.21"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -6464,7 +6719,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["postcss", "npm:8.4.5"],\
             ["react", "npm:18.1.0"],\
             ["react-dom", "virtual:cfaeaae3fb89974e2647b0c9a91fe7a4ca70c33302633cb59e2c01d47de013a2d942e7355ceb0b71f93fbecc11dac53f8b3bc73bc3454689718734b10e9a7bc5#npm:18.1.0"],\
-            ["sass", null],\
+            ["sass", "npm:1.52.2"],\
             ["styled-jsx", "virtual:76bdb679161a313d8616d14badc932c5b610371c98b4e97f4cc6f5a84410adb5a9ec8cd0560cccd91feda5ca223eac9e7b9f56df8f1c6e68be1074c17dae07b3#npm:5.0.2"]\
           ],\
           "packagePeers": [\
@@ -7181,6 +7436,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["readdirp", [\
+        ["npm:3.6.0", {\
+          "packageLocation": "./.yarn/cache/readdirp-npm-3.6.0-f950cc74ab-1ced032e6e.zip/node_modules/readdirp/",\
+          "packageDependencies": [\
+            ["readdirp", "npm:3.6.0"],\
+            ["picomatch", "npm:2.3.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["redent", [\
         ["npm:3.0.0", {\
           "packageLocation": "./.yarn/cache/redent-npm-3.0.0-31892f4906-fa1ef20404.zip/node_modules/redent/",\
@@ -7428,6 +7693,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["rxjs", [\
+        ["npm:6.6.7", {\
+          "packageLocation": "./.yarn/cache/rxjs-npm-6.6.7-055046ea3c-bc334edef1.zip/node_modules/rxjs/",\
+          "packageDependencies": [\
+            ["rxjs", "npm:6.6.7"],\
+            ["tslib", "npm:1.14.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["safe-buffer", [\
         ["npm:5.1.2", {\
           "packageLocation": "./.yarn/cache/safe-buffer-npm-5.1.2-c27fedf6c4-f2f1f7943c.zip/node_modules/safe-buffer/",\
@@ -7459,6 +7734,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/safer-buffer-npm-2.1.2-8d5c0b705e-cab8f25ae6.zip/node_modules/safer-buffer/",\
           "packageDependencies": [\
             ["safer-buffer", "npm:2.1.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["sass", [\
+        ["npm:1.52.2", {\
+          "packageLocation": "./.yarn/cache/sass-npm-1.52.2-ad4574e1be-d5efcbad4b.zip/node_modules/sass/",\
+          "packageDependencies": [\
+            ["sass", "npm:1.52.2"],\
+            ["chokidar", "npm:3.5.3"],\
+            ["immutable", "npm:4.1.0"],\
+            ["source-map-js", "npm:1.0.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -7552,6 +7839,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/shebang-regex-npm-1.0.0-c3612b74e9-404c5a752c.zip/node_modules/shebang-regex/",\
           "packageDependencies": [\
             ["shebang-regex", "npm:1.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["shell-quote", [\
+        ["npm:1.7.3", {\
+          "packageLocation": "./.yarn/cache/shell-quote-npm-1.7.3-76a78a6d77-aca58e73a3.zip/node_modules/shell-quote/",\
+          "packageDependencies": [\
+            ["shell-quote", "npm:1.7.3"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -7738,6 +8034,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/sourcemap-codec-npm-1.4.8-3a1a9e60b1-b57981c056.zip/node_modules/sourcemap-codec/",\
           "packageDependencies": [\
             ["sourcemap-codec", "npm:1.4.8"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["spawn-command", [\
+        ["npm:0.0.2", {\
+          "packageLocation": "./.yarn/cache/spawn-command-npm-0.0.2-014d4d5d9f-e35c5d2817.zip/node_modules/spawn-command/",\
+          "packageDependencies": [\
+            ["spawn-command", "npm:0.0.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -7949,6 +8254,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["has-flag", "npm:4.0.0"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:8.1.1", {\
+          "packageLocation": "./.yarn/cache/supports-color-npm-8.1.1-289e937149-c052193a7e.zip/node_modules/supports-color/",\
+          "packageDependencies": [\
+            ["supports-color", "npm:8.1.1"],\
+            ["has-flag", "npm:4.0.0"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["supports-preserve-symlinks-flag", [\
@@ -8084,11 +8397,29 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["tree-kill", [\
+        ["npm:1.2.2", {\
+          "packageLocation": "./.yarn/cache/tree-kill-npm-1.2.2-3da0e5a759-49117f5f41.zip/node_modules/tree-kill/",\
+          "packageDependencies": [\
+            ["tree-kill", "npm:1.2.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["trim-newlines", [\
         ["npm:3.0.1", {\
           "packageLocation": "./.yarn/cache/trim-newlines-npm-3.0.1-22f1f216de-b530f3fadf.zip/node_modules/trim-newlines/",\
           "packageDependencies": [\
             ["trim-newlines", "npm:3.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["tslib", [\
+        ["npm:1.14.1", {\
+          "packageLocation": "./.yarn/cache/tslib-npm-1.14.1-102499115e-dbe628ef87.zip/node_modules/tslib/",\
+          "packageDependencies": [\
+            ["tslib", "npm:1.14.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -8132,10 +8463,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["typescript", [\
-        ["patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=bda367", {\
-          "packageLocation": "./.yarn/cache/typescript-patch-044c37f428-1cb434fbc6.zip/node_modules/typescript/",\
+        ["patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=7ad353", {\
+          "packageLocation": "./.yarn/cache/typescript-patch-e50fdcf519-1cb434fbc6.zip/node_modules/typescript/",\
           "packageDependencies": [\
-            ["typescript", "patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=bda367"]\
+            ["typescript", "patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=7ad353"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -8419,6 +8750,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["strip-ansi", "npm:6.0.1"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:7.0.0", {\
+          "packageLocation": "./.yarn/cache/wrap-ansi-npm-7.0.0-ad6e1a0554-a790b846fd.zip/node_modules/wrap-ansi/",\
+          "packageDependencies": [\
+            ["wrap-ansi", "npm:7.0.0"],\
+            ["ansi-styles", "npm:4.3.0"],\
+            ["string-width", "npm:4.2.3"],\
+            ["strip-ansi", "npm:6.0.1"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["wrappy", [\
@@ -8435,6 +8776,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/y18n-npm-4.0.3-ced95acdbc-014dfcd9b5.zip/node_modules/y18n/",\
           "packageDependencies": [\
             ["y18n", "npm:4.0.3"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:5.0.8", {\
+          "packageLocation": "./.yarn/cache/y18n-npm-5.0.8-5f3a0a7e62-54f0fb9562.zip/node_modules/y18n/",\
+          "packageDependencies": [\
+            ["y18n", "npm:5.0.8"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -8473,6 +8821,20 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["yargs-parser", "npm:18.1.3"]\
           ],\
           "linkType": "HARD"\
+        }],\
+        ["npm:17.5.1", {\
+          "packageLocation": "./.yarn/cache/yargs-npm-17.5.1-0902fa46de-00d58a2c05.zip/node_modules/yargs/",\
+          "packageDependencies": [\
+            ["yargs", "npm:17.5.1"],\
+            ["cliui", "npm:7.0.4"],\
+            ["escalade", "npm:3.1.1"],\
+            ["get-caller-file", "npm:2.0.5"],\
+            ["require-directory", "npm:2.1.1"],\
+            ["string-width", "npm:4.2.3"],\
+            ["y18n", "npm:5.0.8"],\
+            ["yargs-parser", "npm:21.0.1"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["yargs-parser", [\
@@ -8482,6 +8844,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["yargs-parser", "npm:18.1.3"],\
             ["camelcase", "npm:5.3.1"],\
             ["decamelize", "npm:1.2.0"]\
+          ],\
+          "linkType": "HARD"\
+        }],\
+        ["npm:21.0.1", {\
+          "packageLocation": "./.yarn/cache/yargs-parser-npm-21.0.1-b778fd3462-c3ea2ed12c.zip/node_modules/yargs-parser/",\
+          "packageDependencies": [\
+            ["yargs-parser", "npm:21.0.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -12424,9 +12793,13 @@ function patchFs(patchedFs, fakeFs) {
     }
   }
   {
-    patchedFs.read[nodeUtils.promisify.custom] = async (p, buffer, ...args) => {
-      const res = fakeFs.readPromise(p, buffer, ...args);
+    patchedFs.read[nodeUtils.promisify.custom] = async (fd, buffer, ...args) => {
+      const res = fakeFs.readPromise(fd, buffer, ...args);
       return {bytesRead: await res, buffer};
+    };
+    patchedFs.write[nodeUtils.promisify.custom] = async (fd, buffer, ...args) => {
+      const res = fakeFs.writePromise(fd, buffer, ...args);
+      return {bytesWritten: await res, buffer};
     };
   }
 }
@@ -16883,11 +17256,11 @@ Require stack:
     }
     originalExtensionJSFunction.call(this, module, filename);
   };
-  const originalEmitWarning = process.emitWarning;
-  process.emitWarning = function(warning, name, ctor) {
-    if (name === `ExperimentalWarning` && typeof warning === `string` && warning.includes(`--experimental-loader`))
-      return;
-    originalEmitWarning.apply(process, arguments);
+  const originalEmit = process.emit;
+  process.emit = function(name, data, ...args) {
+    if (name === `warning` && typeof data === `object` && data.name === `ExperimentalWarning` && (data.message.includes(`--experimental-loader`) || data.message.includes(`Custom ESM Loaders is an experimental feature`)))
+      return false;
+    return originalEmit.apply(process, arguments);
   };
   patchFs(fs__default.default, new PosixFS(opts.fakeFs));
 }

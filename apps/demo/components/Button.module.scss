@@ -1,0 +1,40 @@
+.button {
+  display: inline-flex;
+  position: relative;
+  background: #00cec9;
+  color: #2d3436;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 3px;
+
+  &.disabled {
+    background-color: #b2bec3;
+    cursor: not-allowed;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.25);
+    opacity: 0;
+
+    transition: 0.15s ease-in-out;
+    transition-property: opacity;
+  }
+
+  &:not(.disabled):hover {
+    cursor: pointer;
+
+    &:after {
+      opacity: 1;
+    }
+  }
+}

@@ -1,0 +1,21 @@
+.header {
+  font-size: 30px;
+  margin: 0;
+}
+
+.buttons {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.providers,
+.providerInfo {
+  margin-top: 50px;
+}
+
+.providersOptions {
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  gap: 10px;
+}

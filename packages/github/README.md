@@ -48,7 +48,7 @@ import { Redirect } from '@salte-auth/redirect';
 const auth = new SalteAuth({
   providers: [
     new GitHub({
-      clientID: '12345'
+      clientID: 'b44780ca7678681180c9'
     })
   ],
 

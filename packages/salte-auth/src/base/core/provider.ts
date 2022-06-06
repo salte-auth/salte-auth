@@ -53,11 +53,8 @@ export class Provider extends Shared {
   /**
    * Returns the logout url for the provider.
    */
-  public get logout(): string {
-    throw new SalteAuthError({
-      code: 'logout_not_supported',
-      message: `This provider doesn't support logout.`,
-    });
+  public get logout(): string|null {
+    return null;
   }
 }
 

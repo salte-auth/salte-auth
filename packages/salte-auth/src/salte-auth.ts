@@ -177,6 +177,13 @@ export class SalteAuth extends Shared {
 
     const provider = this.provider(normalizedOptions.provider);
 
+    if (!provider.logout) {
+      throw new SalteAuthError({
+        code: 'logout_not_supported',
+        message: `This provider doesn't support logout.`,
+      });
+    }
+
     return provider.dedupe('logout', async () => {
       try {
         const handler = this.handler(normalizedOptions.handler);

@@ -1946,43 +1946,43 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@salte-auth/auth0@workspace:packages/auth0":
+"@salte-auth/auth0@*, @salte-auth/auth0@workspace:packages/auth0":
   version: 0.0.0-use.local
   resolution: "@salte-auth/auth0@workspace:packages/auth0"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
-"@salte-auth/azure@workspace:packages/azure":
+"@salte-auth/azure@*, @salte-auth/azure@workspace:packages/azure":
   version: 0.0.0-use.local
   resolution: "@salte-auth/azure@workspace:packages/azure"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
-"@salte-auth/bitbucket@workspace:packages/bitbucket":
+"@salte-auth/bitbucket@*, @salte-auth/bitbucket@workspace:packages/bitbucket":
   version: 0.0.0-use.local
   resolution: "@salte-auth/bitbucket@workspace:packages/bitbucket"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
-"@salte-auth/cognito@workspace:packages/cognito":
+"@salte-auth/cognito@*, @salte-auth/cognito@workspace:packages/cognito":
   version: 0.0.0-use.local
   resolution: "@salte-auth/cognito@workspace:packages/cognito"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
@@ -1991,64 +1991,76 @@ __metadata:
   resolution: "@salte-auth/demo@workspace:apps/demo"
   dependencies:
     "@preconstruct/next": ^4.0.0
-    "@salte-auth/redirect": ^3.0.0
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/auth0": "*"
+    "@salte-auth/azure": "*"
+    "@salte-auth/bitbucket": "*"
+    "@salte-auth/cognito": "*"
+    "@salte-auth/discord": "*"
+    "@salte-auth/facebook": "*"
+    "@salte-auth/github": "*"
+    "@salte-auth/gitlab": "*"
+    "@salte-auth/google": "*"
+    "@salte-auth/okta": "*"
+    "@salte-auth/redirect": "*"
+    "@salte-auth/salte-auth": "*"
     "@types/node": ^17.0.31
     "@types/react": ^18.0.8
+    classnames: ^2.3.1
     next: ^12.1.6
     react: ^18.1.0
     react-dom: ^18.1.0
+    sass: ^1.52.2
     typescript: ^4.6.4
   languageName: unknown
   linkType: soft
 
-"@salte-auth/discord@workspace:packages/discord":
+"@salte-auth/discord@*, @salte-auth/discord@workspace:packages/discord":
   version: 0.0.0-use.local
   resolution: "@salte-auth/discord@workspace:packages/discord"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
-"@salte-auth/facebook@workspace:packages/facebook":
+"@salte-auth/facebook@*, @salte-auth/facebook@workspace:packages/facebook":
   version: 0.0.0-use.local
   resolution: "@salte-auth/facebook@workspace:packages/facebook"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
-"@salte-auth/github@workspace:packages/github":
+"@salte-auth/github@*, @salte-auth/github@workspace:packages/github":
   version: 0.0.0-use.local
   resolution: "@salte-auth/github@workspace:packages/github"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
-"@salte-auth/gitlab@workspace:packages/gitlab":
+"@salte-auth/gitlab@*, @salte-auth/gitlab@workspace:packages/gitlab":
   version: 0.0.0-use.local
   resolution: "@salte-auth/gitlab@workspace:packages/gitlab"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
-"@salte-auth/google@workspace:packages/google":
+"@salte-auth/google@*, @salte-auth/google@workspace:packages/google":
   version: 0.0.0-use.local
   resolution: "@salte-auth/google@workspace:packages/google"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
@@ -2056,19 +2068,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salte-auth/iframe@workspace:packages/iframe"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
-"@salte-auth/okta@workspace:packages/okta":
+"@salte-auth/okta@*, @salte-auth/okta@workspace:packages/okta":
   version: 0.0.0-use.local
   resolution: "@salte-auth/okta@workspace:packages/okta"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
@@ -2076,19 +2088,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salte-auth/popup@workspace:packages/popup"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
-"@salte-auth/redirect@^3.0.0, @salte-auth/redirect@workspace:packages/redirect":
+"@salte-auth/redirect@*, @salte-auth/redirect@workspace:packages/redirect":
   version: 0.0.0-use.local
   resolution: "@salte-auth/redirect@workspace:packages/redirect"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
@@ -2106,11 +2118,12 @@ __metadata:
     "@changesets/cli": ^2.22.0
     "@manypkg/cli": ^0.19.1
     "@preconstruct/cli": ^2.1.5
+    concurrently: ^7.2.1
     typescript: ^4.6.4
   languageName: unknown
   linkType: soft
 
-"@salte-auth/salte-auth@^3.0.0, @salte-auth/salte-auth@workspace:packages/salte-auth":
+"@salte-auth/salte-auth@*, @salte-auth/salte-auth@^3.1.0, @salte-auth/salte-auth@workspace:packages/salte-auth":
   version: 0.0.0-use.local
   resolution: "@salte-auth/salte-auth@workspace:packages/salte-auth"
   dependencies:
@@ -2123,9 +2136,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salte-auth/tab@workspace:packages/tab"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
@@ -2133,9 +2146,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@salte-auth/wso2@workspace:packages/wso2"
   dependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   peerDependencies:
-    "@salte-auth/salte-auth": ^3.0.0
+    "@salte-auth/salte-auth": ^3.1.0
   languageName: unknown
   linkType: soft
 
@@ -2367,6 +2380,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"anymatch@npm:~3.1.2":
+  version: 3.1.2
+  resolution: "anymatch@npm:3.1.2"
+  dependencies:
+    normalize-path: ^3.0.0
+    picomatch: ^2.0.4
+  checksum: 985163db2292fac9e5a1e072bf99f1b5baccf196e4de25a0b0b81865ebddeb3b3eb4480734ef0a2ac8c002845396b91aa89121f5b84f93981a4658164a9ec6e9
+  languageName: node
+  linkType: hard
+
 "aproba@npm:^1.0.3 || ^2.0.0":
   version: 2.0.0
   resolution: "aproba@npm:2.0.0"
@@ -2550,6 +2573,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"binary-extensions@npm:^2.0.0":
+  version: 2.2.0
+  resolution: "binary-extensions@npm:2.2.0"
+  checksum: ccd267956c58d2315f5d3ea6757cf09863c5fc703e50fbeb13a7dc849b812ef76e3cf9ca8f35a0c48498776a7478d7b4a0418e1e2b8cb9cb9731f2922aaad7f8
+  languageName: node
+  linkType: hard
+
 "brace-expansion@npm:^1.1.7":
   version: 1.1.11
   resolution: "brace-expansion@npm:1.1.11"
@@ -2587,7 +2617,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"braces@npm:^3.0.2":
+"braces@npm:^3.0.2, braces@npm:~3.0.2":
   version: 3.0.2
   resolution: "braces@npm:3.0.2"
   dependencies:
@@ -2779,6 +2809,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chokidar@npm:>=3.0.0 <4.0.0":
+  version: 3.5.3
+  resolution: "chokidar@npm:3.5.3"
+  dependencies:
+    anymatch: ~3.1.2
+    braces: ~3.0.2
+    fsevents: ~2.3.2
+    glob-parent: ~5.1.2
+    is-binary-path: ~2.1.0
+    is-glob: ~4.0.1
+    normalize-path: ~3.0.0
+    readdirp: ~3.6.0
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  checksum: b49fcde40176ba007ff361b198a2d35df60d9bb2a5aab228279eb810feae9294a6b4649ab15981304447afe1e6ffbf4788ad5db77235dc770ab777c6e771980c
+  languageName: node
+  linkType: hard
+
 "chownr@npm:^2.0.0":
   version: 2.0.0
   resolution: "chownr@npm:2.0.0"
@@ -2812,6 +2861,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"classnames@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "classnames@npm:2.3.1"
+  checksum: 14db8889d56c267a591f08b0834989fe542d47fac659af5a539e110cc4266694e8de86e4e3bbd271157dbd831361310a8293e0167141e80b0f03a0f175c80960
+  languageName: node
+  linkType: hard
+
 "clean-stack@npm:^2.0.0":
   version: 2.2.0
   resolution: "clean-stack@npm:2.2.0"
@@ -2827,6 +2883,17 @@ __metadata:
     strip-ansi: ^6.0.0
     wrap-ansi: ^6.2.0
   checksum: 4fcfd26d292c9f00238117f39fc797608292ae36bac2168cfee4c85923817d0607fe21b3329a8621e01aedf512c99b7eaa60e363a671ffd378df6649fb48ae42
+  languageName: node
+  linkType: hard
+
+"cliui@npm:^7.0.2":
+  version: 7.0.4
+  resolution: "cliui@npm:7.0.4"
+  dependencies:
+    string-width: ^4.2.0
+    strip-ansi: ^6.0.0
+    wrap-ansi: ^7.0.0
+  checksum: ce2e8f578a4813806788ac399b9e866297740eecd4ad1823c27fd344d78b22c5f8597d548adbcc46f0573e43e21e751f39446c5a5e804a12aace402b7a315d7f
   languageName: node
   linkType: hard
 
@@ -2925,6 +2992,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"concurrently@npm:^7.2.1":
+  version: 7.2.1
+  resolution: "concurrently@npm:7.2.1"
+  dependencies:
+    chalk: ^4.1.0
+    date-fns: ^2.16.1
+    lodash: ^4.17.21
+    rxjs: ^6.6.3
+    shell-quote: ^1.7.3
+    spawn-command: ^0.0.2-1
+    supports-color: ^8.1.0
+    tree-kill: ^1.2.2
+    yargs: ^17.3.1
+  bin:
+    concurrently: dist/bin/concurrently.js
+  checksum: 384e9f48f2c53a7c46b1bb1143b9dba734953c587e0c080db0c6e71dd4a58f556d096fe4fd9d2d9c601ba7ae8e6c06d452c162bbc2b6a4b16c080c1c4b8e81b4
+  languageName: node
+  linkType: hard
+
 "console-control-strings@npm:^1.1.0":
   version: 1.1.0
   resolution: "console-control-strings@npm:1.1.0"
@@ -3020,6 +3106,13 @@ __metadata:
   version: 2.1.0
   resolution: "dataloader@npm:2.1.0"
   checksum: bbd43496c41697766f8611f60ed3bae437b450985499140b9603a2447c10d45975d3a0661caaebaa9750bc1bc9fd154676a314423294916c8b8ca1a59a08d139
+  languageName: node
+  linkType: hard
+
+"date-fns@npm:^2.16.1":
+  version: 2.28.0
+  resolution: "date-fns@npm:2.28.0"
+  checksum: a0516b2e4f99b8bffc6cc5193349f185f195398385bdcaf07f17c2c4a24473c99d933eb0018be4142a86a6d46cb0b06be6440ad874f15e795acbedd6fd727a1f
   languageName: node
   linkType: hard
 
@@ -3584,7 +3677,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-caller-file@npm:^2.0.1":
+"get-caller-file@npm:^2.0.1, get-caller-file@npm:^2.0.5":
   version: 2.0.5
   resolution: "get-caller-file@npm:2.0.5"
   checksum: b9769a836d2a98c3ee734a88ba712e62703f1df31b94b784762c433c27a386dd6029ff55c2a920c392e33657d80191edbf18c61487e198844844516f843496b9
@@ -3668,7 +3761,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob-parent@npm:^5.1.2":
+"glob-parent@npm:^5.1.2, glob-parent@npm:~5.1.2":
   version: 5.1.2
   resolution: "glob-parent@npm:5.1.2"
   dependencies:
@@ -3966,6 +4059,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"immutable@npm:^4.0.0":
+  version: 4.1.0
+  resolution: "immutable@npm:4.1.0"
+  checksum: b9bc1f14fb18eb382d48339c064b24a1f97ae4cf43102e0906c0a6e186a27afcd18b55ca4a0b63c98eefb58143e2b5ebc7755a5fb4da4a7ad84b7a6096ac5b13
+  languageName: node
+  linkType: hard
+
 "imurmurhash@npm:^0.1.4":
   version: 0.1.4
   resolution: "imurmurhash@npm:0.1.4"
@@ -4040,6 +4140,15 @@ __metadata:
   version: 0.2.1
   resolution: "is-arrayish@npm:0.2.1"
   checksum: eef4417e3c10e60e2c810b6084942b3ead455af16c4509959a27e490e7aee87cfb3f38e01bbde92220b528a0ee1a18d52b787e1458ee86174d8c7f0e58cd488f
+  languageName: node
+  linkType: hard
+
+"is-binary-path@npm:~2.1.0":
+  version: 2.1.0
+  resolution: "is-binary-path@npm:2.1.0"
+  dependencies:
+    binary-extensions: ^2.0.0
+  checksum: 84192eb88cff70d320426f35ecd63c3d6d495da9d805b19bc65b518984b7c0760280e57dbf119b7e9be6b161784a5a673ab2c6abe83abb5198a432232ad5b35c
   languageName: node
   linkType: hard
 
@@ -4183,7 +4292,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-glob@npm:^4.0.0, is-glob@npm:^4.0.1":
+"is-glob@npm:^4.0.0, is-glob@npm:^4.0.1, is-glob@npm:~4.0.1":
   version: 4.0.3
   resolution: "is-glob@npm:4.0.3"
   dependencies:
@@ -4485,6 +4594,13 @@ __metadata:
   version: 4.4.0
   resolution: "lodash.startcase@npm:4.4.0"
   checksum: c03a4a784aca653845fe09d0ef67c902b6e49288dc45f542a4ab345a9c406a6dc194c774423fa313ee7b06283950301c1221dd2a1d8ecb2dac8dfbb9ed5606b5
+  languageName: node
+  linkType: hard
+
+"lodash@npm:^4.17.21":
+  version: 4.17.21
+  resolution: "lodash@npm:4.17.21"
+  checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
   languageName: node
   linkType: hard
 
@@ -5015,7 +5131,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"normalize-path@npm:^3.0.0":
+"normalize-path@npm:^3.0.0, normalize-path@npm:~3.0.0":
   version: 3.0.0
   resolution: "normalize-path@npm:3.0.0"
   checksum: 88eeb4da891e10b1318c4b2476b6e2ecbeb5ff97d946815ffea7794c31a89017c70d7f34b3c2ebf23ef4e9fc9fb99f7dffe36da22011b5b5c6ffa34f4873ec20
@@ -5320,7 +5436,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"picomatch@npm:^2.2.2, picomatch@npm:^2.3.1":
+"picomatch@npm:^2.0.4, picomatch@npm:^2.2.1, picomatch@npm:^2.2.2, picomatch@npm:^2.3.1":
   version: 2.3.1
   resolution: "picomatch@npm:2.3.1"
   checksum: 050c865ce81119c4822c45d3c84f1ced46f93a0126febae20737bd05ca20589c564d6e9226977df859ed5e03dc73f02584a2b0faad36e896936238238b0446cf
@@ -5543,6 +5659,15 @@ __metadata:
     string_decoder: ^1.1.1
     util-deprecate: ^1.0.1
   checksum: d4ea81502d3799439bb955a3a5d1d808592cf3133350ed352aeaa499647858b27b1c4013984900238b0873ec8d0d8defce72469fb7a83e61d53f5ad61cb80dc8
+  languageName: node
+  linkType: hard
+
+"readdirp@npm:~3.6.0":
+  version: 3.6.0
+  resolution: "readdirp@npm:3.6.0"
+  dependencies:
+    picomatch: ^2.2.1
+  checksum: 1ced032e6e45670b6d7352d71d21ce7edf7b9b928494dcaba6f11fba63180d9da6cd7061ebc34175ffda6ff529f481818c962952004d273178acd70f7059b320
   languageName: node
   linkType: hard
 
@@ -5780,6 +5905,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rxjs@npm:^6.6.3":
+  version: 6.6.7
+  resolution: "rxjs@npm:6.6.7"
+  dependencies:
+    tslib: ^1.9.0
+  checksum: bc334edef1bb8bbf56590b0b25734ba0deaf8825b703256a93714308ea36dff8a11d25533671adf8e104e5e8f256aa6fdfe39b2e248cdbd7a5f90c260acbbd1b
+  languageName: node
+  linkType: hard
+
 "safe-buffer@npm:~5.1.1":
   version: 5.1.2
   resolution: "safe-buffer@npm:5.1.2"
@@ -5807,6 +5941,19 @@ __metadata:
   version: 2.1.2
   resolution: "safer-buffer@npm:2.1.2"
   checksum: cab8f25ae6f1434abee8d80023d7e72b598cf1327164ddab31003c51215526801e40b66c5e65d658a0af1e9d6478cadcb4c745f4bd6751f97d8644786c0978b0
+  languageName: node
+  linkType: hard
+
+"sass@npm:^1.52.2":
+  version: 1.52.2
+  resolution: "sass@npm:1.52.2"
+  dependencies:
+    chokidar: ">=3.0.0 <4.0.0"
+    immutable: ^4.0.0
+    source-map-js: ">=0.6.2 <2.0.0"
+  bin:
+    sass: sass.js
+  checksum: d5efcbad4bc2efe638cd12665f8aeedc20f4e6b1cd2454624334f9189e9ab8a73708241232f102f6f873ee56fb64d993a67ff23bf669da5c2cf7495412007739
   languageName: node
   linkType: hard
 
@@ -5899,6 +6046,13 @@ __metadata:
   version: 1.0.0
   resolution: "shebang-regex@npm:1.0.0"
   checksum: 404c5a752cd40f94591dfd9346da40a735a05139dac890ffc229afba610854d8799aaa52f87f7e0c94c5007f2c6af55bdcaeb584b56691926c5eaf41dc8f1372
+  languageName: node
+  linkType: hard
+
+"shell-quote@npm:^1.7.3":
+  version: 1.7.3
+  resolution: "shell-quote@npm:1.7.3"
+  checksum: aca58e73a3a5d933d02e0bdddedc53ee14f7c2ec264f97ac915b9d4482d077a38e422aa664631d60a672cd3cdb4054eb2e6c0303f54882453dacb6483e482d34
   languageName: node
   linkType: hard
 
@@ -6002,7 +6156,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map-js@npm:^1.0.1":
+"source-map-js@npm:>=0.6.2 <2.0.0, source-map-js@npm:^1.0.1":
   version: 1.0.2
   resolution: "source-map-js@npm:1.0.2"
   checksum: c049a7fc4deb9a7e9b481ae3d424cc793cb4845daa690bc5a05d428bf41bf231ced49b4cf0c9e77f9d42fdb3d20d6187619fc586605f5eabe995a316da8d377c
@@ -6066,6 +6220,13 @@ __metadata:
   version: 1.4.8
   resolution: "sourcemap-codec@npm:1.4.8"
   checksum: b57981c05611afef31605732b598ccf65124a9fcb03b833532659ac4d29ac0f7bfacbc0d6c5a28a03e84c7510e7e556d758d0bb57786e214660016fb94279316
+  languageName: node
+  linkType: hard
+
+"spawn-command@npm:^0.0.2-1":
+  version: 0.0.2
+  resolution: "spawn-command@npm:0.0.2"
+  checksum: e35c5d28177b4d461d33c88cc11f6f3a5079e2b132c11e1746453bbb7a0c0b8a634f07541a2a234fa4758239d88203b758def509161b651e81958894c0b4b64b
   languageName: node
   linkType: hard
 
@@ -6241,6 +6402,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"supports-color@npm:^8.1.0":
+  version: 8.1.1
+  resolution: "supports-color@npm:8.1.1"
+  dependencies:
+    has-flag: ^4.0.0
+  checksum: c052193a7e43c6cdc741eb7f378df605636e01ad434badf7324f17fb60c69a880d8d8fcdcb562cf94c2350e57b937d7425ab5b8326c67c2adc48f7c87c1db406
+  languageName: node
+  linkType: hard
+
 "supports-preserve-symlinks-flag@npm:^1.0.0":
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
@@ -6362,10 +6532,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tree-kill@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "tree-kill@npm:1.2.2"
+  bin:
+    tree-kill: cli.js
+  checksum: 49117f5f410d19c84b0464d29afb9642c863bc5ba40fcb9a245d474c6d5cc64d1b177a6e6713129eb346b40aebb9d4631d967517f9fbe8251c35b21b13cd96c7
+  languageName: node
+  linkType: hard
+
 "trim-newlines@npm:^3.0.0":
   version: 3.0.1
   resolution: "trim-newlines@npm:3.0.1"
   checksum: b530f3fadf78e570cf3c761fb74fef655beff6b0f84b29209bac6c9622db75ad1417f4a7b5d54c96605dcd72734ad44526fef9f396807b90839449eb543c6206
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^1.9.0":
+  version: 1.14.1
+  resolution: "tslib@npm:1.14.1"
+  checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
   languageName: node
   linkType: hard
 
@@ -6418,7 +6604,7 @@ __metadata:
 
 "typescript@patch:typescript@^4.6.4#~builtin<compat/typescript>":
   version: 4.6.4
-  resolution: "typescript@patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=bda367"
+  resolution: "typescript@patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=7ad353"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
@@ -6679,6 +6865,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"wrap-ansi@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "wrap-ansi@npm:7.0.0"
+  dependencies:
+    ansi-styles: ^4.0.0
+    string-width: ^4.1.0
+    strip-ansi: ^6.0.0
+  checksum: a790b846fd4505de962ba728a21aaeda189b8ee1c7568ca5e817d85930e06ef8d1689d49dbf0e881e8ef84436af3a88bc49115c2e2788d841ff1b8b5b51a608b
+  languageName: node
+  linkType: hard
+
 "wrappy@npm:1":
   version: 1.0.2
   resolution: "wrappy@npm:1.0.2"
@@ -6690,6 +6887,13 @@ __metadata:
   version: 4.0.3
   resolution: "y18n@npm:4.0.3"
   checksum: 014dfcd9b5f4105c3bb397c1c8c6429a9df004aa560964fb36732bfb999bfe83d45ae40aeda5b55d21b1ee53d8291580a32a756a443e064317953f08025b1aa4
+  languageName: node
+  linkType: hard
+
+"y18n@npm:^5.0.5":
+  version: 5.0.8
+  resolution: "y18n@npm:5.0.8"
+  checksum: 54f0fb95621ee60898a38c572c515659e51cc9d9f787fb109cef6fde4befbe1c4602dc999d30110feee37456ad0f1660fa2edcfde6a9a740f86a290999550d30
   languageName: node
   linkType: hard
 
@@ -6717,6 +6921,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"yargs-parser@npm:^21.0.0":
+  version: 21.0.1
+  resolution: "yargs-parser@npm:21.0.1"
+  checksum: c3ea2ed12cad0377ce3096b3f138df8267edf7b1aa7d710cd502fe16af417bafe4443dd71b28158c22fcd1be5dfd0e86319597e47badf42ff83815485887323a
+  languageName: node
+  linkType: hard
+
 "yargs@npm:^15.1.0":
   version: 15.4.1
   resolution: "yargs@npm:15.4.1"
@@ -6733,6 +6944,21 @@ __metadata:
     y18n: ^4.0.0
     yargs-parser: ^18.1.2
   checksum: 40b974f508d8aed28598087720e086ecd32a5fd3e945e95ea4457da04ee9bdb8bdd17fd91acff36dc5b7f0595a735929c514c40c402416bbb87c03f6fb782373
+  languageName: node
+  linkType: hard
+
+"yargs@npm:^17.3.1":
+  version: 17.5.1
+  resolution: "yargs@npm:17.5.1"
+  dependencies:
+    cliui: ^7.0.2
+    escalade: ^3.1.1
+    get-caller-file: ^2.0.5
+    require-directory: ^2.1.1
+    string-width: ^4.2.3
+    y18n: ^5.0.5
+    yargs-parser: ^21.0.0
+  checksum: 00d58a2c052937fa044834313f07910fd0a115dec5ee35919e857eeee3736b21a4eafa8264535800ba8bac312991ce785ecb8a51f4d2cc8c4676d865af1cfbde
   languageName: node
   linkType: hard
 
