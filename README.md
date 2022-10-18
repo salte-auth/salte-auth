@@ -1,3 +1,5 @@
+**NOTE: This repository is currently in maintenance mode and won't receive any new features!**
+
 <h2 align="center">
   <div>
     <a href="https://github.com/salte-auth/logos">
